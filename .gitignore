@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.ipynb_checkpoints
+.pytest_cache
+.mypy_cache
+.vscode/
+
+# macOS
+.DS_Store
+
+# IDE/Editor specific
+.idea/
+.vscode/
+.continue/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Logs and data
+*.log
+*.sqlite3
+*.db
+
+# Output files
+output_*.wav

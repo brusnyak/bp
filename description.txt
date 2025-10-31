@@ -1,0 +1,151 @@
+Bachelor Thesis Project Description: Real-Time Speech Translation in Online Conferences
+Project Title
+Real-Time Speech Translation in Online Conferences
+Overview
+This bachelor thesis develops a prototype system for real-time speech translation during online conferences, overcoming language barriers for seamless multilingual communication. The solution integrates cutting-edge speech-to-text (STT), machine translation (MT), and text-to-speech (TTS) technologies in a robust backend-focused implementation. Initial development and validation prioritize backend performance to achieve <10 seconds end-to-end latency. All components are free, open-source, and optimized for local execution on Mac M1 Pro using Apple Silicon MPS acceleration for efficient, dependency-aligned operation.
+Key Features and Technical Approach
+1. Voice Cloning for Natural, Personalized Synthesis
+
+Zero-shot voice cloning enabled via short reference audio (e.g., 5 seconds from test/Voice-Training.wav).
+Delivers personalized translated speech in the speaker's own voice, enhancing naturalness for conference settings.
+
+2. Dual-Model Text-to-Speech (TTS) System
+To optimize quality, speed, multilingual support, and Slovak presentation compatibility (via Czech proxy):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ModelRoleKey StrengthsLanguages (Relevant)Latency (M1 Pro)CloningChatterbox Multilingual (Default)High-quality primary outputZero-shot cloning, emotion control, SOTA naturalness23 langs (EN, PL; fine-tunable for CZ/SK)<200 msZero-shotPiperUltra-fast fallbackLightweight, native Czech voices30+ (incl. CZ)<200 msCustom training
+
+Chatterbox: Production-grade, supports fine-tuning for Czech/Slovak (pre-trained CZ model available). Currently facing `get_speaker_embedding` API issues and `torch` version conflicts, temporarily disabled.
+Piper: Instant switch for minimal latency; native Czech (cs) voices for accurate Slovak-like output. Requires manual download of model files.
+
+3. Best-in-Class Speech-to-Text (STT)
+
+Faster-Whisper: Currently facing MPS compatibility issues with `torch`. Switched to `mlx-whisper` as a faster and more compatible alternative for real-time streaming + VAD on Mac M1 Pro.
+
+4. Efficient Machine Translation (MT)
+
+NLLB-200-distilled: Quantized (int8/4-bit), MPS-accelerated for EN ↔ SK with minimal delay. Currently producing garbage output on MPS, indicating compatibility issues with `transformers` and `torch` on Apple Silicon. Re-evaluating strategy for MT.
+
+5. Multilingual Support
+
+Primary: English ↔ Slovak.
+Slovak TTS: Czech (CZ) proxy via Piper native or Chatterbox fine-tuned (community CZ model exists; easy SK adaptation).
+Extensible: Model-agnostic pipelines for 100+ languages.
+
+6. Low Latency Target
+
+<10s end-to-end via:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OptimizationBenefitStreaming inferencePartial results ASAPModel switchingChatterbox → PiperMPS + Quantization4–6× speedup2–3s audio chunksConference-realistic
+
+
+System Architecture
+Backend (Python/FastAPI/WebSockets): Core pipeline (STT → MT → TTS).
+Frontend (ui/): Simple HTML/JS/CSS for testing (live subs, audio I/O).
+Development and Testing Workflow (Backend-Focused)
+
+Setup: pip install chatterbox-tts piper-tts faster-whisper transformers torch[mps]. (Note: `faster-whisper` MPS compatibility with `torch` is being re-evaluated; `mlx-whisper` may require different setup.)
+Load Models: Quantized STT/MT/TTS with MPS.
+Voice Prep: Extract embeddings from reference WAV.
+Process: Stream input → Translate → Synthesize (dynamic model select).
+Test: Latency/accuracy in simulated conferences.
+
+Dependency Alignment: ✅ Perfect – Chatterbox (PyTorch/MPS), Piper (ONNX/C++), no conflicts. (Note: `mlx-whisper` dependencies will need to be integrated.)
+Production Version Considerations
+
+Blackhole 2ch input: Capture Zoom/Teams audio streams.
+Output: Virtual speakers or direct injection.
+
+User Interface (UI)
+
+ui/index.html: Record/upload, live display.
+ui/script.js: WebSocket backend comms.
+ui/style.css: Responsive demo-ready.
+
+Challenges & Solutions
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ChallengeSolutionSK/CZ TTSFine-tune Chatterbox (guides avail.); Piper CZ native.M1 Pro LatencyMPS opts., model switch, chunking.DependenciesUnified PyTorch/ONNX; tested installs. (Note: `mlx-whisper` integration will require careful dependency management.)Cloning SpeedZero-shot (Chatterbox); pre-train if needed.
+Fine-Tuning Chatterbox for SK/CZ: Straightforward via community scripts/HF models (e.g., Czech fine-tune exists). 1–2 hours on M1 Pro with ~10min SK dataset.
+
+Key Citations:
+
+Chatterbox GitHub
+Chatterbox Multilingual
+Piper GitHub
+HF Chatterbox-Czech
+M1 Chatterbox Opts
