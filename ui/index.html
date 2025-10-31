@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+    <title>Live Speech Translation</title>
+    <link rel="stylesheet" href="/ui/style.css" />
+  </head>
+  <body>
+    <div
+      class="container"
+      role="application"
+      aria-label="Live Speech Translation app"
+    >
+      <!-- Header -->
+      <div class="header">
+        <h1 aria-label="Live Speech Translation">🌐 Live Speech Translation</h1>
+        <p>Real-time translation with voice cloning</p>
+      </div>
+
+      <!-- Main Control Section (Minimized) -->
+      <div class="main-controls-minimized">
+        <div class="control-group">
+          <label for="inputLanguageSelect">Input Language:</label>
+          <select
+            id="inputLanguageSelect"
+            class="language-select"
+            title="Select Input Language"
+            aria-label="Select input language"
+          >
+            <option value="en" selected>English</option>
+            <option value="cs">Czech</option>
+            <option value="sk">Slovak</option>
+            <option value="de">German</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="ja">Japanese</option>
+            <option value="ko">Korean</option>
+            <option value="zh">Chinese</option>
+            <option value="ru">Russian</option>
+            <option value="ar">Arabic</option>
+            <option value="pt">Portuguese</option>
+            <option value="it">Italian</option>
+            <!-- Add more languages as needed -->
+          </select>
+        </div>
+        <div class="control-group">
+          <label for="outputLanguageSelect">Output Language:</label>
+          <select
+            id="outputLanguageSelect"
+            class="language-select"
+            title="Select Target Language"
+            aria-label="Select target language"
+          >
+            <option value="en">English</option>
+            <option value="cs" selected>Czech</option>
+            <option value="sk">Slovak</option>
+            <option value="de">German</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="ja">Japanese</option>
+            <option value="ko">Korean</option>
+            <option value="zh">Chinese</option>
+            <option value="ru">Russian</option>
+            <option value="ar">Arabic</option>
+            <option value="pt">Portuguese</option>
+            <option value="it">Italian</my>
+            <!-- Add more languages as needed -->
+          </select>
+        </div>
+        <div class="control-group">
+          <label for="ttsModelSelect">TTS Model:</label>
+          <select
+            id="ttsModelSelect"
+            class="model-select"
+            title="Select TTS Model"
+            aria-label="Select Text-to-Speech model"
+          >
+            <option value="chatterbox">Chatterbox</option>
+            <option value="cosyvoice">CosyVoice3</option>
+          </select>
+        </div>
+        <button id="initBtn" class="btn btn-init" aria-live="polite">
+          Initialize & Train Voice
+        </button>
+      </div>
+
+      <!-- Main content: Transcription and Translation (Initially hidden, shown after init) -->
+      <div class="content-main">
+        <div class="state-indicators" aria-hidden="true">
+          <div class="state-item" role="status" aria-live="polite">
+            <span
+              id="stateListening"
+              class="state-icon idle"
+              title="Listening"
+              aria-hidden="true"
+              >👂</span
+            >
+            <span class="state-label">Listening</span>
+          </div>
+          <div class="state-item" role="status" aria-live="polite">
+            <span
+              id="stateTranslating"
+              class="state-icon idle"
+              title="Translating"
+              aria-hidden="true"
+              >💬</span
+            >
+            <span class="state-label">Translating</span>
+          </div>
+          <div class="state-item" role="status" aria-live="polite">
+            <span
+              id="stateSpeaking"
+              class="state-icon idle"
+              title="Speaking"
+              aria-hidden="true"
+              >📢</span
+            >
+            <span class="state-label">Speaking</span>
+          </div>
+        </div>
+
+        <div
+          class="input-level-container"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          <label id="micLevelLabel">Mic Input Level:</label>
+          <div
+            class="input-level-bar-segments"
+            id="inputLevelSegments"
+            aria-labelledby="micLevelLabel"
+            role="img"
+            aria-label="Microphone input level"
+          >
+            <!-- Segments will be dynamically added/removed by JavaScript -->
+          </div>
+        </div>
+
+        <div class="content">
+          <!-- Left Column: Transcription -->
+          <div class="column transcription-column" aria-live="polite">
+            <div class="column-header">
+              <h2>📝 Transcription</h2>
+              <span
+                id="inputLanguageBadge"
+                class="language-badge"
+                aria-hidden="true"
+                >EN</span
+              >
+            </div>
+            <div
+              class="transcript-box"
+              id="transcriptionBox"
+              tabindex="0"
+              role="region"
+              aria-label="Transcription output"
+            >
+              <p class="placeholder">Waiting for speech...</p>
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="divider" aria-hidden="true"></div>
+
+          <!-- Right Column: Translation -->
+          <div class="column translation-column" aria-live="polite">
+            <div class="column-header">
+              <h2>🗣️ Translation</h2>
+              <span
+                id="outputLanguageBadge"
+                class="language-badge"
+                aria-hidden="true"
+                >CS</span
+              >
+            </div>
+            <div
+              class="transcript-box"
+              id="translationBox"
+              tabindex="0"
+              role="region"
+              aria-label="Translation output"
+            >
+              <p class="placeholder">Translation will appear here...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Metrics -->
+        <div class="metrics" role="status" aria-live="polite">
+          <div class="metric" aria-hidden="false">
+            <span class="metric-label">STT:</span>
+            <span class="metric-value" id="sttTime">0.0s</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">MT:</span>
+            <span class="metric-value" id="mtTime">0.0s</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">TTS:</span>
+            <span class="metric-value" id="ttsTime">0.0s</span>
+          </div>
+          <div class="metric">
+            <span class="metric-label">Total:</span>
+            <span class="metric-value" id="totalTime">0.0s</span>
+          </div>
+        </div>
+
+        <!-- Footer with controls -->
+        <div class="footer">
+          <button id="startBtn" class="btn btn-start" disabled>Start</button>
+          <button id="stopBtn" class="btn btn-stop" disabled>Stop</button>
+          <div class="status-indicator" aria-hidden="true">
+            <span
+              id="statusIndicator"
+              class="indicator off"
+              aria-hidden="true"
+            ></span>
+            <span id="statusLabel">Ready</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-status" role="status" aria-live="polite">
+        <span id="settingsStatusText" class="metric-value"></span>
+      </div>
+      <div
+        class="log-container"
+        role="log"
+        aria-live="polite"
+        aria-atomic="false"
+      >
+        <h3>Activity Log</h3>
+        <div id="activityLog" class="activity-log-box" tabindex="0">
+          <!-- Log messages will be appended here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Voice Training Modal -->
+    <div
+      id="voiceTrainingModal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalTitle"
+    >
+      <div class="modal-content">
+        <h2 id="modalTitle">Train and authorize speaker</h2>
+        <p>
+          Record the statement below to train your speaker and authorize its
+          use. For the best results, read with range in your voice and tone.
+        </p>
+        <div id="modalLoadingIndicator" class="loading-spinner"></div> <!-- New loading spinner -->
+        <p id="modalLoadingMessage" class="status-text">Waiting for models to preload...</p> <!-- New loading message -->
+        <div class="control-group">
+          <label for="modalInputLanguageSelect">Prompt Language:</label>
+          <select
+            id="modalInputLanguageSelect"
+            class="language-select"
+            title="Select Prompt Language"
+            aria-label="Select prompt language"
+          >
+            <option value="en" selected>English</option>
+            <option value="cs">Czech</option>
+            <option value="sk">Slovak</option>
+            <option value="de">German</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="ja">Japanese</option>
+            <option value="ko">Korean</option>
+            <option value="zh">Chinese</option>
+            <option value="ru">Russian</option>
+            <option value="ar">Arabic</option>
+            <option value="pt">Portuguese</option>
+            <option value="it">Italian</option>
+          </select>
+        </div>
+        <div
+          id="modalPhoneticPromptText"
+          class="prompt-text-box"
+          tabindex="0"
+          role="textbox"
+          aria-label="Phonetic prompt text to read"
+        >
+          <p class="placeholder">Generating prompt...</p>
+        </div>
+          <div
+            class="input-level-container hidden-initial"
+            id="modalMicLevelContainer"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+          <label id="modalMicLevelLabel">Mic Input Level:</label>
+          <div
+            class="input-level-bar-segments"
+            id="modalInputLevelSegments"
+            aria-labelledby="modalMicLevelLabel"
+            role="img"
+            aria-label="Microphone input level"
+          >
+            <!-- Segments will be dynamically added/removed by JavaScript -->
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button id="modalNotNowBtn" class="btn btn-secondary">Not now</button>
+          <div class="modal-actions-right">
+            <button id="modalRecordBtn" class="btn btn-secondary" disabled>Record</button>
+            <button id="modalChooseFileBtn" class="btn btn-primary" disabled>Choose a file</button>
+            <input
+              type="file"
+              id="modalReferenceAudioUpload"
+              accept="audio/*"
+              style="display: none"
+            />
+          </div>
+        </div>
+        <span id="modalReferenceAudioStatus" class="status-text"></span>
+        <span id="modalRecordingConfirmation" class="status-text"></span>
+      </div>
+    </div>
+
+    <script src="/ui/script.js"></script>
+  </body>
+</html>

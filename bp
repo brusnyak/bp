@@ -1,0 +1,12 @@
+Type of work:	Bachelor thesis
+Topic:	Preklad reči v reálnom čase počas online konferencie
+Title of topic in English:	Real Time Speech Translation in Online Conference
+Progress of registration:	approved
+State of topic:	approved (doc. Ing. Radoslav Vargic, PhD. - Study programme supervisor)
+Thesis supervisor:	I. Minárik
+Faculty:	Faculty of Electrical Engineering and Information Technology
+Supervising department:	Institute of Multimedia Information and Communication Technologies - FEI
+Max. no. of students:	1
+Academic year:	2024/2025
+Proposed by:	Ing. Ivan Minárik
+Summary:	Online konferencie často narážajú na jazykové bariéry medzi účastníkmi. Moderné technológie na rozpoznávanie, preklad a syntézu reči umožňujú tieto prekážky prekonávať. Cieľom práce je vytvoriť prototyp systému, ktorý zabezpečí preklad reči v reálnom čase medzi angličtinou a ďalším vybraným jazykom počas online stretnutí, s využitím dostupných nástrojov a so zameraním na backendové riešenie a overenie funkčnosti. Úlohy: 1. Preskúmajte existujúce technológie na rozpoznávanie reči, strojový preklad a syntézu reči pre angličtinu a vybraný cieľový jazyk. 2. Navrhnite architektúru a implementujte prototyp systému pre preklad reči v reálnom čase s využitím vhodných nástrojov (napr. Whisper, prekladové API, TTS). 3. Realizujte jednoduché používateľské rozhranie na testovanie prototypu (napríklad zobrazenie titulkov alebo prehrávanie syntetizovanej reči). 4. Otestujte funkčnosť riešenia a analyzujte presnosť a oneskorenie prekladu v typickom online konferenčnom prostredí.
