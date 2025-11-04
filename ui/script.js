@@ -1,937 +1,965 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // --- DOM Element References ---
-    const inputLanguageSelect = document.getElementById('inputLanguageSelect');
-    const outputLanguageSelect = document.getElementById('outputLanguageSelect');
-    const ttsModelSelect = document.getElementById('ttsModelSelect');
-    const initBtn = document.getElementById('initBtn');
+document.addEventListener("DOMContentLoaded", () => {
+  // --- DOM Element References ---
+  const initBtn = document.getElementById("initBtn");
+  const startBtn = document.getElementById("startBtn");
+  const stopBtn = document.getElementById("stopBtn");
+  const statusIndicator = document.getElementById("statusIndicator");
+  const statusLabel = document.getElementById("statusLabel");
+  const inputLevelSegmentsContainer =
+    document.getElementById("inputLevelSegments");
+  const NUM_LEVEL_SEGMENTS = 10;
+  let levelSegments = [];
+  const ttsModelSelect = document.getElementById("ttsModelSelect");
+  const inputLanguageSelect = document.getElementById("inputLanguageSelect");
+  const outputLanguageSelect = document.getElementById("outputLanguageSelect");
+  const inputLanguageBadge = document.getElementById("inputLanguageBadge");
+  const outputLanguageBadge = document.getElementById("outputLanguageBadge");
+  const transcriptionBox = document.getElementById("transcriptionBox");
+  const translationBox = document.getElementById("translationBox");
+  const stateListening = document.getElementById("stateListening");
+  const stateTranslating = document.getElementById("stateTranslating");
+  const stateSpeaking = document.getElementById("stateSpeaking");
+  const settingsStatusText = document.getElementById("settingsStatusText"); // Existing status text
+  const activityLog = document.getElementById("activityLog"); // New activity log container
 
-    // Main content elements (initially hidden)
-    const contentMain = document.querySelector('.content-main');
-    const stateListening = document.getElementById('stateListening');
-    const stateTranslating = document.getElementById('stateTranslating');
-    const stateSpeaking = document.getElementById('stateSpeaking');
-    const inputLevelSegmentsContainer = document.getElementById('inputLevelSegments');
-    const NUM_LEVEL_SEGMENTS = 20; // Increased for more reactivity
-    let levelSegments = [];
-    const inputLanguageBadge = document.getElementById('inputLanguageBadge');
-    const outputLanguageBadge = document.getElementById('outputLanguageBadge');
-    const transcriptionBox = document.getElementById('transcriptionBox');
-    const translationBox = document.getElementById('translationBox');
-    const sttTime = document.getElementById('sttTime');
-    const mtTime = document.getElementById('mtTime');
-    const ttsTime = document.getElementById('ttsTime');
-    const totalTime = document.getElementById('totalTime');
-    const startBtn = document.getElementById('startBtn');
-    const stopBtn = document.getElementById('stopBtn');
-    const statusIndicator = document.getElementById('statusIndicator');
-    const statusLabel = document.getElementById('statusLabel');
-    const settingsStatusText = document.getElementById('settingsStatusText');
-    const activityLog = document.getElementById('activityLog');
+  // --- Latency Metrics Elements ---
+  const inputToSttTime = document.getElementById("inputToSttTime");
+  const sttToMtTime = document.getElementById("sttToMtTime");
+  const mtToTtsTime = document.getElementById("mtToTtsTime");
+  const totalPipelineTime = document.getElementById("totalPipelineTime");
+  const totalE2ELatency = document.getElementById("totalE2ELatency");
 
-    // Modal elements
-    const voiceTrainingModal = document.getElementById('voiceTrainingModal');
-    const modalInputLanguageSelect = document.getElementById('modalInputLanguageSelect'); // New
-    const modalPhoneticPromptText = document.getElementById('modalPhoneticPromptText');
-    const modalNotNowBtn = document.getElementById('modalNotNowBtn');
-    const modalRecordBtn = document.getElementById('modalRecordBtn'); // New button
-    const modalRecordingConfirmation = document.getElementById('modalRecordingConfirmation'); // New element for confirmation
-    const modalChooseFileBtn = document.getElementById('modalChooseFileBtn'); // New button
-    const modalReferenceAudioUpload = document.getElementById('modalReferenceAudioUpload');
-    const modalReferenceAudioStatus = document.getElementById('modalReferenceAudioStatus');
-    const modalLoadingIndicator = document.getElementById('modalLoadingIndicator'); // New
-    const modalLoadingMessage = document.getElementById('modalLoadingMessage'); // New
-    const modalMicLevelContainer = document.getElementById('modalMicLevelContainer'); // New
-    const modalInputLevelSegmentsContainer = document.getElementById('modalInputLevelSegments'); // New
-    let modalLevelSegments = []; // New for modal mic level
+  // --- Latency Tracking State ---
+  let lastInputTimestamp = 0;
+  let sttReceivedTimestamp = 0;
+  let mtReceivedTimestamp = 0;
+  let ttsReceivedTimestamp = 0;
+  let playbackStartedTimestamp = 0;
+  let playbackQueue = []; // Queue for audio buffers
+  let isPlayingAudio = false; // Flag to manage sequential playback
+  let recordingStartTime = 0; // Absolute timestamp when recording starts for chart X-axis
+  let currentOutputChartIndex = -1; // Temporary storage for the chart index of the current audio segment
 
-    // --- Global State ---
-    let websocket = null;
-    let audioContext = null;
-    let mediaStream = null;
-    let audioProcessor = null;
-    let isInitialized = false;
-    let isRecording = false;
-    let isModalRecording = false; // New state for modal recording
-    let currentPhoneticPrompt = null; // Store the generated phonetic prompt for the modal
-    let referenceAudioBase64 = null; // Store base64 for reference audio from modal
-    let referenceAudioMimeType = null; // Store mime type for reference audio from modal
-    let modalAudioContext = null; // New AudioContext for modal recording
-    let modalAudioProcessor = null; // New AudioProcessor for modal recording
-    let modalMediaStream = null; // New MediaStream for modal recording
-    let modalEmaLevel = 0.0; // EMA for modal mic level
-    let modalCurrentWordIndex = 0; // Track current word for highlighting in modal
+  // Chart.js instance
+  let latencyChart = null; // Chart.js instance
+  let chartData = { // Data structure for the chart
+    labels: ["Input Speech", "Translated Speech"],
+    datasets: [],
+  };
 
-    // Build API / WS URLs using current page protocol and host (safer on dev vs prod)
-    const proto = window.location.protocol === 'https:' ? 'https' : 'http';
-    const wsProto = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const API_BASE_URL = `${proto}://${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}`;
-    const WS_URL = `${wsProto}://${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}/ws`;
-    const API_URL = `${API_BASE_URL}`;
+  // --- Global State ---
+  let websocket = null;
+  let audioContext = null;
+  let mediaStream = null;
+  let audioProcessor = null;
+  let isInitialized = false;
+  let isRecording = false;
+  let blackHoleOutputDeviceId = null; // Store BlackHole device ID for output routing
 
-    // Initialize main UI level segments
-    for (let i = 0; i < NUM_LEVEL_SEGMENTS; i++) {
-        const segment = document.createElement('div');
-        segment.classList.add('level-segment');
-        inputLevelSegmentsContainer.appendChild(segment);
-        levelSegments.push(segment);
+  // Build API / WS URLs using current page protocol and host (safer on dev vs prod)
+  const proto = window.location.protocol === "https:" ? "https" : "http";
+  const wsProto = window.location.protocol === "https:" ? "wss" : "ws";
+  const API_BASE_URL = `${proto}://${window.location.hostname}${window.location.port ? ":" + window.location.port : ""}`;
+  const WS_URL = `${wsProto}://${window.location.hostname}${window.location.port ? ":" + window.location.port : ""}/ws`;
+  const API_URL = `${API_BASE_URL}`;
+
+  // Initialize level segments
+  for (let i = 0; i < NUM_LEVEL_SEGMENTS; i++) {
+    const segment = document.createElement("div");
+    segment.classList.add("level-segment");
+    inputLevelSegmentsContainer.appendChild(segment);
+    levelSegments.push(segment);
+  }
+
+  const SAMPLE_RATE = 16000;
+
+  // --- Input level smoothing state ----
+  let emaLevel = 0.0; // exponential moving average for smoothing
+  const EMA_ALPHA = 0.3; // Increased for more responsiveness
+
+  // --- Throttle state for debug logs (avoid spamming console) ---
+  let lastLogAt = 0;
+  const LOG_THROTTLE_MS = 1000; // log at most once per second
+
+  // --- Utility Functions ---
+  function updateStatus(indicatorClass, labelText) {
+    statusIndicator.className = `indicator ${indicatorClass}`;
+    statusLabel.textContent = labelText;
+  }
+
+  function updateStateIcon(element, isActive) {
+    if (isActive) {
+      element.classList.remove("idle");
+      element.classList.add("active");
+    } else {
+      element.classList.remove("active");
+      element.classList.add("idle");
     }
+  }
 
-    // Initialize modal UI level segments
-    for (let i = 0; i < NUM_LEVEL_SEGMENTS; i++) {
-        const segment = document.createElement('div');
-        segment.classList.add('level-segment');
-        modalInputLevelSegmentsContainer.appendChild(segment);
-        modalLevelSegments.push(segment);
-    }
+  function setInputLevel(level) {
+    // Expect 'level' to be a 0..1 RMS-like magnitude (server-side should send RMS or average absolute)
+    // Apply sqrt to approximate perceptual loudness, then EMA smoothing
+    const scaled = Math.sqrt(Math.min(1, Math.max(0, level)));
+    emaLevel = emaLevel * (1 - EMA_ALPHA) + scaled * EMA_ALPHA;
 
-    const SAMPLE_RATE = 16000;
-    const BUFFER_SIZE = 4096;
+    const normalizedLevel = Math.min(1, Math.max(0, emaLevel));
+    const activeSegments = Math.ceil(normalizedLevel * NUM_LEVEL_SEGMENTS);
 
-    // --- Input level smoothing state ----
-    let emaLevel = 0.0; // exponential moving average for smoothing
-    const EMA_ALPHA = 0.5; // Increased for more responsiveness
+    levelSegments.forEach((segment, index) => {
+      if (index < activeSegments) {
+        segment.classList.add("active");
 
-    // --- Throttle state for debug logs (avoid spamming console) ---
-    let lastLogAt = 0;
-    const LOG_THROTTLE_MS = 1000; // log at most once per second
-
-    // --- Utility Functions ---
-    function updateStatus(indicatorClass, labelText) {
-        statusIndicator.className = `indicator ${indicatorClass}`;
-        statusLabel.textContent = labelText;
-    }
-
-    function updateStateIcon(element, isActive) {
-        if (isActive) {
-            element.classList.remove('idle');
-            element.classList.add('active');
+        // style classes for medium/high ranges
+        if (normalizedLevel > 0.7) {
+          segment.classList.add("high");
+          segment.classList.remove("medium");
+        } else if (normalizedLevel > 0.3) {
+          segment.classList.add("medium");
+          segment.classList.remove("high");
         } else {
-            element.classList.remove('active');
-            element.classList.add('idle');
+          segment.classList.remove("medium", "high");
         }
+      } else {
+        segment.classList.remove("active", "medium", "high");
+      }
+    });
+  }
+
+  function resetUI() {
+    if (transcriptionBox)
+      transcriptionBox.innerHTML = '<p class="placeholder">Waiting for speech...</p>';
+    if (translationBox)
+      translationBox.innerHTML = '<p class="placeholder">Translation will appear here...</p>';
+    emaLevel = 0;
+    setInputLevel(0);
+    updateStateIcon(stateListening, false);
+    updateStateIcon(stateTranslating, false);
+    updateStateIcon(stateSpeaking, false);
+    if (settingsStatusText) settingsStatusText.textContent = ""; // Clear existing status text
+    if (activityLog) activityLog.innerHTML = ""; // Clear activity log
+
+    // Reset latency metrics
+    if (inputToSttTime) inputToSttTime.textContent = "0.0s";
+    if (sttToMtTime) sttToMtTime.textContent = "0.0s";
+    if (ttsToPlaybackTime) ttsToPlaybackTime.textContent = "0.0s";
+    if (totalPipelineTime) totalPipelineTime.textContent = "0.0s";
+    if (totalE2ELatency) totalE2ELatency.textContent = "0.0s";
+
+    // Reset latency tracking state
+    lastInputTimestamp = 0;
+    sttReceivedTimestamp = 0;
+    mtReceivedTimestamp = 0;
+    ttsReceivedTimestamp = 0;
+    playbackStartedTimestamp = 0;
+
+    // Clear playback queue
+    playbackQueue = [];
+    isPlayingAudio = false;
+
+    // Reset chart data
+    if (latencyChart) {
+      chartData.datasets = [
+        {
+          label: "Input Speech",
+          data: [],
+          backgroundColor: "rgba(233, 69, 96, 0.6)", // Red
+          borderColor: "rgba(233, 69, 96, 1)",
+          borderWidth: 2, // 2px line
+          type: 'scatter', // Use scatter for custom drawing
+          pointRadius: 0, // No points
+          yAxisID: 'y',
+        },
+        {
+          label: "Translated Speech",
+          data: [],
+          backgroundColor: "rgba(15, 52, 96, 0.6)", // Blue
+          borderColor: "rgba(15, 52, 96, 1)",
+          borderWidth: 2, // 2px line
+          type: 'scatter', // Use scatter for custom drawing
+          pointRadius: 0, // No points
+          yAxisID: 'y',
+        },
+      ];
+      latencyChart.options.scales.x.max = 300; // Reset max X-axis to 5 minutes
+      latencyChart.options.scales.x.min = 0; // Ensure min X-axis is reset to 0
+      latencyChart.update();
+    }
+  }
+
+  function appendLog(message, type = "info") {
+    const timestamp = new Date().toLocaleTimeString();
+    const logEntry = document.createElement("p");
+    logEntry.classList.add("log-entry", `log-${type}`);
+    logEntry.innerHTML = `[${escapeHtml(message)}]`;
+    activityLog.prepend(logEntry); // Add to top
+    // Optional: Limit log entries to prevent UI clutter
+    while (activityLog.children.length > 50) {
+      activityLog.removeChild(activityLog.lastChild);
+    }
+  }
+
+  // --- WebSocket Handling ---
+  function connectWebSocket() {
+    try {
+      websocket = new WebSocket(WS_URL);
+    } catch (err) {
+      settingsStatusText.textContent = `Invalid WS URL: ${WS_URL}`;
+      updateStatus("error", "WS Error");
+      return;
     }
 
-    function setInputLevel(level) {
-        // Expect 'level' to be a 0..1 RMS-like magnitude (server-side should send RMS or average absolute)
-        // Apply sqrt to approximate perceptual loudness, then EMA smoothing
-        const scaled = Math.sqrt(Math.min(1, Math.max(0, level)));
-        emaLevel = emaLevel * (1 - EMA_ALPHA) + scaled * EMA_ALPHA;
+    websocket.onopen = () => {
+      console.log("WebSocket connected.");
+      updateStatus("on", "Connected");
+      appendLog("WebSocket connected.", "success");
+    };
 
-        const normalizedLevel = Math.min(1, Math.max(0, emaLevel));
-        const activeSegments = Math.ceil(normalizedLevel * NUM_LEVEL_SEGMENTS);
-
-        levelSegments.forEach((segment, index) => {
-            if (index < activeSegments) {
-                segment.classList.add('active');
-
-                // style classes for medium/high ranges
-                if (normalizedLevel > 0.7) {
-                    segment.classList.add('high');
-                    segment.classList.remove('medium');
-                } else if (normalizedLevel > 0.3) {
-                    segment.classList.add('medium');
-                    segment.classList.remove('high');
-                } else {
-                    segment.classList.remove('medium', 'high');
-                }
-            } else {
-                segment.classList.remove('active', 'medium', 'high');
-            }
-        });
-    }
-
-    function setModalInputLevel(level) {
-        const scaled = Math.sqrt(Math.min(1, Math.max(0, level)));
-        modalEmaLevel = modalEmaLevel * (1 - EMA_ALPHA) + scaled * EMA_ALPHA;
-
-        const normalizedLevel = Math.min(1, Math.max(0, modalEmaLevel));
-        const activeSegments = Math.ceil(normalizedLevel * NUM_LEVEL_SEGMENTS);
-
-        modalLevelSegments.forEach((segment, index) => {
-            if (index < activeSegments) {
-                segment.classList.add('active');
-                if (normalizedLevel > 0.7) {
-                    segment.classList.add('high');
-                    segment.classList.remove('medium');
-                } else if (normalizedLevel > 0.3) {
-                    segment.classList.add('medium');
-                    segment.classList.remove('high');
-                } else {
-                    segment.classList.remove('medium', 'high');
-                }
-            } else {
-                segment.classList.remove('active', 'medium', 'high');
-            }
-        });
-    }
-
-    function resetUI() {
-        // Reset main UI elements
-        transcriptionBox.innerHTML = '<p class="placeholder">Waiting for speech...</p>';
-        translationBox.innerHTML = '<p class="placeholder">Translation will appear here...</p>';
-        sttTime.textContent = '0.0s';
-        mtTime.textContent = '0.0s';
-        ttsTime.textContent = '0.0s';
-        totalTime.textContent = '0.0s';
-        emaLevel = 0;
-        setInputLevel(0);
-        updateStateIcon(stateListening, false);
-        updateStateIcon(stateTranslating, false);
-        updateStateIcon(stateSpeaking, false);
-        settingsStatusText.textContent = ''; // Clear existing status text
-        activityLog.innerHTML = ''; // Clear activity log
-
-        // Reset modal specific elements
-        modalReferenceAudioStatus.textContent = ''; // Clear modal status
-        modalPhoneticPromptText.innerHTML = '<p class="placeholder">Generating prompt...</p>'; // Reset modal prompt
-        if (modalRecordingConfirmation) {
-            modalRecordingConfirmation.textContent = ''; // Clear confirmation message
-        }
-        currentPhoneticPrompt = null; // Clear stored prompt
-        referenceAudioBase64 = null; // Clear stored audio
-        referenceAudioMimeType = null; // Clear stored mime type
-        isModalRecording = false;
-        modalRecordBtn.textContent = 'Record';
-        modalRecordBtn.classList.remove('recording');
-        modalLoadingIndicator.style.display = 'none'; // Hide spinner
-        modalLoadingMessage.style.display = 'none'; // Hide message
-        modalMicLevelContainer.classList.add('hidden-initial'); // Hide mic level
-        modalEmaLevel = 0;
-        setModalInputLevel(0);
-        modalCurrentWordIndex = 0; // Reset for new recording
-    }
-
-    function appendLog(message, type = 'info') {
-        const timestamp = new Date().toLocaleTimeString();
-        const logEntry = document.createElement('p');
-        logEntry.classList.add('log-entry', `log-${type}`);
-        logEntry.innerHTML = `[${timestamp}] ${escapeHtml(message)}`;
-        activityLog.prepend(logEntry); // Add to top
-        // Optional: Limit log entries to prevent UI clutter
-        while (activityLog.children.length > 50) {
-            activityLog.removeChild(activityLog.lastChild);
-        }
-    }
-
-    // --- WebSocket Handling ---
-    function connectWebSocket() {
-        if (websocket && websocket.readyState === WebSocket.OPEN) {
-            console.log('WebSocket already connected.');
-            return;
-        }
+    websocket.onmessage = async (event) => {
+      if (event.data instanceof ArrayBuffer || event.data instanceof Blob) {
+        // If it's a Blob, convert it to ArrayBuffer first
+        const audioData =
+          event.data instanceof Blob
+            ? await event.data.arrayBuffer()
+            : event.data;
+        // Pass the stored outputChartIndex with the audio data
+        await playAudio(audioData, currentOutputChartIndex);
+        currentOutputChartIndex = -1; // Reset after use
+      } else {
         try {
-            console.log(`Attempting to connect WebSocket to: ${WS_URL}`);
-            websocket = new WebSocket(WS_URL);
-        } catch (err) {
-            console.error('WebSocket constructor error:', err);
-            settingsStatusText.textContent = `Invalid WS URL: ${WS_URL}`;
-            updateStatus('error', 'WS Error');
-            appendLog(`WebSocket constructor error: ${err.message}`, 'error');
-            return;
-        }
+          const data = JSON.parse(event.data);
+          const currentTime = performance.now(); // Use high-resolution time
 
-        websocket.onopen = () => {
-            console.log('WebSocket connected.');
-            updateStatus('on', 'Connected');
-            appendLog('WebSocket connected.', 'success');
-            // If modal is open, request phonetic prompt now that WS is connected
-            if (voiceTrainingModal.style.display === 'flex') {
-                modalLoadingIndicator.style.display = 'none'; // Hide spinner
-                modalLoadingMessage.style.display = 'none'; // Hide message
-                modalRecordBtn.disabled = false; // Enable buttons
-                modalChooseFileBtn.disabled = false; // Enable buttons
-                modalNotNowBtn.disabled = false; // Enable "Not now" button
-
-                const currentPromptLang = modalInputLanguageSelect.value; // Use modal's language select
-                websocket.send(JSON.stringify({
-                    type: 'request_phonetic_prompt',
-                    language: currentPromptLang
-                }));
-                modalPhoneticPromptText.innerHTML = '<p class="placeholder">Generating prompt...</p>'; // Update to generating
-                appendLog(`Requesting phonetic prompt for ${currentPromptLang.toUpperCase()} after WS connect.`, 'info');
+          if (data.type === "audio_level") {
+            setInputLevel(typeof data.level === "number" ? data.level : 0);
+            // Update lastInputTimestamp only if we are actively listening and it's the start of a new segment
+            if (isRecording && lastInputTimestamp === 0) {
+              lastInputTimestamp = currentTime;
             }
+          } else if (data.type === "transcription_result") {
+            if (data.transcribed) {
+              if (transcriptionBox)
+                transcriptionBox.innerHTML = `<p>${escapeHtml(data.transcribed)}</p>`;
+              updateStateIcon(stateTranslating, true);
+              sttReceivedTimestamp = currentTime;
+              if (lastInputTimestamp && inputToSttTime) {
+                inputToSttTime.textContent = `${(
+                  (sttReceivedTimestamp - lastInputTimestamp) /
+                  1000
+                ).toFixed(2)}s`;
+              }
+            }
+          } else if (data.type === "translation_result") {
+            if (data.translated) {
+              if (translationBox)
+                translationBox.innerHTML = `<p>${escapeHtml(data.translated)}</p>`;
+              updateStateIcon(stateTranslating, false);
+              updateStateIcon(stateSpeaking, true);
+              mtReceivedTimestamp = currentTime;
+              if (sttReceivedTimestamp && sttToMtTime) {
+                sttToMtTime.textContent = `${(
+                  (mtReceivedTimestamp - sttReceivedTimestamp) /
+                  1000
+                ).toFixed(2)}s`;
+              }
+            }
+          } else if (data.type === "final_metrics") {
+            if (data.metrics) {
+              updateStateIcon(stateSpeaking, false);
+              ttsReceivedTimestamp = currentTime; // This is when TTS audio is *sent* from backend
+              if (mtReceivedTimestamp && mtToTtsTime) {
+                mtToTtsTime.textContent = `${(
+                  (ttsReceivedTimestamp - mtReceivedTimestamp) /
+                  1000
+                ).toFixed(2)}s`;
+              }
+              // Total pipeline time is STT+MT+TTS from backend
+              if (totalPipelineTime)
+                totalPipelineTime.textContent = `${(
+                  data.metrics.stt_time + data.metrics.mt_time + data.metrics.tts_time
+                ).toFixed(2)}s`;
+
+              // Add data to chart
+              if (lastInputTimestamp && recordingStartTime && latencyChart) {
+                const inputStartRelative =
+                  (lastInputTimestamp - recordingStartTime) / 1000;
+                const inputEndRelative =
+                  (sttReceivedTimestamp - recordingStartTime) / 1000;
+                const outputStartRelative =
+                  (ttsReceivedTimestamp - recordingStartTime) / 1000;
+
+                console.log(`[Chart Debug] Adding input data:
+                  inputStartRelative: ${inputStartRelative.toFixed(2)}s
+                  inputEndRelative: ${inputEndRelative.toFixed(2)}s`);
+                console.log(`[Chart Debug] Adding output placeholder:
+                  outputStartRelative: ${outputStartRelative.toFixed(2)}s`);
+
+                // Ensure datasets exist
+                if (!chartData.datasets[0]) {
+                  chartData.datasets[0] = {
+                    label: "Input Speech",
+                    data: [],
+                    backgroundColor: "rgba(233, 69, 96, 0.6)", // Red
+                    borderColor: "rgba(233, 69, 96, 1)",
+                    borderWidth: 8, // 8px line for better visibility
+                    type: 'scatter', // Use scatter for custom drawing
+                    pointRadius: 0, // No points
+                    yAxisID: 'y',
+                  };
+                }
+                if (!chartData.datasets[1]) {
+                  chartData.datasets[1] = {
+                    label: "Translated Speech",
+                    data: [],
+                    backgroundColor: "rgba(250, 202, 6, 0.6)", // Yellow for better visibility
+                    borderColor: "rgba(252, 232, 4, 1)",
+                    borderWidth: 8, // 8px line for better visibility
+                    type: 'scatter', // Use scatter for custom drawing
+                    pointRadius: 0, // No points
+                    yAxisID: 'y',
+                  };
+                }
+
+                // Add data to chart for input speech
+                const inputChartIndex = chartData.datasets[0].data.length;
+                const newInputData = {
+                  x: inputStartRelative,
+                  y: "Input Speech",
+                  x2: inputEndRelative,
+                  index: inputChartIndex // Ensure index is added here
+                };
+                chartData.datasets[0].data.push(newInputData);
+                console.log(`[Chart Debug] Pushed input data: ${JSON.stringify(newInputData)}`);
+
+                // Add a placeholder for translated speech, will update x2 when audio finishes playing
+                const outputChartIndex = chartData.datasets[1].data.length;
+                chartData.datasets[1].data.push({
+                  x: outputStartRelative,
+                  y: "Translated Speech",
+                  x2: outputStartRelative, // Placeholder, will be updated
+                  index: outputChartIndex // Store index for later update
+                });
+
+                // Store the outputChartIndex globally for the next incoming audio data
+                currentOutputChartIndex = outputChartIndex;
+
+                // Dynamically update X-axis max
+                const currentChartMaxX = latencyChart.options.scales.x.max;
+                const latestEndTime = Math.max(inputEndRelative, outputStartRelative); // Use outputStartRelative for now
+
+                // Expand max X-axis if the latest event exceeds the current max, with a small buffer
+                if (latestEndTime + 10 > currentChartMaxX) { // Add 10 seconds buffer
+                  latencyChart.options.scales.x.max = latestEndTime + 10;
+                }
+
+                // Ensure min X-axis remains at 0 for continuous timeline
+                latencyChart.options.scales.x.min = 0;
+                
+                latencyChart.update();
+              }
+
+              // Reset lastInputTimestamp for the next speech segment
+              lastInputTimestamp = 0;
+            }
+          } else if (data.type === "status") {
+            // Backend status messages go to the new activity log
+            appendLog(data.message || "", "info");
+          } else if (data.status === "error") {
+            console.error("Server Error:", data.message);
+            appendLog(`Server Error: ${data.message}`, "error");
+            if (settingsStatusText)
+              settingsStatusText.textContent = `Error: ${data.message}`; // Keep critical error in settingsStatusText
+            stopRecording();
+          }
+        } catch (error) {
+          console.error("Error parsing WebSocket message:", error);
+          appendLog(
+            `Error parsing WebSocket message: ${error.message}`,
+            "error",
+          );
+        }
+      }
+    };
+
+    websocket.onclose = () => {
+      console.log("WebSocket disconnected.");
+      updateStatus("off", "Disconnected");
+      appendLog("WebSocket disconnected.", "warning");
+      stopRecording();
+    };
+
+    websocket.onerror = (error) => {
+      console.error("WebSocket Error:", error);
+      settingsStatusText.textContent = "WebSocket connection error.";
+      updateStatus("error", "Error");
+      appendLog(`WebSocket Error: ${error.message}`, "error");
+      stopRecording();
+    };
+  }
+
+  function closeWebSocket() {
+    if (websocket) {
+      websocket.close();
+      websocket = null;
+    }
+  }
+
+  // Modified playAudio to accept audio data and its corresponding chart index
+  async function playAudio(audioBuffer, outputChartIndex) {
+    playbackQueue.push({ audioBuffer, outputChartIndex });
+    if (!isPlayingAudio) {
+      playNextAudioInQueue();
+    }
+  }
+
+  async function playNextAudioInQueue() {
+    if (playbackQueue.length === 0 || isPlayingAudio) {
+      return;
+    }
+
+    isPlayingAudio = true;
+    const { audioBuffer, outputChartIndex } = playbackQueue.shift(); // Get the next audio buffer and its index
+
+    let playbackAudioContext;
+    try {
+      playbackAudioContext = new (
+        window.AudioContext || window.webkitAudioContext
+      )({
+        sampleRate: SAMPLE_RATE,
+        sinkId: blackHoleOutputDeviceId || "default",
+      });
+      console.log(
+        `Playback AudioContext created with sinkId: ${playbackAudioContext.sinkId}. Actual sinkId used: ${playbackAudioContext.sinkId}`,
+      );
+      appendLog(
+        `Playback AudioContext created. Attempted sinkId: ${blackHoleOutputDeviceId || "default"}. Actual sinkId: ${playbackAudioContext.sinkId}`,
+        "info",
+      );
+    } catch (e) {
+      console.error("Error creating playback AudioContext:", e);
+      appendLog(`Error creating playback AudioContext: ${e.message}`, "error");
+      isPlayingAudio = false;
+      playNextAudioInQueue();
+      return;
+    }
+
+    try {
+      const audioData = await playbackAudioContext.decodeAudioData(audioBuffer);
+      const source = playbackAudioContext.createBufferSource();
+      source.buffer = audioData;
+      source.connect(playbackAudioContext.destination);
+      source.start(0);
+      playbackStartedTimestamp = performance.now(); // Mark when playback actually starts
+
+      // Update E2E latency and TTS to Playback time
+      if (lastInputTimestamp && totalE2ELatency) {
+        totalE2ELatency.textContent = `${(
+          (playbackStartedTimestamp - lastInputTimestamp) /
+          1000
+        ).toFixed(2)}s`;
+      }
+      if (ttsReceivedTimestamp && ttsToPlaybackTime) {
+        ttsToPlaybackTime.textContent = `${(
+          (playbackStartedTimestamp - ttsReceivedTimestamp) /
+          1000
+        ).toFixed(2)}s`;
+      }
+
+      appendLog(
+        `Playing synthesized audio to ${blackHoleOutputDeviceId ? "BlackHole" : "default output"}.`,
+        "success",
+      );
+
+      source.onended = () => {
+        playbackAudioContext.close();
+        isPlayingAudio = false;
+
+        // Update the x2 (end time) for the corresponding translated speech bar
+        if (latencyChart && outputChartIndex !== undefined && chartData.datasets[1].data[outputChartIndex]) {
+          const outputEndRelative = (performance.now() - recordingStartTime) / 1000;
+          chartData.datasets[1].data[outputChartIndex].x2 = outputEndRelative;
+          console.log(`[Chart Debug] Updated output bar ${outputChartIndex} x2 to: ${outputEndRelative.toFixed(2)}s`);
+          latencyChart.update();
+        }
+        playNextAudioInQueue();
+      };
+    } catch (error) {
+      console.error("Error playing audio:", error);
+      appendLog(`Error playing audio: ${error.message}`, "error");
+      isPlayingAudio = false;
+      playNextAudioInQueue();
+    }
+  }
+
+  // --- Audio Recording Handling ---
+  async function startRecording() {
+    if (isRecording) return;
+
+    // Reset chart data on new recording start
+    if (latencyChart) {
+      chartData.datasets = []; // Clear all datasets
+      latencyChart.options.scales.x.max = 300; // Reset max X-axis to 5 minutes
+      latencyChart.options.scales.x.min = 0; // Ensure min X-axis is reset to 0
+      latencyChart.update();
+    }
+
+    // Reset recordingStartTime and playbackStartedTimestamp for each new recording session
+    recordingStartTime = performance.now(); // Set absolute recording start time
+    playbackStartedTimestamp = 0; // Reset playback start time
+    console.log(`[Chart Debug] Recording started. recordingStartTime: ${recordingStartTime}`);
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      if (settingsStatusText)
+        settingsStatusText.textContent =
+          "Microphone not supported by your browser.";
+      updateStatus("error", "Mic Error");
+      appendLog("Microphone not supported by browser.", "error");
+      return;
+    }
+
+    try {
+      // Remove hardcoded BlackHole input. Use default microphone.
+      // We still enumerate devices to find BlackHole for output later.
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const blackHoleOutputDevice = devices.find(
+        (device) =>
+          device.kind === "audiooutput" &&
+          device.label.toLowerCase().includes("blackhole"),
+      );
+
+      if (blackHoleOutputDevice) {
+        blackHoleOutputDeviceId = blackHoleOutputDevice.deviceId;
+        appendLog(
+          `Found BlackHole 2ch output device: ${blackHoleOutputDevice.label}`,
+          "info",
+        );
+      } else {
+        blackHoleOutputDeviceId = null;
+        appendLog(
+          "Warning: BlackHole 2ch output device not found. Translated audio will play through default output.",
+          "warning",
+        );
+      }
+
+      let audioConstraints = {
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false,
+      };
+
+      // No specific deviceId for input, will use default microphone
+      mediaStream = await navigator.mediaDevices.getUserMedia({
+        audio: audioConstraints,
+      });
+
+      appendLog("Using default microphone for input.", "info");
+      if (settingsStatusText)
+        settingsStatusText.textContent = "Microphone set to: Default";
+
+      audioContext = new (window.AudioContext || window.webkitAudioContext)({
+        sampleRate: SAMPLE_RATE,
+      });
+
+      // Resume audio context if it was suspended
+      if (audioContext.state === "suspended") {
+        await audioContext.resume();
+      }
+
+      const source = audioContext.createMediaStreamSource(mediaStream);
+
+      try {
+        // Load AudioWorklet processor
+        await audioContext.audioWorklet.addModule("ui/audio-processor.js");
+        audioProcessor = new AudioWorkletNode(audioContext, "audio-processor");
+
+        audioProcessor.port.onmessage = (event) => {
+          if (websocket && websocket.readyState === WebSocket.OPEN) {
+          const audioData = event.data;
+          const audioClone = new Float32Array(audioData); // copy before sending
+
+          // Throttled debug log to avoid heavy console spam
+          const now = Date.now();
+          if (now - lastLogAt > LOG_THROTTLE_MS) {
+            console.debug(`Received ${audioClone.length} audio samples from AudioWorklet. Sending to WebSocket.`);
+            lastLogAt = now;
+          }
+
+          // Send as binary message (server must accept Float32Array buffer)
+          websocket.send(audioClone.buffer);
+          }
         };
+      } catch (workletError) {
+        console.error("Error loading AudioWorklet:", workletError);
+        settingsStatusText.textContent = `Audio processing error: ${workletError.message}`;
+        appendLog(`AudioWorklet failed to load: ${workletError.message}`, "error");
+        stopRecording();
+        return;
+      }
 
-        websocket.onmessage = async (event) => {
-            if (event.data instanceof ArrayBuffer) {
-                await playAudio(event.data);
-            } else {
-                try {
-                    const data = JSON.parse(event.data);
+      source.connect(audioProcessor);
+      // audioProcessor -> destination is required for some browsers to keep the processing alive
+      // audioProcessor.connect(audioContext.destination); // Removed to prevent echo
 
-                    if (data.type === 'audio_level') {
-                        setInputLevel(typeof data.level === 'number' ? data.level : 0);
-                    } else if (data.type === 'transcription_result') {
-                        if (data.transcribed) {
-                            transcriptionBox.innerHTML = `<p>${escapeHtml(data.transcribed)}</p>`;
-                            sttTime.textContent = `${(data.metrics.stt_time || 0).toFixed(2)}s`;
-                            updateStateIcon(stateTranslating, true);
-                        }
-                    } else if (data.type === 'translation_result') {
-                        if (data.translated) {
-                            translationBox.innerHTML = `<p>${escapeHtml(data.translated)}</p>`;
-                            mtTime.textContent = `${(data.metrics.mt_time || 0).toFixed(2)}s`;
-                            updateStateIcon(stateTranslating, false);
-                            updateStateIcon(stateSpeaking, true);
-                        }
-                    } else if (data.type === 'final_metrics') {
-                        if (data.metrics) {
-                            ttsTime.textContent = `${(data.metrics.tts_time || 0).toFixed(2)}s`;
-                            totalTime.textContent = `${(data.metrics.total_latency || 0).toFixed(2)}s`;
-                            updateStateIcon(stateSpeaking, false);
-                        }
-                    } else if (data.type === 'status') {
-                        appendLog(data.message || '', 'info');
-                        // Specific status updates for reference audio upload in modal
-                        if (data.message.includes("Reference audio updated")) {
-                            modalReferenceAudioStatus.textContent = data.message;
-                            modalReferenceAudioStatus.style.color = 'green';
-                        } else if (data.message.includes("Error processing reference audio")) {
-                            modalReferenceAudioStatus.textContent = data.message;
-                            modalReferenceAudioStatus.style.color = 'red';
-                        }
-                    } else if (data.type === 'phonetic_prompt_result') {
-                        currentPhoneticPrompt = data.prompt_text;
-                        // Split prompt into words and wrap each in a span for highlighting
-                        modalPhoneticPromptText.innerHTML = currentPhoneticPrompt.split(' ').map((word, index) => 
-                            `<span id="prompt-word-${index}">${escapeHtml(word)}</span>`
-                        ).join(' ');
-                        appendLog('Phonetic prompt generated.', 'info');
-                    } else if (data.type === 'modal_transcription_update') {
-                        if (data.segments && data.segments.length > 0) {
-                            const newWords = data.segments[0].words; // Assuming one segment for simplicity
-                            newWords.forEach(wordInfo => {
-                                // Find the corresponding word in the phonetic prompt
-                                // We need to be careful with word matching due to potential transcription differences
-                                // For now, we'll rely on sequential highlighting based on modalCurrentWordIndex
-                                if (modalCurrentWordIndex < currentPhoneticPrompt.split(' ').length) {
-                                    const promptWordSpan = document.getElementById(`prompt-word-${modalCurrentWordIndex}`);
-                                    if (promptWordSpan) {
-                                        promptWordSpan.classList.add('highlight');
-                                        // Optional: Scroll to the highlighted word
-                                        promptWordSpan.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                                    }
-                                    modalCurrentWordIndex++;
-                                }
-                            });
-                            appendLog(`Modal transcription update: ${newWords.map(w => w.word).join(' ')}`, 'info');
-                        }
-                        if (data.is_final) {
-                            modalReferenceAudioStatus.textContent = 'Recording finished. Processing...';
-                            modalReferenceAudioStatus.style.color = 'green';
-                            // After final transcription, we can trigger the upload if needed, or just close modal
-                            // For now, we'll assume the backend handles the final processing and then the modal closes.
-                            // If we need to upload the recorded audio for voice cloning, we'd need to re-introduce MediaRecorder
-                            // or have the backend save the full modal audio buffer.
-                            // For this task, we are focusing on real-time highlighting, not modal audio upload.
-                        }
-                    } else if (data.type === 'models_loading_status') {
-                        if (data.loading_started && !data.fully_loaded) {
-                            settingsStatusText.textContent = 'Models are loading in the background...';
-                            appendLog('Models loading started in background.', 'info');
-                            // If modal is open, update its message
-                            if (voiceTrainingModal.style.display === 'flex') {
-                                modalLoadingMessage.textContent = 'Models are loading in the background. You may train your voice now.';
-                                modalLoadingIndicator.style.display = 'none'; // Hide spinner once loading starts
-                                modalRecordBtn.disabled = false; // Enable buttons
-                                modalChooseFileBtn.disabled = false;
-                                modalNotNowBtn.disabled = false; // Enable "Not now" button
-                            }
-                        } else if (data.fully_loaded) {
-                            isInitialized = true; // Set isInitialized to true here
-                            settingsStatusText.textContent = 'All models are ready.';
-                            appendLog('All models fully loaded.', 'success');
-                            startBtn.disabled = false; // Enable main start button
-                            initBtn.disabled = true; // Disable init button once fully loaded
-                            contentMain.style.display = 'flex'; // Show main content only when models are fully loaded
-                            // If modal is open, update its message
-                            if (voiceTrainingModal.style.display === 'flex') {
-                                modalLoadingMessage.textContent = 'Models are ready. Voice training complete.';
-                                modalLoadingIndicator.style.display = 'none';
-                                modalRecordBtn.disabled = false;
-                                modalChooseFileBtn.disabled = false;
-                                modalNotNowBtn.disabled = false; // Re-enable "Not now" button
-                                // Optionally close modal if voice training was successful and models are loaded
-                                // closeModal();
-                            }
-                        } else {
-                            settingsStatusText.textContent = 'Awaiting model initialization.';
-                            appendLog('Awaiting model initialization.', 'info');
-                        }
-                    } else if (data.status === 'error') {
-                        console.error('Server Error:', data.message);
-                        appendLog(`Server Error: ${data.message}`, 'error');
-                        settingsStatusText.textContent = `Error: ${data.message}`;
-                        stopRecordingMain();
-                    }
-                } catch (error) {
-                    console.error('Error parsing WebSocket message:', error);
-                    appendLog(`Error parsing WebSocket message: ${error.message}`, 'error');
-                }
-            }
-        };
+      isRecording = true;
+      updateStatus("on", "Listening...");
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      updateStateIcon(stateListening, true);
 
-        websocket.onclose = () => {
-            console.log('WebSocket disconnected.');
-            updateStatus('off', 'Disconnected');
-            appendLog('WebSocket disconnected.', 'warning');
-            stopRecordingMain(); // Changed from stopRecording()
-            // If modal is open, disable buttons and show waiting message
-            if (voiceTrainingModal.style.display === 'flex') {
-                modalRecordBtn.disabled = true;
-                modalChooseFileBtn.disabled = true;
-                modalNotNowBtn.disabled = true; // Disable "Not now" button
-                modalLoadingIndicator.style.display = 'block';
-                modalLoadingMessage.style.display = 'block';
-                modalLoadingMessage.textContent = 'WebSocket disconnected. Waiting for reconnection...';
-                modalPhoneticPromptText.innerHTML = '<p class="placeholder">Waiting for server connection to generate prompt...</p>';
-            }
-        };
-
-        websocket.onerror = (event) => {
-            console.error('WebSocket Error Event:', event);
-            settingsStatusText.textContent = 'WebSocket connection error. Check console for details.';
-            updateStatus('error', 'Error');
-            // Attempt to extract more specific error message if available
-            const errorMessage = event.message || (event.target && event.target.readyState === WebSocket.CLOSED ? 'Connection closed unexpectedly.' : 'Unknown WebSocket error.');
-            appendLog(`WebSocket Error: ${errorMessage}`, 'error');
-            stopRecordingMain(); // Changed from stopRecording()
-            // If modal is open, disable buttons and show error message
-            if (voiceTrainingModal.style.display === 'flex') {
-                modalRecordBtn.disabled = true;
-                modalChooseFileBtn.disabled = true;
-                modalNotNowBtn.disabled = true; // Disable "Not now" button
-                modalLoadingIndicator.style.display = 'none'; // Hide spinner on error
-                modalLoadingMessage.style.display = 'block';
-                modalLoadingMessage.textContent = `WebSocket error: ${errorMessage}`;
-                modalPhoneticPromptText.innerHTML = '<p class="placeholder" style="color: red;">WebSocket not open. Cannot generate prompt.</p>';
-            }
-        };
+      if (websocket && websocket.readyState === WebSocket.OPEN) {
+        websocket.send(JSON.stringify({ type: "start" }));
+      }
+    } catch (error) {
+      console.error("Error accessing microphone:", error);
+      if (settingsStatusText)
+        settingsStatusText.textContent = `Microphone access denied: ${error.message}`;
+      updateStatus("error", "Mic Error");
+      stopRecording();
     }
+  }
 
-    function closeWebSocket() {
-        if (websocket) {
-            websocket.close();
-            websocket = null;
-        }
-    }
+  function stopRecording() {
+    if (!isRecording) return;
 
-    async function playAudio(audioBuffer) {
-        if (!audioContext) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: SAMPLE_RATE });
-        }
-        try {
-            const audioData = await audioContext.decodeAudioData(audioBuffer);
-            const source = audioContext.createBufferSource();
-            source.buffer = audioData;
-            source.connect(audioContext.destination);
-            source.start(0);
-            appendLog('Playing synthesized audio.', 'success');
-        } catch (error) {
-            console.error('Error playing audio:', error);
-            appendLog(`Error playing audio: ${error.message}`, 'error');
-        }
-    }
-
-    // --- Audio Recording Handling ---
-    // --- Audio Recording Handling (Main UI) ---
-    async function startRecordingMain() {
-        if (isRecording) return;
-
-        try {
-            const devices = await navigator.mediaDevices.enumerateDevices();
-            const audioInputDevices = devices.filter(device => device.kind === 'audioinput');
-            
-            let defaultMicId = null;
-            if (audioInputDevices.length > 0) {
-                const nonBlackHoleMic = audioInputDevices.find(device => !device.label.toLowerCase().includes('blackhole'));
-                defaultMicId = nonBlackHoleMic ? nonBlackHoleMic.deviceId : audioInputDevices[0].deviceId;
-                console.log(`[UI] Using audio input device: ${nonBlackHoleMic ? nonBlackHoleMic.label : audioInputDevices[0].label} (ID: ${defaultMicId})`);
-            } else {
-                console.warn("[UI] No audio input devices found.");
-                settingsStatusText.textContent = "No microphone found. Please connect one.";
-                updateStatus('error', 'Mic Error');
-                return;
-            }
-
-            mediaStream = await navigator.mediaDevices.getUserMedia({
-                audio: {
-                    deviceId: defaultMicId ? { exact: defaultMicId } : undefined,
-                    echoCancellation: false,
-                    noiseSuppression: false,
-                    autoGainControl: false
-                }
-            });
-
-            audioContext = new (window.AudioContext || window.webkitAudioContext)({
-                sampleRate: SAMPLE_RATE
-            });
-
-            const source = audioContext.createMediaStreamSource(mediaStream);
-            audioProcessor = audioContext.createScriptProcessor(BUFFER_SIZE, 1, 1);
-            audioProcessor.onaudioprocess = (event) => {
-                if (websocket && websocket.readyState === WebSocket.OPEN) {
-                    const audioData = event.inputBuffer.getChannelData(0);
-                    const audioClone = new Float32Array(audioData);
-                    websocket.send(audioClone.buffer);
-                    const now = Date.now();
-                    if (now - lastLogAt > LOG_THROTTLE_MS) {
-                        console.debug(`Sent ${audioClone.length} audio samples`);
-                        lastLogAt = now;
-                    }
-                }
-            };
-
-            source.connect(audioProcessor);
-            audioProcessor.connect(audioContext.destination);
-
-            isRecording = true;
-            updateStatus('on', 'Listening...');
-            startBtn.disabled = true;
-            stopBtn.disabled = false;
-            updateStateIcon(stateListening, true);
-
-            if (websocket && websocket.readyState === WebSocket.OPEN) {
-                websocket.send(JSON.stringify({ type: 'start' }));
-            }
-        } catch (error) {
-            console.error('Error accessing microphone:', error);
-            settingsStatusText.textContent = `Microphone access denied: ${error.message}`;
-            updateStatus('error', 'Mic Error');
-            stopRecordingMain();
-        }
-    }
-
-    function stopRecordingMain() {
-        if (!isRecording) return;
-
-        isRecording = false;
-        updateStatus('off', 'Ready');
-        startBtn.disabled = false;
-        stopBtn.disabled = true;
-        updateStateIcon(stateListening, false);
-        updateStateIcon(stateTranslating, false);
-        updateStateIcon(stateSpeaking, false);
-        resetUI();
-
-        if (mediaStream) {
-            mediaStream.getTracks().forEach(track => track.stop());
-            mediaStream = null;
-        }
-        if (audioProcessor) {
-            try {
-                audioProcessor.disconnect();
-            } catch (_) { /* ignore */ }
-            audioProcessor = null;
-        }
-        if (audioContext) {
-            audioContext.close();
-            audioContext = null;
-        }
-
-        if (websocket && websocket.readyState === WebSocket.OPEN) {
-            websocket.send(JSON.stringify({ type: 'stop' }));
-        }
-    }
-
-    // --- Audio Recording Handling (Modal) ---
-    let mediaRecorder;
-    let audioChunks = [];
-
-    async function startModalRecording() {
-        if (isModalRecording) {
-            stopModalRecording();
-            return;
-        }
-
-        try {
-            modalMediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            modalAudioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: SAMPLE_RATE });
-            const source = modalAudioContext.createMediaStreamSource(modalMediaStream);
-            modalAudioProcessor = modalAudioContext.createScriptProcessor(BUFFER_SIZE, 1, 1);
-
-            modalAudioProcessor.onaudioprocess = (event) => {
-                const audioData = event.inputBuffer.getChannelData(0);
-                // Calculate RMS for mic level visualization
-                let sumSquares = 0;
-                for (const sample of audioData) {
-                    sumSquares += sample * sample;
-                }
-                const rms = Math.sqrt(sumSquares / audioData.length);
-                setModalInputLevel(rms);
-
-                // Send audio data to WebSocket for real-time processing
-                if (websocket && websocket.readyState === WebSocket.OPEN && isModalRecording) {
-                    const audioClone = new Float32Array(audioData);
-                    websocket.send(audioClone.buffer); // Send raw audio bytes
-                }
-            };
-
-            source.connect(modalAudioProcessor);
-            modalAudioProcessor.connect(modalAudioContext.destination); // Connect to destination to ensure onaudioprocess fires
-
-            // No longer using MediaRecorder for chunk sending, but for fallback or if needed later
-            // mediaRecorder = new MediaRecorder(modalMediaStream);
-            // audioChunks = [];
-
-            // mediaRecorder.ondataavailable = event => {
-            //     audioChunks.push(event.data);
-            // };
-
-            // mediaRecorder.onstop = async () => {
-            //     // This part is now handled by sending chunks directly
-            // };
-
-            // mediaRecorder.start(); // No longer needed for chunk sending
-            isModalRecording = true;
-            modalRecordBtn.textContent = 'Stop Recording';
-            modalRecordBtn.classList.add('recording');
-            modalReferenceAudioStatus.textContent = 'Recording...';
-            modalReferenceAudioStatus.style.color = 'orange';
-            modalMicLevelContainer.classList.remove('hidden-initial'); // Show mic level
-            appendLog('Started modal recording.', 'info');
-
-            // Send a 'start_modal_recording' message to the backend
-            if (websocket && websocket.readyState === WebSocket.OPEN) {
-                websocket.send(JSON.stringify({ type: 'start_modal_recording', language: modalInputLanguageSelect.value }));
-            }
-
-        } catch (error) {
-            console.error('Error accessing microphone for modal recording:', error);
-            modalReferenceAudioStatus.textContent = `Mic access denied: ${error.message}`;
-            modalReferenceAudioStatus.style.color = 'red';
-            appendLog(`Error accessing microphone for modal recording: ${error.message}`, 'error');
-        }
-    }
-
-    function stopModalRecording() {
-        if (!isModalRecording) return;
-
-        isModalRecording = false;
-        modalRecordBtn.textContent = 'Record';
-        modalRecordBtn.classList.remove('recording');
-        appendLog('Stopped modal recording.', 'info');
-
-        // Send a 'stop_modal_recording' message to the backend
-        if (websocket && websocket.readyState === WebSocket.OPEN) {
-            websocket.send(JSON.stringify({ type: 'stop_modal_recording' }));
-        }
-
-        // if (mediaRecorder && mediaRecorder.state !== 'inactive') { // No longer using MediaRecorder for chunk sending
-        //     mediaRecorder.stop();
-        // }
-        if (modalMediaStream) {
-            modalMediaStream.getTracks().forEach(track => track.stop());
-            modalMediaStream = null;
-        }
-        if (modalAudioProcessor) {
-            try {
-                modalAudioProcessor.disconnect();
-            } catch (_) { /* ignore */ }
-            modalAudioProcessor = null;
-        }
-        if (modalAudioContext) {
-            modalAudioContext.close();
-            modalAudioContext = null;
-        }
-        modalMicLevelContainer.classList.add('hidden-initial'); // Hide mic level
-        modalEmaLevel = 0;
-        setModalInputLevel(0);
-    }
-
-    async function uploadReferenceAudioToBackend() {
-        if (!websocket || websocket.readyState !== WebSocket.OPEN) {
-            modalReferenceAudioStatus.textContent = 'Not connected to server. Cannot upload audio. Please wait for models to load and WebSocket to connect.';
-            modalReferenceAudioStatus.style.color = 'red';
-            appendLog('Not connected to server. Cannot upload reference audio.', 'warning');
-            return;
-        }
-
-        if (!referenceAudioBase64 || !referenceAudioMimeType) {
-            modalReferenceAudioStatus.textContent = 'No audio data to upload.';
-            modalReferenceAudioStatus.style.color = 'red';
-            return;
-        }
-
-        modalReferenceAudioStatus.textContent = 'Uploading...';
-        modalReferenceAudioStatus.style.color = 'inherit';
-
-        try {
-            const uploadPayload = {
-                type: 'upload_reference_audio',
-                audio_data_base64: referenceAudioBase64,
-                mime_type: referenceAudioMimeType
-            };
-
-            if (currentPhoneticPrompt) {
-                uploadPayload.provided_transcription = currentPhoneticPrompt;
-            }
-
-            websocket.send(JSON.stringify(uploadPayload));
-            appendLog(`Reference audio uploaded.`, 'info');
-            modalReferenceAudioStatus.textContent = `Reference audio sent.`;
-            modalReferenceAudioStatus.style.color = 'green';
-            
-            // Display the processing message
-            modalLoadingIndicator.style.display = 'block';
-            modalLoadingMessage.style.display = 'block';
-            modalLoadingMessage.textContent = "Your voice is being processed, please wait for other modules to load ~1 minute. You may exit this window now.";
-            modalRecordBtn.disabled = true; // Disable buttons during processing
-            modalChooseFileBtn.disabled = true;
-            modalNotNowBtn.disabled = true; // Disable "Not now" button as well
-
-            // The modal will be closed by the backend's 'status' message or 'models_loaded_status'
-            // when the reference audio processing is complete and models are fully loaded.
-            // For now, we'll keep it open with the message.
-            // closeModal(); // Do not close immediately, wait for backend confirmation
-        } catch (error) {
-            console.error('Error uploading reference audio:', error);
-            modalReferenceAudioStatus.textContent = `Error uploading: ${error.message}`;
-            modalReferenceAudioStatus.style.color = 'red';
-            appendLog(`Error uploading reference audio: ${error.message}`, 'error');
-        }
-    }
-
-    // --- Modal Functions ---
-    function openModal() {
-        voiceTrainingModal.style.display = 'flex';
-        // Always show a loading message initially
-        modalPhoneticPromptText.innerHTML = '<p class="placeholder">Waiting for server connection to generate prompt...</p>';
-        modalLoadingIndicator.style.display = 'block'; // Show spinner
-        modalLoadingMessage.style.display = 'block'; // Show message
-        modalLoadingMessage.textContent = 'Please wait until models preload before you record your voice.';
-        modalRecordBtn.disabled = true; // Disable buttons
-        modalChooseFileBtn.disabled = true; // Disable buttons
-        appendLog('Voice training modal opened. Waiting for WebSocket connection.', 'info');
-
-        // Request phonetic prompt only if WS is already open
-        if (websocket && websocket.readyState === WebSocket.OPEN) {
-            const currentPromptLang = modalInputLanguageSelect.value; // Use modal's language select
-            websocket.send(JSON.stringify({
-                type: 'request_phonetic_prompt',
-                language: currentPromptLang
-            }));
-            modalPhoneticPromptText.innerHTML = '<p class="placeholder">Generating prompt...</p>'; // Update to generating
-            appendLog(`Requesting phonetic prompt for ${currentPromptLang.toUpperCase()}.`, 'info');
-        } else {
-            // If WS is not open, the onopen handler will request the prompt once connected.
-            // For now, just log and display waiting message.
-            appendLog('WebSocket not open. Will request phonetic prompt after connection.', 'info');
-        }
-    }
-
-    function closeModal() {
-        voiceTrainingModal.style.display = 'none';
-        modalReferenceAudioStatus.textContent = ''; // Clear modal status
-        modalPhoneticPromptText.innerHTML = '<p class="placeholder">Generating prompt...</p>'; // Reset modal prompt
-        if (modalRecordingConfirmation) {
-            modalRecordingConfirmation.textContent = ''; // Clear confirmation message
-        }
-        currentPhoneticPrompt = null; // Clear stored prompt
-        referenceAudioBase64 = null; // Clear stored audio
-        referenceAudioMimeType = null; // Clear stored mime type
-        isModalRecording = false;
-        modalRecordBtn.textContent = 'Record';
-        modalRecordBtn.classList.remove('recording');
-        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-            mediaRecorder.stop();
-        }
-        // Reset word highlights
-        if (currentPhoneticPrompt) {
-            const words = currentPhoneticPrompt.split(' ');
-            for (let i = 0; i < words.length; i++) {
-                const wordSpan = document.getElementById(`prompt-word-${i}`);
-                if (wordSpan) {
-                    wordSpan.classList.remove('highlight');
-                }
-            }
-        }
-        // Reset modal specific UI elements
-        modalLoadingIndicator.style.display = 'none';
-        modalLoadingMessage.style.display = 'none';
-        modalMicLevelContainer.classList.add('hidden-initial');
-        modalEmaLevel = 0;
-        setModalInputLevel(0);
-        modalCurrentWordIndex = 0; // Reset for new modal session
-    }
-
-
-    // --- Helpers & Events ---
-    initBtn.addEventListener('click', async () => {
-        if (isInitialized) {
-            settingsStatusText.textContent = 'Pipeline already initialized.';
-            return;
-        }
-        initBtn.disabled = true;
-        updateStatus('prepping', 'Initializing Models...');
-        appendLog('Initializing models...', 'info');
-        settingsStatusText.textContent = 'Loading models (this may take ~1 minute on first run)...';
-        
-        // Connect WebSocket immediately
-        connectWebSocket();
-
-        // Trigger backend initialization (which starts background loading)
-        try {
-            const sourceLang = inputLanguageSelect.value;
-            const targetLang = outputLanguageSelect.value;
-            const ttsModel = ttsModelSelect.value;
-
-            appendLog(`Attempting to initialize pipeline with: Source=${sourceLang.toUpperCase()}, Target=${targetLang.toUpperCase()}, TTS Model=${ttsModel}.`, 'info');
-
-            const response = await fetch(`${API_URL}/initialize?source_lang=${sourceLang}&target_lang=${targetLang}&tts_model_choice=${ttsModel}`, { method: 'POST' });
-            const data = await response.json();
-
-            if (data.status === 'success') {
-                // isInitialized will be set to true when models_fully_loaded is received
-                // startBtn will be enabled when models_fully_loaded is received
-                settingsStatusText.textContent = data.message;
-                appendLog(`Pipeline initialization triggered: ${data.message}`, 'success');
-                contentMain.style.display = 'flex'; // Show main content
-                openModal(); // Open the voice training modal after initialization is triggered
-            } else {
-                settingsStatusText.textContent = `Initialization failed: ${data.message}`;
-                updateStatus('error', 'Init Error');
-                appendLog(`Initialization failed: ${data.message}`, 'error');
-                initBtn.disabled = false;
-            }
-        } catch (error) {
-            console.error('Initialization API error:', error);
-            settingsStatusText.textContent = `Initialization failed: ${error.message}`;
-            updateStatus('error', 'Init Error');
-            appendLog(`Initialization API error: ${error.message}`, 'error');
-            initBtn.disabled = false;
-        }
-    });
-
-    // No longer a separate "Train Voice" button, functionality integrated into initBtn
-    // const trainVoiceBtn = document.getElementById('trainVoiceBtn');
-    // trainVoiceBtn.addEventListener('click', () => {
-    //     openModal();
-    // });
-
-    modalNotNowBtn.addEventListener('click', () => {
-        // Close modal and proceed. Model loading is already triggered by initBtn.
-        closeModal();
-    });
-
-    modalRecordBtn.addEventListener('click', startModalRecording); // New record button handler
-
-    modalChooseFileBtn.addEventListener('click', () => { // New choose file button handler
-        modalReferenceAudioUpload.click(); // Trigger file input click
-    });
-
-    modalReferenceAudioUpload.addEventListener('change', async (event) => {
-        if (!websocket || websocket.readyState !== WebSocket.OPEN) {
-            modalReferenceAudioStatus.textContent = 'Not connected to server. Cannot upload audio. Please wait for models to load and WebSocket to connect.';
-            modalReferenceAudioStatus.style.color = 'red';
-            appendLog('Not connected to server. Cannot upload reference audio.', 'warning');
-            return;
-        }
-
-        const file = event.target.files[0];
-        if (!file) {
-            modalReferenceAudioStatus.textContent = 'No file selected.';
-            modalReferenceAudioStatus.style.color = 'red';
-            return;
-        }
-
-        modalReferenceAudioStatus.textContent = 'Uploading...';
-        modalReferenceAudioStatus.style.color = 'inherit';
-
-        try {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => {
-                referenceAudioBase64 = reader.result.split(',')[1];
-                referenceAudioMimeType = file.type;
-                uploadReferenceAudioToBackend(); // Use the new function
-            };
-            reader.onerror = (error) => {
-                console.error('Error reading file:', error);
-                modalReferenceAudioStatus.textContent = `Error reading file: ${error.message}`;
-                modalReferenceAudioStatus.style.color = 'red';
-                appendLog(`Error reading reference audio file: ${error.message}`, 'error');
-            };
-        } catch (error) {
-            console.error('Error uploading reference audio:', error);
-            modalReferenceAudioStatus.textContent = `Error uploading: ${error.message}`;
-            modalReferenceAudioStatus.style.color = 'red';
-            appendLog(`Error uploading reference audio: ${error.message}`, 'error');
-        }
-    });
-
-    startBtn.addEventListener('click', startRecordingMain); // Renamed for clarity
-    stopBtn.addEventListener('click', stopRecordingMain); // Renamed for clarity
-
-    function sendConfigUpdate() {
-        if (websocket && websocket.readyState === WebSocket.OPEN) {
-            const config = {
-                type: 'config_update',
-                source_lang: inputLanguageSelect.value,
-                target_lang: outputLanguageSelect.value,
-                tts_model_choice: ttsModelSelect.value
-            };
-            websocket.send(JSON.stringify(config));
-            appendLog(`Configuration updated: Source=${config.source_lang.toUpperCase()}, Target=${config.target_lang.toUpperCase()}, TTS Model=${config.tts_model_choice}.`, 'info');
-            settingsStatusText.textContent = 'Configuration updated.'; // Keep this for immediate feedback
-        } else {
-            settingsStatusText.textContent = 'Not connected to server. Cannot update config.';
-            appendLog('Not connected to server. Cannot update config.', 'warning');
-        }
-    }
-
-    inputLanguageSelect.addEventListener('change', (event) => {
-        inputLanguageBadge.textContent = event.target.value.toUpperCase();
-        appendLog(`Input language changed to ${event.target.value.toUpperCase()}.`, 'info');
-        sendConfigUpdate();
-        // If modal is open, update the prompt language
-        if (voiceTrainingModal.style.display === 'flex' && websocket && websocket.readyState === WebSocket.OPEN) {
-            const currentPromptLang = modalInputLanguageSelect.value;
-            websocket.send(JSON.stringify({
-                type: 'request_phonetic_prompt',
-                language: currentPromptLang
-            }));
-            modalPhoneticPromptText.innerHTML = '<p class="placeholder">Generating prompt...</p>';
-            appendLog(`Requesting new phonetic prompt for ${currentPromptLang.toUpperCase()} due to input language change.`, 'info');
-        }
-    });
-
-    outputLanguageSelect.addEventListener('change', (event) => {
-        outputLanguageBadge.textContent = event.target.value.toUpperCase();
-        appendLog(`Output language changed to ${event.target.value.toUpperCase()}.`, 'info');
-        sendConfigUpdate();
-    });
-
-    ttsModelSelect.addEventListener('change', (event) => {
-        appendLog(`TTS Model changed to ${event.target.value}.`, 'info');
-        sendConfigUpdate();
-    });
-
-    modalInputLanguageSelect.addEventListener('change', (event) => {
-        appendLog(`Modal prompt language changed to ${event.target.value.toUpperCase()}.`, 'info');
-        if (websocket && websocket.readyState === WebSocket.OPEN) {
-            websocket.send(JSON.stringify({
-                type: 'request_phonetic_prompt',
-                language: event.target.value
-            }));
-            modalPhoneticPromptText.innerHTML = '<p class="placeholder">Generating prompt...</p>';
-            appendLog(`Requesting new phonetic prompt for ${event.target.value.toUpperCase()}.`, 'info');
-        }
-    });
-
-    // Helper function to escape HTML for safe display
-    function escapeHtml(unsafe) {
-        return unsafe
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
-    // Initial UI setup
-    resetUI();
-    updateStatus('off', 'Awaiting Initialization');
-    startBtn.disabled = true;
+    isRecording = false;
+    updateStatus("off", "Ready");
+    startBtn.disabled = false;
     stopBtn.disabled = true;
+    updateStateIcon(stateListening, false);
+    updateStateIcon(stateTranslating, false);
+    updateStateIcon(stateSpeaking, false);
+    resetUI();
+
+    if (mediaStream) {
+      mediaStream.getTracks().forEach((track) => track.stop());
+      mediaStream = null;
+    }
+    if (audioProcessor) {
+      try {
+        audioProcessor.port.onmessage = null; // Clear message handler
+        audioProcessor.disconnect();
+      } catch (_) {
+        /* ignore */
+      }
+      audioProcessor = null;
+    }
+    // Ensure audioContext is closed to stop all processing and release resources
+    if (audioContext) {
+      audioContext.close();
+      audioContext = null;
+    }
+
+    // Send stop command to backend AFTER clearing local audio processing
+    if (websocket && websocket.readyState === WebSocket.OPEN) {
+      websocket.send(JSON.stringify({ type: "stop" }));
+    }
+  }
+
+  // --- Helpers & Events ---
+  initBtn.addEventListener("click", async () => {
+    if (isInitialized) {
+      if (settingsStatusText)
+        settingsStatusText.textContent = "Pipeline already initialized.";
+      return;
+    }
+    initBtn.disabled = true;
+    updateStatus("prepping", "Initializing Models...");
+    appendLog("Initializing models...", "info");
+    if (settingsStatusText)
+      settingsStatusText.textContent =
+        "Loading models (this may take ~1 minute on first run)..."; // Keep this for prominent display
+
+    try {
+      const sourceLang = inputLanguageSelect.value;
+      const targetLang = outputLanguageSelect.value;
+      const ttsModel = ttsModelSelect.value;
+
+      appendLog(
+        `Attempting to initialize pipeline with: Source=${sourceLang.toUpperCase()}, Target=${targetLang.toUpperCase()}, TTS Model=${ttsModel}.`,
+        "info",
+      );
+
+      const response = await fetch(
+        `${API_URL}/initialize?source_lang=${sourceLang}&target_lang=${targetLang}&tts_model_choice=${ttsModel}`,
+        { method: "POST" },
+      );
+      const data = await response.json();
+
+      if (data.status === "success") {
+        isInitialized = true;
+        startBtn.disabled = false;
+        updateStatus("off", "Ready");
+        if (settingsStatusText) settingsStatusText.textContent = data.message;
+        appendLog(
+          `Pipeline initialized successfully: ${data.message}`,
+          "success",
+        );
+        connectWebSocket();
+      } else {
+        if (settingsStatusText)
+          settingsStatusText.textContent = `Initialization failed: ${data.message}`;
+        updateStatus("error", "Init Error");
+        appendLog(`Initialization failed: ${data.message}`, "error");
+        initBtn.disabled = false;
+      }
+    } catch (error) {
+      console.error("Initialization API error:", error);
+      if (settingsStatusText)
+        settingsStatusText.textContent = `Initialization failed: ${error.message}`;
+      updateStatus("error", "Init Error");
+      appendLog(`Initialization API error: ${error.message}`, "error");
+      initBtn.disabled = false;
+    }
+  });
+
+  startBtn.addEventListener("click", startRecording);
+  stopBtn.addEventListener("click", stopRecording);
+
+  function sendConfigUpdate() {
+    if (websocket && websocket.readyState === WebSocket.OPEN) {
+      const config = {
+        type: "config_update",
+        source_lang: inputLanguageSelect.value,
+        target_lang: outputLanguageSelect.value,
+        tts_model_choice: ttsModelSelect.value,
+      };
+      websocket.send(JSON.stringify(config));
+      appendLog(
+        `Configuration updated: Source=${config.source_lang.toUpperCase()}, Target=${config.target_lang.toUpperCase()}, TTS Model=${config.tts_model_choice}.`,
+        "info",
+      );
+      if (settingsStatusText)
+        settingsStatusText.textContent = "Configuration updated."; // Keep this for immediate feedback
+    } else {
+      if (settingsStatusText)
+        settingsStatusText.textContent =
+          "Not connected to server. Cannot update config.";
+      appendLog("Not connected to server. Cannot update config.", "warning");
+    }
+  }
+
+  inputLanguageSelect.addEventListener("change", (event) => {
+    inputLanguageBadge.textContent = event.target.value.toUpperCase();
+    appendLog(
+      `Input language changed to ${event.target.value.toUpperCase()}.`,
+      "info",
+    );
+    sendConfigUpdate();
+  });
+
+  outputLanguageSelect.addEventListener("change", (event) => {
+    outputLanguageBadge.textContent = event.target.value.toUpperCase();
+    appendLog(
+      `Output language changed to ${event.target.value.toUpperCase()}.`,
+      "info",
+    );
+    sendConfigUpdate();
+  });
+
+  ttsModelSelect.addEventListener("change", (event) => {
+    appendLog(`TTS Model changed to ${event.target.value}.`, "info");
+    sendConfigUpdate();
+  });
+
+  // Helper function to escape HTML for safe display
+  function escapeHtml(unsafe) {
+    return unsafe
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  // Initial UI setup
+  resetUI();
+  updateStatus("off", "Awaiting Initialization");
+  startBtn.disabled = true;
+  stopBtn.disabled = true;
+
+  // --- Charting Implementation ---
+  // Custom Chart.js plugin for the real-time vertical line
+  const realtimeLinePlugin = {
+    id: 'realtimeLine',
+    beforeDraw: (chart) => {
+      if (!isRecording || recordingStartTime === 0) {
+        return;
+      }
+
+      const { ctx, chartArea: { left, right, top, bottom }, scales: { x } } = chart;
+      ctx.save();
+
+      // Draw the line
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(255, 255, 0, 0.8)'; // Yellow line
+      ctx.lineWidth = 2;
+
+      const currentTimeRelative = (performance.now() - recordingStartTime) / 1000;
+      const xCoordinate = x.getPixelForValue(currentTimeRelative);
+
+      // Ensure the line is within the chart area
+      if (xCoordinate >= left && xCoordinate <= right) {
+        ctx.moveTo(xCoordinate, top);
+        ctx.lineTo(xCoordinate, bottom);
+      }
+      ctx.stroke();
+      ctx.restore();
+    },
+  };
+
+  // Custom Chart.js plugin for drawing horizontal lines (segments)
+  const segmentDrawingPlugin = {
+    id: 'segmentDrawing',
+    beforeDatasetsDraw: (chart, args, pluginOptions) => {
+      const { ctx, chartArea: { left, right, top, bottom }, scales: { x, y } } = chart;
+      ctx.save();
+
+      chart.data.datasets.forEach((dataset) => {
+        if (dataset.type === 'scatter') { // Only apply to scatter datasets
+          const isInput = dataset.label === "Input Speech";
+          const yCategory = isInput ? "Input Speech" : "Translated Speech";
+          const base_yCenter = y.getPixelForValue(yCategory);
+          const lineWidth = dataset.borderWidth || 2; // Use dataset's borderWidth or default to 2px
+          const offsetPerSegment = 5; // Adjust this value for desired spacing
+
+          dataset.data.forEach(dataPoint => {
+            const yOffset = (dataPoint.index % 2) * offsetPerSegment; // Alternate offset for better visibility
+            const yCenter = base_yCenter + yOffset;
+
+            const startX = x.getPixelForValue(dataPoint.x);
+            const endX = x.getPixelForValue(dataPoint.x2);
+
+            console.log(`[Segment Drawing Debug] Dataset: ${dataset.label}, Index: ${dataPoint.index},
+              yCategory: ${yCategory}, base_yCenter: ${base_yCenter}, yOffset: ${yOffset}, yCenter: ${yCenter},
+              startX: ${startX}, endX: ${endX}, dataPoint.x: ${dataPoint.x}, dataPoint.x2: ${dataPoint.x2}`);
+
+            ctx.beginPath();
+            ctx.strokeStyle = dataset.borderColor;
+            ctx.lineWidth = lineWidth;
+            ctx.moveTo(startX, yCenter);
+            ctx.lineTo(endX, yCenter);
+            ctx.stroke();
+          });
+        }
+      });
+      ctx.restore();
+    }
+  };
+
+  // Set default locale for Chart.js to prevent TypeError
+  if (typeof Chart !== 'undefined') {
+    Chart.defaults.locale = 'en-US';
+  }
+
+  // Initialize Chart.js
+  const chartCanvas = document.getElementById("latencyTimelineChart");
+  if (chartCanvas) {
+    const ctx = chartCanvas.getContext("2d");
+    latencyChart = new Chart(ctx, {
+      type: "scatter", // Changed to scatter type
+      data: chartData,
+      options: {
+        indexAxis: "y", // Keep y-axis as category for labels
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            type: "linear",
+            position: "bottom",
+            title: {
+              display: true,
+              text: "Time (seconds from start)",
+              color: "#e0e0e0",
+            },
+            grid: {
+              color: "rgba(255, 255, 255, 0.1)",
+            },
+            ticks: {
+              color: "#e0e0e0",
+            },
+            min: 0,
+            max: 300, // Initial max set to 5 minutes (300 seconds)
+            beginAtZero: true,
+          },
+          y: {
+            type: "category",
+            labels: ["Input Speech", "Translated Speech"], // Explicit labels for clarity
+            offset: true,
+            stacked: false,
+            title: {
+              display: true,
+              text: "Pipeline Stage",
+              color: "#e0e0e0",
+            },
+            grid: {
+              color: "rgba(255, 255, 255, 0.1)",
+            },
+            ticks: {
+              color: "#e0e0e0",
+            },
+          },
+        },
+        plugins: {
+          legend: {
+            display: true,
+            labels: {
+              color: "#e0e0e0",
+              filter: function(legendItem, chartData) {
+                // Hide legend items for scatter datasets as they are drawn by custom plugin
+                return chartData.datasets[legendItem.datasetIndex].type !== 'scatter';
+              }
+            },
+          },
+          title: {
+            display: true,
+            text: "Speech Processing Timeline",
+            color: "#e0e0e0",
+            font: {
+              size: 16,
+            },
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const label = context.dataset.label || "";
+                const start = context.raw.x.toFixed(2);
+                const end = context.raw.x2 !== undefined ? context.raw.x2.toFixed(2) : start;
+                const duration = (end - start).toFixed(2);
+
+                let tooltipText = `${label}: ${start}s - ${end}s (${duration}s)`;
+
+                // If this is an input segment, try to find a corresponding output segment for latency
+                if (context.dataset.label === "Input Speech") {
+                  const inputSegmentIndex = context.dataIndex;
+                  // Find the corresponding output segment (assuming 1:1 mapping and same order)
+                  if (chartData.datasets[1].data[inputSegmentIndex]) {
+                    const outputStart = chartData.datasets[1].data[inputSegmentIndex].x;
+                    const latency = (outputStart - start).toFixed(2);
+                    tooltipText += ` | Latency to Output: ${latency}s`;
+                  }
+                }
+                return tooltipText;
+              },
+            },
+          },
+          realtimeLine: realtimeLinePlugin, // Register the custom plugin here
+          segmentDrawing: segmentDrawingPlugin, // Register the custom segment drawing plugin
+        },
+      },
+      plugins: [realtimeLinePlugin, segmentDrawingPlugin] // Register plugins at the chart level
+    });
+
+    // Update the real-time line every 100ms for smoother movement
+    setInterval(() => {
+      if (isRecording && recordingStartTime > 0 && latencyChart) {
+        latencyChart.update();
+      }
+    }, 100); 
+
+    console.log("Chart.js initialized successfully.");
+    console.log("Initial chartData:", chartData);
+  } else {
+    console.error("Chart canvas element not found!");
+    appendLog("Error: Chart canvas element not found.", "error");
+  }
 });

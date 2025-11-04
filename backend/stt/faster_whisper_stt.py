@@ -1,0 +1,88 @@
+from faster_whisper import WhisperModel
+import numpy as np
+from typing import Optional, Tuple
+
+
+class FasterWhisperSTT:
+    def __init__(
+        self, model_size: str = "tiny", device: str = "auto", compute_type: str = "int8"
+    ):
+        """
+        Initializes the FasterWhisperSTT model.
+
+        Args:
+            model_size (str): Size of the Whisper model to use (e.g., "tiny", "base", "small", "medium", "large").
+            device (str): Device to run the model on ("cpu", "cuda", "auto"). For M1/M2 Macs, "auto" should use MPS.
+            compute_type (str): Type of computation to use (e.g., "int8", "float16", "float32").
+        """
+        self.model = WhisperModel(model_size, device=device, compute_type=compute_type)
+        print(
+            f"FasterWhisperSTT initialized with model_size={model_size}, device={device}, compute_type={compute_type}"
+        )
+
+    def transcribe_audio(
+        self, audio_data: np.ndarray, sample_rate: int, language: Optional[str] = None
+    ) -> Tuple[str, float]:
+        """
+        Transcribes audio data using Faster-Whisper.
+
+        Args:
+            audio_data (np.ndarray): Audio data as a NumPy array (float32).
+            sample_rate (int): Sample rate of the audio data.
+            language (Optional[str]): Language of the audio. If None, it will be detected.
+
+        Returns:
+            Tuple[str, float]: A tuple containing the transcribed text and the transcription time in seconds.
+        """
+        # Faster-Whisper expects a file path or a numpy array of float32 at 16kHz
+        # Ensure audio_data is float32 and resample if necessary (though for testing, we assume 16kHz)
+        if sample_rate != 16000:
+            # In a real scenario, you'd resample here. For now, assume input is 16kHz.
+            print(
+                "Warning: Faster-Whisper expects 16kHz audio. Resampling not implemented in this wrapper."
+            )
+
+        # Faster-Whisper's transcribe method expects a path or a float32 numpy array
+        # We'll pass the numpy array directly.
+
+        import time
+
+        start_time = time.time()
+
+        # Enable VAD filter to ignore non-speech segments
+        segments, info = self.model.transcribe(
+            audio_data, language=language, beam_size=5, vad_filter=True
+        )
+
+        transcribed_text = " ".join([segment.text for segment in segments])
+
+        end_time = time.time()
+        transcription_time = end_time - start_time
+
+        print(
+            f"Transcribed: '{transcribed_text}' in {transcription_time:.2f}s (language: {language or 'detected'})"
+        )
+        return transcribed_text, transcription_time
+
+
+if __name__ == "__main__":
+    import soundfile as sf
+    import os
+
+    dummy_audio_path = "dummy_audio_faster.wav"
+    sample_rate = 16000
+    duration = 5  # seconds
+    frequency = 440  # Hz
+    t = np.linspace(0, duration, int(sample_rate * duration), endpoint=False)
+    dummy_audio_data = 0.5 * np.sin(2 * np.pi * frequency * t).astype(np.float32)
+    sf.write(dummy_audio_path, dummy_audio_data, sample_rate)
+
+    stt_model = FasterWhisperSTT(model_size="tiny")
+
+    audio_data, sr = sf.read(dummy_audio_path)
+
+    text, time = stt_model.transcribe_audio(audio_data, sr, language="en")
+    print(f"Final Transcription: {text}")
+    print(f"Transcription Time: {time:.2f}s")
+
+    os.remove(dummy_audio_path)

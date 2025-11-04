@@ -14,11 +14,9 @@ class MLXWhisperSTT:
             compute_type (str): Type of computation to use (e.g., "int8", "float16", "float32").
                                 Note: MLX handles device automatically on Apple Silicon.
         """
-        # The mlx_whisper.transcribe.transcribe function loads the model internally.
-        # We store the model_size to pass it to the transcribe function later.
-        self.model_size = model_size
-        self.compute_type = compute_type # Store for consistency, though not directly used by transcribe()
-        print(f"MLXWhisperSTT initialized with model_size={model_size}, compute_type={compute_type}")
+        self.model_id = f"mlx-community/whisper-{model_size}" if "/" not in model_size else model_size
+        self.compute_type = compute_type
+        print(f"MLXWhisperSTT initialized with model_id={self.model_id}, compute_type={compute_type}")
 
     def transcribe_audio(self, audio_data: np.ndarray, sample_rate: int, language: Optional[str] = None) -> Tuple[str, float]:
         """
@@ -37,9 +35,7 @@ class MLXWhisperSTT:
         import time
         start_time = time.time()
 
-        # Call transcribe with audio and model_size (path_or_hf_repo)
-        # The 'language' parameter is passed as an option to transcribe.
-        result = transcribe(audio_mx, path_or_hf_repo=self.model_size, language=language)
+        result = transcribe(audio_mx, path_or_hf_repo=self.model_id, language=language)
         
         transcribed_text = result['text'].strip()
         
