@@ -1,0 +1,4 @@
+In this experiment, the system converts spoken English into text, translates it into Slovak and then synthesizes it back into speech. 
+The process involves three stages, speech recognition, machine translation, and text to speech. 
+Each model introduces a small delay, so we will measure the overall latency. 
+The main objective is to achieve natural communication despite language barriers.

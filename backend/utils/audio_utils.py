@@ -7,7 +7,10 @@ import os
 
 from typing import Optional
 
-def load_audio(file_path: str, target_sr: Optional[int] = None) -> Tuple[np.ndarray, int]:
+
+def load_audio(
+    file_path: str, target_sr: Optional[int] = None
+) -> Tuple[np.ndarray, int]:
     """
     Loads an audio file and optionally resamples it.
 
@@ -18,7 +21,7 @@ def load_audio(file_path: str, target_sr: Optional[int] = None) -> Tuple[np.ndar
     Returns:
         Tuple[np.ndarray, int]: Audio data as a NumPy array (float32) and its sample rate.
     """
-    audio_data, sr = sf.read(file_path, dtype='float32')
+    audio_data, sr = sf.read(file_path, dtype="float32")
 
     # sf.read can return stereo audio, convert to mono if necessary
     if audio_data.ndim > 1:
@@ -30,8 +33,9 @@ def load_audio(file_path: str, target_sr: Optional[int] = None) -> Tuple[np.ndar
         resampler = torchaudio.transforms.Resample(orig_freq=sr, new_freq=target_sr)
         audio_data = resampler(audio_tensor).numpy()
         sr = target_sr
-    
+
     return audio_data, sr
+
 
 def save_audio(file_path: str, audio_data: np.ndarray, sample_rate: int):
     """
@@ -43,6 +47,7 @@ def save_audio(file_path: str, audio_data: np.ndarray, sample_rate: int):
         sample_rate (int): Sample rate of the audio data.
     """
     sf.write(file_path, audio_data, sample_rate)
+
 
 def normalize_audio(audio_data: np.ndarray) -> np.ndarray:
     """
@@ -58,6 +63,7 @@ def normalize_audio(audio_data: np.ndarray) -> np.ndarray:
     if max_abs > 0:
         return audio_data / max_abs
     return audio_data
+
 
 if __name__ == "__main__":
     # Example Usage:
@@ -83,7 +89,9 @@ if __name__ == "__main__":
     # Test normalization
     normalized_audio = normalize_audio(loaded_audio)
     print(f"Normalized audio max abs: {np.max(np.abs(normalized_audio))}")
-    assert np.isclose(np.max(np.abs(normalized_audio)), 1.0) or np.all(normalized_audio == 0)
+    assert np.isclose(np.max(np.abs(normalized_audio)), 1.0) or np.all(
+        normalized_audio == 0
+    )
 
     # Test saving
     output_audio_path = "output_resampled_normalized.wav"

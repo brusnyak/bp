@@ -1,0 +1,271 @@
+1. can we update the chart to show 2 lines separately, right now it's weird since it shows the input as if it doesn't stop, despite the fact i made some big pauses.
+
+
+
+console:
+WebSocket connected.
+script.js:400 Playback AudioContext created with sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880. Actual sinkId used: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880
+script.js:400 Playback AudioContext created with sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880. Actual sinkId used: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880
+(index):1  Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+2script.js:400 Playback AudioContext created with sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880. Actual sinkId used: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880
+2script.js:400 Playback AudioContext created with sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880. Actual sinkId used: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880
+2script.js:400 Playback AudioContext created with sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880. Actual sinkId used: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880
+script.js:400 Playback AudioContext created with sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880. Actual sinkId used: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880
+2script.js:400 Playback AudioContext created with sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880. Actual sinkId used: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880
+
+
+
+Latency Breakdown
+Input to STT:
+10.46s
+STT to MT:
+0.37s
+MT to TTS:
+0.49s
+TTS to Playback:
+0.09s
+Backend Pipeline:
+1.58s
+Total E2E Latency:
+0.09s
+Microphone set to: Default
+Activity Log
+[Playing synthesized audio to BlackHole.]
+
+[Playback AudioContext created. Attempted sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880. Actual sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880]
+
+[Playing synthesized audio to BlackHole.]
+
+[Playback AudioContext created. Attempted sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880. Actual sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880]
+
+[Playing synthesized audio to BlackHole.]
+
+[Playback AudioContext created. Attempted sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880. Actual sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880]
+
+[Playing synthesized audio to BlackHole.]
+
+[Playback AudioContext created. Attempted sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880. Actual sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880]
+
+[Playing synthesized audio to BlackHole.]
+
+[Playback AudioContext created. Attempted sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880. Actual sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880]
+
+[Playing synthesized audio to BlackHole.]
+
+[Playback AudioContext created. Attempted sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880. Actual sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880]
+
+[Playing synthesized audio to BlackHole.]
+
+[Playback AudioContext created. Attempted sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880. Actual sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880]
+
+[Playing synthesized audio to BlackHole.]
+
+[Playback AudioContext created. Attempted sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880. Actual sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880]
+
+[Playing synthesized audio to BlackHole.]
+
+[Playback AudioContext created. Attempted sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880. Actual sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880]
+
+[Playing synthesized audio to BlackHole.]
+
+[Playback AudioContext created. Attempted sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880. Actual sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880]
+
+[Playing synthesized audio to BlackHole.]
+
+[Playback AudioContext created. Attempted sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880. Actual sinkId: 33c6b9f1c4428815387f144905e1bb3a8d5267a33cad5c7f2ad1be53dbe69880]
+
+[Using default microphone for input.]
+
+[Found BlackHole 2ch output device: BlackHole 2ch (Virtual)]
+
+[WebSocket connected.]
+
+[Pipeline initialized successfully: Models initialization triggered.]
+
+[Attempting to initialize pipeline with: Source=EN, Target=CS, TTS Model=piper.]
+
+[Initializing models...]
+
+
+terminal:
+^[[A^[[A%                                                                                                                              
+(BP) yegor@tourist BP % python app.py
+/Users/yegor/.pyenv/versions/3.10.13/lib/python3.10/site-packages/webrtcvad.py:1: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+INFO:     Started server process [54152]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on https://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:54144 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54144 - "GET /ui/style.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54146 - "GET /ui/script.js HTTP/1.1" 200 OK
+App: Received initialization request: source_lang=en, target_lang=cs, tts_model_choice=piper
+Backend: Initializing models...
+Backend: Initializing FasterWhisperSTT...
+FasterWhisperSTT initialized with model_size=tiny, device=auto, compute_type=int8
+Backend: FasterWhisperSTT initialized.
+Backend: Initializing CTranslate2MT...
+CTranslate2MT initialized with device=cpu (forced to CPU for MPS compatibility).
+CTranslate2MT initialized with model_path=ct2_models/Helsinki-NLP--opus-mt-en-sk, device=cpu
+Backend: CTranslate2MT initialized.
+Backend: Attempting to initialize PiperTTS with model_id=cs_CZ-jirka-medium
+PiperTTS: MPS device detected and will be used.
+PiperTTS initialized with model: cs_CZ-jirka-medium, device: mps, speaker_id: 0
+Backend: PiperTTS initialized.
+Backend: Initializing WebRTC VAD with aggressiveness=3...
+Backend: WebRTC VAD initialized.
+Backend: All models initialized (or attempted to initialize).
+App: Broadcasting models_loading_status: fully_loaded=True
+INFO:     127.0.0.1:54146 - "POST /initialize?source_lang=en&target_lang=cs&tts_model_choice=piper HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54179 - "WebSocket /ws" [accepted]
+App: WebSocket accepted from 127.0.0.1:54179
+App: Sending personal models_loading_status to new websocket: fully_loaded=True
+INFO:     connection open
+Client connected from 127.0.0.1:54179
+INFO:     127.0.0.1:54146 - "GET /ui/audio-processor.js HTTP/1.1" 200 OK
+Received 'start' command. Beginning transcription.
+
+Backend: Processing speech segment (0.09s)...
+Transcribed: '' in 0.13s (language: en)
+
+Backend: Processing speech segment (4.50s)...
+Transcribed: ' Hello, my name is Nathan and I'm testing the live speech translation.' in 0.67s (language: en)
+Translated ' Hello, my name is Nathan and I'm testing the live speech translation.' (en) to 'Zdravím, volám sa Nathan a skúšam živý preklad reči.' (cs) in 0.3217s
+Piper synthesized text: 'Zdravím, volám sa Nathan a skúšam živý preklad reči.' in 0.3573s (language: cs, speaker: 0)
+
+Backend: Processing speech segment (2.70s)...
+Transcribed: ' during the conference with voice cloning.' in 0.51s (language: en)
+Translated ' during the conference with voice cloning.' (en) to 'počas konferencie s hlasovým klonovaním.' (cs) in 0.1495s
+Piper synthesized text: 'počas konferencie s hlasovým klonovaním.' in 0.1882s (language: cs, speaker: 0)
+
+Backend: Processing speech segment (0.18s)...
+Transcribed: '' in 0.05s (language: en)
+
+Backend: Processing speech segment (1.44s)...
+Transcribed: '' in 0.06s (language: en)
+
+Backend: Processing speech segment (0.21s)...
+Transcribed: '' in 0.06s (language: en)
+
+Backend: Processing speech segment (2.01s)...
+Transcribed: '' in 0.45s (language: en)
+
+Backend: Processing speech segment (0.09s)...
+Transcribed: '' in 0.03s (language: en)
+
+Backend: Processing speech segment (0.18s)...
+Transcribed: '' in 0.08s (language: en)
+
+Backend: Processing speech segment (5.28s)...
+Transcribed: ' There is still some echo when I turn on the volume a little bit.' in 0.51s (language: en)
+Translated ' There is still some echo when I turn on the volume a little bit.' (en) to 'Keď trochu zapnem hlasitosť, stále je tam nejaká ozvena.' (cs) in 0.3122s
+Piper synthesized text: 'Keď trochu zapnem hlasitosť, stále je tam nejaká ozvena.' in 0.3039s (language: cs, speaker: 0)
+
+Backend: Processing speech segment (6.12s)...
+Transcribed: ' which seems to be weird because I have a separate audio device set to black hole.' in 0.61s (language: en)
+Translated ' which seems to be weird because I have a separate audio device set to black hole.' (en) to 'Čo sa zdá byť divné, pretože mám samostatné audio zariadenie nastavené na čiernu dieru.' (cs) in 0.2306s
+Piper synthesized text: 'Čo sa zdá byť divné, pretože mám samostatné audio zariadenie nastavené na čiernu dieru.' in 0.4297s (language: cs, speaker: 0)
+
+Backend: Processing speech segment (3.30s)...
+Transcribed: ' Sing with aggregate device, which I see.' in 0.49s (language: en)
+Translated ' Sing with aggregate device, which I see.' (en) to 'Spievaj s agregátnym zariadením, čo vidím.' (cs) in 0.2045s
+Piper synthesized text: 'Spievaj s agregátnym zariadením, čo vidím.' in 0.2273s (language: cs, speaker: 0)
+
+Backend: Processing speech segment (0.93s)...
+Transcribed: ' separately.' in 0.42s (language: en)
+Translated ' separately.' (en) to 'samostatne.' (cs) in 0.0364s
+Piper synthesized text: 'samostatne.' in 0.0769s (language: cs, speaker: 0)
+
+Backend: Processing speech segment (0.24s)...
+Transcribed: '' in 0.05s (language: en)
+
+Backend: Processing speech segment (0.09s)...
+Transcribed: '' in 0.05s (language: en)
+
+Backend: Processing speech segment (4.02s)...
+Transcribed: ' Alright, this is a test of speech processing timeline.' in 0.51s (language: en)
+Translated ' Alright, this is a test of speech processing timeline.' (en) to 'Dobre, toto je skúška času na spracovanie reči.' (cs) in 0.1760s
+Piper synthesized text: 'Dobre, toto je skúška času na spracovanie reči.' in 0.2202s (language: cs, speaker: 0)
+
+Backend: Processing speech segment (4.35s)...
+Transcribed: ' Right now I've only seen the input speech which sounds weird.' in 0.52s (language: en)
+Translated ' Right now I've only seen the input speech which sounds weird.' (en) to 'Práve teraz som videl len vstupný prejav, ktorý znie divne.' (cs) in 0.1663s
+Piper synthesized text: 'Práve teraz som videl len vstupný prejav, ktorý znie divne.' in 0.2724s (language: cs, speaker: 0)
+
+Backend: Processing speech segment (1.65s)...
+Transcribed: ' And, despite the fact,' in 0.42s (language: en)
+Translated ' And, despite the fact,' (en) to 'A napriek tomu,' (cs) in 0.0718s
+Piper synthesized text: 'A napriek tomu,' in 0.0805s (language: cs, speaker: 0)
+
+Backend: Processing speech segment (4.56s)...
+Transcribed: ' The theory is a very good stop in at least a couple of seconds.' in 0.57s (language: en)
+Translated ' The theory is a very good stop in at least a couple of seconds.' (en) to 'Teória je veľmi dobrá zastávka aspoň za pár sekúnd.' (cs) in 0.1653s
+Piper synthesized text: 'Teória je veľmi dobrá zastávka aspoň za pár sekúnd.' in 0.2282s (language: cs, speaker: 0)
+
+Backend: Processing speech segment (9.51s)...
+Transcribed: ' It doesn't display it in the speech process in timer.  It only shows the input speech, the hole from like 8 seconds to the end of it.' in 0.73s (language: en)
+Translated ' It doesn't display it in the speech process in timer.  It only shows the input speech, the hole from like 8 seconds to the end of it.' (en) to 'Nezobrazuje ho v rečovom procese v časovači. Zobrazuje len vstupnú reč, dieru z asi 8 sekúnd na jej koniec.' (cs) in 0.3661s
+Piper synthesized text: 'Nezobrazuje ho v rečovom procese v časovači. Zobrazuje len vstupnú reč, dieru z asi 8 sekúnd na jej koniec.' in 0.4665s (language: cs, speaker: 0)
+
+Backend: Processing speech segment (0.36s)...
+Transcribed: '' in 0.06s (language: en)
+
+Backend: Processing speech segment (1.83s)...
+Transcribed: '' in 0.05s (language: en)
+
+Backend: Processing speech segment (0.42s)...
+Transcribed: '' in 0.45s (language: en)
+
+Backend: Processing speech segment (0.27s)...
+Transcribed: '' in 0.07s (language: en)
+
+Backend: Processing speech segment (0.09s)...
+Transcribed: '' in 0.05s (language: en)
+
+Backend: Processing speech segment (0.18s)...
+Transcribed: '' in 0.06s (language: en)
+
+Backend: Processing speech segment (0.09s)...
+Transcribed: '' in 0.05s (language: en)
+
+Backend: Processing speech segment (0.36s)...
+Transcribed: '' in 0.10s (language: en)
+
+Backend: Processing speech segment (1.02s)...
+Transcribed: '' in 0.06s (language: en)
+
+Backend: Processing speech segment (0.48s)...
+Transcribed: '' in 0.05s (language: en)
+
+Backend: Processing speech segment (0.84s)...
+Transcribed: '' in 0.10s (language: en)
+
+Backend: Processing speech segment (0.78s)...
+Transcribed: '' in 0.10s (language: en)
+
+Backend: Processing speech segment (0.36s)...
+Transcribed: '' in 0.07s (language: en)
+
+Backend: Processing speech segment (0.09s)...
+Transcribed: '' in 0.04s (language: en)
+
+Backend: Processing speech segment (0.36s)...
+Transcribed: '' in 0.15s (language: en)
+
+Backend: Processing speech segment (0.36s)...
+Transcribed: '' in 0.05s (language: en)
+
+Backend: Processing speech segment (0.27s)...
+Transcribed: '' in 0.04s (language: en)
+
+Backend: Processing speech segment (0.24s)...
+Transcribed: '' in 0.05s (language: en)
+^CINFO:     Shutting down
+An unexpected error occurred: Cannot call "receive" once a disconnect message has been received.
+Client 127.0.0.1:54179 handler finished.
+App: WebSocket error: Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+INFO:     connection closed
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [54152]
+(BP) yegor@tourist BP % 
