@@ -1,0 +1,30 @@
+hey there, i'm starting to work on my @/bp project - live speech translation during the call/conference.
+
+it will be a simple backend + frontend project based on modules -> STT, MT and TTS.
+
+i want you to check entire information i have about the project, let me know if you have any questions.
+
+then help me create modular tests, cmpare models, after decision and succesfull test update requirements to include all necesaty dependencies.
+
+the crucial and hard thing will be dependencies configuration.
+so please note, i'm programing on mac with m1 pro chip and mps support.
+using conda env ->(base) yegor@tourist BP % conda deactivate && conda activate BP
+(BP) yegor@tourist BP % 
+
+the testing will happen based on the @"/test/My test speech_xtts_speaker_clean.wav" and @/test/Voice-Training.wav for voice training of TTS
+
+
+check info, and help me with STT models, we should test many of them on 'my test speech'.  mlx, faster-whisper, deepspeech, Wav2vec, kaldi, SpeechBrain, groq-whisper-large-v3-turbo, Kyutai STT, Agora's Real-Time Speech to Text 
+
+next for mt we should test:
+marian, SeamlessM4T-v2 or NLLB-200, model mentioned in @/comaprison.txt, Qwen-MT, opus mt
+
+after for tts we should test models that support voice cloning/training, multilanguage, and simple pretrained voice but super fast:
+chatterbox, piper, Mozilla TTS, ChatTTS (i tied before xtts v2, and it's too slow for live speech translation), MeloTTS, Mimic 3,  Bark, Higgs Audio V2
+
+but we should also make our reaserch and decision and which is more prior to this project. and remeber that we only need to test it step by step. first with stt then mt and finaly when the first 2 are fit/set and are best with minimal latency - tts.
+
+info of the project @/description.txt @/Makefile 
+
+the project should be built on free/open source. be robust/fast and multilanguage
+main testing in en->sk and vice versa

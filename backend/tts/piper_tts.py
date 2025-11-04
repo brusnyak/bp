@@ -3,24 +3,84 @@ import numpy as np
 import soundfile as sf
 import io
 from typing import Tuple, Optional
+import os
+import torch  # Import torch for MPS check
+
 
 class PiperTTS:
-    def __init__(self, model_path: str, speaker_id: int = 0, **kwargs):
+    def __init__(
+        self,
+        model_id: str = "cs_CZ-jirka-medium",
+        speaker_id: int = 0,
+        device: str = "auto",
+    ):
         """
         Initializes the Piper TTS model.
 
         Args:
-            model_path (str): Path to the Piper ONNX model file.
+            model_id (str): The ID of the Piper model (e.g., "cs_CZ-jirka-medium").
+                            This will be used to construct the path to the ONNX model file.
             speaker_id (int): The ID of the speaker to use for synthesis.
-            **kwargs: Additional arguments for PiperVoice.load (e.g., use_mps=True).
+            device (str): Device to run the model on ("cpu", "mps"). "auto" will use MPS if available.
         """
-        # PiperVoice.load expects only the model_path, it will automatically look for the .json config
-        # Add use_mps=True for Apple Silicon MPS acceleration
-        self.model = PiperVoice.load(model_path, **kwargs)
+        self.model_id = model_id
         self.speaker_id = speaker_id
-        print(f"PiperTTS initialized with model: {model_path}, speaker_id: {speaker_id}")
+        self.device = device
 
-    def synthesize_speech(self, text: str, language: str, speaker_id: Optional[int] = None) -> Tuple[np.ndarray, int, float]:
+        # Construct model path based on project structure
+        # Assuming models are downloaded to backend/tts/piper_models/
+        base_model_dir = os.path.join("backend", "tts", "piper_models")
+        onnx_model_path = os.path.join(base_model_dir, f"{model_id}.onnx")
+        json_config_path = os.path.join(base_model_dir, f"{model_id}.onnx.json")
+
+        # Check if model files exist, if not, provide instructions or attempt download
+        if not os.path.exists(onnx_model_path) or not os.path.exists(json_config_path):
+            print(f"Error: Piper model files not found for {model_id}.")
+            print(
+                f"Please download '{model_id}.onnx' and '{model_id}.onnx.json' to '{base_model_dir}'."
+            )
+            print("Example download for cs_CZ-jirka-medium:")
+            print(
+                "  https://huggingface.co/rhasspy/piper-voices/resolve/main/cs/cs_CZ/vits/fairseq/medium/cs_CZ-fairseq-medium.onnx"
+            )
+            print(
+                "  https://huggingface.co/rhasspy/piper-voices/resolve/main/cs/cs_CZ/vits/fairseq/medium/cs_CZ-fairseq-medium.json"
+            )
+            raise FileNotFoundError(f"Piper model files not found for {model_id}")
+
+        # Determine if MPS should be used
+        use_mps = False
+        if self.device == "auto":
+            if torch.backends.mps.is_available():
+                use_mps = True
+                self.device = "mps"
+                print("PiperTTS: MPS device detected and will be used.")
+            else:
+                self.device = "cpu"
+                print("PiperTTS: MPS not available, falling back to CPU.")
+        elif self.device == "mps":
+            if torch.backends.mps.is_available():
+                use_mps = True
+                print("PiperTTS: MPS device explicitly requested and available.")
+            else:
+                self.device = "cpu"
+                print(
+                    "WARNING: PiperTTS: MPS device requested but not available, falling back to CPU."
+                )
+        elif self.device == "cpu":
+            print("PiperTTS: CPU device explicitly requested.")
+
+        # Load Piper model
+        # The 'use_mps' argument is not supported in this version of Piper.
+        # Piper is expected to handle MPS automatically if available and configured in the environment.
+        self.model = PiperVoice.load(onnx_model_path)
+        print(
+            f"PiperTTS initialized with model: {model_id}, device: {self.device}, speaker_id: {speaker_id}"
+        )
+
+    def synthesize(
+        self, text: str, language: str = "sk", output_path: Optional[str] = None
+    ) -> Tuple[np.ndarray, int, float]:
         """
         Synthesizes speech from text using Piper.
 
@@ -28,124 +88,48 @@ class PiperTTS:
             text (str): The text to synthesize.
             language (str): The language of the text (e.g., "en", "cs", "sk").
                             Piper uses ISO 639-1 codes. For Slovak, 'cs' (Czech) is a good proxy.
-            speaker_id (Optional[int]): Override default speaker ID for this synthesis.
+            output_path (Optional[str]): Path to save the synthesized audio.
 
         Returns:
             Tuple[np.ndarray, int, float]: A tuple containing the synthesized audio (numpy array),
                                            sample rate, and synthesis time in seconds.
         """
-        actual_speaker_id = speaker_id if speaker_id is not None else self.speaker_id
-        
+        # Piper's synthesize_wav method does not take a language argument directly.
+        # The language is determined by the loaded model.
+        # For Slovak, we are using a Czech model as a proxy.
+
         import time
-        import wave # Import wave module
+        import wave  # Import wave module
+
         start_time = time.perf_counter()
 
         audio_buffer = io.BytesIO()
+        # Get audio parameters from the Piper model's config
+        # Piper's config might not directly expose num_channels or sample_width.
+        # Assuming common values for TTS output: 1 channel (mono), 2 bytes per sample (16-bit).
+        sample_rate = self.model.config.sample_rate
+        num_channels = 1  # Most TTS models output mono audio
+        sample_width = 2  # 16-bit audio is common, which is 2 bytes per sample
+
         with wave.open(audio_buffer, "wb") as wav_file:
+            wav_file.setnchannels(num_channels)
+            wav_file.setsampwidth(sample_width)
+            wav_file.setframerate(sample_rate)
+            # Piper's synthesize_wav expects text and a file-like object, without speaker_id
             self.model.synthesize_wav(text, wav_file)
-        audio_buffer.seek(0) # Rewind the buffer to read its content
+        audio_buffer.seek(0)  # Rewind the buffer to read its content
 
         audio_waveform, sample_rate = sf.read(audio_buffer)
-        
+
         end_time = time.perf_counter()
         synthesis_time = end_time - start_time
 
-        print(f"Piper synthesized text: '{text}' in {synthesis_time:.4f}s (language: {language}, speaker: {actual_speaker_id})")
+        print(
+            f"Piper synthesized text: '{text}' in {synthesis_time:.4f}s (language: {language}, speaker: {self.speaker_id})"
+        )
+
+        if output_path:
+            sf.write(output_path, audio_waveform, sample_rate)
+            print(f"Saved synthesized audio to {output_path}")
+
         return audio_waveform, sample_rate, synthesis_time
-
-if __name__ == "__main__":
-    # Example Usage:
-    import soundfile as sf
-    import os
-
-    # To run this example, you need to download a Piper model and its config.
-    # For example, for a Czech model (as a proxy for Slovak):
-    # Model: https://huggingface.co/rhasspy/piper-voices/resolve/main/cs/cs_CZ/vits/fairseq/medium/cs_CZ-fairseq-medium.onnx
-    # Config: https://huggingface.co/rhasspy/piper-voices/resolve/main/cs/cs_CZ/vits/fairseq/medium/cs_CZ-fairseq-medium.json
-    
-    # Create dummy model and config files for demonstration if they don't exist
-    dummy_model_path = "dummy_piper_model.onnx"
-    dummy_config_path = "dummy_piper_model.json"
-
-    if not os.path.exists(dummy_model_path):
-        print(f"WARNING: {dummy_model_path} not found. Piper TTS example will use mock data.")
-        # Create a minimal dummy ONNX file (not functional, just to satisfy file existence)
-        with open(dummy_model_path, "wb") as f:
-            f.write(b'\x08\x01\x12\x00') # Minimal ONNX header
-    
-    if not os.path.exists(dummy_config_path):
-        print(f"WARNING: {dummy_config_path} not found. Piper TTS example will use mock data.")
-        # Create a minimal dummy config file
-        with open(dummy_config_path, "w") as f:
-            f.write('{"audio": {"sample_rate": 22050}, "speakers": {"default": 0}}')
-
-    # Mock PiperVoice.load_from_file for testing without actual model files
-    class MockPiperVoice:
-        def __init__(self, sample_rate=22050):
-            class MockConfig:
-                def __init__(self, sr):
-                    self.sample_rate = sr
-            self.config = MockConfig(sample_rate)
-            self.speaker_id_map = {"default": 0} # Mock speaker map
-
-        def synthesize_text(self, text, speaker_id=0):
-            # Mock synthesis: generate a simple sine wave
-            duration = len(text) * 0.05  # Estimate duration
-            t = np.linspace(0, duration, int(self.config.sample_rate * duration), endpoint=False)
-            audio_waveform_float32 = (0.3 * np.sin(2 * np.pi * 300 * t) + 0.2 * np.sin(2 * np.pi * 600 * t)).astype(np.float32)
-            audio_waveform_int16 = (audio_waveform_float32 * 32767).astype(np.int16)
-            return audio_waveform_int16.tobytes()
-
-    # Mock PiperVoice.load for testing without actual model files
-    class MockPiperVoice:
-        def __init__(self, sample_rate=22050):
-            class MockConfig:
-                def __init__(self, sr):
-                    self.sample_rate = sr
-            self.config = MockConfig(sample_rate)
-            self.speaker_id_map = {"default": 0} # Mock speaker map
-
-        def synthesize_wav(self, text, wav_file, speaker_id=0):
-            # Mock synthesis: generate a simple sine wave
-            duration = len(text) * 0.05  # Estimate duration
-            t = np.linspace(0, duration, int(self.config.sample_rate * duration), endpoint=False)
-            audio_waveform_float32 = (0.3 * np.sin(2 * np.pi * 300 * t) + 0.2 * np.sin(2 * np.pi * 600 * t)).astype(np.float32)
-            
-            # Write mock WAV header and data
-            wav_file.setnchannels(1)
-            wav_file.setsampwidth(2) # 16-bit PCM
-            wav_file.setframerate(self.config.sample_rate)
-            wav_file.writeframes((audio_waveform_float32 * 32767).astype(np.int16).tobytes())
-
-    # Temporarily replace PiperVoice.load for testing
-    original_load = PiperVoice.load
-    PiperVoice.load = lambda mp, **kwargs: MockPiperVoice()
-
-    try:
-        # Initialize PiperTTS with dummy paths
-        piper_tts_model = PiperTTS(model_path=dummy_model_path, speaker_id=0)
-
-        # Synthesize speech in Czech (as proxy for Slovak)
-        text_cs = "Ahoj, toto je testovacia veta v češtine."
-        audio_cs, sr_cs, time_cs = piper_tts_model.synthesize_speech(text_cs, "cs")
-        sf.write("output_cs_piper.wav", audio_cs, sr_cs)
-        print(f"Saved Piper Czech speech to output_cs_piper.wav (Time: {time_cs:.4f}s)")
-
-        # Synthesize speech in English (if the model supports it, or use a generic voice)
-        text_en = "Hello, this is a test sentence in English from Piper."
-        audio_en, sr_en, time_en = piper_tts_model.synthesize_speech(text_en, "en")
-        sf.write("output_en_piper.wav", audio_en, sr_en)
-        print(f"Saved Piper English speech to output_en_piper.wav (Time: {time_en:.4f}s)")
-
-    finally:
-        # Restore original load
-        PiperVoice.load = original_load
-        # Clean up dummy files
-        if os.path.exists(dummy_model_path):
-            os.remove(dummy_model_path)
-        if os.path.exists(dummy_config_path):
-            os.remove(dummy_config_path)
-        if os.path.exists("output_cs_piper.wav"):
-            os.remove("output_cs_piper.wav")
-        if os.path.exists("output_en_piper.wav"):
-            os.remove("output_en_piper.wav")
