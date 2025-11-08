@@ -17,11 +17,16 @@ class CTranslate2MT:
                               If a Hugging Face model ID, it will be converted and saved locally.
             device (str): Device to run the model on ("cpu", "cuda", "auto"). "auto" will use MPS on Apple Silicon.
         """
-        # CTranslate2 does not directly support "mps" as a device. Use "cpu" for Apple Silicon.
-        self.device = "cpu"
-        print(
-            f"CTranslate2MT initialized with device={self.device} (forced to CPU for MPS compatibility)."
-        )
+        if device == "auto":
+            if torch.backends.mps.is_available():
+                self.device = "mps"
+                print("CTranslate2MT: MPS device detected and will be used.")
+            else:
+                self.device = "cpu"
+                print("CTranslate2MT: MPS not available, falling back to CPU.")
+        else:
+            self.device = device
+            print(f"CTranslate2MT: Using specified device: {self.device}.")
 
         # CTranslate2 models are typically pre-converted.
         # For simplicity, we'll assume the model_path points to a converted directory.

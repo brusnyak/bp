@@ -1,0 +1,2 @@
+Please place the reference transcript for your Slovak test speech in this file (e.g., "Toto je testovacia veta.").
+This file serves as a placeholder.
