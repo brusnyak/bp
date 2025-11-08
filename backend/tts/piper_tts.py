@@ -34,19 +34,19 @@ class PiperTTS:
         json_config_path = os.path.join(base_model_dir, f"{model_id}.onnx.json")
 
         # Check if model files exist, if not, provide instructions or attempt download
+        print(f"PiperTTS: Attempting to load model '{model_id}'.")
+        print(f"PiperTTS: Expected ONNX model path: {os.path.abspath(onnx_model_path)}")
+        print(f"PiperTTS: Expected JSON config path: {os.path.abspath(json_config_path)}")
+        print(f"PiperTTS: os.path.exists(onnx_model_path): {os.path.exists(onnx_model_path)}")
+        print(f"PiperTTS: os.path.exists(json_config_path): {os.path.exists(json_config_path)}")
+
         if not os.path.exists(onnx_model_path) or not os.path.exists(json_config_path):
-            print(f"Error: Piper model files not found for {model_id}.")
+            print(f"Error: Piper model files not found for {model_id} at the expected paths.")
             print(
-                f"Please download '{model_id}.onnx' and '{model_id}.onnx.json' to '{base_model_dir}'."
-            )
-            print("Example download for cs_CZ-jirka-medium:")
-            print(
-                "  https://huggingface.co/rhasspy/piper-voices/resolve/main/cs/cs_CZ/vits/fairseq/medium/cs_CZ-fairseq-medium.onnx"
-            )
-            print(
-                "  https://huggingface.co/rhasspy/piper-voices/resolve/main/cs/cs_CZ/vits/fairseq/medium/cs_CZ-fairseq-medium.json"
+                f"Please ensure '{model_id}.onnx' and '{model_id}.onnx.json' are present in '{os.path.abspath(base_model_dir)}'."
             )
             raise FileNotFoundError(f"Piper model files not found for {model_id}")
+
 
         # Determine if MPS should be used
         use_mps = False
@@ -73,10 +73,14 @@ class PiperTTS:
         # Load Piper model
         # The 'use_mps' argument is not supported in this version of Piper.
         # Piper is expected to handle MPS automatically if available and configured in the environment.
-        self.model = PiperVoice.load(onnx_model_path)
-        print(
-            f"PiperTTS initialized with model: {model_id}, device: {self.device}, speaker_id: {speaker_id}"
-        )
+        try:
+            self.model = PiperVoice.load(onnx_model_path)
+            print(
+                f"PiperTTS initialized with model: {model_id}, device: {self.device}, speaker_id: {speaker_id}"
+            )
+        except Exception as e:
+            print(f"ERROR: Failed to load Piper model '{model_id}': {e}")
+            raise RuntimeError(f"Failed to load Piper model '{model_id}': {e}") from e
 
     def synthesize(
         self, text: str, language: str = "sk", output_path: Optional[str] = None

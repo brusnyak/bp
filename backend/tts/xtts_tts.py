@@ -3,8 +3,18 @@ import torch
 from TTS.api import TTS
 
 class XTTS_TTS:
-    def __init__(self, model_name="tts_models/multilingual/multi-dataset/xtts_v2", device="cpu"):
-        self.device = device
+    def __init__(self, model_name="tts_models/multilingual/multi-dataset/xtts_v2", device="auto"):
+        # Determine the actual device
+        if device == "auto":
+            if torch.cuda.is_available():
+                self.device = "cuda"
+            elif torch.backends.mps.is_available():
+                self.device = "mps"
+            else:
+                self.device = "cpu"
+        else:
+            self.device = device
+            
         self.model_name = model_name
         self.tts = None
         self.speaker_wav_path = None # Path to the speaker reference audio
@@ -12,7 +22,8 @@ class XTTS_TTS:
     async def load_model(self):
         if self.tts is None:
             print(f"Loading XTTS v2 model: {self.model_name} to device: {self.device}")
-            self.tts = TTS(model_name=self.model_name, progress_bar=True).to(self.device)
+            # TTS().to() expects a torch.device object or a string like "cpu", "cuda", "mps"
+            self.tts = TTS(model_name=self.model_name, progress_bar=True).to(torch.device(self.device))
             print("XTTS v2 model loaded.")
 
     def set_speaker_wav(self, speaker_wav_path):
@@ -28,12 +39,23 @@ class XTTS_TTS:
             raise RuntimeError("Speaker WAV not set. Call set_speaker_wav() first.")
 
         print(f"Synthesizing speech with XTTS v2 for text: '{text}' in language: {language}")
-        wav = self.tts.tts(
+        
+        # Use synthesize_stream to get chunks
+        audio_chunks = []
+        for chunk in self.tts.synthesize_stream(
             text=text,
             speaker_wav=self.speaker_wav_path,
             language=language,
             split_sentences=True # XTTS v2 handles sentence splitting internally
-        )
+        ):
+            audio_chunks.append(chunk)
+        
+        # Concatenate all chunks into a single numpy array
+        if not audio_chunks:
+            return b"" # Return empty bytes if no audio was generated
+        
+        wav = torch.cat(audio_chunks, dim=0).cpu().numpy()
+
         # The tts method returns a numpy array, convert to bytes
         # Assuming 16kHz, 16-bit PCM for WAV output
         # For real-time streaming, you might want to return raw PCM bytes
@@ -45,6 +67,28 @@ class XTTS_TTS:
         sf.write(buffer, wav, samplerate=self.tts.synthesizer.output_sample_rate, format='WAV')
         buffer.seek(0)
         return buffer.getvalue()
+
+    async def synthesize_stream(self, text: str, language: str):
+        if self.tts is None:
+            raise RuntimeError("XTTS v2 model not loaded. Call load_model() first.")
+        if self.speaker_wav_path is None:
+            raise RuntimeError("Speaker WAV not set. Call set_speaker_wav() first.")
+
+        print(f"Streaming speech with XTTS v2 for text: '{text}' in language: {language}")
+        
+        # The synthesize_stream method yields audio chunks
+        for chunk in self.tts.synthesize_stream(
+            text=text,
+            speaker_wav=self.speaker_wav_path,
+            language=language,
+            split_sentences=True
+        ):
+            # Convert each chunk (torch tensor) to bytes
+            # Assuming 16kHz, 16-bit PCM for WAV output
+            buffer = io.BytesIO()
+            sf.write(buffer, chunk.cpu().numpy(), samplerate=self.tts.synthesizer.output_sample_rate, format='WAV')
+            buffer.seek(0)
+            yield buffer.getvalue()
 
 if __name__ == '__main__':
     # Example usage

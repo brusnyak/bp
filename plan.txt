@@ -1,51 +1,39 @@
-### Project Plan: Real-Time Speech Translation in Online Conferences
+# Live Speech Translation Project Plan
 
-**Overall Goal:** Develop a real-time speech translation system with voice cloning, achieving under 10 seconds latency, supporting multiple languages (EN↔SK initially), with a backend-focused development and a simple frontend for testing.
+This plan outlines the steps to optimize the live speech translation project for minimal latency, improve accuracy, implement voice cloning, and enhance the user interface.
 
-**Phase 1: Environment Setup & Dependency Management**
-1.  **Conda Environment Creation:** Create a dedicated Conda environment named `BP` to manage all project dependencies.
-2.  **Dependency Research & `requirements.txt`:**
-    *   Identify specific versions of `chatterbox-tts`, `piper-tts`, `transformers`, `torch` (with MPS support), `sentencepiece` (for NLLB), and `mlx-whisper` (or `faster-whisper` if MPS issue is resolved) that are compatible and optimized for Mac M1 Pro (Apple Silicon MPS acceleration).
-    *   Create a comprehensive `requirements.txt` file to ensure all dependencies are listed and version-locked, preventing mismatches.
-    *   Investigate any potential conflicts between `chatterbox-tts` (PyTorch/MPS), `piper-tts` (ONNX/C++), and `mlx-whisper` (MLX framework) and ensure a unified installation strategy.
+**Phase 1: Core System Refinement & UI/UX Enhancement (Immediate Focus)**
 
-**Phase 2: Backend Development - Core Modules**
-1.  **Speech-to-Text (STT) Module (`mlx-whisper`):**
-    *   Implement real-time audio streaming and processing.
-    *   `mlx-whisper` is integrated and working for transcription on Mac M1 Pro.
-    *   Incorporate Voice Activity Detection (VAD) for efficient processing of conference audio.
-    *   Handle multilingual input for STT.
-2.  **Machine Translation (MT) Module (Re-evaluation needed):**
-    *   `NLLB-200-distilled` is currently producing garbage output on MPS, indicating compatibility issues.
-    *   **Action:** Research and integrate an alternative MT model known for better MPS compatibility, or implement a robust CPU-only fallback for NLLB if no suitable MPS-accelerated alternative is found. Prioritize models that can be quantized for lower latency.
-    *   Configure for EN ↔ SK translation, with extensibility for other languages.
-3.  **Text-to-Speech (TTS) Module (`chatterbox` & `piper`):**
-    *   Implement a dual-model TTS system:
-        *   **Chatterbox:** Currently facing `get_speaker_embedding` API issues and `torch` version conflicts, temporarily disabled. Further investigation or alternative required for voice cloning.
-        *   **Piper:** Integrated, but requires manual download of model files for full functionality.
-    *   Develop logic for dynamic model selection based on latency or quality requirements.
-    *   Integrate voice cloning using a short reference audio (e.g., `test/Voice-Training.wav`).
-4.  **Voice Cloning Integration:**
-    *   Currently blocked by Chatterbox `get_speaker_embedding` issues. Will revisit once Chatterbox is stable or an alternative is chosen.
-    *   Pass these embeddings to the TTS model (Chatterbox) for personalized translated speech.
-5.  **Backend API & WebSocket:**
-    *   Set up a Python backend using FastAPI and WebSockets for real-time communication with the frontend.
-    *   Define API endpoints for initialization, configuration updates, and streaming audio data.
+1.  **Update `requirements.txt` for Stability and Performance:**
+    *   [x] Align `requirements.txt` with optimized versions and additions from `update.txt`.
+    *   [x] Ensure compatibility for Apple Silicon (M1 Pro, 16GB RAM).
+2.  **Enhance UI/UX for Clarity and Aesthetics:**
+    *   [x] **Visual Design:** Refine `ui/style.css` for a modern, clean aesthetic, improved color palette, typography, spacing, and consistent styling.
+    *   [x] **Feedback & Status:** Improve visual feedback for "Listening," "Translating," and "Speaking" states in `ui/index.html` and `ui/script.js`. Make the activity log more prominent.
+    *   [x] **Latency Visualization:** Refine `latencyTimelineChart` in `ui/script.js` for real-time X-axis expansion and accurate segment drawing.
+    *   [x] **Burger Menu & Sidebar:** Adjust `ui/style.css` and `ui/script.js` for a visually appealing burger menu (hidden by default) and a functional sidebar (`voiceList`) for displaying/selecting voice profiles.
+    *   [x] **Voice Configuration Modal:** Ensure `voiceConfigModal` is well-integrated with clear instructions and feedback.
+3.  **Backend Core Functionality Adjustments:**
+    *   [x] **VAD Tuning:** Review and adjust VAD parameters (`VAD_AGGRESSIVENESS`, `MIN_SPEECH_DURATION`, `SILENCE_TIMEOUT`) in `backend/main.py` for single-speaker optimization and noise reduction.
+    *   [x] **Streaming TTS:** Configure `backend/main.py` to send partial TTS outputs for minimal perceived latency.
+    *   [x] **Model Initialization:** Ensure `app.py` correctly unpacks initialized models from `backend/main.py` to prevent `ValueError`s.
 
-**Phase 3: Backend Testing Workflow**
-1.  **Module Initialization:** Implement a function to initialize all STT, MT, and TTS models, loading them with appropriate quantization and MPS acceleration.
-2.  **Voice Training:** Develop a function to train the voice cloning model using `test/Voice-Training.wav`. This will involve extracting and storing speaker embeddings.
-3.  **Input Processing:** Implement a workflow to take `test/My test speech_xtts_speaker_clean.wav` as input, pass it through the STT, MT, and TTS pipeline.
-4.  **Output Generation:** Generate the translated and synthesized speech output.
-5.  **Latency Measurement:** Integrate robust timing mechanisms to measure STT, MT, TTS, and total end-to-end latency, ensuring the <10s target is met.
-6.  **Multilingual Testing:** Test the workflow for EN→SK and SK→EN translation.
+**Phase 2: Voice Cloning Integration (F5-TTS) & Advanced Features**
 
-**Phase 4: Frontend Integration (for testing)**
-1.  **UI Connection:** Connect the existing `ui/index.html`, `ui/script.js`, and `ui/style.css` to the backend via WebSockets.
-2.  **Real-time Display:** Update the UI to display transcription, translation, and latency metrics in real-time.
-3.  **Audio I/O:** Implement microphone input and synthesized audio output through the frontend.
-4.  **Voice Training Modal:** Ensure the voice training modal correctly interacts with the backend for prompt generation and reference audio upload/recording.
+4.  **Integrate F5-TTS for Voice Cloning:**
+    *   [x] **Dependency Management:** Add F5-TTS installation commands and dependencies to `requirements.txt` (commented out initially).
+    *   [x] **Backend Logic:** Implement F5-TTS model loading, speaker embedding generation from 10-15 second audio samples, and real-time TTS inference in `backend/tts/xtts_tts.py` (or a new F5-TTS module).
+    *   [x] **Speaker Voice Management:** Implement backend endpoints and logic to store recorded/uploaded speaker WAVs in `speaker_voices`, generate/save persistent speaker embeddings, list available voices, and allow frontend selection.
+5.  **Robust Multi-language Support:**
+    *   [x] Ensure UI language selection (`inputLanguageSelect`, `outputLanguageSelect`) dynamically switches `CTranslate2MT` and `PiperTTS` (and F5-TTS) models in the backend.
 
-**Phase 5: Production Version Considerations**
-1.  **Audio Input:** Plan for switching to Blackhole 2ch input for capturing conference platform audio streams.
-2.  **Audio Output:** Consider options for virtual speakers or direct audio injection into conference platforms.
+**Phase 3: Comprehensive Testing & Deployment Considerations**
+
+6.  **Develop Comprehensive Testing Framework:**
+    *   [x] Extend `test/streaming_pipeline_tests.py` to include tests for streaming TTS latency/quality, multi-language switching, and voice cloning workflow.
+    *   [x] Use pre-recorded audio for reproducibility and provide clear metrics (WER, BLEU, latency breakdown).
+    *   [x] **NOTE:** For full testing, actual `.wav` audio files for `test/slovak_test_speech.wav` and `test/My test speech_xtts_speaker_clean.wav` (if different from `test/Voice-Training.wav`) will need to be provided. The current `.wav` files are placeholders.
+
+7.  **Deployment & Packaging Strategy:**
+    *   [ ] Focus on local deployment optimization for M1 Pro MacBook.
+    *   [ ] (Future Idea) Explore `pip` packaging with `setup.py` for easier installation.

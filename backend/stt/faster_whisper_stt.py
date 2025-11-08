@@ -22,7 +22,7 @@ class FasterWhisperSTT:
 
     def transcribe_audio(
         self, audio_data: np.ndarray, sample_rate: int, language: Optional[str] = None
-    ) -> Tuple[str, float]:
+    ) -> Tuple[list, float]: # Changed return type to list of segments
         """
         Transcribes audio data using Faster-Whisper.
 
@@ -54,15 +54,14 @@ class FasterWhisperSTT:
             audio_data, language=language, beam_size=5, vad_filter=True
         )
 
-        transcribed_text = " ".join([segment.text for segment in segments])
-
         end_time = time.time()
         transcription_time = end_time - start_time
 
-        print(
-            f"Transcribed: '{transcribed_text}' in {transcription_time:.2f}s (language: {language or 'detected'})"
-        )
-        return transcribed_text, transcription_time
+        # Return the list of segments directly
+        # print(
+        #     f"Transcribed {len(segments)} segments in {transcription_time:.2f}s (language: {language or 'detected'})"
+        # )
+        return list(segments), transcription_time
 
 
 if __name__ == "__main__":

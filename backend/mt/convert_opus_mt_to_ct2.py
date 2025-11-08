@@ -24,19 +24,21 @@ def convert_model(model_name: str, output_dir: str, quantization: str = "int8"):
 
     print(f"Model {model_name} successfully converted and saved to {output_dir}")
 
+import argparse
+
 if __name__ == "__main__":
-    # Define models to convert
-    models_to_convert = [
-        "Helsinki-NLP/opus-mt-en-sk",
-        "Helsinki-NLP/opus-mt-sk-en"
-    ]
+    parser = argparse.ArgumentParser(description="Convert Hugging Face Transformers model to CTranslate2 format.")
+    parser.add_argument("--model_name", type=str, required=True,
+                        help="The Hugging Face model ID (e.g., 'Helsinki-NLP/opus-mt-en-sk').")
+    parser.add_argument("--quantization", type=str, default="int8",
+                        help="Quantization type (e.g., 'int8', 'float16', 'float32'). Default is 'int8'.")
+
+    args = parser.parse_args()
 
     base_output_dir = "ct2_models"
     os.makedirs(base_output_dir, exist_ok=True)
 
-    for model_name in models_to_convert:
-        # Create a specific output directory for each model
-        model_output_dir = os.path.join(base_output_dir, model_name.replace("/", "--"))
-        convert_model(model_name, model_output_dir, quantization="int8")
+    model_output_dir = os.path.join(base_output_dir, args.model_name.replace("/", "--"))
+    convert_model(args.model_name, model_output_dir, quantization=args.quantization)
 
-    print("\nAll specified models attempted conversion to CTranslate2.")
+    print(f"\nConversion attempt for {args.model_name} completed.")

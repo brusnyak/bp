@@ -1,0 +1,3 @@
+# Placeholder for Slovak test speech transcript.
+# This file should contain the accurate transcription of the Slovak test speech audio.
+# Example: "Dobrý deň, toto je testovací prejav v slovenčine."

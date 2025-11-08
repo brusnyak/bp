@@ -1,0 +1,3 @@
+# Placeholder for Slovak test speech translation.
+# This file should contain the accurate English translation of the Slovak test speech audio.
+# Example: "Good day, this is a test speech in Slovak."
