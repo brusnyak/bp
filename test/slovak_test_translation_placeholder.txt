@@ -1,2 +1,0 @@
-Please place the reference English translation for your Slovak test speech in this file (e.g., "This is a test sentence.").
-This file serves as a placeholder.

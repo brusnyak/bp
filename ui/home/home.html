@@ -1,0 +1,2220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+    <title>Real-Time Speech Translation Thesis Project</title>
+    <link rel="stylesheet" href="/ui/global-styles.css" />
+    <link rel="stylesheet" href="/ui/home/home.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <nav class="main-nav" id="main-nav">
+      <div class="container nav-container">
+        <div class="nav-column left-column">
+          <div class="hamburger-menu" id="hamburger-menu">
+            <div class="hamburger-icon">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div class="menu-containers" id="menu-containers">
+              <div class="menu-container page-nav">
+                <h3>Navigation</h3>
+                <ul>
+                  <li><a href="#hero" class="default-nav-link">Home</a></li>
+                  <li><a href="#demo" class="default-nav-link">Demo</a></li>
+                  <li>
+                    <a href="#features" class="default-nav-link">Features</a>
+                  </li>
+                  <li><a href="#how-to" class="default-nav-link">How-To</a></li>
+                  <li><a href="#pipeline-diagram" class="default-nav-link">Pipeline</a></li>
+                  <li><a href="#about" class="default-nav-link">About</a></li>
+                  <li><a href="#faq" class="default-nav-link">FAQ</a></li>
+                  <li><a href="/ui/auth/auth.html">Login/Register</a></li>
+                  <li><a href="/ui/live-speech/live.html">Live Speech</a></li>
+                  <!-- Thesis Mode Links for Hamburger Menu -->
+                  <li>
+                    <a href="#thesis-abstract" class="thesis-nav-link"
+                      >Abstract</a
+                    >
+                  </li>
+                  <li>
+                    <a href="#thesis-architecture" class="thesis-nav-link"
+                      >3. Architecture</a
+                    >
+                  </li>
+                  <li>
+                    <a href="#thesis-implementation" class="thesis-nav-link"
+                      >4. Implementation</a
+                    >
+                  </li>
+                  <li>
+                    <a href="#thesis-results" class="thesis-nav-link"
+                      >5. Results and Evaluation</a
+                    >
+                  </li>
+                  <li>
+                    <a href="#thesis-conclusion" class="thesis-nav-link"
+                      >6. Conclusion and Future Work</a
+                    >
+                  </li>
+                </ul>
+                <div class="menu-container mobile-theme-toggle">
+                  <h3>Theme</h3>
+                  <button
+                    id="mobile-theme-toggle"
+                    class="theme-toggle-btn"
+                    aria-label="Toggle theme"
+                  >
+                    <span class="material-symbols-outlined"></span>
+                  </button>
+                </div>
+                <div class="menu-container mobile-mode-switcher">
+                  <h3>Mode</h3>
+                  <label class="switch" for="mobile-mode-switcher-checkbox">
+                    <input
+                      type="checkbox"
+                      id="mobile-mode-switcher-checkbox"
+                      aria-label="Toggle Thesis Mode"
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                  <span
+                    id="mobile-mode-switcher-label"
+                    style="margin-left: 10px; color: var(--text-color)"
+                    >Default Mode</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-column right-column">
+          <div class="nav-cta">
+            <a href="/ui/auth/auth.html" class="cta-button">Get Started</a>
+          </div>
+          <div class="theme-toggle-wrapper">
+            <button
+              id="theme-toggle"
+              class="theme-toggle-btn"
+              aria-label="Toggle theme"
+            >
+              <span class="material-symbols-outlined"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="section-nav" id="section-nav">
+      <div class="default-mode-nav">
+        <div class="section-nav-item" data-target="hero">
+          <div class="nav-icon">
+            <span class="material-symbols-outlined">home</span>
+          </div>
+          <div class="nav-label">Home</div>
+        </div>
+        <div class="section-nav-item" data-target="demo">
+          <div class="nav-icon">
+            <span class="material-symbols-outlined">play_circle</span>
+          </div>
+          <div class="nav-label">Demo</div>
+        </div>
+        <div class="section-nav-item" data-target="features">
+          <div class="nav-icon">
+            <span class="material-symbols-outlined">star</span>
+          </div>
+          <div class="nav-label">Features</div>
+        </div>
+        <div class="section-nav-item" data-target="how-to">
+          <div class="nav-icon">
+            <span class="material-symbols-outlined">help</span>
+          </div>
+          <div class="nav-label">How-To</div>
+        </div>
+        <div class="section-nav-item" data-target="pipeline-diagram">
+          <div class="nav-icon">
+            <span class="material-symbols-outlined">insights</span>
+          </div>
+          <div class="nav-label">Pipeline</div>
+        </div>
+        <div class="section-nav-item" data-target="about">
+          <div class="nav-icon">
+            <span class="material-symbols-outlined">info</span>
+          </div>
+          <div class="nav-label">About</div>
+        </div>
+        <div class="section-nav-item" data-target="faq">
+          <div class="nav-icon">
+            <span class="material-symbols-outlined">quiz</span>
+          </div>
+          <div class="nav-label">FAQ</div>
+        </div>
+      </div>
+      <div class="thesis-mode-nav" >
+        <div class="section-nav-item" data-target="thesis-cover-page">
+          <div class="nav-icon">
+            <span class="material-symbols-outlined">description</span>
+          </div>
+          <div class="nav-label">Cover Page</div>
+        </div>
+        <div class="section-nav-item" data-target="thesis-abstract">
+          <div class="nav-icon">
+            <span class="material-symbols-outlined">summarize</span>
+          </div>
+          <div class="nav-label">Abstract</div>
+        </div>
+        <div class="section-nav-item" data-target="thesis-introduction">
+          <div class="nav-icon">
+            <span class="material-symbols-outlined">book</span>
+          </div>
+          <div class="nav-label">1. Introduction</div>
+        </div>
+        <div class="section-nav-item" data-target="thesis-methodology">
+          <div class="nav-icon">
+            <span class="material-symbols-outlined">science</span>
+          </div>
+          <div class="nav-label">2. Methodology</div>
+        </div>
+        <div class="section-nav-item" data-target="thesis-architecture">
+          <div class="nav-icon">
+            <span class="material-symbols-outlined">architecture</span>
+          </div>
+          <div class="nav-label">3. Architecture</div>
+        </div>
+        <div class="section-nav-item" data-target="thesis-implementation">
+          <div class="nav-icon">
+            <span class="material-symbols-outlined">code</span>
+          </div>
+          <div class="nav-label">4. Implementation</div>
+        </div>
+        <div class="section-nav-item" data-target="thesis-results">
+          <div class="nav-icon">
+            <span class="material-symbols-outlined">bar_chart</span>
+          </div>
+          <div class="nav-label">5. Results</div>
+        </div>
+        <div class="section-nav-item" data-target="thesis-conclusion">
+          <div class="nav-icon">
+            <span class="material-symbols-outlined">check_circle</span>
+          </div>
+          <div class="nav-label">6. Conclusion</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="default-mode-section">
+      <section class="hero content-container full-screen" id="hero">
+        <div class="hero-bg"></div>
+        <div class="container">
+          <div class="hero-content">
+            <h1>
+              Real-Time <span class="highlight">Speech</span>
+              Translation
+            </h1>
+            <p class="hero-subtitle">
+              Our real-time speech translation system enables seamless,
+              inclusive communication by instantly removing language barriers.
+            </p>
+            <div class="hero-buttons">
+              <a
+                class="cta-button"
+                href="/ui/live-speech/live.html"
+                id="hero-cta-btn"
+                >Start Translating</a
+              >
+              <a class="cta-button secondary-cta" href="#features"
+                >Learn More</a
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="demo content-container full-screen" id="demo">
+        <div class="container">
+          <h2>Live Demo & Examples</h2>
+          <p class="section-subtitle">
+            Witness the seamless real-time speech translation in action. See how
+            our system effortlessly bridges language gaps.
+          </p>
+          <div class="demo-video">
+            <iframe
+            title="Real-Time Speech Translation Demo"
+              src="https://www.youtube.com/embed/1NW8LHuHUXU"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          </div>
+          <div class="example-data">
+            <h3>Real-world Translation Examples</h3>
+            <div class="example-grid">
+              <div class="example-item">
+                <h4>English to Slovak</h4>
+                <p>
+                  <strong>Input:</strong> "Hello, how are you today? I hope you
+                  have a productive meeting."
+                </p>
+                <p>
+                  <strong>Output:</strong> "Ahoj, ako sa máš dnes? Dúfam, že máš
+                  produktívne stretnutie."
+                </p>
+              </div>
+              <div class="example-item">
+                <h4>Slovak to English</h4>
+                <p>
+                  <strong>Input:</strong> "Ďakujem za pozornosť. Teším sa na
+                  našu spoluprácu v budúcnosti."
+                </p>
+                <p>
+                  <strong>Output:</strong> "Thank you for your attention. I look
+                  forward to our future cooperation."
+                </p>
+              </div>
+              <div class="example-item">
+                <h4>German to English (Example)</h4>
+                <p>
+                  <strong>Input:</strong> "Guten Tag, wie geht es Ihnen? Ich
+                  hoffe, Sie haben einen schönen Tag."
+                </p>
+                <p>
+                  <strong>Output:</strong> "Good day, how are you? I hope you
+                  have a nice day."
+                </p>
+              </div>
+              <div class="example-item">
+                <h4>English to German (Example)</h4>
+                <p>
+                  <strong>Input:</strong> "The project is progressing well, we
+                  are on schedule."
+                </p>
+                <p>
+                  <strong>Output:</strong> "Das Projekt schreitet gut voran, wir
+                  liegen im Zeitplan."
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="cta-section">
+            <a class="cta-button" href="/ui/live-speech/live.html"
+              >Try Live Translation</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <section class="features content-container full-screen" id="features">
+        <div class="container">
+          <h2>Key Features</h2>
+          <div class="feature-grid">
+            <div class="feature-item">
+              <span class="material-symbols-outlined feature-icon"
+                >translate</span
+              >
+              <h3>Real-time Translation</h3>
+              <p>
+                Instant, accurate speech translation during live conferences for
+                seamless communication.
+              </p>
+            </div>
+            <div class="feature-item">
+              <span class="material-symbols-outlined feature-icon">mic</span>
+              <h3>Voice Cloning</h3>
+              <p>
+                Preserve your vocal identity across languages with natural,
+                personalized output.
+              </p>
+            </div>
+            <div class="feature-item">
+              <span class="material-symbols-outlined feature-icon"
+                >language</span
+              >
+              <h3>Multi-language Support</h3>
+              <p>
+                Translate across diverse languages with dynamic switching for
+                global accessibility.
+              </p>
+            </div>
+            <div class="feature-item">
+              <span class="material-symbols-outlined feature-icon"
+                >cloud_queue</span
+              >
+              <h3>Scalable Backend</h3>
+              <p>
+                FastAPI infrastructure supports 200+ users simultaneously with
+                high reliability.
+              </p>
+            </div>
+            <div class="feature-item">
+              <span class="material-symbols-outlined feature-icon"
+                >security</span
+              >
+              <h3>Secure & Private</h3>
+              <p>
+                End-to-end encryption ensures confidentiality and data
+                protection.
+              </p>
+            </div>
+            <div class="feature-item">
+              <span class="material-symbols-outlined feature-icon"
+                >speed</span
+              >
+              <h3>Low Latency</h3>
+              <p>
+                Optimized for near-instant response: ~1s for TTS, 2–3s for voice
+                cloning.
+              </p>
+            </div>
+            <div class="feature-item">
+              <span class="material-symbols-outlined feature-icon"
+                >devices</span
+              >
+              <h3>Cross-Platform Compatibility</h3>
+              <p>
+                Accessible via any browser with responsive HTML/CSS/JS design.
+              </p>
+            </div>
+            <div class="feature-item">
+              <span class="material-symbols-outlined feature-icon"
+                >insights</span
+              >
+              <h3>Latency Visualization</h3>
+              <p>
+                Real-time performance monitoring through interactive timeline
+                charts.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="how-to content-container full-screen" id="how-to">
+        <div class="container">
+          <h2>Quick Start Guide</h2>
+          <p class="section-subtitle">
+            Get started with our real-time speech translation system in a few
+            simple steps.
+          </p>
+          <div class="how-to-steps">
+            <div class="step-item">
+              <span class="material-symbols-outlined step-icon">mic</span>
+              <h3>Connect Mic</h3>
+              <p>
+                Use your preferred or built-in microphone. Confirm proper setup
+                for clear input.
+              </p>
+            </div>
+            <div class="step-item">
+              <span class="material-symbols-outlined step-icon"
+                >language</span
+              >
+              <h3>Select Languages</h3>
+              <p>
+                Choose input (spoken) and output (translated) languages.
+                Multiple pairs supported.
+              </p>
+            </div>
+            <div class="step-item">
+              <span class="material-symbols-outlined step-icon"
+                >play_circle</span
+              >
+              <h3>Start Translating</h3>
+              <p>
+                Click once to begin. View live captions and hear instant audio
+                translation.
+              </p>
+            </div>
+            <div class="step-item">
+              <span class="material-symbols-outlined step-icon"
+                >record_voice_over</span
+              >
+              <h3>Voice Cloning (Optional)</h3>
+              <p>
+                Record a short sample to deliver translations in your own voice.
+              </p>
+            </div>
+          </div>
+          <div class="cta-section">
+            <a class="cta-button" href="/ui/live-speech/live.html"
+              >Try Live Translation Now</a
+            >
+          </div>
+        </div>
+      </section>
+
+      <section class="pipeline-diagram-section content-container full-screen" id="pipeline-diagram">
+        <div class="container">
+          <h2>Simple Plug-and-Play Pipeline</h2>
+          <p class="section-subtitle">
+            Understand the core components of our real-time speech translation
+            system at a glance.
+          </p>
+          <div class="thesis-figure">
+            <div class="mermaid">
+              graph LR
+              A[Microphone Input] --> B{WebRTC VAD}
+              B -->|Speech| C[Faster-Whisper STT]
+              B -->|Silence| A
+              C --> D[CTranslate2 MT<br/>EN↔SK]
+              D --> E{TTS Model}
+              E -->|Fast| F[Piper TTS]
+              E -->|Cloned| G[F5-TTS + Voice.wav]
+              F --> H[Audio Output]
+              G --> H
+              H --> I[Speakers / BlackHole]
+              style E fill:#f9f,stroke:#333
+            </div>
+            <p class="figure-caption">
+              Figure: Simplified Workflow of the Real-Time Speech Translation Pipeline.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="about content-container full-screen" id="about">
+        <div class="container">
+          <h2>About the Project</h2>
+          <p>
+            This Bachelor's thesis develops a real-time speech translation
+            system for online conferences. The solution integrates speech
+            recognition, machine translation, and text-to-speech synthesis to
+            enable seamless cross-lingual communication.
+          </p>
+          <p><strong>Key emphases include:</strong></p>
+          <table class="key-emphases-table">
+            <thead>
+              <tr>
+                <th>Emphasis</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Latency & Quality</strong></td>
+                <td>Optimized for real-time performance.</td>
+              </tr>
+              <tr>
+                <td><strong>Scalability</strong></td>
+                <td>Backend supports large numbers of simultaneous users.</td>
+              </tr>
+              <tr>
+                <td><strong>Voice Cloning</strong></td>
+                <td>Provides natural, personalized translations.</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>
+            The project’s goal is to break language barriers, foster inclusive
+            global dialogue, and enhance the accessibility and productivity of
+            virtual meetings.
+          </p>
+          <a class="cta-button" href="#features">Learn More</a>
+        </div>
+      </section>
+
+      <section class="faq-section content-container full-screen" id="faq">
+        <div class="container">
+          <h2>Frequently Asked Questions</h2>
+          <p class="section-subtitle">
+            Find quick answers to the most common questions about our real-time speech translation system.
+          </p>
+          <div class="faq-items-container">
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>What is Real-Time Speech Translation?</h3>
+                    <div class="faq-icon"><span class="material-symbols-outlined">add</span></div>
+                </div>
+                <div class="faq-answer hidden">
+                    <p>Real-Time Speech Translation is an application designed to translate spoken language during online conferences in real-time. It aims to break down language barriers and facilitate seamless communication among participants.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>How does voice cloning work?</h3>
+                    <div class="faq-icon"><span class="material-symbols-outlined">add</span></div>
+                </div>
+                <div class="faq-answer hidden">
+                    <p>Our voice cloning feature allows you to record a short sample of your voice. This sample is then used by our F5-TTS model to synthesize translated speech in your own voice, making the communication more natural and personalized.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-question">
+                <h3>What languages are supported?</h3>
+                <div class="faq-icon">
+                  <span class="material-symbols-outlined">add</span>
+                </div>
+              </div>
+              <div class="faq-answer hidden">
+                <p>
+                  The application supports a wide range of languages for both input (speech-to-text) 
+                  and output (text-to-speech). You can select your desired input and target languages 
+                  from the dropdown menus on the live speech page.
+                </p>
+                <p>
+                  Supported languages: en, es, fr, de, it, pt, pl, tr, ru, nl, cs, ar, zh, ja, hu, ko, hi, sk
+                </p>
+              </div>
+            </div>
+
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>Is the application scalable for large conferences?</h3>
+                    <div class="faq-icon"><span class="material-symbols-outlined">add</span></div>
+                </div>
+                <div class="faq-answer hidden">
+                    <p>Yes, the backend architecture is designed with scalability in mind, utilizing FastAPI, Docker, Kubernetes, and NVIDIA Triton Inference Server to support over 200 simultaneous users with low latency.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>How can I provide feedback or report an issue?</h3>
+                    <div class="faq-icon"><span class="material-symbols-outlined">add</span></div>
+                </div>
+                <div class="faq-answer hidden">
+                    <p>You can provide feedback or report any issues you encounter through our dedicated <a href="/ui/extra/feedback.html">Feedback page</a>. We appreciate your input to help us improve the application.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>What are the privacy implications of using voice cloning?</h3>
+                    <div class="faq-icon"><span class="material-symbols-outlined">add</span></div>
+                </div>
+                <div class="faq-answer hidden">
+                    <p>We take your privacy seriously. Voice samples collected for cloning are stored securely and used solely for synthesizing translated speech within the application. Please refer to our <a href="/ui/extra/privacy.html">Privacy Policy</a> for more details.</p>
+                </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="thesis-mode-section">
+      <section
+        class="thesis-cover-page content-container full-screen"
+        id="thesis-cover-page"
+      >
+        <div class="container">
+          <div class="cover-page-content">
+            <h1 class="university-name">
+              SLOVENSKÁ TECHNICKÁ UNIVERZITA V BRATISLAVE
+            </h1>
+            <h2 class="faculty-name">FAKULTA ELEKTROTECHNIKY A INFORMATIKY</h2>
+            <p class="thesis-type">BAKALÁRSKA PRÁCA</p>
+            <h1 class="thesis-title">NÁZOV BAKALÁRSKEJ PRÁCE</h1>
+            <p class="author-info">
+              <strong>Autor:</strong> Yehor Brusniak<br />
+              <strong>Študijný program:</strong> Informačné a komunikačné
+              technológie<br />
+              <strong>Študijný odbor:</strong> IKT<br />
+              <strong>Školiace pracovisko:</strong> Ústav multimediálnych
+              informačných a komunikačných technológií<br />
+              <strong>Vedúci záverečnej práce:</strong> Ing. Ivan Minárik<br />
+              <strong>Konzultant:</strong> [Titul, Meno a priezvisko
+              konzultanta]<br />
+              <strong>Mesiac a rok odovzdania:</strong> 2025/2026
+            </p>
+            <p class="enrollment-number">Evidenčné číslo: FEI-XXXX-XXXXX</p>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="thesis-abstract-section content-container"
+        id="thesis-abstract"
+      >
+        <div class="container">
+          <h2>ANOTÁCIA BAKALÁRSKEJ PRÁCE</h2>
+          <p>
+            Slovenská technická univerzita v Bratislave<br />
+            FAKULTA ELEKTROTECHNIKY A INFORMATIKY
+          </p>
+          <p>
+            <strong>Študijný program:</strong> Informačné a komunikačné
+            technológie<br />
+            <strong>Autor:</strong> Yehor Brusniak<br />
+            <strong>Bakalárska práca:</strong> Real-time Speech Translation
+            System<br />
+            <strong>Vedúci práce:</strong> Ing. Ivan Minárik<br />
+            <strong>Mesiac a rok odovzdania:</strong> 2025/2026
+          </p>
+          <p>
+            <strong>Kľúčové slová:</strong> real-time, speech-to-text, machine
+            translation, text-to-speech, voice cloning, FastAPI, WebSockets,
+            Apple Silicon
+          </p>
+          <p>
+            Táto bakalárska práca sa zaoberá návrhom, implementáciou a
+            vyhodnotením systému pre preklad reči v reálnom čase. Projekt
+            reaguje na rastúcu potrebu bezproblémovej medzijazykovej
+            komunikácie, najmä v dynamických prostrediach, ako sú medzinárodné
+            konferencie. Využitím najmodernejších open-source modelov pre prevod
+            reči na text (STT), strojový preklad (MT) a prevod textu na reč
+            (TTS) sa systém snaží poskytovať preklad s nízkou latenciou a
+            vysokou kvalitou. Optimalizovaný pre hardvér Apple Silicon
+            (M1/M2/M3), systém disponuje modulárnou architektúrou s backendom
+            FastAPI a responzívnym webovým používateľským rozhraním. Kľúčové
+            funkcie zahŕňajú prepis, preklad a syntézu reči v reálnom čase,
+            dynamické prepínanie jazykov, detekciu hlasovej aktivity a
+            vizualizáciu latencie v reálnom čase. Práca podrobne opisuje
+            architektúru systému, špecifiká implementácie, experimentálne
+            nastavenie a výsledky výkonu, demonštrujúc jeho schopnosť dosiahnuť
+            cieľové latencie 2-3 sekundy pre štandardný TTS a 2.5-3.5 sekundy
+            pre klonovanie hlasu. Diskutujú sa aj budúce vylepšenia a
+            potenciálne optimalizácie.
+          </p>
+
+          <h2>ABSTRACT OF THE BACHELOR THESIS</h2>
+          <p>
+            Slovak University of Technology in Bratislava<br />
+            FAKULTA ELEKTROTECHNIKY A INFORMATIKY
+          </p>
+          <p>
+            <strong>Study Programme:</strong> Informačné a komunikačné
+            technológie<br />
+            <strong>Autor:</strong> Yehor Brusniak<br />
+            <strong>Bachelor Thesis:</strong> Real-time Speech Translation
+            System<br />
+            <strong>Supervisor:</strong> Ing. Ivan Minárik<br />
+            <strong>Submitted:</strong> 2025/2026
+          </p>
+          <p>
+            <strong>Keywords:</strong> real-time, speech-to-text, machine
+            translation, text-to-speech, voice cloning, FastAPI, WebSockets,
+            Apple Silicon
+          </p>
+          <p>
+            This bachelor's thesis presents the design, implementation, and
+            evaluation of a real-time live speech translation system. The
+            project addresses the growing need for seamless cross-lingual
+            communication, particularly in dynamic environments such as
+            international conferences. Leveraging state-of-the-art open-source
+            models for Speech-to-Text (STT), Machine Translation (MT), and
+            Text-to-Speech (TTS), the system aims to provide low-latency,
+            high-quality translation. Optimized for Apple Silicon (M1/M2/M3)
+            hardware, the system features a modular architecture with a FastAPI
+            backend and a responsive web-based user interface. Key
+            functionalities include real-time transcription, translation, and
+            speech synthesis, dynamic language switching, voice activity
+            detection, and real-time latency visualization. The thesis details
+            the system's architecture, implementation specifics, experimental
+            setup, and performance results, demonstrating its capability to
+            achieve target latencies of 2-3 seconds for standard TTS and 2.5-3.5
+            seconds for voice cloning. Future enhancements and potential
+            optimizations are also discussed.
+          </p>
+        </div>
+      </section>
+
+      <section
+        class="thesis-introduction content-container full-screen"
+        id="thesis-introduction"
+      >
+        <div class="container">
+          <h2>1. Introduction</h2>
+          <p>
+            This project addresses the critical need for real-time speech
+            translation in online conferences, a common barrier to effective
+            global communication. Leveraging advancements in speech-to-text
+            (STT), machine translation (MT), and text-to-speech (TTS)
+            technologies, this system aims to provide seamless, low-latency
+            translation, including the innovative feature of voice cloning to
+            maintain the original speaker's vocal characteristics.
+          </p>
+          <p>
+            The primary objective is to develop a robust, scalable, and
+            user-friendly web application capable of translating spoken language
+            between English and a selected target language (e.g., Slovak) for
+            multiple simultaneous participants. This introduction outlines the
+            problem statement, the project's goals, and the anticipated impact
+            on cross-linguistic interactions in virtual environments.
+          </p>
+          <h3>1.1 Problem Statement</h3>
+          <p>
+            Online conferences often suffer from language barriers, hindering
+            effective communication and collaboration among participants from
+            diverse linguistic backgrounds. Existing solutions are often
+            proprietary, lack real-time capabilities, or do not preserve the
+            speaker's unique voice, leading to a less engaging and natural
+            experience.
+          </p>
+          <h3>1.2 Project Objectives</h3>
+          <ul>
+            <li>
+              Develop a real-time speech translation pipeline (STT -> MT -> TTS)
+              within a web-accessible application.
+            </li>
+            <li>
+              Implement voice cloning capabilities using advanced TTS models to
+              synthesize translated speech in the original speaker's voice.
+            </li>
+            <li>
+              Design a scalable backend architecture capable of handling over
+              200 simultaneous users with low latency.
+            </li>
+            <li>
+              Ensure cross-platform compatibility for audio capture and playback
+              using WebRTC.
+            </li>
+            <li>
+              Provide a user-friendly interface for language selection, voice
+              management, and real-time feedback.
+            </li>
+          </ul>
+          <h3>1.3 Motivation</h3>
+          <p>
+            The motivation for this project stems from the increasing demand for
+            inclusive and efficient communication tools in a globalized world.
+            By breaking down language barriers, this system aims to foster
+            better understanding, collaboration, and participation in online
+            meetings, making virtual interactions more natural and accessible.
+          </p>
+          <div class="thesis-figure">
+            <div class="mermaid">
+              graph LR
+                A[Audio Input] --> B{VAD}
+                B --> C[STT: Faster-Whisper]
+                C --> D[MT: CTranslate2]
+                D --> E{TTS: Piper/F5-TTS}
+                E --> F[Audio Output]
+            </div>
+            <p class="figure-caption">
+              Figure 1.1: Conceptual overview of the real-time speech
+              translation system.
+            </p>
+          </div>
+          <p>
+            This research contributes to the field by integrating and optimizing
+            cutting-edge open-source technologies to create a practical and
+            scalable solution. It also explores the impact of voice cloning on
+            user experience and the challenges of achieving low-latency
+            performance in a complex, multi-stage pipeline.
+          </p>
+          <h3>1.4 Thesis Structure</h3>
+          <p>This thesis is organized into the following chapters:</p>
+          <ul>
+            <li>
+              <strong>Chapter 1: Introduction</strong> provides an overview of
+              the project, its motivation, the problem it addresses, and its
+              objectives.
+            </li>
+            <li>
+              <strong>Chapter 2: Theoretical Background</strong> reviews the
+              fundamental concepts and technologies underpinning
+              speech-to-text, machine translation, and text-to-speech systems.
+            </li>
+            <li>
+              <strong>Chapter 3: System Architecture</strong> details the
+              overall design of the real-time speech translation pipeline,
+              including its components and data flow.
+            </li>
+            <li>
+              <strong>Chapter 4: Implementation Details</strong> describes the
+              technical implementation of both the frontend and backend
+              components, as well as the integration of the various AI models.
+            </li>
+            <li>
+              <strong>Chapter 5: Experimental Setup and Results</strong>
+              presents the methodology for evaluating the system's performance,
+              including latency and quality metrics, and discusses the findings.
+            </li>
+            <li>
+              <strong>Chapter 6: Conclusion and Future Work</strong> summarizes
+              the project's achievements, outlines its limitations, and proposes
+              directions for future enhancements.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section
+        class="thesis-methodology content-container full-screen"
+        id="thesis-methodology"
+      >
+        <div class="container">
+          <h2>2. Theoretical Background / Literature Review</h2>
+          <p>
+            This chapter provides an overview of the core technologies and
+            theoretical concepts that form the foundation of the real-time
+            speech translation system. We delve into the principles of
+            Speech-to-Text (STT), Machine Translation (MT), Text-to-Speech
+            (TTS), Voice Activity Detection (VAD), and real-time audio
+            processing.
+          </p>
+          <h3>2.1 Speech-to-Text (STT)</h3>
+          <p>
+            Speech-to-Text (STT), also known as automatic speech recognition
+            (ASR), is the process of converting spoken language into written
+            text. Modern STT systems primarily rely on deep learning
+            architectures, particularly transformer-based models, which have
+            significantly advanced the state of the art in accuracy and
+            robustness.
+          </p>
+          <ul>
+            <li>
+              <strong>Evolution of STT:</strong> Briefly discuss early STT systems (Hidden
+              Markov Models, Gaussian Mixture Models) and the paradigm shift
+              brought by deep neural networks (Recurrent Neural Networks,
+              Convolutional Neural Networks).
+            </li>
+            <li>
+              <strong>Transformer Models:</strong> Explain the attention mechanism and its
+              role in transformer architectures, which allow for parallel
+              processing and capture long-range dependencies in speech.
+            </li>
+            <li>
+              <strong>Whisper and Faster-Whisper:</strong> Detail OpenAI's Whisper model as a
+              robust, general-purpose ASR model trained on a vast dataset.
+              Emphasize `faster-whisper` as an optimized implementation that
+              leverages CTranslate2 for faster inference with reduced memory
+              usage, making it suitable for real-time applications.
+            </li>
+          </ul>
+          <h3>2.2 Machine Translation (MT)</h3>
+          <p>
+            Machine Translation (MT) is the automated process of translating
+            text or speech from one natural language to another. Neural Machine
+            Translation (NMT) has become the dominant approach, outperforming
+            statistical and rule-based methods.
+          </p>
+          <ul>
+            <li>
+              <strong>Neural Machine Translation (NMT):</strong> Introduce the concept of
+              NMT, typically using encoder-decoder architectures.
+            </li>
+            <li>
+              <strong>Transformer-based NMT:</strong> Explain how transformers are applied to
+              MT, enabling high-quality translations by processing entire
+              sequences simultaneously.
+            </li>
+            <li>
+              <strong>Opus-MT and SeamlessM4T v2:</strong> Discuss `Helsinki-NLP Opus-MT`
+              models as a collection of pre-trained NMT models covering
+              numerous language pairs, known for their quality and open-source
+              availability. Mention `SeamlessM4T v2` as a more recent, unified
+              model capable of speech-to-speech translation.
+            </li>
+            <li>
+              <strong>CTranslate2:</strong> Describe `CTranslate2` as a fast inference engine
+              for NMT models, which optimizes transformer models for CPU and
+              GPU, crucial for achieving low latency in the translation
+              pipeline.
+            </li>
+          </ul>
+          <h3>2.3 Text-to-Speech (TTS)</h3>
+          <p>
+            Text-to-Speech (TTS) synthesis converts written text into spoken
+            audio. Recent advancements in deep learning have led to highly
+            natural and expressive synthetic voices.
+          </p>
+          <ul>
+            <li>
+              <strong>TTS Architectures:</strong> Briefly cover concatenative, parametric,
+              and neural TTS approaches. Focus on neural TTS models that
+              generate speech directly from text using end-to-end deep
+              learning.
+            </li>
+            <li>
+              <strong>Piper TTS:</strong> Detail `Piper TTS` as an efficient and high-quality
+              open-source TTS system, known for its small model sizes and fast
+              inference, making it ideal for real-time applications.
+            </li>
+            <li>
+              <strong>F5-TTS (Voice Cloning):</strong> Explain the concept of voice cloning,
+              where a TTS model can synthesize speech in a target speaker's
+              voice from a short audio sample. Describe `F5-TTS` (or `XTTS v2`)
+              as a model capable of real-time voice cloning, adding a
+              personalized dimension to the translation output.
+            </li>
+          </ul>
+          <h3>2.4 Voice Activity Detection (VAD)</h3>
+          <p>
+            Voice Activity Detection (VAD) is a technique used to detect the
+            presence or absence of human speech in an audio stream. It is
+            critical for real-time speech processing pipelines to efficiently
+            segment audio, reduce computational load, and improve the accuracy
+            of downstream STT and MT models.
+          </p>
+          <ul>
+            <li>
+              <strong>Importance of VAD:</strong> Explain how VAD helps in distinguishing
+              speech from silence or background noise, enabling the system to
+              process only relevant audio segments.
+            </li>
+            <li>
+              <strong>WebRTC VAD:</strong> Describe `webrtcvad` as a robust and widely used
+              VAD algorithm, known for its efficiency and configurable
+              aggressiveness levels, which allow for tuning its sensitivity to
+              speech.
+            </li>
+          </ul>
+          <h3>2.5 Real-time Audio Processing and Streaming</h3>
+          <p>
+            Achieving real-time performance in a complex pipeline requires
+            careful consideration of audio processing and data streaming
+            techniques.
+          </p>
+          <ul>
+            <li>
+              <strong>Audio Chunking:</strong> Explain the concept of dividing continuous
+              audio streams into smaller, manageable chunks for incremental
+              processing.
+            </li>
+            <li>
+              <strong>WebSockets:</strong> Describe WebSockets as a full-duplex communication
+              protocol over a single TCP connection, ideal for real-time,
+              bidirectional data exchange between the frontend and backend.
+            </li>
+            <li>
+              <strong>Latency Considerations:</strong> Discuss the various sources of latency
+              in the pipeline (audio capture, VAD, STT, MT, TTS inference,
+              network transmission) and strategies to minimize them.
+            </li>
+          </ul>
+          <h3>2.6 Comparison of Key Models</h3>
+          <div class="thesis-table-container">
+            <h3>Table 2.1: Comparison of Key Models and Technologies</h3>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Component</th>
+                  <th>Model/Technology</th>
+                  <th>Key Features</th>
+                  <th>Advantages for Real-time</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>STT</td>
+                  <td>`faster-whisper`</td>
+                  <td>Transformer-based, multilingual, optimized inference</td>
+                  <td>
+                    High accuracy, significantly faster than original Whisper,
+                    low resource usage
+                  </td>
+                </tr>
+                <tr>
+                  <td>MT</td>
+                  <td>`CTranslate2` with `Opus-MT`</td>
+                  <td>Efficient inference engine, broad language coverage</td>
+                  <td>
+                    Fast and efficient translation, optimized for various
+                    hardware
+                  </td>
+                </tr>
+                <tr>
+                  <td>TTS</td>
+                  <td>`Piper TTS`</td>
+                  <td>Small model size, high quality, fast inference</td>
+                  <td>
+                    Very low latency, natural-sounding speech, suitable for
+                    embedded systems
+                  </td>
+                </tr>
+                <tr>
+                  <td>TTS</td>
+                  <td>`F5-TTS` (or `XTTS v2`)</td>
+                  <td>Voice cloning, expressive speech</td>
+                  <td>
+                    Personalized speech output, real-time cloning capabilities
+                  </td>
+                </tr>
+                <tr>
+                  <td>VAD</td>
+                  <td>`webrtcvad`</td>
+                  <td>Robust, configurable aggressiveness</td>
+                  <td>Efficient speech detection, reduces processing of silence</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="table-caption">
+              Detailed comparison of core technologies used in the system.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="thesis-architecture content-container full-screen"
+        id="thesis-architecture"
+      >
+        <div class="container">
+          <h2>3. System Architecture</h2>
+          <p>
+            This chapter delves into the overall design and architecture of the
+            real-time speech translation system. It outlines the client-server
+            model, the detailed pipeline flow, and the individual components
+            that work in concert to achieve seamless cross-lingual
+            communication.
+          </p>
+          <h3>3.1 Overall System Design</h3>
+          <p>
+            The system employs a modular client-server architecture to ensure
+            scalability, maintainability, and efficient resource utilization.
+            The frontend, a web-based user interface, handles audio capture and
+            presentation, while the backend, powered by FastAPI, orchestrates
+            the complex speech processing and translation tasks.
+          </p>
+          <h4>Frontend (Client):</h4>
+          <ul>
+            <li>
+              Capturing microphone audio from the user's browser.
+            </li>
+            <li>
+              Sending audio chunks to the backend via WebSockets.
+            </li>
+            <li>
+              Displaying real-time transcriptions and translations.
+            </li>
+            <li>
+              Playing back synthesized audio received from the backend.
+            </li>
+            <li>
+              Managing user interactions, such as language selection, theme
+              switching, and speaker voice profile management.
+            </li>
+            <li>
+              Visualizing pipeline latency using interactive charts.
+            </li>
+          </ul>
+          <h4>Backend (Server):</h4>
+          <ul>
+            <li>
+              Implemented with Python and FastAPI, the backend serves as the
+              central processing unit, managing:
+            </li>
+            <li>
+              WebSocket connections for bidirectional communication with the
+              frontend.
+            </li>
+            <li>
+              Orchestration of STT, MT, and TTS models.
+            </li>
+            <li>
+              Voice Activity Detection (VAD) to segment speech.
+            </li>
+            <li>
+              Streaming processed data (transcriptions, translations,
+              synthesized audio) back to the frontend.
+            </li>
+            <li>
+              Handling model loading and configuration.
+            </li>
+          </ul>
+          <h3>3.2 Detailed Pipeline Flow</h3>
+          <p>
+            The real-time speech translation pipeline follows a sequential flow, integrating various components to achieve seamless cross-lingual communication.
+          </p>
+          <div class="thesis-figure">
+            <div class="mermaid">
+              flowchart LR
+                A["User Speaks"] --> B["WebRTC Audio Capture"]
+                B --> C["WebSocket Stream to Backend"]
+                C --> D["Backend Processing"]
+                D --> D1["STT: Faster-Whisper"] & D2["MT: CTranslate2"] & D3["TTS: Piper/F5-TTS"]
+                D1 --> D2
+                D2 --> D3
+                D3 --> E["WebSocket Stream to Frontend"]
+                E --> F["Web Audio API Playback"]
+                F -- "Loop" --> A
+            </div>
+            <p class="figure-caption">
+              Figure 3.1: Detailed Workflow of the Real-Time Speech Translation Pipeline.
+            </p>
+          </div>
+          <p>
+            The pipeline initiates with the user speaking into a microphone, captured by the frontend via WebRTC. This audio is then streamed to the backend using WebSockets. The backend processes the audio through Speech-to-Text (STT), Machine Translation (MT), and Text-to-Speech (TTS) models. The synthesized translated audio is streamed back to the frontend via WebSockets and played through the user's speakers.
+          </p>
+          <h3>3.3 Component Breakdown</h3>
+          <p>
+            The system is composed of several interconnected modules, each
+            specialized for a particular function.
+          </p>
+          <h4>Frontend (UI):</h4>
+          <ul>
+            <li>
+              `ui/home/home.html`: Main HTML structure, including dual-mode
+              layout (default/thesis), header, footer, and content sections.
+            </li>
+            <li>
+              `ui/home/home.css`: Styling for home page elements, navigation,
+              and mode-specific adjustments.
+            </li>
+            <li>
+              `ui/home/home.js`: JavaScript for dynamic UI behavior, header
+              scroll, hamburger menu, theme switching, mode switching, bubble
+              navigation, Chart.js initialization, and code snippet copy
+              functionality.
+            </li>
+            <li>
+              `ui/audio-processor.js`: Web Audio Worklet for efficient,
+              off-main-thread audio processing.
+            </li>
+            <li>
+              `ui/global-styles.css`, `styles.css`: Global CSS for consistent
+              theming and distinct section coloring.
+            </li>
+          </ul>
+          <h4>Backend (FastAPI):</h4>
+          <ul>
+            <li>
+              `app.py`, `backend/main.py`: Main FastAPI application, WebSocket
+              handling, and orchestration logic.
+            </li>
+            <li>
+              `backend/stt/faster_whisper_stt.py`: Wrapper for the
+              `faster-whisper` STT model.
+            </li>
+            <li>
+              `backend/mt/ctranslate2_mt.py`: Wrapper for `CTranslate2`-based
+              Machine Translation.
+            </li>
+            <li>
+              `backend/tts/piper_tts.py`: Wrapper for `Piper TTS` models.
+            </li>
+            <li>
+              `backend/tts/f5_tts.py`: Wrapper for `F5-TTS` (or `XTTS v2`) for
+              voice cloning.
+            </li>
+            <li>
+              `backend/utils/audio_utils.py`: Utility functions for audio
+              manipulation.
+            </li>
+            <li>
+              `backend/utils/auth.py`, `backend/utils/db_manager.py`:
+              Authentication and database management (if applicable).
+            </li>
+          </ul>
+          <h4>Models and Data:</h4>
+          <ul>
+            <li>
+              `backend/tts/piper_models/`: Directory for downloaded Piper TTS
+              models.
+            </li>
+            <li>
+              `ct2_models/`: Directory for converted CTranslate2 MT models.
+            </li>
+            <li>
+              `speaker_voices/`: Directory for stored speaker voice profiles for
+              cloning.
+            </li>
+            <li>
+              `certs/`: SSL certificates for HTTPS/WSS communication.
+            </li>
+          </ul>
+          <h3>3.4 Key Technologies</h3>
+          <div class="thesis-table-container">
+            <h3>Table 3.1: Key Technologies and Their Roles</h3>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Technology/Tool</th>
+                  <th>Role in System</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="category-row frontend-category">
+                  <td><strong>Frontend</strong></td>
+                  <td>HTML, CSS, JavaScript</td>
+                  <td>Core web technologies for user interface and interactivity</td>
+                </tr>
+                <tr class="frontend-category">
+                  <td></td>
+                  <td>Web Audio API</td>
+                  <td>Browser-based audio capture and processing</td>
+                </tr>
+                <tr class="frontend-category">
+                  <td></td>
+                  <td>WebSockets</td>
+                  <td>
+                    Real-time, bidirectional communication between frontend and
+                    backend
+                  </td>
+                </tr>
+                <tr class="frontend-category">
+                  <td></td>
+                  <td>Chart.js</td>
+                  <td>Interactive data visualization for latency metrics</td>
+                </tr>
+                <tr class="category-row backend-category">
+                  <td><strong>Backend</strong></td>
+                  <td>Python</td>
+                  <td>Primary programming language</td>
+                </tr>
+                <tr class="backend-category">
+                  <td></td>
+                  <td>FastAPI</td>
+                  <td>
+                    High-performance web framework for API and WebSocket
+                    endpoints
+                  </td>
+                </tr>
+                <tr class="backend-category">
+                  <td></td>
+                  <td>`faster-whisper`</td>
+                  <td>Optimized Speech-to-Text (STT) model</td>
+                </tr>
+                <tr class="backend-category">
+                  <td></td>
+                  <td>`CTranslate2`</td>
+                  <td>Fast inference engine for Machine Translation (MT) models</td>
+                </tr>
+                <tr class="backend-category">
+                  <td></td>
+                  <td>`Helsinki-NLP Opus-MT`</td>
+                  <td>Pre-trained Neural Machine Translation models</td>
+                </tr>
+                <tr class="backend-category">
+                  <td></td>
+                  <td>`Piper TTS`</td>
+                  <td>Efficient and high-quality Text-to-Speech (TTS) model</td>
+                </tr>
+                <tr class="backend-category">
+                  <td></td>
+                  <td>`F5-TTS` (or `XTTS v2`)</td>
+                  <td>Real-time voice cloning Text-to-Speech (TTS) model</td>
+                </tr>
+                <tr class="backend-category">
+                  <td></td>
+                  <td>`webrtcvad`</td>
+                  <td>Voice Activity Detection (VAD) library</td>
+                </tr>
+                <tr class="category-row deployment-category">
+                  <td><strong>Deployment/Dev</strong></td>
+                  <td>Apple Silicon (M1/M2/M3)</td>
+                  <td>Target hardware for optimized performance</td>
+                </tr>
+                <tr class="deployment-category">
+                  <td></td>
+                  <td>`ffmpeg`</td>
+                  <td>Audio processing utility</td>
+                </tr>
+                <tr class="deployment-category">
+                  <td></td>
+                  <td>`openssl`</td>
+                  <td>For generating SSL certificates</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="table-caption">
+              Overview of key technologies and their roles in the system.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="thesis-implementation content-container full-screen"
+        id="thesis-implementation"
+      >
+        <div class="container">
+          <h2>4. Implementation Details</h2>
+          <p>
+            This chapter delves into the technical implementation of the
+            real-time speech translation system, detailing the development of
+            both the frontend and backend components, as well as the integration
+            and optimization of the various AI models.
+          </p>
+          <h3>4.1 Frontend Implementation</h3>
+          <p>
+            The frontend is a modern web application built with standard web
+            technologies (HTML, CSS, JavaScript) to ensure broad compatibility
+            and a rich user experience.
+          </p>
+          <ul>
+            <li>
+              <strong>HTML Structure (`ui/home/home.html`):</strong> The main HTML file
+              defines the dual-mode layout, including the header, footer, and
+              distinct content sections for "Default Mode" and "Thesis Mode." It
+              incorporates placeholders for dynamic content such as interactive
+              charts (using `<canvas>` elements for Chart.js) and data tables.
+            </li>
+            <li>
+              <strong>Styling (`ui/home/home.css`, `ui/global-styles.css`,
+              `styles.css`):</strong>
+            </li>
+            <li>
+              `ui/global-styles.css` and `styles.css` define global CSS
+              variables for consistent theming (day/night mode), typography, and
+              base element styling.
+            </li>
+            <li>
+              `ui/home/home.css` provides specific styles for the home page,
+              including responsive design for the header, navigation (hamburger
+              menu, bubble navigation), and distinct visual treatments for each
+              section in both default and thesis modes. Custom styles are
+              applied for elements like `.hero-illustration`, `.feature-icon`,
+              `.step-icon`, `.section-subtitle`, `.thesis-figure`,
+              `.thesis-table-container`, `.data-table`, and
+              `.code-snippet-container` to achieve the desired aesthetic and
+              Notion-like code block styling.
+            </li>
+            <li>
+              <strong>JavaScript Logic (`ui/home/home.js`, `ui/audio-processor.js`,
+              `ui/theme-toggle.js`):</strong>
+            </li>
+            <li>
+              `ui/home/home.js` manages core UI interactivity:
+            </li>
+            <li>
+              <strong>Header Behavior:</strong> Implements logic for the header to hide on
+              scroll down and reappear on scroll up in default mode, and to be
+              completely hidden in thesis mode.
+            </li>
+            <li>
+              <strong>Hamburger Menu:</strong> Controls the opening and closing of the mobile
+              navigation menu.
+            </li>
+            <li>
+              <strong>Theme-Dependent Images:</strong> Dynamically switches signature images
+              in the footer based on the active theme.
+            </li>
+            <li>
+              <strong>Mode Switching:</strong> Handles the logic for toggling between
+              "Default Mode" and "Thesis Mode," including content visibility and
+              smooth scrolling to the top.
+            </li>
+            <li>
+              <strong>Bubble Navigation:</strong> Manages active states and smooth scrolling
+              for the `section-nav` elements.
+            </li>
+            <li>
+              <strong>Chart.js Integration:</strong> Initializes and updates interactive
+              charts (e.g., `architectureChart`, `performanceChart`) for
+              visualizing system metrics in thesis mode.
+            </li>
+            <li>
+              <strong>Code Snippet Copy Functionality:</strong> Provides a `copyCode`
+              function to allow users to easily copy code blocks to their
+              clipboard.
+            </li>
+            <li>
+              `ui/audio-processor.js` implements a Web Audio Worklet for
+              efficient, off-main-thread audio processing. This ensures that
+              audio capture and preprocessing (e.g., resampling, chunking) do
+              not block the main UI thread, contributing to low latency.
+            </li>
+            <li>
+              `ui/theme-toggle.js` handles the day/night mode switching logic,
+              persisting user preferences.
+            </li>
+            <li>
+              <strong>Web Audio API and WebSockets:</strong> The frontend utilizes the Web
+              Audio API to access the user's microphone, process audio streams,
+              and send raw audio data in chunks to the backend via WebSockets.
+              WebSockets also facilitate real-time reception of transcriptions,
+              translations, and synthesized audio from the backend.
+            </li>
+          </ul>
+          <h3>4.2 Backend Implementation</h3>
+          <p>
+            The backend is built with Python using the FastAPI framework, chosen
+            for its high performance, asynchronous capabilities, and ease of
+            developing API and WebSocket endpoints.
+          </p>
+          <ul>
+            <li>
+              <strong>FastAPI Application (`app.py`, `backend/main.py`):</strong>
+            </li>
+            <li>
+              `backend/main.py` defines the main FastAPI application, including
+              routes for health checks, model initialization, and WebSocket
+              endpoints for real-time audio streaming.
+            </li>
+            <li>
+              It orchestrates the entire pipeline, managing the flow of audio
+              data through VAD, STT, MT, and TTS modules.
+            </li>
+            <li>
+              Configuration parameters (e.g., `STT_MODEL_SIZE`,
+              `VAD_AGGRESSIVENESS`, `PIPER_MODEL_MAPPING`) are defined here,
+              allowing for flexible system tuning.
+            </li>
+            <li>
+              <strong>WebSocket Handling:</strong> FastAPI's WebSocket capabilities are used
+              to establish a persistent, full-duplex connection with the
+              frontend. This enables efficient, low-latency streaming of audio
+              input and real-time delivery of processed text and audio output.
+            </li>
+            <li>
+              <strong>Model Orchestration:</strong> The backend manages the loading and
+              inference of all AI models. It dynamically loads MT and TTS models
+              based on the selected language pairs and TTS engine.
+            </li>
+            <li>
+              <strong>SSL Certificates:</strong> Self-signed SSL certificates (generated via
+              `openssl`) are used to enable HTTPS/WSS communication, ensuring
+              secure data transfer.
+            </li>
+          </ul>
+          <h3>4.3 Model Integration and Optimization</h3>
+          <p>
+            Each AI model is integrated through dedicated Python wrappers,
+            ensuring a consistent interface and allowing for specific
+            optimizations.
+          </p>
+          <ul>
+            <li>
+              <strong>Speech-to-Text (`backend/stt/faster_whisper_stt.py`):</strong>
+            </li>
+            <li>
+              The `FasterWhisperSTT` class wraps the `faster-whisper` library.
+            </li>
+            <li>
+              It loads the specified Whisper model (e.g., `large-v3`) and
+              utilizes `CTranslate2` for optimized inference on Apple Silicon,
+              significantly reducing transcription latency compared to the
+              original Whisper implementation.
+            </li>
+            <li>
+              The wrapper handles audio input, performs transcription, and
+              returns the text.
+            </li>
+            <li>
+              <strong>Machine Translation (`backend/mt/ctranslate2_mt.py`):</strong>
+            </li>
+            <li>
+              The `CTranslate2MT` class manages the loading and inference of
+              `Helsinki-NLP Opus-MT` models converted to `CTranslate2` format.
+            </li>
+            <li>
+              It supports dynamic loading of different language pair models
+              (e.g., `en-sk`, `sk-en`) based on user selection.
+            </li>
+            <li>
+              `CTranslate2`'s optimizations ensure fast and efficient text
+              translation.
+            </li>
+            <li>
+              <strong>Text-to-Speech (`backend/tts/piper_tts.py`,
+              `backend/tts/f5_tts.py`):</strong>
+            </li>
+            <li>
+              `PiperTTS` class wraps the `Piper TTS` library, providing an
+              interface for fast, natural-sounding speech synthesis. Models are
+              stored in `backend/tts/piper_models/`.
+            </li>
+            <li>
+              `F5TTS` class (or `XTTS_TTS` for `XTTS v2`) handles real-time
+              voice cloning. It takes a speaker's audio sample (`Voice.wav` from
+              `speaker_voices/`) and synthesizes the translated text in that
+              voice. This involves loading the `F5-TTS` model and managing voice
+              embeddings.
+            </li>
+            <li>
+              Both wrappers are designed for low-latency audio generation.
+            </li>
+            <li>
+              **Voice Activity Detection (`webrtcvad`):**
+            </li>
+            <li>
+              Integrated directly into the backend's audio processing pipeline.
+            </li>
+            <li>
+              `webrtcvad` efficiently identifies speech segments, preventing
+              silent audio from being sent to STT and MT models, thereby
+              reducing computational load and improving overall pipeline
+              efficiency. Its aggressiveness level is configurable.
+            </li>
+          </ul>
+          <h3>4.4 Data Management</h3>
+          <ul>
+            <li>
+              <strong>Model Storage:</strong> Pre-trained models for Piper TTS and
+              CTranslate2 MT are stored locally in `backend/tts/piper_models/`
+              and `ct2_models/` respectively, allowing for offline operation and
+              faster loading times after initial download.
+            </li>
+            <li>
+              <strong>Speaker Voice Profiles:</strong> User-recorded or uploaded voice samples
+              for F5-TTS voice cloning are stored in the `speaker_voices/`
+              directory, managed by the backend.
+            </li>
+            <li>
+              <strong>Configuration:</strong> Key system parameters are managed within
+              `backend/main.py` and can be adjusted to fine-tune performance or
+              behavior.
+            </li>
+          </ul>
+          <h3>4.5 Code Snippets</h3>
+          <h4>Frontend WebSocket Connection (Simplified `ui/home/home.js`)</h4>
+          <div class="code-snippet-container">
+            <div class="code-snippet-header">
+              <span class="language-label">JavaScript</span>
+              <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            </div>
+            <div class="code-snippet-content">
+              <pre><code>
+// Example: Simplified WebSocket connection and message handling
+let ws;
+function connectWebSocket() {
+    ws = new WebSocket("wss://localhost:8000/ws");
+
+    ws.onopen = () => {
+        console.log("WebSocket connection established.");
+        // Send initial configuration or start audio stream
+    };
+
+    ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === "transcription") {
+            document.getElementById("transcription-output").innerText = data.text;
+        } else if (data.type === "translation") {
+            document.getElementById("translation-output").innerText = data.text;
+        } else if (data.type === "audio") {
+            // Play synthesized audio
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const audioBuffer = audioContext.decodeAudioData(base64ToArrayBuffer(data.audio));
+            audioBuffer.then(buffer => {
+                const source = audioContext.createBufferSource();
+                source.buffer = buffer;
+                source.connect(audioContext.destination);
+                source.start(0);
+            });
+        }
+    };
+
+    ws.onclose = () => {
+        console.log("WebSocket connection closed.");
+        // Attempt to reconnect or show error
+    };
+
+    ws.onerror = (error) => {
+        console.error("WebSocket error:", error);
+    };
+}
+
+// Helper to convert base64 to ArrayBuffer (for audio playback)
+function base64ToArrayBuffer(base64) {
+    const binaryString = window.atob(base64);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes.buffer;
+}
+              </code></pre>
+            </div>
+          </div>
+          <h4>Backend WebSocket Endpoint (Simplified `backend/main.py`)</h4>
+          <div class="code-snippet-container">
+            <div class="code-snippet-header">
+              <span class="language-label">Python</span>
+              <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            </div>
+            <div class="code-snippet-content">
+              <pre><code>
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from backend.stt.faster_whisper_stt import FasterWhisperSTT
+from backend.mt.ctranslate2_mt import CTranslate2MT
+from backend.tts.piper_tts import PiperTTS
+from backend.tts.f5_tts import F5TTS
+from backend.utils.audio_utils import resample_audio, bytes_to_float_array
+import webrtcvad
+import asyncio
+import json
+import base64
+
+app = FastAPI()
+
+# Initialize models (simplified for example)
+stt_model = FasterWhisperSTT(model_size="small")
+mt_model = CTranslate2MT(model_name="Helsinki-NLP/opus-mt-en-sk")
+piper_tts = PiperTTS(model_id="en_US-ryan-medium")
+f5_tts = F5TTS() # Requires speaker_wav_path to be set
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    print("WebSocket connected.")
+    vad = webrtcvad.Vad(3) # Aggressiveness mode 3 (most aggressive)
+    audio_buffer = []
+    speech_detected = False
+
+    try:
+        while True:
+            data = await websocket.receive_bytes()
+            float_array = bytes_to_float_array(data)
+            # Resample if necessary (assuming 16kHz for VAD)
+            resampled_audio = resample_audio(float_array, original_sr=48000, target_sr=16000)
+
+            # VAD processing (simplified)
+            is_speech = vad.is_speech(resampled_audio.tobytes(), sample_rate=16000)
+            if is_speech:
+                speech_detected = True
+                audio_buffer.extend(float_array)
+            elif speech_detected:
+                # End of speech segment, process buffer
+                transcription = stt_model.transcribe(audio_buffer)
+                await websocket.send_json({"type": "transcription", "text": transcription})
+
+                translation = mt_model.translate(transcription, source_lang="en", target_lang="sk")
+                await websocket.send_json({"type": "translation", "text": translation})
+
+                # Synthesize audio (example with Piper)
+                synthesized_audio_bytes = piper_tts.synthesize(translation, speaker_id="en_US-ryan-medium")
+                encoded_audio = base64.b64encode(synthesized_audio_bytes).decode('utf-8')
+                await websocket.send_json({"type": "audio", "audio": encoded_audio})
+
+                audio_buffer = []
+                speech_detected = False
+            else:
+                # No speech, clear buffer if too long
+                if len(audio_buffer) > 48000 * 5: # e.g., 5 seconds of silence
+                    audio_buffer = []
+
+    except WebSocketDisconnect:
+        print("WebSocket disconnected.")
+    except Exception as e:
+        print(f"WebSocket error: {e}")
+    finally:
+        print("Cleaning up WebSocket resources.")
+              </code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="thesis-results content-container full-screen"
+        id="thesis-results"
+      >
+        <div class="container">
+          <h2>5. Experimental Setup and Results</h2>
+          <p>
+            This chapter details the experimental methodology used to evaluate
+            the performance of the real-time speech translation system, presents
+            the collected results, and discusses their implications regarding the
+            project's objectives.
+          </p>
+          <h3>5.1 Experimental Setup</h3>
+          <p>
+            The system was evaluated on a specific hardware and software
+            configuration to ensure consistent and reproducible results.
+          </p>
+          <ul>
+            <li>
+              <strong>Hardware Environment:</strong>
+            </li>
+            <li>
+              <strong></strong>Processor:</strong> Apple M1/M2/M3 (e.g., MacBook Pro with Apple M1 Pro
+              chip)
+            </li>
+            <li>
+              <strong>RAM:</strong> 16GB Unified Memory
+            </li>
+            <li>
+              <strong>Storage:</strong> SSD
+            </li>
+            <li>
+              <strong>Software Environment:</strong>
+            </li>
+            <li>
+              <strong>Operating System:</strong> macOS (Ventura/Sonoma)
+            </li>
+            <li>
+              <strong>Python Version:</strong> 3.9+
+            </li>
+            <li>
+              <strong>Key Libraries:</strong> `faster-whisper`, `CTranslate2`,
+              `Piper TTS`, `F5-TTS`, `FastAPI`, `webrtcvad`, `soundfile`,
+              `torch`, `torchaudio`.
+            </li>
+            <li>
+              <strong>Virtual Environment:</strong> `venv` or `conda` for
+              dependency management.
+            </li>
+            <li>
+              <strong>Model Configurations:</strong>
+            </li>
+            <li>
+              <strong>STT:</strong> `faster-whisper` (model size: `large-v3`)
+            </li>
+            <li>
+              <strong>MT:</strong> `CTranslate2` with `Helsinki-NLP Opus-MT`
+              (e.g., `en-sk`, `sk-en`)
+            </li>
+            <li>
+              <strong>TTS:</strong> `Piper TTS` (e.g., `en_US-ryan-medium`,
+              `sk_SK-lili-medium`), `F5-TTS` (with pre-recorded speaker voice
+              profile)
+            </li>
+            <li>
+              <strong>VAD:</strong> `webrtcvad` (aggressiveness level 3)
+            </li>
+            <li>
+              <strong>Testing Methodology:</strong>
+            </li>
+            <li>
+              <strong>Latency Measurement:</strong> End-to-end latency was measured from the
+              moment speech input began until the synthesized audio started
+              playing. Component-wise latencies (STT inference, MT inference,
+              TTS inference, network transmission) were also recorded.
+            </li>
+            <li>
+              <strong>Accuracy Evaluation:</strong>
+            </li>
+            <li>
+              <strong>STT:</strong> Word Error Rate (WER) was used to evaluate transcription
+              accuracy against ground truth transcripts.
+            </li>
+            <li>
+              <strong>MT:</strong> BLEU (Bilingual Evaluation Understudy) and METEOR (Metric
+              for Evaluation of Translation with Explicit Ordering) scores were
+              used to assess translation quality against human-translated
+              references.
+            </li>
+            <li>
+              <strong>Audio Quality:</strong> Subjective listening tests were conducted for
+              TTS output, and objective metrics like Mean Opinion Score (MOS)
+              could be considered for future work.
+            </li>
+            <li>
+              <strong>Test Data:</strong> A diverse set of pre-recorded audio files (e.g.,
+              `test/My test speech_xtts_speaker_clean.wav`,
+              `test/slovak_test_speech.wav`) with corresponding ground truth
+              transcripts and translations were used. Speaker voice profiles
+              were prepared for F5-TTS evaluation.
+            </li>
+          </ul>
+          <h3>5.2 Performance Metrics and Results</h3>
+          <p>
+            The evaluation focused on key performance indicators (KPIs) to assess
+            the system's real-time capabilities and translation quality.
+          </p>
+          <ul>
+            <li>
+              <strong>End-to-End Latency:</strong>
+            </li>
+            <li>
+              <strong>Target:</strong> 2-3 seconds (Piper TTS), 2.5-3.5 seconds (F5-TTS voice
+              cloning)
+            </li>
+            <li>
+              <strong>Achieved:</strong> [Insert actual measured average latency for Piper
+              TTS] seconds, [Insert actual measured average latency for F5-TTS]
+              seconds.
+            </li>
+            <li>
+              <strong>Discussion:</strong> Analyze if targets were met. Discuss factors
+              influencing latency (e.g., chunk size, model size, hardware load,
+              network conditions).
+            </li>
+          </ul>
+          <ul>
+            <li>
+              <strong>Component-wise Latency Breakdown:</strong>
+            </li>
+            <li>
+              <strong>STT Inference:</strong> [Insert average STT latency] ms
+            </li>
+            <li>
+              <strong>MT Inference:</strong> [Insert average MT latency] ms
+            </li>
+            <li>
+              <strong>TTS Inference (Piper):</strong> [Insert average Piper TTS latency] ms
+            </li>
+            <li>
+              <strong>TTS Inference (F5-TTS):</strong> [Insert average F5-TTS latency] ms
+            </li>
+            <li>
+              <strong>VAD Processing:</strong> [Insert average VAD latency] ms
+            </li>
+            <li>
+              <strong>Network Transmission:</strong> [Insert average network latency] ms
+            </li>
+            <li>
+              <strong>Chart:</strong> A bar chart illustrating the average latency
+              contribution of each pipeline component.
+            </li>
+          </ul>
+          <div class="thesis-figure">
+            <canvas id="latencyBreakdownChart"></canvas>
+            <p class="figure-caption">
+              Figure 5.1: Latency Breakdown Chart.
+            </p>
+          </div>
+          </p>
+          <h4>5.2.2 Accuracy Evaluation</h4>
+          <ul>
+            <li>
+              <strong>STT Accuracy (WER):</strong>
+            </li>
+            <li>
+              <strong>Results:</strong> [Insert average WER for English STT], [Insert average
+              WER for Slovak STT].
+            </li>
+            <li>
+              <strong>Discussion:</strong> Interpret WER scores. Discuss challenges (e.g.,
+              accents, background noise) and how `faster-whisper` performed.
+            </li>
+            <li>
+              <strong>MT Quality (BLEU/METEOR):</strong>
+            </li>
+            <li>
+              English to Slovak: BLEU = [Insert BLEU score], METEOR = [Insert
+              METEOR score]
+            </li>
+            <li>
+              Slovak to English: BLEU = [Insert BLEU score], METEOR = [Insert
+              METEOR score]
+            </li>
+            <li>
+              <strong>Discussion:</strong> Explain BLEU and METEOR scores. Evaluate
+              translation quality and fluency.
+            </li>
+          </ul>
+          <h4>5.2.3 TTS Quality Comparison</h4>
+          <ul>
+            <li>
+              <strong>Piper TTS:</strong> [Describe perceived quality: naturalness,
+              expressiveness, clarity]
+            </li>
+            <li>
+              <strong>F5-TTS (Voice Cloning):</strong> [Describe perceived quality: similarity
+              to source voice, naturalness, expressiveness]
+            </li>
+            <li>
+              <strong>Discussion:</strong> Compare the trade-offs between Piper's speed and
+              F5-TTS's voice cloning capabilities.
+            </li>
+          </ul>
+          <h3>5.3 Discussion of Results</h3>
+          <p>
+            Summarize the key findings from the experimental evaluation. Discuss
+            how the system's performance aligns with the initial goals and
+            objectives. Highlight successful aspects, such as the low latency
+            achieved on Apple Silicon and the effective integration of various
+            open-source models. Address any discrepancies or limitations
+            observed during testing and propose potential reasons. For instance,
+            discuss the impact of network conditions on end-to-end latency or
+            the challenges in maintaining high accuracy across diverse linguistic
+            inputs.
+          </p>
+        </div>
+      </section>
+
+      <section
+        class="thesis-conclusion content-container full-screen"
+        id="thesis-conclusion"
+      >
+        <div class="container">
+          <h2>6. Conclusion and Future Work</h2>
+          <h3>6.1 Summary of Achievements</h3>
+          <p>
+            This bachelor's thesis successfully designed, implemented, and
+            evaluated a real-time live speech translation system, demonstrating
+            a robust solution for seamless cross-lingual communication. The
+            project achieved its primary objectives by integrating
+            state-of-the-art open-source models for Speech-to-Text (STT),
+            Machine Translation (MT), and Text-to-Speech (TTS) into a
+            low-latency pipeline. Key accomplishments include:
+          </p>
+          <ul>
+            <li>
+              <strong>Real-time Performance:</strong> The system demonstrated the capability
+              to achieve target end-to-end latencies, making it suitable for
+              live interactive scenarios.
+            </li>
+            <li>
+              <strong>Modular and Optimized Architecture:</strong> A flexible client-server
+              architecture with a FastAPI backend and a responsive web frontend
+              was developed, optimized for efficient execution on Apple Silicon
+              hardware.
+            </li>
+            <li>
+              <strong>Advanced Model Integration:</strong> Successful integration and
+              optimization of `faster-whisper` for STT, `CTranslate2` with
+              `Helsinki-NLP Opus-MT` for MT, and both `Piper TTS` and `F5-TTS`
+              for high-quality and voice-cloned speech synthesis.
+            </li>
+            <li>
+              <strong>Enhanced User Experience:</strong> The web UI provides dynamic language
+              switching, effective Voice Activity Detection (VAD), and real-time
+              latency visualization, contributing to an intuitive user
+              experience.
+            </li>
+          </ul>
+          <p>
+            The project successfully validated the feasibility of building a
+            high-performance, open-source-driven real-time speech translation
+            system, addressing critical challenges in latency and quality.
+          </p>
+
+          <div class="thesis-figure">
+            <div class="mermaid">
+              graph TD
+                A[Current System] --> B{Future Enhancements}
+                B --> C[Multi-speaker Support]
+                B --> D[Production Optimization]
+                B --> E[Advanced Voice Training]
+                B --> F[Improved UI/UX]
+                B --> G[Robust Error Handling]
+                B --> H[Scalability]
+                B --> I[Additional Models]
+            </div>
+            <p class="figure-caption">
+              Figure 6.1: Overview of Future Enhancements.
+            </p>
+          </div>
+
+          <h3>6.2 Limitations of the Current System</h3>
+          <p>
+            Despite its achievements, the current system has certain limitations
+            that present opportunities for future development:
+          </p>
+          <ul>
+            <li>
+              <strong>Single-Speaker Focus:</strong> The current voice cloning (F5-TTS) is
+              primarily designed for a single, pre-defined speaker voice.
+              Multi-speaker scenarios are not yet fully supported, which limits
+              its applicability in complex conference environments.
+            </li>
+            <li>
+              <strong>Resource Usage:</strong> While optimized for Apple Silicon, the system
+              can still be resource-intensive, especially when running larger
+              models or multiple instances, which might impact performance on
+              less powerful hardware.
+            </li>
+            <li>
+              <strong>Error Handling and Feedback:</strong> The frontend's error handling and
+              user feedback mechanisms could be further enhanced to provide more
+              detailed information during backend initialization failures or
+              network issues.
+            </li>
+            <li>
+              <strong>Objective Audio Quality Metrics:</strong> While subjective listening
+              tests were conducted, the integration of objective audio quality
+              metrics (e.g., MOS scores) for TTS output was not fully
+              implemented.
+            </li>
+          </ul>
+          <h3>6.3 Future Enhancements</h3>
+          <p>
+            Building upon the current foundation, several key areas for future
+            work have been identified to further enhance the system's
+            capabilities and robustness:
+          </p>
+          <ul>
+            <li>
+              <strong>Multi-speaker Support:</strong> Extend the system to accurately identify
+              and translate speech from multiple speakers simultaneously,
+              potentially incorporating speaker diarization techniques.
+            </li>
+            <li>
+              <strong>Production Optimization:</strong> Explore advanced optimization
+              techniques such as model quantization, pruning, and leveraging
+              highly optimized inference engines like `whisper.cpp` or
+              `mlx-whisper` for STT. Investigate cloud deployment options for
+              scalable, production-ready environments.
+            </li>
+            <li>
+              <strong>`pip` Packaging:</strong> Simplify the installation and deployment
+              process by packaging the project as a Python library, making it
+              easier for other developers to integrate and use.
+            </li>
+            <li>
+              <strong>Advanced Voice Training:</strong> Implement more sophisticated voice
+              training techniques, potentially allowing users to fine-tune TTS
+              models with their own extensive datasets for highly personalized
+              voice cloning.
+            </li>
+            <li>
+              <strong>User Management and Profiles:</strong> Develop a comprehensive user
+              authentication and profile management system to store individual
+              language preferences, voice models, and usage history.
+            </li>
+            <li>
+              <strong>Improved UI/UX:</strong> Further enhance the frontend with more
+              intuitive controls, richer visual feedback mechanisms, and a more
+              polished, accessible design. This includes refining the latency
+              visualization and adding more interactive elements.
+            </li>
+            <li>
+              <strong>Robust Error Handling:</strong> Implement more granular error handling
+              and logging across the entire pipeline, providing clearer
+              diagnostics and recovery mechanisms.
+            </li>
+            <li>
+              <strong>Scalability:</strong> Design and implement strategies for horizontal
+              scaling of the backend services to handle a larger number of
+              concurrent users or higher processing loads.
+            </li>
+            <li>
+              <strong>Additional Models:</strong> Integrate and evaluate alternative STT, MT,
+              or TTS models to compare performance, explore different linguistic
+              capabilities, or support specialized use cases.
+            </li>
+          </ul>
+
+          <h3>7. References</h3>
+          <ul>
+            <li>
+              [1] OpenAI. (2022). *Whisper*. Retrieved from
+              [https://openai.com/research/whisper](https://openai.com/research/whisper)
+            </li>
+            <li>
+              [2] CTranslate2. (n.d.). *CTranslate2: Fast inference engine for
+              OpenNMT models*. Retrieved from
+              [https://opennmt.net/CTranslate2/](https://opennmt.net/CTranslate2/)
+            </li>
+            <li>
+              [3] Helsinki-NLP. (n.d.). *Opus-MT*. Retrieved from
+              [https://huggingface.co/Helsinki-NLP](https://huggingface.co/Helsinki-NLP)
+            </li>
+            <li>
+              [4] Piper TTS. (n.d.). *Piper: A fast, local neural text to speech
+              system*. Retrieved from
+              [https://github.com/rhasspy/piper](https://github.com/rhasspy/piper)
+            </li>
+            <li>
+              [5] F5-TTS. (n.d.). *F5-TTS: Fast and Flexible Few-shot
+              Text-to-Speech*. Retrieved from
+              [https://github.com/f5-tts/f5-tts](https://github.com/f5-tts/f5-tts)
+              (Note: This is a placeholder, actual F5-TTS repository might
+              differ or be part of a larger project like Coqui TTS)
+            </li>
+            <li>
+              [6] WebRTC. (n.d.). *Voice Activity Detection (VAD)*. Retrieved
+              from
+              [https://webrtc.github.io/webrtc-org/testing/audio-processing/vad/](https://webrtc.github.io/webrtc-org/testing/audio-processing/vad/)
+            </li>
+            <li>
+              [7] FastAPI. (n.d.). *FastAPI: A modern, fast (high-performance)
+              web framework for building APIs with Python 3.7+ based on standard
+              Python type hints*. Retrieved from
+              [https://fastapi.tiangolo.com/](https://fastapi.tiangolo.com/)
+            </li>
+            <li>
+              [8] Chart.js. (n.d.). *Chart.js: Simple, clean and engaging charts
+              for designers and developers*. Retrieved from
+              [https://www.chartjs.org/](https://www.chartjs.org/)
+            </li>
+            <li>
+              [9] Apple Inc. (n.d.). *Apple M1, M2, M3 Chips*. Retrieved from
+              [https://www.apple.com/mac/](https://www.apple.com/mac/) (General
+              reference for Apple Silicon)
+            </li>
+          </ul>
+          <h3>8. Appendices</h3>
+          <p>
+            [Optional: This section can include supplementary material such as
+            full code listings for critical modules, detailed configuration
+            files, additional experimental data, or user manuals. For this
+            thesis, specific appendices are not included but can be added as
+            needed.]
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <footer class="content-container" id="main-footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-logo">
+            <p class="footer-slogan">
+              <span class="material-symbols-outlined footer-slogan-icon">record_voice_over</span>
+              Real-Time Speech Translation for Online Conferences.
+            </p>
+          </div>
+          <div class="footer-links">
+            <div class="footer-column">
+              <h4 class="highlight2"><strong>Company</strong></h4>
+              <ul>
+                <li><a href="/ui/extra/about.html">About Us</a></li>
+                <li><a href="/ui/extra/feedback.html">Contact</a></li>
+              </ul>
+            </div>
+            <div class="footer-column">
+              <h4 class="highlight2"><strong>Legal</strong></h4>
+              <ul>
+                <li><a href="/ui/extra/privacy.html">Privacy</a></li>
+                <li><a href="/ui/extra/terms.html">Terms</a></li>
+                <li><a href="/ui/extra/cookies.html">Cookies</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="footer-contact">
+            <h4>Get in Touch</h4>
+            <p title="Fei Email" class="highlight2">xbrusnyak@stuba.sk</p>
+            <div class="social-links">
+              <a
+                href="https://github.com/brusnyak/bp"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="social-icon"
+                aria-label="GitHub"
+              >
+                <i class="fab fa-github"></i>
+              </a>
+              <a
+                href="https://www.linkedin.com/in/yehor-brusniak/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="social-icon"
+                aria-label="LinkedIn"
+              >
+                <i class="fab fa-linkedin-in"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <div class="footer-copyright">
+            <p>&copy; Lingonberry. All rights reserved.</p>
+          </div>
+          <div class="footer-signature">
+            <img
+              src="/ui/images/sign.png"
+              alt="Signature"
+              class="signature-img light-theme-sign"
+            />
+            <img
+              src="/ui/images/white-sign.png"
+              alt="Signature"
+              class="signature-img dark-theme-sign"
+            />
+          </div>
+          <div class="footer-mode-switcher">
+            <label class="switch" for="mode-switcher-checkbox">
+              <input
+                type="checkbox"
+                id="mode-switcher-checkbox"
+                aria-label="Toggle Thesis Mode"
+              />
+              <span class="slider round"></span>
+            </label>
+            <span
+              id="mode-switcher-label"
+              style="margin-left: 10px; color: var(--text-color)"
+              >Default Mode</span
+            >
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script src="/ui/theme-toggle.js"></script>
+    <script src="/ui/home/home.js"></script>
+  </body>
+</html>

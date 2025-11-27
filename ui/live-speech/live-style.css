@@ -1,0 +1,1277 @@
+/* General Layout */
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(
+    135deg,
+    var(--background-color-start) 0%,
+    var(--background-color-end) 100%
+  );
+  color: var(--text-color);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Distribute items with space between them */
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1.5rem;
+}
+
+.header-title-link {
+  /* New style for the anchor tag wrapping the title group */
+  flex-grow: 1; /* Allow the link to take available space */
+  display: flex; /* Make it a flex container to center its content */
+  justify-content: center; /* Center the title group horizontally */
+  text-decoration: none; /* Remove underline from link */
+}
+
+.header-title-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center align items */
+  text-align: center; /* Center text within the group */
+  justify-content: center; /* Center vertically if space allows */
+}
+
+.header-title-group h1 {
+  font-size: 2rem;
+  margin: 0;
+  color: var(--primary-color);
+}
+
+.header-title-group p {
+  margin: 0;
+  color: var(--secondary-color);
+  font-size: 0.9rem;
+}
+
+.burger-menu-btn {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: var(--text-color);
+  cursor: pointer;
+  margin-right: 1rem;
+  display: block; /* Always show on live speech page */
+}
+
+/* Theme Toggle in Header */
+.header .theme-toggle-wrapper {
+  margin-left: auto; /* Push to the right */
+  position: static; /* Override absolute positioning from auth.css */
+  background: none; /* Remove background */
+  border: none; /* Remove border */
+  box-shadow: none; /* Remove shadow */
+  padding: 0; /* Remove padding */
+}
+
+.header .theme-toggle-btn {
+  font-size: 1.8rem;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 280px;
+  background-color: var(--surface-color);
+  border-right: 1px solid var(--border-color);
+  box-shadow: 2px 0 10px var(--shadow-color);
+  padding: 1.5rem;
+  position: fixed;
+  height: 95vh; /* Adjusted to 95vh */
+  left: -500px; /* Hidden by default */
+
+  transition: left 0.3s ease;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.75rem; /* Added border-radius for consistency */
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar-header h3 {
+  margin: 0;
+  color: var(--primary-color);
+  font-size: 1.3rem;
+}
+
+.close-sidebar-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+.voice-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.voice-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px dashed var(--border-color);
+  color: var(--text-color);
+}
+
+.voice-list li:last-child {
+  border-bottom: none;
+}
+
+.voice-list li span {
+  flex-grow: 1;
+}
+
+.voice-list li .voice-actions button {
+  background: none;
+  border: none;
+  color: var(--secondary-color);
+  cursor: pointer;
+  margin-left: 0.5rem;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.voice-list li .voice-actions button:hover {
+  color: var(--primary-color);
+}
+
+.sidebar-divider {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 1rem 0;
+}
+
+.voice-language-sections-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 0.5rem; /* For scrollbar */
+}
+
+/* Sidebar Bottom Section for Account */
+.sidebar-bottom-section {
+  margin-top: auto; /* Push to the bottom */
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  position: relative; /* For positioning the floating container */
+}
+
+.sidebar-bottom-section .account-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: var(--background-color-end);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  color: var(--text-color);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sidebar-bottom-section .account-button:hover {
+  background-color: var(--border-color);
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+}
+
+.sidebar-bottom-section .account-button .user-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.sidebar-bottom-section .account-floating-container {
+  position: absolute;
+  bottom: calc(100% + 0.5rem); /* Position above the button with a small gap */
+  left: 0; /* Align to the left of the parent .sidebar-bottom-section */
+  right: 0; /* Extend to the right of the parent */
+  margin: 0 auto; /* Center horizontally within the available space */
+  width: 100%; /* Take full width of parent */
+  max-width: 230px; /* Max width to prevent it from being too wide */
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  box-shadow: 0 -5px 15px var(--shadow-color);
+  padding: 1.5rem;
+  z-index: 10;
+  color: var(--text-color);
+  /* Ensure it's hidden by default and only shown via JS toggle */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px); /* Re-add translateY for smooth transition */
+  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+}
+
+.sidebar-bottom-section .account-floating-container:not(.hidden) {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.sidebar-bottom-section .account-floating-container hr {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 1rem 0;
+}
+
+.sidebar-bottom-section .account-floating-container p {
+  margin: 0.25rem 0; /* Reduced margin */
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Align items to center */
+  flex-wrap: nowrap; /* Prevent wrapping for individual lines */
+  width: 100%; /* Ensure paragraphs take full width for consistent spacing */
+}
+
+.sidebar-bottom-section .account-floating-container .account-info-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem; /* Space between info lines */
+  align-items: flex-start; /* Align items to the start within the group */
+  width: 100%; /* Ensure the group takes full width */
+}
+
+.sidebar-bottom-section .account-floating-container .account-info-group p {
+  display: flex; /* Use flex for label and value */
+  justify-content: space-between; /* Distribute label and value */
+  align-items: center;
+  width: 100%; /* Ensure paragraphs take full width */
+}
+
+.sidebar-bottom-section .account-floating-container .account-label {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.sidebar-bottom-section .account-floating-container .account-links-group {
+  display: flex;
+  flex-direction: column; /* Stack links vertically */
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  align-items: flex-start; /* Align links to the left */
+}
+
+.sidebar-bottom-section .account-floating-container .account-links-group a {
+  display: block; /* Make links block-level for stacking */
+  padding: 0.25rem 0; /* Remove horizontal padding to align left */
+  color: var(--text-color);
+  text-decoration: none;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+}
+
+.sidebar-bottom-section .account-floating-container .bottom-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  font-size: 0.65rem; /* Make links smaller */
+}
+
+.sidebar-bottom-section .account-floating-container .bottom-links a {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  color: var(--text-color);
+  text-decoration: none;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+}
+
+.sidebar-bottom-section .account-floating-container .bottom-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.sidebar-bottom-section .account-floating-container .bottom-links a {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  color: var(--text-color);
+  text-decoration: none;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+}
+
+.sidebar-bottom-section
+  .account-floating-container
+  .account-links-group
+  a:hover,
+.sidebar-bottom-section .account-floating-container .bottom-links a:hover {
+  color: var(--primary-color);
+}
+
+.sidebar-bottom-section .account-floating-container .logout-button {
+  width: 100%;
+  margin-top: 1rem;
+  background-color: var(--danger-color);
+  color: var(--surface-color);
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.sidebar-bottom-section .account-floating-container .logout-button:hover {
+  background-color: darken(var(--danger-color), 10%); /* Darken on hover */
+  transform: translateY(-2px);
+}
+
+.sidebar-bottom-section .account-floating-container .bottom-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.sidebar-bottom-section .account-floating-container .bottom-links a {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  color: var(--text-color);
+  text-decoration: none;
+  transition: color 0.3s ease;
+  white-space: nowrap;
+}
+
+.sidebar-bottom-section .account-floating-container .bottom-links a:hover {
+  color: var(--primary-color);
+}
+
+.sidebar-bottom-section .account-floating-container ul li a:hover {
+  color: var(--primary-color);
+}
+
+.sidebar-bottom-section .account-floating-container .logout-button {
+  width: 100%;
+  margin-top: 1rem;
+  background-color: var(--danger-color);
+  color: var(--surface-color);
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.sidebar-bottom-section .account-floating-container .logout-button:hover {
+  background-color: darken(var(--danger-color), 10%); /* Darken on hover */
+  transform: translateY(-2px);
+}
+
+/* Language Toggle in Sidebar */
+.voice-language-section {
+  margin-bottom: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: var(
+    --surface-color
+  ); /* Explicitly set background to prevent bleed */
+}
+
+.voice-language-section .language-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: var(--background-color-end);
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  transition: background-color 0.3s ease;
+}
+
+.voice-language-section .language-toggle:hover {
+  background-color: var(--border-color);
+}
+
+.voice-language-section .language-toggle .expand-icon {
+  font-size: 1.5rem;
+  transition: transform 0.3s ease;
+}
+
+.voice-language-section .voice-list {
+  padding: 0.5rem 1rem;
+  background-color: var(
+    --surface-color
+  ); /* Explicitly set background to prevent bleed */
+  border-top: 1px solid var(--border-color);
+}
+
+.voice-language-section .voice-list li {
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.voice-language-section .voice-list li:last-child {
+  border-bottom: none;
+}
+
+.voice-language-section .voice-list li.selected {
+  background-color: var(--primary-color);
+  color: var(--surface-color);
+  border-radius: 0.25rem;
+  padding-left: 0.5rem;
+  margin-left: -0.5rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.voice-language-section .voice-list li.selected span {
+  color: var(--surface-color);
+}
+
+.voice-language-section .voice-list li.selected .voice-actions button {
+  color: var(--surface-color);
+}
+
+.voice-language-section .voice-list li.selected .voice-actions button:hover {
+  color: var(--light-berry); /* A lighter shade for hover in selected state */
+}
+
+/* Main Controls */
+.main-controls {
+  background-color: var(--surface-color);
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 5px 15px var(--shadow-color);
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color);
+}
+
+.main-controls .top-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto; /* State indicators, input level, TTS model */
+  gap: 1.5rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.main-controls .state-indicators {
+  grid-column: 1;
+  flex-shrink: 0;
+}
+
+.main-controls .input-level-container {
+  grid-column: 2;
+  justify-content: center;
+  min-width: 100px; /* Reduced min-width to allow more squeezing */
+}
+
+.main-controls .control-group:nth-of-type(1) {
+  /* TTS Model Select */
+  grid-column: 3;
+  flex-shrink: 0;
+  min-width: 150px; /* Ensure TTS dropdown has enough space */
+}
+
+.main-controls .control-group:nth-of-type(2) {
+  /* XTTS Voice Select */
+  grid-column: 1 / span 3; /* Span all columns when visible */
+  justify-self: center; /* Center the group */
+  width: 100%; /* Take full width */
+  min-width: 150px; /* Ensure XTTS dropdown has enough space */
+}
+
+/* Adjust layout when XTTS voice selection is visible */
+.main-controls .top-row.expanded {
+  grid-template-columns: auto 1fr auto auto; /* Add a fourth column for the XTTS voice select */
+  gap: 1rem; /* Reduce gap when expanded to help squeeze */
+}
+
+.main-controls .top-row.expanded .control-group:nth-of-type(1) {
+  /* TTS Model Select */
+  grid-column: 3;
+}
+
+.main-controls .top-row.expanded .control-group:nth-of-type(2) {
+  /* XTTS Voice Select */
+  grid-column: 4; /* Place in the new fourth column */
+  display: flex;
+  justify-content: flex-start; /* Align to start of its grid cell */
+  min-width: 150px; /* Ensure XTTS dropdown has enough space */
+}
+
+/* Adjust for smaller screens when expanded */
+@media (max-width: 1024px) {
+  /* Adjust breakpoint as needed */
+  .main-controls .top-row.expanded {
+    grid-template-columns: auto 1fr auto; /* Revert to 3 columns, XTTS dropdown spans */
+  }
+  .main-controls .top-row.expanded .control-group:nth-of-type(2) {
+    /* XTTS Voice Select */
+    grid-column: 1 / span 3; /* Span all columns */
+    justify-content: center; /* Center its content */
+  }
+}
+
+/* Further adjustments for very small screens to ensure elements fit */
+@media (max-width: 600px) {
+  .main-controls .top-row.expanded {
+    grid-template-columns: 1fr; /* Stack all items on small screens */
+    gap: 0.5rem;
+  }
+  .main-controls .top-row.expanded .state-indicators,
+  .main-controls .top-row.expanded .input-level-container,
+  .main-controls .top-row.expanded .control-group:nth-of-type(1),
+  .main-controls .top-row.expanded .control-group:nth-of-type(2) {
+    grid-column: 1; /* All items take full width */
+    justify-content: center; /* Center content */
+    text-align: center;
+  }
+}
+
+.state-indicators {
+  display: flex;
+  gap: 1rem;
+}
+
+.state-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--secondary-color);
+}
+
+.state-icon {
+  font-size: 1.5rem;
+}
+
+.state-icon.active {
+  color: var(--accent-color);
+}
+
+.state-icon.idle {
+  color: var(--secondary-color);
+}
+
+.input-level-container {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Ensure horizontal centering */
+  gap: 0.75rem; /* Increased gap slightly */
+  color: var(--secondary-color);
+  height: 100%; /* Take full height of the row */
+}
+
+.mic-input-level-label {
+  white-space: nowrap;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.input-level-bar-segments {
+  display: flex;
+  gap: 2px;
+  height: 12px; /* Slightly taller for better visibility */
+  width: 120px; /* Slightly wider */
+  background-color: var(--background-color-end);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Add depth */
+}
+
+.input-level-bar-segments .segment {
+  flex-grow: 1;
+  background-color: var(--accent-color);
+  opacity: 0.3;
+  transition: opacity 0.05s ease; /* Faster transition for snappier feel */
+}
+
+.input-level-bar-segments .segment.active {
+  opacity: 1;
+  box-shadow: 0 0 5px var(--accent-color); /* Glow effect */
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.control-group label {
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+.model-select,
+.language-select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  background-color: var(--background-color-end);
+  color: var(--text-color);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.model-select:focus,
+.language-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.control-buttons {
+  display: flex;
+  flex-wrap: wrap; /* Allow items to wrap to the next line */
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.virtual-mic-hint-centered {
+  width: 100%; /* Take full width to allow centering */
+  text-align: center; /* Center the text */
+  margin-top: 0.5rem; /* Add some space above it */
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: var(--surface-color);
+}
+
+.btn-primary:hover {
+  background: var(--primary-color); /* Adjust hover color if needed */
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: var(--surface-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+}
+
+.btn-init {
+  background: var(--accent-color);
+  color: var(--surface-color);
+}
+
+.btn-init:hover {
+  background: var(--accent-color);
+  transform: translateY(-2px);
+}
+
+.btn-active {
+  background-color: var(--accent-color); /* Use accent color for active state */
+  box-shadow: 0 0 15px rgba(var(--text-color-rgb), 0.5); /* Add a glow effect */
+  color: var(--surface-color);
+}
+
+.btn-active:hover {
+  background-color: darken(var(--accent-color), 10%);
+  transform: translateY(-2px);
+}
+
+/* Styles for disabled buttons */
+.btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none; /* Remove hover effect */
+  box-shadow: none; /* Remove any shadows */
+}
+
+.btn-primary[disabled] {
+  background: var(
+    --secondary-color
+  ); /* A neutral color for disabled primary buttons */
+}
+
+.btn-secondary[disabled] {
+  background: var(
+    --background-color-end
+  ); /* A neutral color for disabled secondary buttons */
+  border-color: var(--secondary-color);
+  color: var(--secondary-text-grey);
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--secondary-color);
+}
+
+.indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--danger-color); /* Default off */
+  transition: background-color 0.3s ease;
+}
+
+.indicator.on {
+  background-color: var(--accent-color);
+}
+
+/* Main Content Columns */
+.content {
+  display: flex;
+  flex-grow: 1;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.column {
+  flex: 1;
+  background-color: var(--surface-color);
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 5px 15px var(--shadow-color);
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+}
+
+.column-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.75rem;
+}
+
+.column-header h2 {
+  font-size: 1.5rem;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.language-badge {
+  background-color: var(--primary-color);
+  color: var(--surface-color);
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.8rem;
+  margin-left: 0.75rem;
+}
+
+.transcript-box {
+  flex-grow: 1;
+  background-color: var(--background-color-end);
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  padding: 1rem;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  overflow-y: auto;
+  color: var(--text-color);
+}
+
+.transcript-box .placeholder {
+  color: var(--secondary-color);
+  font-style: italic;
+}
+
+.divider {
+  width: 1px;
+  background-color: var(--border-color);
+}
+
+/* Latency Metrics */
+.latency-metrics {
+  background-color: var(--surface-color);
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 5px 15px var(--shadow-color);
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color);
+}
+
+.latency-metrics h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.metric-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+}
+
+.metric-label {
+  font-size: 0.9rem;
+  color: var(--secondary-color);
+  margin-bottom: 0.25rem;
+}
+
+.metric-value {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.total-e2e .metric-value {
+  color: var(--primary-color);
+  font-size: 1.4rem;
+}
+
+.timeline-chart-container {
+  max-width: 100%;
+  height: 200px;
+  background-color: var(--background-color-end);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+}
+
+/* Settings Status */
+.settings-status {
+  background-color: var(--surface-color);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 5px 15px var(--shadow-color);
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color);
+  text-align: center;
+  color: var(--text-color);
+}
+
+/* Activity Log */
+.log-container {
+  background-color: var(--surface-color);
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 5px 15px var(--shadow-color);
+  border: 1px solid var(--border-color);
+}
+
+.log-container h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.activity-log-box {
+  background-color: var(--background-color-end);
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  padding: 1rem;
+  height: 150px;
+  overflow-y: auto;
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: var(--text-color);
+}
+
+.log-message {
+  margin-bottom: 0.5rem;
+}
+
+.log-message.info {
+  color: var(--log-info-color);
+}
+.log-message.success {
+  color: var(--log-success-color);
+}
+.log-message.warning {
+  color: var(--log-warning-color);
+}
+.log-message.error {
+  color: var(--log-error-color);
+}
+
+/* Modals */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed;
+  z-index: 101; /* Higher than sidebar */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.6);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal.open {
+  display: flex;
+}
+
+.modal-content {
+  background-color: var(--surface-color);
+  margin: auto;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 30px var(--shadow-color);
+  width: 90%;
+  max-width: 600px;
+  position: relative;
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.modal-content p {
+  color: var(--secondary-color);
+  margin-bottom: 1.5rem;
+}
+
+.close-button {
+  color: var(--secondary-color);
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  font-size: 2rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close-button:hover,
+.close-button:focus {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.modal-section {
+  margin-bottom: 1.5rem;
+}
+
+.checkbox-container {
+  display: block;
+  position: relative;
+  padding-left: 2rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  color: var(--text-color);
+}
+
+.checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 1.25rem;
+  width: 1.25rem;
+  background-color: var(--background-color-end);
+  border: 1px solid var(--border-color);
+  border-radius: 0.25rem;
+}
+
+.checkbox-container:hover input ~ .checkmark {
+  background-color: var(--border-color);
+}
+
+.checkbox-container input:checked ~ .checkmark {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.checkbox-container .checkmark:after {
+  left: 0.45rem;
+  top: 0.2rem;
+  width: 0.3rem;
+  height: 0.6rem;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+.reading-text {
+  background-color: var(--background-color-end);
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--primary-color);
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-style: italic;
+  color: var(--text-color);
+}
+
+.info-text {
+  font-size: 0.9rem;
+  color: var(--secondary-color);
+  display: block;
+  margin-top: 0.5rem;
+}
+
+.hint-text {
+  font-size: 0.85em;
+  margin-top: 4px;
+  color: var(--text-muted, #888);
+}
+
+.error-text {
+  color: var(--danger-color);
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+.recording-indicator {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--danger-color); /* Red for inactive */
+  margin-left: 0.5rem;
+  vertical-align: middle;
+  opacity: 0; /* Hidden by default */
+  transition: opacity 0.3s ease;
+}
+
+.recording-indicator.active {
+  opacity: 1;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--text-color-rgb), 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(var(--text-color-rgb), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--text-color-rgb), 0);
+  }
+}
+
+.error-text {
+  color: var(--danger-color);
+}
+
+.modal-body-content {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.modal-left-content {
+  flex: 2;
+  min-width: 250px;
+}
+
+.modal-right-controls {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 150px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.text-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  background-color: var(--background-color-end);
+  color: var(--text-color);
+  transition: border-color 0.3s ease;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+/* Utility Classes */
+.hidden {
+  display: none !important;
+}
+
+/* Custom Notification Bar */
+.notification-bar {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 15px 25px;
+  border-radius: 8px;
+  color: var(--surface-color);
+  font-weight: 600;
+  font-size: 1rem;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  min-width: 250px;
+  text-align: center;
+}
+
+.notification-bar.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-10px); /* Slight lift effect */
+}
+
+.notification-bar.info {
+  background-color: var(--primary-color); /* Lingonberry Red */
+}
+
+.notification-bar.success {
+  background-color: var(--accent-color); /* Green accent */
+}
+
+.notification-bar.warning {
+  background-color: var(--orange); /* Orange */
+}
+
+.notification-bar.error {
+  background-color: var(--danger-color); /* Darker Red */
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .header {
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .header h1,
+  .header p {
+    width: 100%;
+    margin: 0.5rem 0;
+  }
+
+  .header .theme-toggle-wrapper {
+    margin: 0;
+    width: 100%;
+    text-align: center;
+  }
+
+  .main-controls .top-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .state-indicators {
+    justify-content: center;
+  }
+
+  .control-buttons {
+    flex-direction: column;
+  }
+
+  .content {
+    flex-direction: column;
+  }
+
+  .divider {
+    width: 100%;
+    height: 1px;
+  }
+
+  .metric-group {
+    flex-direction: column;
+  }
+
+  .modal-body-content {
+    flex-direction: column;
+  }
+
+  .modal-right-controls {
+    flex-direction: row;
+    justify-content: center;
+  }
+}

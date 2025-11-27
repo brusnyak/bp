@@ -1,39 +1,58 @@
-# Live Speech Translation Project Plan
+**Project Plan: Transition from F5-TTS to Coqui TTS**
 
-This plan outlines the steps to optimize the live speech translation project for minimal latency, improve accuracy, implement voice cloning, and enhance the user interface.
+**Overall Goal:** Remove F5-TTS integration, fully leverage Coqui TTS (XTTS v2) for voice cloning, and enhance its performance and quality for English to English (en->en) and English to Slovak/Czech (en->sk/cs) translations using provided audio.
 
-**Phase 1: Core System Refinement & UI/UX Enhancement (Immediate Focus)**
+**Phase 1: Remove F5-TTS References**
 
-1.  **Update `requirements.txt` for Stability and Performance:**
-    *   [x] Align `requirements.txt` with optimized versions and additions from `update.txt`.
-    *   [x] Ensure compatibility for Apple Silicon (M1 Pro, 16GB RAM).
-2.  **Enhance UI/UX for Clarity and Aesthetics:**
-    *   [x] **Visual Design:** Refine `ui/style.css` for a modern, clean aesthetic, improved color palette, typography, spacing, and consistent styling.
-    *   [x] **Feedback & Status:** Improve visual feedback for "Listening," "Translating," and "Speaking" states in `ui/index.html` and `ui/script.js`. Make the activity log more prominent.
-    *   [x] **Latency Visualization:** Refine `latencyTimelineChart` in `ui/script.js` for real-time X-axis expansion and accurate segment drawing.
-    *   [x] **Burger Menu & Sidebar:** Adjust `ui/style.css` and `ui/script.js` for a visually appealing burger menu (hidden by default) and a functional sidebar (`voiceList`) for displaying/selecting voice profiles.
-    *   [x] **Voice Configuration Modal:** Ensure `voiceConfigModal` is well-integrated with clear instructions and feedback.
-3.  **Backend Core Functionality Adjustments:**
-    *   [x] **VAD Tuning:** Review and adjust VAD parameters (`VAD_AGGRESSIVENESS`, `MIN_SPEECH_DURATION`, `SILENCE_TIMEOUT`) in `backend/main.py` for single-speaker optimization and noise reduction.
-    *   [x] **Streaming TTS:** Configure `backend/main.py` to send partial TTS outputs for minimal perceived latency.
-    *   [x] **Model Initialization:** Ensure `app.py` correctly unpacks initialized models from `backend/main.py` to prevent `ValueError`s.
+1.  **Update `bp`:**
+    *   Remove all explicit mentions of `F5-TTS`.
+    *   Update the `TTS (Text-to-Speech)` section to exclusively refer to `Piper` (for fast, lightweight, generic voice) and `Coqui TTS` (for cross-lingual, zero-shot, higher quality, voice cloning using XTTS v2).
+    *   Remove `F5-TTS` specific functionality from `UI Features` (e.g., "Voice Cloning Management (F5-TTS Specific)").
+    *   Update `TTS Testing` to refer to `Coqui TTS` instead of `F5-TTS`.
+2.  **Update `guide.md`:**
+    *   Remove all explicit mentions of `F5-TTS`.
+    *   Update the `TTS Model Selection` and `Key Technologies & Design Decisions` sections to reflect the exclusive use of `Coqui TTS` for voice cloning.
+    *   Update `TTS Quality` in `Testing Approach` to refer to `Coqui TTS`.
+3.  **Update `backend/main.py`:**
+    *   Remove `F5-TTS` import (e.g., `from backend.tts.f5_tts import F5TTS`).
+    *   Remove `F5-TTS` related logic in `_initialize_tts_models` (e.g., `elif tts_model_choice == "f5"` block).
+    *   Remove `F5-TTS` related logic in `_process_speech_segment_pipeline` (e.g., `elif tts_model_choice == "f5"` block).
+    *   Ensure `CoquiTTS` is correctly integrated and used when `tts_model_choice == "xtts"`.
+    *   Remove `f5_tts_model` from `session_data` initialization and `get_initialized_models` function.
+    *   Update the `tts_model_choice` options in `initialize_all_models` to reflect "piper" and "xtts".
+4.  **Update `app.py`:**
+    *   Remove `F5-TTS` related import paths (e.g., `sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "third_party/F5-TTS/src"))`).
+    *   Remove `f5_tts_model` from the `current_tts_model_instance` check in `initialize_pipeline` and `websocket_endpoint`.
+5.  **Update `ui/live-speech/live.html` and `ui/live-speech/live-script.js`:**
+    *   Modify the UI elements and JavaScript logic that previously handled `F5-TTS` to now work with `Coqui TTS` (referred to as `xtts`). This includes the `TTS Model Switch` and any voice cloning management features.
+    *   Ensure the TTS model selection correctly offers "Piper" and "XTTS".
+6.  **Update `Makefile`:**
+    *   Review and remove any `F5-TTS` specific build, download, or cleanup commands if they are found. (Initial review suggests none are explicit, but a double-check is warranted).
+7.  **Update `requirements.txt`:**
+    *   Verify that no `F5-TTS` specific dependencies are present. (Initial review shows none, so no changes expected here).
 
-**Phase 2: Voice Cloning Integration (F5-TTS) & Advanced Features**
+**Phase 2: Enhance Coqui TTS and Testing**
 
-4.  **Integrate F5-TTS for Voice Cloning:**
-    *   [x] **Dependency Management:** Add F5-TTS installation commands and dependencies to `requirements.txt` (commented out initially).
-    *   [x] **Backend Logic:** Implement F5-TTS model loading, speaker embedding generation from 10-15 second audio samples, and real-time TTS inference in `backend/tts/xtts_tts.py` (or a new F5-TTS module).
-    *   [x] **Speaker Voice Management:** Implement backend endpoints and logic to store recorded/uploaded speaker WAVs in `speaker_voices`, generate/save persistent speaker embeddings, list available voices, and allow frontend selection.
-5.  **Robust Multi-language Support:**
-    *   [x] Ensure UI language selection (`inputLanguageSelect`, `outputLanguageSelect`) dynamically switches `CTranslate2MT` and `PiperTTS` (and F5-TTS) models in the backend.
+1.  **Address Slovak/Czech Language Support in `test/coqui_tts_test.py`:**
+    *   Investigate the comment `# Slovak removed as it's not directly supported by Coqui XTTS v2 - will re-evaluate after investigation`.
+    *   Confirm Coqui XTTS v2's actual support for Slovak (`sk`) and Czech (`cs`).
+    *   If supported, re-enable and add a test case for `en->sk` and `en->cs` translation with voice cloning.
+    *   If not fully supported, document the limitation and propose a strategy (e.g., using Piper for these languages if voice cloning is not critical, or exploring other Coqui models/approaches).
+2.  **Update `backend/tts/coqui_tts.py` for Performance and Quality:**
+    *   Review Coqui TTS documentation for performance optimization techniques (e.g., batching, model loading strategies, specific parameters for faster inference or higher quality).
+    *   Consider adding configurable parameters to the `synthesize` method for fine-tuning quality or speed if Coqui TTS offers them.
+    *   Investigate if `mps` (Apple Silicon GPU) can be leveraged more effectively for Coqui TTS, as it is currently forced to `cpu`.
+3.  **Update `test/coqui_tts_test.py` with Specific Audio and Languages:**
+    *   Add a test case for `en->en` voice cloning using `test/Hello.wav` as the speaker reference.
+    *   Add a test case for `en->sk` or `en->cs` voice cloning using `test/My test speech_xtts_speaker_clean.wav` as the speaker reference (once Slovak/Czech support is confirmed/enabled).
+    *   Measure and log latency for these new test cases, focusing on both TTS-only and end-to-end latency.
+    *   Consider integrating objective metrics for TTS quality if feasible (e.g., a simple subjective rating scale or a more advanced metric if time permits).
 
-**Phase 3: Comprehensive Testing & Deployment Considerations**
+**Phase 3: Quality and Latency Focus**
 
-6.  **Develop Comprehensive Testing Framework:**
-    *   [x] Extend `test/streaming_pipeline_tests.py` to include tests for streaming TTS latency/quality, multi-language switching, and voice cloning workflow.
-    *   [x] Use pre-recorded audio for reproducibility and provide clear metrics (WER, BLEU, latency breakdown).
-    *   [x] **NOTE:** For full testing, actual `.wav` audio files for `test/slovak_test_speech.wav` and `test/My test speech_xtts_speaker_clean.wav` (if different from `test/Voice-Training.wav`) will need to be provided. The current `.wav` files are placeholders.
-
-7.  **Deployment & Packaging Strategy:**
-    *   [ ] Focus on local deployment optimization for M1 Pro MacBook.
-    *   [ ] (Future Idea) Explore `pip` packaging with `setup.py` for easier installation.
+1.  **Analyze Test Results:** After implementing all changes and running the updated test suite, thoroughly analyze the latency and quality metrics obtained for Coqui TTS.
+2.  **Iterative Improvement:** Based on the analysis, identify specific bottlenecks and areas for further improvement in Coqui TTS performance and quality. This might involve:
+    *   Adjusting Coqui TTS model parameters or configurations.
+    *   Exploring different versions or fine-tuned variants of Coqui TTS models.
+    *   Optimizing the audio processing pipeline specifically around the TTS component.
+    *   Investigating model quantization, compilation, or other advanced optimization techniques if supported by Coqui TTS for further speedup.

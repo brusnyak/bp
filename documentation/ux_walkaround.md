@@ -50,3 +50,112 @@ The current UI presents a dark theme with distinct sections for "Transcription" 
 - `ui/index.html`: For structural changes, adding/modifying classes, or initial element states.
 - `ui/style.css`: For all visual styling, color changes, responsiveness, and layout fixes.
 - `ui/script.js`: For controlling the visibility of the voice recording pop-up and potentially other dynamic UI behaviors.
+
+**Project Update: UI Enhancements and Thesis Mode Integration**
+
+I've addressed your requests regarding the UI and the concept of a "thesis-like environment" for the home page. Here's a summary of the updates:
+
+**1. UI Structure and Navigation:**
+
+- **Hamburger Menu**: The hamburger menu in the header is now implemented for mobile responsiveness, providing navigation links for both default and thesis modes.
+- **Sidebar Navigation**: A dedicated sidebar navigation (`thesis-sidebar-nav`) has been integrated for the "thesis mode" to outline the academic structure (Introduction, Methodology, etc.). This sidebar is dynamically shown/hidden based on the active mode.
+
+**2. Home Page Modes (Default and Thesis):**
+The home page (`ui/home/home.html`) now supports two distinct modes:
+
+- **Default Mode**: Presents a more general overview of the project with sections like Hero, Features, How-To, Demo, and About.
+- **Thesis Mode**: Designed to incorporate deep technical data, following a stylized academic structure. Placeholder sections for Introduction, Methodology, Implementation, Results, and Conclusion have been added. These sections are ready for detailed content, interactive graphs, tables, algorithms, and explanations.
+
+**3. Footer Enhancements:**
+The footer (`id="main-footer"`) has been significantly updated to include:
+
+- Copyright information: "© 2025 Lingonberry. All rights reserved."
+- "Developed by brusnyak" with a link to the project repository.
+- Theme-dependent signature images (`/images/sign.png` for light theme and `/images/white-sign.png` for dark theme).
+- Additional navigation links (Services, Company, Legal).
+- Social media links.
+- A **Mode Switcher Button** (`id="mode-switcher-btn"`) to toggle between "Default Mode" and "Thesis Mode". This button is located in the footer and ensures the page scrolls to the top upon mode change for a smooth transition.
+
+**4. Styling and Theming:**
+
+- Initial styling has been applied to the new header, footer, and thesis mode sections using `ui/global-styles.css` and `ui/home/home.css`.
+- Color variables from `ui/global-styles.css` and `styles.css` are being utilized to ensure theme compatibility and distinct background colors for each section.
+
+**Next Steps:**
+The next phase will focus on populating the "thesis mode" sections with detailed content, integrating interactive data visualizations (graphs, tables), and styling code snippets in a Notion-like layout. We will also integrate data from static JSON files, backend API calls, and pre-generated images as planned.
+
+---
+
+Developed by brusnyak
+[GitHub: https://github.com/brusnyak/bp]
+[Email: yegor@lingonberrymail.com]
+
+**Refined Plan for UI Updates (HCJ Implementation)**
+
+**Phase 1: Initial UI Structure and Styling (Home Page)**
+
+- **Goal**: Establish the basic structure of the home page (`ui/home/home.html`) to support both `default` and `thesis` modes, including the header, main content sections, and footer.
+
+- **Steps**:
+
+  - **Header Implementation**:
+
+    - Modify `ui/home/home.html` to include a redesigned header with a hamburger menu (for mobile) and a "Login/Get Started" button.
+    - Integrate the existing `theme-toggle.js` into the header.
+    - Implement JavaScript in `ui/home/home.js` for the header to disappear on scroll down and reappear on scroll up.
+    - Update `ui/home/home.css` to style the new header, hamburger menu, and navigation.
+
+  - **Main Content Sections (Default Mode)**:
+
+    - Ensure `ui/home/home.html` has distinct full-screen sections for "Hero", "Features", "How-To", "Demo", and "About".
+    - Define distinct, theme-compatible background colors for these sections using variables from `ui/global-styles.css` and `styles.css`.
+
+  - **Footer Implementation**:
+
+    - Replace the existing footer in `ui/home/home.html` with the structure you provided in `plan.txt`, including:
+
+      - "© 2025 Lingonberry. All rights reserved."
+      - "Developed by brusnyak" with a link to the project repository.
+      - Signature images (`images/sign.png` / `images/white-sign.png`) that switch based on the theme.
+      - Additional navigation links (Services, Company, Legal).
+      - Social links.
+      - The theme toggle button.
+      - A placeholder for the "mode switcher" button (for default/thesis mode).
+
+    - Update `ui/home/home.css` and potentially `ui/global-styles.css` to style the new footer.
+
+  - **Styling**: Apply initial styling using `ui/global-styles.css` and `ui/home/home.css` to match the design vision, incorporating colors from `styles.css` as needed.
+
+**Phase 2: Thesis Mode Implementation (Content and Logic)**
+
+- **Goal**: Develop the "thesis mode" content structure, mode switching logic, and integrate interactive elements.
+
+- **Steps**:
+
+  - **Thesis Mode Content Structure**:
+
+    - Create new HTML sections within `ui/home/home.html` (or dynamically loaded partials) that correspond to major thesis chapters (Introduction, Methodology, Implementation, Results, Conclusion).
+    - For each section, design a layout that supports sub-pages or detailed content blocks, allowing for "academic precision" with all data, charts, and references.
+    - Integrate placeholders for interactive graphs/diagrams (e.g., using Chart.js), interactive tables, and Notion-like code snippets.
+    - Develop a "stylized academic" presentation by focusing on clear headings, logical flow, visual hierarchy, and data integrity.
+
+  - **Mode Switching Logic (HCJ)**:
+
+    - Implement JavaScript in `ui/home/home.js` to toggle between `default` and `thesis` modes. This will involve dynamically changing content visibility, classes, and potentially loading different content blocks.
+    - Ensure the page scrolls smoothly to the top after a mode switch, as requested.
+
+  - **Navigation**:
+    - Implement a dynamic sidebar navigation for "thesis mode" that outlines the chapters and sub-pages. This sidebar should be accessible via the hamburger menu on mobile.
+
+**Phase 3: Data Integration and Refinement**
+
+- **Goal**: Populate the "thesis mode" with actual data and refine the presentation.
+
+- **Steps**:
+
+  - **Data Sources**: Begin integrating data from static JSON files, backend API calls (if any endpoints are ready for UI consumption), and pre-generated images into the thesis mode sections.
+  - **Interactive Elements**: Implement Chart.js for interactive graphs and explore suitable HCJ libraries or custom JavaScript for interactive tables.
+  - **Code Snippets**: Style code snippets effectively using CSS for a Notion-like appearance.
+  - **Academic Content**: Populate the sections with detailed academic content, ensuring it is both visually appealing and rigorously presented.
+
+I am now ready to proceed with the implementation of **Phase 1**.

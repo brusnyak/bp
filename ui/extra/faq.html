@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+    <title>Frequently Asked Questions</title>
+    <link rel="stylesheet" href="/ui/global-styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <a href="javascript:history.back()" class="back-button">
+          <span class="material-symbols-outlined">arrow_back</span>
+          Back
+        </a>
+        <div class="theme-toggle-wrapper">
+          <button
+            id="theme-toggle"
+            class="theme-toggle-btn"
+            aria-label="Toggle theme"
+          >
+            <span class="material-symbols-outlined"></span>
+          </button>
+        </div>
+      </div>
+      <div class="content-section floating-container">
+        <h1>Frequently Asked Questions</h1>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <h3>What is Real-Time Speech Translation?</h3>
+            <div class="faq-icon">
+              <span class="material-symbols-outlined">add</span>
+            </div>
+          </div>
+          <div class="faq-answer hidden">
+            <p>
+              Real-Time Speech Translation is an application designed to
+              translate spoken language during online conferences in real-time.
+              It aims to break down language barriers and facilitate seamless
+              communication among participants.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <h3>How does voice cloning work?</h3>
+            <div class="faq-icon">
+              <span class="material-symbols-outlined">add</span>
+            </div>
+          </div>
+          <div class="faq-answer hidden">
+            <p>
+              Our voice cloning feature allows you to record a short sample of
+              your voice. This sample is then used by our Coqui TTS (XTTS v2) model to
+              synthesize translated speech in your own voice, making the
+              communication more natural and personalized.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <h3>What languages are supported?</h3>
+            <div class="faq-icon">
+              <span class="material-symbols-outlined">add</span>
+            </div>
+          </div>
+          <div class="faq-answer hidden">
+            <p>
+              The application supports a wide range of languages for both input
+              (speech-to-text) and output (text-to-speech). You can select your
+              desired input and target languages from the dropdown menus on the
+              live speech page.
+            </p>
+            <ul class="language-list">
+              <li>English (en)</li>
+              <li>Spanish (es)</li>
+              <li>French (fr)</li>
+              <li>German (de)</li>
+              <li>Italian (it)</li>
+              <li>Portuguese (pt)</li>
+              <li>Polish (pl)</li>
+              <li>Turkish (tr)</li>
+              <li>Russian (ru)</li>
+              <li>Dutch (nl)</li>
+              <li>Czech (cs)</li>
+              <li>Arabic (ar)</li>
+              <li>Chinese (zh)</li>
+              <li>Japanese (ja)</li>
+              <li>Hungarian (hu)</li>
+              <li>Korean (ko)</li>
+              <li>Hindi (hi)</li>
+              <li>Slovak (sk)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <h3>Is the application scalable for large conferences?</h3>
+            <div class="faq-icon">
+              <span class="material-symbols-outlined">add</span>
+            </div>
+          </div>
+          <div class="faq-answer hidden">
+            <p>
+              Yes, the backend architecture is designed with scalability in
+              mind, utilizing FastAPI, Docker, Kubernetes, and NVIDIA Triton
+              Inference Server to support over 200 simultaneous users with low
+              latency.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <h3>How can I provide feedback or report an issue?</h3>
+            <div class="faq-icon">
+              <span class="material-symbols-outlined">add</span>
+            </div>
+          </div>
+          <div class="faq-answer hidden">
+            <p>
+              You can provide feedback or report any issues you encounter
+              through our dedicated
+              <a href="/ui/extra/feedback.html">Feedback page</a>. We appreciate
+              your input to help us improve the application.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <h3>What are the privacy implications of using voice cloning?</h3>
+            <div class="faq-icon">
+              <span class="material-symbols-outlined">add</span>
+            </div>
+          </div>
+          <div class="faq-answer hidden">
+            <p>
+              We take your privacy seriously. Voice samples collected for
+              cloning are stored securely and used solely for synthesizing
+              translated speech within the application. Please refer to our
+              <a href="/ui/extra/privacy.html">Privacy Policy</a> for more
+              details.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="/ui/theme-toggle.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const faqQuestions = document.querySelectorAll(".faq-question");
+
+        faqQuestions.forEach((question) => {
+          question.addEventListener("click", () => {
+            const answer = question.nextElementSibling;
+            const icon = question.querySelector(
+              ".faq-icon .material-symbols-outlined"
+            );
+
+            answer.classList.toggle("hidden");
+            if (answer.classList.contains("hidden")) {
+              icon.textContent = "add";
+            } else {
+              icon.textContent = "remove";
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
