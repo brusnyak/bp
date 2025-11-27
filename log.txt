@@ -1,0 +1,1075 @@
+Re-initialization result: Object
+live-script.js:235 WebSocket opened: Event
+live-script.js:653 Frontend: Start/Stop button clicked. isStreaming: false
+live-script.js:387 Frontend: Attempting to start real-time audio streaming...
+live-script.js:389 Frontend: Calling navigator.mediaDevices.getUserMedia...
+live-script.js:399 Frontend: Found audio input: MacBook Pro Microphone (Built-in) (BlackHole: false)
+live-script.js:403 Frontend: Selected mic: MacBook Pro Microphone (Built-in)
+live-script.js:399 Frontend: Found audio input: Default - MacBook Pro Microphone (Built-in) (BlackHole: false)
+live-script.js:399 Frontend: Found audio input: BlackHole 2ch (Virtual) (BlackHole: true)
+live-script.js:439 Frontend: MediaStream obtained. Active: true Tracks: Array(1)
+live-script.js:441 Frontend: Audio Track 0: id=519cb235-3cab-4532-9e56-933d9a5380ef, label=MacBook Pro Microphone (Built-in), readyState=live, enabled=true
+live-script.js:446 Frontend: AudioContext created with sampleRate: 16000 and state: running
+live-script.js:458 Frontend: Added GainNode with initial gain: 4
+live-script.js:206 [MIC] RMS: 0.0546, Scaled: 0.2337, EMA: 0.0701, Segments: 1/10
+live-script.js:206 [MIC] RMS: 0.0491, Scaled: 0.2215, EMA: 0.1155, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0769, Scaled: 0.2772, EMA: 0.1640, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.1273, Scaled: 0.3568, EMA: 0.2219, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1289, Scaled: 0.3591, EMA: 0.2630, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1045, Scaled: 0.3233, EMA: 0.2811, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.2580, Scaled: 0.5079, EMA: 0.3492, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.2462, Scaled: 0.4962, EMA: 0.3933, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1990, Scaled: 0.4461, EMA: 0.4091, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1387, Scaled: 0.3724, EMA: 0.3981, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1190, Scaled: 0.3450, EMA: 0.3822, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1445, Scaled: 0.3801, EMA: 0.3816, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1368, Scaled: 0.3699, EMA: 0.3781, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1192, Scaled: 0.3453, EMA: 0.3682, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0953, Scaled: 0.3087, EMA: 0.3504, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1013, Scaled: 0.3182, EMA: 0.3407, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0885, Scaled: 0.2974, EMA: 0.3277, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1002, Scaled: 0.3166, EMA: 0.3244, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1501, Scaled: 0.3874, EMA: 0.3433, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1168, Scaled: 0.3417, EMA: 0.3428, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1264, Scaled: 0.3555, EMA: 0.3466, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1402, Scaled: 0.3744, EMA: 0.3549, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1032, Scaled: 0.3212, EMA: 0.3448, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1872, Scaled: 0.4327, EMA: 0.3712, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1506, Scaled: 0.3881, EMA: 0.3762, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1718, Scaled: 0.4145, EMA: 0.3877, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1615, Scaled: 0.4018, EMA: 0.3920, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1138, Scaled: 0.3373, EMA: 0.3755, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1274, Scaled: 0.3570, EMA: 0.3700, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.6982, Scaled: 0.8356, EMA: 0.5097, Segments: 6/10
+live-script.js:206 [MIC] RMS: 0.7365, Scaled: 0.8582, EMA: 0.6142, Segments: 7/10
+live-script.js:206 [MIC] RMS: 0.6724, Scaled: 0.8200, EMA: 0.6760, Segments: 7/10
+live-script.js:206 [MIC] RMS: 0.6864, Scaled: 0.8285, EMA: 0.7217, Segments: 8/10
+live-script.js:206 [MIC] RMS: 0.6372, Scaled: 0.7983, EMA: 0.7447, Segments: 8/10
+live-script.js:206 [MIC] RMS: 0.5372, Scaled: 0.7329, EMA: 0.7412, Segments: 8/10
+live-script.js:206 [MIC] RMS: 0.4884, Scaled: 0.6988, EMA: 0.7285, Segments: 8/10
+live-script.js:206 [MIC] RMS: 0.4722, Scaled: 0.6872, EMA: 0.7161, Segments: 8/10
+live-script.js:206 [MIC] RMS: 0.4279, Scaled: 0.6541, EMA: 0.6975, Segments: 7/10
+live-script.js:206 [MIC] RMS: 0.3077, Scaled: 0.5547, EMA: 0.6547, Segments: 7/10
+live-script.js:206 [MIC] RMS: 0.0943, Scaled: 0.3072, EMA: 0.5504, Segments: 6/10
+live-script.js:206 [MIC] RMS: 0.0637, Scaled: 0.2525, EMA: 0.4610, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1069, Scaled: 0.3270, EMA: 0.4208, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.4402, Scaled: 0.6635, EMA: 0.4936, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.4458, Scaled: 0.6677, EMA: 0.5458, Segments: 6/10
+live-script.js:206 [MIC] RMS: 0.4433, Scaled: 0.6658, EMA: 0.5818, Segments: 6/10
+live-script.js:206 [MIC] RMS: 0.3847, Scaled: 0.6203, EMA: 0.5934, Segments: 6/10
+live-script.js:206 [MIC] RMS: 0.4092, Scaled: 0.6397, EMA: 0.6073, Segments: 7/10
+live-script.js:206 [MIC] RMS: 0.3144, Scaled: 0.5608, EMA: 0.5933, Segments: 6/10
+live-script.js:206 [MIC] RMS: 0.1858, Scaled: 0.4311, EMA: 0.5446, Segments: 6/10
+live-script.js:206 [MIC] RMS: 0.0969, Scaled: 0.3114, EMA: 0.4747, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.0841, Scaled: 0.2900, EMA: 0.4193, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.0852, Scaled: 0.2919, EMA: 0.3810, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.2250, Scaled: 0.4743, EMA: 0.4090, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.3779, Scaled: 0.6147, EMA: 0.4707, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.3793, Scaled: 0.6159, EMA: 0.5143, Segments: 6/10
+live-script.js:206 [MIC] RMS: 0.3613, Scaled: 0.6011, EMA: 0.5403, Segments: 6/10
+live-script.js:206 [MIC] RMS: 0.2485, Scaled: 0.4985, EMA: 0.5278, Segments: 6/10
+live-script.js:206 [MIC] RMS: 0.3239, Scaled: 0.5691, EMA: 0.5402, Segments: 6/10
+live-script.js:206 [MIC] RMS: 0.3685, Scaled: 0.6070, EMA: 0.5602, Segments: 6/10
+live-script.js:206 [MIC] RMS: 0.3286, Scaled: 0.5733, EMA: 0.5642, Segments: 6/10
+live-script.js:206 [MIC] RMS: 0.3038, Scaled: 0.5512, EMA: 0.5603, Segments: 6/10
+live-script.js:206 [MIC] RMS: 0.1917, Scaled: 0.4378, EMA: 0.5235, Segments: 6/10
+live-script.js:206 [MIC] RMS: 0.1054, Scaled: 0.3247, EMA: 0.4639, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1056, Scaled: 0.3249, EMA: 0.4222, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.0909, Scaled: 0.3016, EMA: 0.3860, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1095, Scaled: 0.3308, EMA: 0.3694, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1257, Scaled: 0.3545, EMA: 0.3650, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1115, Scaled: 0.3339, EMA: 0.3556, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0892, Scaled: 0.2986, EMA: 0.3385, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1675, Scaled: 0.4093, EMA: 0.3598, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1227, Scaled: 0.3503, EMA: 0.3569, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0848, Scaled: 0.2911, EMA: 0.3372, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0620, Scaled: 0.2490, EMA: 0.3107, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0410, Scaled: 0.2025, EMA: 0.2783, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0597, Scaled: 0.2444, EMA: 0.2681, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0466, Scaled: 0.2159, EMA: 0.2524, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0432, Scaled: 0.2079, EMA: 0.2391, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0346, Scaled: 0.1861, EMA: 0.2232, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0518, Scaled: 0.2276, EMA: 0.2245, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0596, Scaled: 0.2440, EMA: 0.2304, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0932, Scaled: 0.3053, EMA: 0.2529, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0873, Scaled: 0.2955, EMA: 0.2657, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0607, Scaled: 0.2463, EMA: 0.2599, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0600, Scaled: 0.2449, EMA: 0.2554, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0957, Scaled: 0.3094, EMA: 0.2716, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1127, Scaled: 0.3356, EMA: 0.2908, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1040, Scaled: 0.3225, EMA: 0.3003, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1311, Scaled: 0.3621, EMA: 0.3189, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1067, Scaled: 0.3266, EMA: 0.3212, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0966, Scaled: 0.3109, EMA: 0.3181, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1007, Scaled: 0.3174, EMA: 0.3179, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1470, Scaled: 0.3834, EMA: 0.3375, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1029, Scaled: 0.3208, EMA: 0.3325, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0908, Scaled: 0.3013, EMA: 0.3231, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0708, Scaled: 0.2660, EMA: 0.3060, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0925, Scaled: 0.3041, EMA: 0.3054, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0773, Scaled: 0.2780, EMA: 0.2972, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0961, Scaled: 0.3100, EMA: 0.3010, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0763, Scaled: 0.2761, EMA: 0.2936, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0525, Scaled: 0.2292, EMA: 0.2743, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0875, Scaled: 0.2958, EMA: 0.2807, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0629, Scaled: 0.2509, EMA: 0.2718, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0529, Scaled: 0.2300, EMA: 0.2592, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0491, Scaled: 0.2216, EMA: 0.2479, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0383, Scaled: 0.1956, EMA: 0.2322, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0384, Scaled: 0.1959, EMA: 0.2213, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0430, Scaled: 0.2074, EMA: 0.2172, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0362, Scaled: 0.1904, EMA: 0.2091, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0552, Scaled: 0.2350, EMA: 0.2169, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0909, Scaled: 0.3014, EMA: 0.2423, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1053, Scaled: 0.3244, EMA: 0.2669, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0787, Scaled: 0.2806, EMA: 0.2710, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0859, Scaled: 0.2930, EMA: 0.2776, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0645, Scaled: 0.2540, EMA: 0.2705, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0664, Scaled: 0.2577, EMA: 0.2667, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0729, Scaled: 0.2701, EMA: 0.2677, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0818, Scaled: 0.2860, EMA: 0.2732, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1031, Scaled: 0.3210, EMA: 0.2875, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0720, Scaled: 0.2683, EMA: 0.2818, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0870, Scaled: 0.2950, EMA: 0.2857, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0883, Scaled: 0.2972, EMA: 0.2892, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0918, Scaled: 0.3030, EMA: 0.2933, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1214, Scaled: 0.3484, EMA: 0.3099, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0822, Scaled: 0.2868, EMA: 0.3029, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0972, Scaled: 0.3118, EMA: 0.3056, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0726, Scaled: 0.2694, EMA: 0.2947, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0910, Scaled: 0.3016, EMA: 0.2968, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0733, Scaled: 0.2707, EMA: 0.2890, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0637, Scaled: 0.2525, EMA: 0.2780, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1019, Scaled: 0.3192, EMA: 0.2904, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1026, Scaled: 0.3204, EMA: 0.2994, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0989, Scaled: 0.3145, EMA: 0.3039, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0804, Scaled: 0.2835, EMA: 0.2978, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0671, Scaled: 0.2591, EMA: 0.2862, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0576, Scaled: 0.2400, EMA: 0.2723, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0625, Scaled: 0.2501, EMA: 0.2657, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0742, Scaled: 0.2723, EMA: 0.2677, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0596, Scaled: 0.2441, EMA: 0.2606, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0454, Scaled: 0.2132, EMA: 0.2464, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0769, Scaled: 0.2773, EMA: 0.2556, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1045, Scaled: 0.3233, EMA: 0.2759, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1121, Scaled: 0.3348, EMA: 0.2936, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0902, Scaled: 0.3003, EMA: 0.2956, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0934, Scaled: 0.3057, EMA: 0.2986, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0634, Scaled: 0.2517, EMA: 0.2846, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0463, Scaled: 0.2153, EMA: 0.2638, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0421, Scaled: 0.2051, EMA: 0.2462, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0627, Scaled: 0.2505, EMA: 0.2475, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0795, Scaled: 0.2820, EMA: 0.2578, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0694, Scaled: 0.2634, EMA: 0.2595, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0387, Scaled: 0.1967, EMA: 0.2406, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0441, Scaled: 0.2101, EMA: 0.2315, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0369, Scaled: 0.1921, EMA: 0.2197, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0442, Scaled: 0.2103, EMA: 0.2169, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0454, Scaled: 0.2131, EMA: 0.2157, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0436, Scaled: 0.2089, EMA: 0.2137, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0671, Scaled: 0.2591, EMA: 0.2273, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0469, Scaled: 0.2165, EMA: 0.2241, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0510, Scaled: 0.2258, EMA: 0.2246, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0554, Scaled: 0.2353, EMA: 0.2278, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0600, Scaled: 0.2450, EMA: 0.2330, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0684, Scaled: 0.2615, EMA: 0.2415, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0488, Scaled: 0.2210, EMA: 0.2354, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0696, Scaled: 0.2639, EMA: 0.2439, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0690, Scaled: 0.2627, EMA: 0.2495, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0746, Scaled: 0.2731, EMA: 0.2566, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0503, Scaled: 0.2242, EMA: 0.2469, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0654, Scaled: 0.2556, EMA: 0.2495, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0450, Scaled: 0.2121, EMA: 0.2383, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0429, Scaled: 0.2071, EMA: 0.2289, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0343, Scaled: 0.1852, EMA: 0.2158, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0288, Scaled: 0.1697, EMA: 0.2020, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0325, Scaled: 0.1802, EMA: 0.1954, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0313, Scaled: 0.1770, EMA: 0.1899, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0389, Scaled: 0.1971, EMA: 0.1921, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0533, Scaled: 0.2309, EMA: 0.2037, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0748, Scaled: 0.2735, EMA: 0.2247, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0624, Scaled: 0.2499, EMA: 0.2322, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0791, Scaled: 0.2813, EMA: 0.2469, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0786, Scaled: 0.2804, EMA: 0.2570, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0514, Scaled: 0.2267, EMA: 0.2479, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0680, Scaled: 0.2608, EMA: 0.2518, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0624, Scaled: 0.2497, EMA: 0.2512, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0510, Scaled: 0.2258, EMA: 0.2436, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0409, Scaled: 0.2021, EMA: 0.2311, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0284, Scaled: 0.1684, EMA: 0.2123, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0304, Scaled: 0.1743, EMA: 0.2009, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0411, Scaled: 0.2028, EMA: 0.2015, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0430, Scaled: 0.2073, EMA: 0.2032, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0338, Scaled: 0.1840, EMA: 0.1974, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0380, Scaled: 0.1949, EMA: 0.1967, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0449, Scaled: 0.2119, EMA: 0.2012, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0454, Scaled: 0.2131, EMA: 0.2048, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0424, Scaled: 0.2060, EMA: 0.2052, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0389, Scaled: 0.1972, EMA: 0.2028, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0370, Scaled: 0.1923, EMA: 0.1996, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0457, Scaled: 0.2138, EMA: 0.2039, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0329, Scaled: 0.1814, EMA: 0.1971, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0335, Scaled: 0.1831, EMA: 0.1929, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0293, Scaled: 0.1712, EMA: 0.1864, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0311, Scaled: 0.1763, EMA: 0.1834, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0453, Scaled: 0.2129, EMA: 0.1922, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0487, Scaled: 0.2208, EMA: 0.2008, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0457, Scaled: 0.2137, EMA: 0.2047, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0522, Scaled: 0.2284, EMA: 0.2118, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0520, Scaled: 0.2281, EMA: 0.2167, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0397, Scaled: 0.1993, EMA: 0.2115, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0356, Scaled: 0.1887, EMA: 0.2046, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0458, Scaled: 0.2141, EMA: 0.2075, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0424, Scaled: 0.2059, EMA: 0.2070, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0675, Scaled: 0.2598, EMA: 0.2229, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0521, Scaled: 0.2283, EMA: 0.2245, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0403, Scaled: 0.2007, EMA: 0.2174, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0525, Scaled: 0.2292, EMA: 0.2209, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0454, Scaled: 0.2130, EMA: 0.2185, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0480, Scaled: 0.2190, EMA: 0.2187, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0389, Scaled: 0.1972, EMA: 0.2122, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0612, Scaled: 0.2473, EMA: 0.2228, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0790, Scaled: 0.2811, EMA: 0.2403, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0685, Scaled: 0.2617, EMA: 0.2467, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0514, Scaled: 0.2267, EMA: 0.2407, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0562, Scaled: 0.2371, EMA: 0.2396, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0477, Scaled: 0.2183, EMA: 0.2332, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0534, Scaled: 0.2311, EMA: 0.2326, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0579, Scaled: 0.2407, EMA: 0.2350, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0881, Scaled: 0.2969, EMA: 0.2536, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1072, Scaled: 0.3274, EMA: 0.2757, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1170, Scaled: 0.3421, EMA: 0.2956, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0867, Scaled: 0.2944, EMA: 0.2953, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0486, Scaled: 0.2206, EMA: 0.2728, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0731, Scaled: 0.2704, EMA: 0.2721, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0463, Scaled: 0.2152, EMA: 0.2550, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0478, Scaled: 0.2186, EMA: 0.2441, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0869, Scaled: 0.2948, EMA: 0.2593, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1104, Scaled: 0.3323, EMA: 0.2812, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1115, Scaled: 0.3339, EMA: 0.2970, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0943, Scaled: 0.3071, EMA: 0.3000, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0806, Scaled: 0.2839, EMA: 0.2952, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0646, Scaled: 0.2542, EMA: 0.2829, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0602, Scaled: 0.2453, EMA: 0.2716, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0493, Scaled: 0.2219, EMA: 0.2567, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0490, Scaled: 0.2213, EMA: 0.2461, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0730, Scaled: 0.2702, EMA: 0.2533, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1024, Scaled: 0.3200, EMA: 0.2733, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0643, Scaled: 0.2536, EMA: 0.2674, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0848, Scaled: 0.2911, EMA: 0.2745, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0855, Scaled: 0.2925, EMA: 0.2799, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0859, Scaled: 0.2931, EMA: 0.2839, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0853, Scaled: 0.2921, EMA: 0.2863, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0609, Scaled: 0.2467, EMA: 0.2744, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0619, Scaled: 0.2489, EMA: 0.2668, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0481, Scaled: 0.2193, EMA: 0.2525, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0466, Scaled: 0.2159, EMA: 0.2415, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0499, Scaled: 0.2235, EMA: 0.2361, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0563, Scaled: 0.2372, EMA: 0.2364, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0462, Scaled: 0.2149, EMA: 0.2300, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0452, Scaled: 0.2125, EMA: 0.2247, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0545, Scaled: 0.2335, EMA: 0.2274, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0405, Scaled: 0.2012, EMA: 0.2195, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0475, Scaled: 0.2179, EMA: 0.2190, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0649, Scaled: 0.2548, EMA: 0.2298, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0745, Scaled: 0.2730, EMA: 0.2427, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0634, Scaled: 0.2519, EMA: 0.2455, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0743, Scaled: 0.2726, EMA: 0.2536, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0733, Scaled: 0.2707, EMA: 0.2587, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0643, Scaled: 0.2536, EMA: 0.2572, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0735, Scaled: 0.2711, EMA: 0.2614, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0795, Scaled: 0.2820, EMA: 0.2676, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0703, Scaled: 0.2651, EMA: 0.2668, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1009, Scaled: 0.3177, EMA: 0.2821, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0695, Scaled: 0.2637, EMA: 0.2766, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0516, Scaled: 0.2271, EMA: 0.2617, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0398, Scaled: 0.1996, EMA: 0.2431, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0555, Scaled: 0.2356, EMA: 0.2408, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0607, Scaled: 0.2464, EMA: 0.2425, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0300, Scaled: 0.1731, EMA: 0.2217, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0404, Scaled: 0.2009, EMA: 0.2155, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0450, Scaled: 0.2122, EMA: 0.2145, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0675, Scaled: 0.2597, EMA: 0.2281, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0389, Scaled: 0.1972, EMA: 0.2188, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0337, Scaled: 0.1836, EMA: 0.2082, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0293, Scaled: 0.1711, EMA: 0.1971, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0318, Scaled: 0.1783, EMA: 0.1915, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0403, Scaled: 0.2008, EMA: 0.1943, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0321, Scaled: 0.1792, EMA: 0.1897, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0379, Scaled: 0.1948, EMA: 0.1913, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0485, Scaled: 0.2203, EMA: 0.2000, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0271, Scaled: 0.1647, EMA: 0.1894, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0248, Scaled: 0.1574, EMA: 0.1798, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0269, Scaled: 0.1642, EMA: 0.1751, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0494, Scaled: 0.2223, EMA: 0.1892, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0597, Scaled: 0.2444, EMA: 0.2058, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0618, Scaled: 0.2486, EMA: 0.2186, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0443, Scaled: 0.2106, EMA: 0.2162, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0393, Scaled: 0.1982, EMA: 0.2108, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0440, Scaled: 0.2096, EMA: 0.2105, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.2159, Scaled: 0.4646, EMA: 0.2867, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1752, Scaled: 0.4186, EMA: 0.3263, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1314, Scaled: 0.3625, EMA: 0.3371, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1029, Scaled: 0.3208, EMA: 0.3323, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0916, Scaled: 0.3026, EMA: 0.3234, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1019, Scaled: 0.3192, EMA: 0.3221, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0897, Scaled: 0.2996, EMA: 0.3154, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1049, Scaled: 0.3239, EMA: 0.3179, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0951, Scaled: 0.3083, EMA: 0.3150, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1116, Scaled: 0.3341, EMA: 0.3208, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0991, Scaled: 0.3148, EMA: 0.3190, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0958, Scaled: 0.3095, EMA: 0.3162, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0854, Scaled: 0.2922, EMA: 0.3090, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0920, Scaled: 0.3034, EMA: 0.3073, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0872, Scaled: 0.2952, EMA: 0.3037, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1375, Scaled: 0.3708, EMA: 0.3238, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1201, Scaled: 0.3466, EMA: 0.3306, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1251, Scaled: 0.3537, EMA: 0.3375, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0773, Scaled: 0.2781, EMA: 0.3197, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1078, Scaled: 0.3283, EMA: 0.3223, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0639, Scaled: 0.2528, EMA: 0.3014, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1089, Scaled: 0.3300, EMA: 0.3100, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1136, Scaled: 0.3370, EMA: 0.3181, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0928, Scaled: 0.3046, EMA: 0.3140, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0687, Scaled: 0.2621, EMA: 0.2985, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0601, Scaled: 0.2451, EMA: 0.2824, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0452, Scaled: 0.2126, EMA: 0.2615, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0963, Scaled: 0.3103, EMA: 0.2761, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1332, Scaled: 0.3650, EMA: 0.3028, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1314, Scaled: 0.3625, EMA: 0.3207, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0961, Scaled: 0.3099, EMA: 0.3175, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1029, Scaled: 0.3209, EMA: 0.3185, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0792, Scaled: 0.2815, EMA: 0.3074, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0960, Scaled: 0.3099, EMA: 0.3081, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1075, Scaled: 0.3278, EMA: 0.3140, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0980, Scaled: 0.3130, EMA: 0.3137, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0889, Scaled: 0.2982, EMA: 0.3091, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0991, Scaled: 0.3148, EMA: 0.3108, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0834, Scaled: 0.2888, EMA: 0.3042, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0746, Scaled: 0.2732, EMA: 0.2949, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0845, Scaled: 0.2906, EMA: 0.2936, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0972, Scaled: 0.3118, EMA: 0.2991, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0719, Scaled: 0.2681, EMA: 0.2898, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0672, Scaled: 0.2593, EMA: 0.2806, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0636, Scaled: 0.2521, EMA: 0.2721, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0918, Scaled: 0.3030, EMA: 0.2813, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0794, Scaled: 0.2817, EMA: 0.2815, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0576, Scaled: 0.2400, EMA: 0.2690, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0564, Scaled: 0.2374, EMA: 0.2596, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0794, Scaled: 0.2817, EMA: 0.2662, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0852, Scaled: 0.2919, EMA: 0.2739, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0686, Scaled: 0.2619, EMA: 0.2703, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0817, Scaled: 0.2857, EMA: 0.2749, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0681, Scaled: 0.2610, EMA: 0.2708, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0609, Scaled: 0.2468, EMA: 0.2636, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0689, Scaled: 0.2625, EMA: 0.2632, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0585, Scaled: 0.2418, EMA: 0.2568, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0657, Scaled: 0.2563, EMA: 0.2567, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0657, Scaled: 0.2564, EMA: 0.2566, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0780, Scaled: 0.2793, EMA: 0.2634, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0549, Scaled: 0.2343, EMA: 0.2547, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0320, Scaled: 0.1790, EMA: 0.2320, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0338, Scaled: 0.1838, EMA: 0.2175, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0295, Scaled: 0.1719, EMA: 0.2038, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0415, Scaled: 0.2036, EMA: 0.2038, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0455, Scaled: 0.2133, EMA: 0.2066, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0693, Scaled: 0.2632, EMA: 0.2236, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0673, Scaled: 0.2595, EMA: 0.2344, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0621, Scaled: 0.2493, EMA: 0.2388, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0496, Scaled: 0.2228, EMA: 0.2340, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0487, Scaled: 0.2207, EMA: 0.2300, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0534, Scaled: 0.2312, EMA: 0.2304, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0559, Scaled: 0.2364, EMA: 0.2322, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0730, Scaled: 0.2701, EMA: 0.2436, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0780, Scaled: 0.2793, EMA: 0.2543, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0585, Scaled: 0.2419, EMA: 0.2506, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0906, Scaled: 0.3010, EMA: 0.2657, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0808, Scaled: 0.2843, EMA: 0.2713, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0485, Scaled: 0.2202, EMA: 0.2560, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0789, Scaled: 0.2808, EMA: 0.2634, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0592, Scaled: 0.2433, EMA: 0.2574, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0929, Scaled: 0.3049, EMA: 0.2716, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0869, Scaled: 0.2947, EMA: 0.2786, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0907, Scaled: 0.3012, EMA: 0.2854, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0694, Scaled: 0.2634, EMA: 0.2788, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0904, Scaled: 0.3007, EMA: 0.2854, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0885, Scaled: 0.2975, EMA: 0.2890, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1063, Scaled: 0.3261, EMA: 0.3001, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1165, Scaled: 0.3413, EMA: 0.3125, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1062, Scaled: 0.3258, EMA: 0.3165, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0691, Scaled: 0.2628, EMA: 0.3004, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0838, Scaled: 0.2895, EMA: 0.2971, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0972, Scaled: 0.3118, EMA: 0.3015, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0946, Scaled: 0.3075, EMA: 0.3033, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0996, Scaled: 0.3157, EMA: 0.3070, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1059, Scaled: 0.3254, EMA: 0.3125, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1034, Scaled: 0.3216, EMA: 0.3153, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0887, Scaled: 0.2978, EMA: 0.3100, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0991, Scaled: 0.3149, EMA: 0.3115, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0903, Scaled: 0.3005, EMA: 0.3082, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0627, Scaled: 0.2505, EMA: 0.2909, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0737, Scaled: 0.2715, EMA: 0.2850, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0863, Scaled: 0.2937, EMA: 0.2876, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0771, Scaled: 0.2777, EMA: 0.2847, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0843, Scaled: 0.2904, EMA: 0.2864, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0908, Scaled: 0.3014, EMA: 0.2909, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0743, Scaled: 0.2727, EMA: 0.2854, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0745, Scaled: 0.2729, EMA: 0.2817, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0867, Scaled: 0.2945, EMA: 0.2855, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0689, Scaled: 0.2625, EMA: 0.2786, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0769, Scaled: 0.2774, EMA: 0.2782, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0731, Scaled: 0.2704, EMA: 0.2759, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0736, Scaled: 0.2714, EMA: 0.2745, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0778, Scaled: 0.2790, EMA: 0.2759, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0721, Scaled: 0.2685, EMA: 0.2737, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0646, Scaled: 0.2541, EMA: 0.2678, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0726, Scaled: 0.2694, EMA: 0.2683, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0671, Scaled: 0.2590, EMA: 0.2655, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0655, Scaled: 0.2560, EMA: 0.2626, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0630, Scaled: 0.2510, EMA: 0.2592, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0595, Scaled: 0.2439, EMA: 0.2546, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0650, Scaled: 0.2549, EMA: 0.2547, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0559, Scaled: 0.2364, EMA: 0.2492, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0499, Scaled: 0.2234, EMA: 0.2414, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0484, Scaled: 0.2199, EMA: 0.2350, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0604, Scaled: 0.2458, EMA: 0.2382, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0496, Scaled: 0.2227, EMA: 0.2336, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0546, Scaled: 0.2336, EMA: 0.2336, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0709, Scaled: 0.2662, EMA: 0.2434, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0684, Scaled: 0.2615, EMA: 0.2488, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0636, Scaled: 0.2521, EMA: 0.2498, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0528, Scaled: 0.2299, EMA: 0.2438, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0641, Scaled: 0.2532, EMA: 0.2466, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0656, Scaled: 0.2561, EMA: 0.2495, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0725, Scaled: 0.2692, EMA: 0.2554, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0614, Scaled: 0.2479, EMA: 0.2531, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0692, Scaled: 0.2631, EMA: 0.2561, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0635, Scaled: 0.2520, EMA: 0.2549, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0463, Scaled: 0.2153, EMA: 0.2430, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0573, Scaled: 0.2393, EMA: 0.2419, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0672, Scaled: 0.2593, EMA: 0.2471, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0600, Scaled: 0.2449, EMA: 0.2464, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0521, Scaled: 0.2283, EMA: 0.2410, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0410, Scaled: 0.2025, EMA: 0.2295, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0655, Scaled: 0.2559, EMA: 0.2374, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0620, Scaled: 0.2490, EMA: 0.2409, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0722, Scaled: 0.2687, EMA: 0.2492, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0640, Scaled: 0.2529, EMA: 0.2503, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0641, Scaled: 0.2532, EMA: 0.2512, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0618, Scaled: 0.2486, EMA: 0.2504, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0667, Scaled: 0.2583, EMA: 0.2528, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0648, Scaled: 0.2546, EMA: 0.2533, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0730, Scaled: 0.2701, EMA: 0.2584, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0681, Scaled: 0.2609, EMA: 0.2591, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0889, Scaled: 0.2982, EMA: 0.2708, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0677, Scaled: 0.2602, EMA: 0.2676, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0691, Scaled: 0.2628, EMA: 0.2662, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0581, Scaled: 0.2410, EMA: 0.2586, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0541, Scaled: 0.2326, EMA: 0.2508, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0893, Scaled: 0.2989, EMA: 0.2652, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1145, Scaled: 0.3383, EMA: 0.2872, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0875, Scaled: 0.2959, EMA: 0.2898, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0677, Scaled: 0.2601, EMA: 0.2809, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0515, Scaled: 0.2268, EMA: 0.2647, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0719, Scaled: 0.2681, EMA: 0.2657, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0631, Scaled: 0.2512, EMA: 0.2613, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0890, Scaled: 0.2982, EMA: 0.2724, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0747, Scaled: 0.2734, EMA: 0.2727, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1171, Scaled: 0.3422, EMA: 0.2935, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1040, Scaled: 0.3225, EMA: 0.3022, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0894, Scaled: 0.2989, EMA: 0.3012, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0795, Scaled: 0.2820, EMA: 0.2955, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0535, Scaled: 0.2313, EMA: 0.2762, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0703, Scaled: 0.2651, EMA: 0.2729, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0824, Scaled: 0.2871, EMA: 0.2771, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0748, Scaled: 0.2735, EMA: 0.2761, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0553, Scaled: 0.2353, EMA: 0.2638, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0790, Scaled: 0.2810, EMA: 0.2690, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0988, Scaled: 0.3144, EMA: 0.2826, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0849, Scaled: 0.2913, EMA: 0.2852, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0724, Scaled: 0.2691, EMA: 0.2804, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0665, Scaled: 0.2579, EMA: 0.2736, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0720, Scaled: 0.2683, EMA: 0.2720, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0508, Scaled: 0.2254, EMA: 0.2580, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0632, Scaled: 0.2514, EMA: 0.2560, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0821, Scaled: 0.2865, EMA: 0.2652, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0944, Scaled: 0.3073, EMA: 0.2778, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1170, Scaled: 0.3420, EMA: 0.2971, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1214, Scaled: 0.3485, EMA: 0.3125, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1040, Scaled: 0.3225, EMA: 0.3155, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1059, Scaled: 0.3255, EMA: 0.3185, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1089, Scaled: 0.3301, EMA: 0.3220, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0866, Scaled: 0.2943, EMA: 0.3137, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0688, Scaled: 0.2623, EMA: 0.2983, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0789, Scaled: 0.2809, EMA: 0.2931, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0878, Scaled: 0.2963, EMA: 0.2941, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0782, Scaled: 0.2796, EMA: 0.2897, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0919, Scaled: 0.3031, EMA: 0.2937, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0930, Scaled: 0.3050, EMA: 0.2971, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0761, Scaled: 0.2758, EMA: 0.2907, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0874, Scaled: 0.2957, EMA: 0.2922, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0809, Scaled: 0.2844, EMA: 0.2899, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0742, Scaled: 0.2725, EMA: 0.2846, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0869, Scaled: 0.2949, EMA: 0.2877, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0700, Scaled: 0.2646, EMA: 0.2808, Segments: 3/10
+live-script.js:314 Frontend: Starting TTS playback. Stopping audio capture...
+live-script.js:528 Frontend: Pausing audio capture for TTS playback...
+live-script.js:549 Frontend: Audio capture paused.
+live-script.js:339 Frontend: Received and playing translated audio blob.
+live-script.js:272 Frontend: Final Metrics: Object
+live-script.js:279 Frontend: Chart updated at 15.83s. Input Active: true, Translation Active: true
+live-script.js:206 [MIC] RMS: 0.0842, Scaled: 0.2902, EMA: 0.2836, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0935, Scaled: 0.3057, EMA: 0.2902, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0992, Scaled: 0.3150, EMA: 0.2977, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0959, Scaled: 0.3097, EMA: 0.3013, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0873, Scaled: 0.2955, EMA: 0.2995, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0629, Scaled: 0.2507, EMA: 0.2849, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0929, Scaled: 0.3047, EMA: 0.2908, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0592, Scaled: 0.2432, EMA: 0.2766, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0570, Scaled: 0.2388, EMA: 0.2652, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0570, Scaled: 0.2388, EMA: 0.2573, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0393, Scaled: 0.1981, EMA: 0.2396, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0460, Scaled: 0.2145, EMA: 0.2320, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0388, Scaled: 0.1970, EMA: 0.2215, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0512, Scaled: 0.2263, EMA: 0.2230, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0213, Scaled: 0.1460, EMA: 0.1999, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0330, Scaled: 0.1816, EMA: 0.1944, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0282, Scaled: 0.1680, EMA: 0.1865, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0367, Scaled: 0.1914, EMA: 0.1880, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0320, Scaled: 0.1788, EMA: 0.1852, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0370, Scaled: 0.1923, EMA: 0.1873, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0429, Scaled: 0.2072, EMA: 0.1933, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0396, Scaled: 0.1991, EMA: 0.1950, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0603, Scaled: 0.2455, EMA: 0.2102, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0628, Scaled: 0.2507, EMA: 0.2223, Segments: 3/10
+live-script.js:304 Frontend: Audio routed to virtual device
+live-script.js:322 Frontend: Audio playback started.
+live-script.js:332 Frontend: TTS playback finished. Restarting audio capture...
+live-script.js:554 Frontend: Resuming audio capture after TTS playback...
+live-script.js:564 Frontend: MediaStream restarted.
+live-script.js:590 Frontend: Audio capture resumed successfully.
+live-script.js:206 [MIC] RMS: 0.0622, Scaled: 0.2494, EMA: 0.2304, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0120, Scaled: 0.1093, EMA: 0.1941, Segments: 2/10
+live-script.js:206 [MIC] RMS: 0.0541, Scaled: 0.2327, EMA: 0.2057, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.0805, Scaled: 0.2838, EMA: 0.2291, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1336, Scaled: 0.3656, EMA: 0.2700, Segments: 3/10
+live-script.js:206 [MIC] RMS: 0.1748, Scaled: 0.4181, EMA: 0.3145, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1743, Scaled: 0.4174, EMA: 0.3454, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1306, Scaled: 0.3614, EMA: 0.3502, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1417, Scaled: 0.3764, EMA: 0.3581, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1678, Scaled: 0.4097, EMA: 0.3735, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1014, Scaled: 0.3184, EMA: 0.3570, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1338, Scaled: 0.3658, EMA: 0.3596, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1265, Scaled: 0.3556, EMA: 0.3584, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1831, Scaled: 0.4279, EMA: 0.3793, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1456, Scaled: 0.3816, EMA: 0.3800, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1767, Scaled: 0.4203, EMA: 0.3921, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.2001, Scaled: 0.4474, EMA: 0.4087, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1811, Scaled: 0.4255, EMA: 0.4137, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1394, Scaled: 0.3734, EMA: 0.4016, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1828, Scaled: 0.4275, EMA: 0.4094, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1916, Scaled: 0.4377, EMA: 0.4179, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1727, Scaled: 0.4156, EMA: 0.4172, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.2384, Scaled: 0.4883, EMA: 0.4385, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1703, Scaled: 0.4127, EMA: 0.4308, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1776, Scaled: 0.4214, EMA: 0.4280, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1532, Scaled: 0.3915, EMA: 0.4170, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1377, Scaled: 0.3711, EMA: 0.4033, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1441, Scaled: 0.3796, EMA: 0.3962, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1204, Scaled: 0.3470, EMA: 0.3814, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1127, Scaled: 0.3357, EMA: 0.3677, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1377, Scaled: 0.3711, EMA: 0.3687, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1458, Scaled: 0.3818, EMA: 0.3727, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1240, Scaled: 0.3522, EMA: 0.3665, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1054, Scaled: 0.3247, EMA: 0.3540, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1418, Scaled: 0.3765, EMA: 0.3607, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1494, Scaled: 0.3865, EMA: 0.3685, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1412, Scaled: 0.3758, EMA: 0.3707, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1426, Scaled: 0.3776, EMA: 0.3727, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1264, Scaled: 0.3556, EMA: 0.3676, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.2765, Scaled: 0.5258, EMA: 0.4151, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1887, Scaled: 0.4344, EMA: 0.4209, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.2019, Scaled: 0.4494, EMA: 0.4294, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1250, Scaled: 0.3536, EMA: 0.4067, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1217, Scaled: 0.3488, EMA: 0.3893, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1516, Scaled: 0.3893, EMA: 0.3893, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1703, Scaled: 0.4127, EMA: 0.3963, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1919, Scaled: 0.4381, EMA: 0.4089, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.2217, Scaled: 0.4708, EMA: 0.4275, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1611, Scaled: 0.4013, EMA: 0.4196, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.2015, Scaled: 0.4488, EMA: 0.4284, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1404, Scaled: 0.3747, EMA: 0.4123, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1346, Scaled: 0.3668, EMA: 0.3986, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1669, Scaled: 0.4085, EMA: 0.4016, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1670, Scaled: 0.4087, EMA: 0.4037, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1204, Scaled: 0.3469, EMA: 0.3867, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1022, Scaled: 0.3196, EMA: 0.3666, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1484, Scaled: 0.3852, EMA: 0.3722, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1338, Scaled: 0.3658, EMA: 0.3703, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1444, Scaled: 0.3800, EMA: 0.3732, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1207, Scaled: 0.3474, EMA: 0.3655, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1042, Scaled: 0.3228, EMA: 0.3526, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1277, Scaled: 0.3573, EMA: 0.3540, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1179, Scaled: 0.3433, EMA: 0.3508, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1597, Scaled: 0.3996, EMA: 0.3655, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1411, Scaled: 0.3756, EMA: 0.3685, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1466, Scaled: 0.3829, EMA: 0.3728, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1638, Scaled: 0.4047, EMA: 0.3824, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.2943, Scaled: 0.5425, EMA: 0.4304, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1830, Scaled: 0.4278, EMA: 0.4296, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1111, Scaled: 0.3333, EMA: 0.4007, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1165, Scaled: 0.3414, EMA: 0.3829, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1188, Scaled: 0.3447, EMA: 0.3715, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1452, Scaled: 0.3811, EMA: 0.3744, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1764, Scaled: 0.4199, EMA: 0.3880, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1351, Scaled: 0.3676, EMA: 0.3819, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1075, Scaled: 0.3279, EMA: 0.3657, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0902, Scaled: 0.3004, EMA: 0.3461, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1316, Scaled: 0.3627, EMA: 0.3511, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1373, Scaled: 0.3705, EMA: 0.3569, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1739, Scaled: 0.4170, EMA: 0.3749, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.2659, Scaled: 0.5156, EMA: 0.4171, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.2920, Scaled: 0.5404, EMA: 0.4541, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.2739, Scaled: 0.5234, EMA: 0.4749, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.2744, Scaled: 0.5239, EMA: 0.4896, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.2446, Scaled: 0.4946, EMA: 0.4911, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.2130, Scaled: 0.4615, EMA: 0.4822, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.3237, Scaled: 0.5689, EMA: 0.5082, Segments: 6/10
+live-script.js:206 [MIC] RMS: 0.2023, Scaled: 0.4498, EMA: 0.4907, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.2186, Scaled: 0.4675, EMA: 0.4837, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.2105, Scaled: 0.4588, EMA: 0.4762, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1672, Scaled: 0.4089, EMA: 0.4560, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1383, Scaled: 0.3718, EMA: 0.4308, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1561, Scaled: 0.3951, EMA: 0.4201, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1427, Scaled: 0.3777, EMA: 0.4074, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1657, Scaled: 0.4071, EMA: 0.4073, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1725, Scaled: 0.4153, EMA: 0.4097, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1919, Scaled: 0.4380, EMA: 0.4182, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1515, Scaled: 0.3892, EMA: 0.4095, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1218, Scaled: 0.3490, EMA: 0.3913, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1626, Scaled: 0.4032, EMA: 0.3949, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1669, Scaled: 0.4085, EMA: 0.3990, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1946, Scaled: 0.4411, EMA: 0.4116, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1660, Scaled: 0.4074, EMA: 0.4103, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1477, Scaled: 0.3843, EMA: 0.4025, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1014, Scaled: 0.3185, EMA: 0.3773, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1106, Scaled: 0.3326, EMA: 0.3639, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1482, Scaled: 0.3850, EMA: 0.3702, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1695, Scaled: 0.4117, EMA: 0.3827, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1686, Scaled: 0.4106, EMA: 0.3910, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1957, Scaled: 0.4424, EMA: 0.4064, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1990, Scaled: 0.4461, EMA: 0.4184, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1278, Scaled: 0.3575, EMA: 0.4001, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1333, Scaled: 0.3650, EMA: 0.3896, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1301, Scaled: 0.3606, EMA: 0.3809, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1526, Scaled: 0.3906, EMA: 0.3838, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1334, Scaled: 0.3652, EMA: 0.3782, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1323, Scaled: 0.3637, EMA: 0.3739, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1916, Scaled: 0.4378, EMA: 0.3930, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1699, Scaled: 0.4122, EMA: 0.3988, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1244, Scaled: 0.3527, EMA: 0.3849, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1560, Scaled: 0.3950, EMA: 0.3879, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1311, Scaled: 0.3621, EMA: 0.3802, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1176, Scaled: 0.3429, EMA: 0.3690, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1045, Scaled: 0.3232, EMA: 0.3553, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1100, Scaled: 0.3317, EMA: 0.3482, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1183, Scaled: 0.3440, EMA: 0.3469, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0819, Scaled: 0.2862, EMA: 0.3287, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0829, Scaled: 0.2880, EMA: 0.3165, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0817, Scaled: 0.2858, EMA: 0.3073, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1020, Scaled: 0.3193, EMA: 0.3109, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1460, Scaled: 0.3821, EMA: 0.3323, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0756, Scaled: 0.2750, EMA: 0.3151, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0988, Scaled: 0.3142, EMA: 0.3148, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0726, Scaled: 0.2694, EMA: 0.3012, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1447, Scaled: 0.3804, EMA: 0.3250, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1960, Scaled: 0.4427, EMA: 0.3603, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1389, Scaled: 0.3727, EMA: 0.3640, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1424, Scaled: 0.3774, EMA: 0.3680, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1017, Scaled: 0.3190, EMA: 0.3533, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1136, Scaled: 0.3371, EMA: 0.3484, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1393, Scaled: 0.3732, EMA: 0.3559, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1121, Scaled: 0.3348, EMA: 0.3495, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1065, Scaled: 0.3263, EMA: 0.3426, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0737, Scaled: 0.2715, EMA: 0.3213, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0878, Scaled: 0.2964, EMA: 0.3138, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1134, Scaled: 0.3368, EMA: 0.3207, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1379, Scaled: 0.3713, EMA: 0.3359, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1371, Scaled: 0.3703, EMA: 0.3462, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1499, Scaled: 0.3872, EMA: 0.3585, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.2466, Scaled: 0.4966, EMA: 0.3999, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.3660, Scaled: 0.6050, EMA: 0.4614, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.3130, Scaled: 0.5595, EMA: 0.4909, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.3018, Scaled: 0.5493, EMA: 0.5084, Segments: 6/10
+live-script.js:206 [MIC] RMS: 0.1628, Scaled: 0.4035, EMA: 0.4769, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.2226, Scaled: 0.4718, EMA: 0.4754, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1334, Scaled: 0.3652, EMA: 0.4423, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1500, Scaled: 0.3873, EMA: 0.4258, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1799, Scaled: 0.4241, EMA: 0.4253, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.2073, Scaled: 0.4553, EMA: 0.4343, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1950, Scaled: 0.4416, EMA: 0.4365, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1499, Scaled: 0.3872, EMA: 0.4217, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1712, Scaled: 0.4138, EMA: 0.4193, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1539, Scaled: 0.3923, EMA: 0.4112, Segments: 5/10
+live-script.js:206 [MIC] RMS: 0.1107, Scaled: 0.3328, EMA: 0.3877, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0810, Scaled: 0.2847, EMA: 0.3568, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0885, Scaled: 0.2976, EMA: 0.3390, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1017, Scaled: 0.3189, EMA: 0.3330, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0834, Scaled: 0.2889, EMA: 0.3198, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0762, Scaled: 0.2760, EMA: 0.3066, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0885, Scaled: 0.2974, EMA: 0.3039, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0867, Scaled: 0.2945, EMA: 0.3010, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1016, Scaled: 0.3187, EMA: 0.3063, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0964, Scaled: 0.3104, EMA: 0.3076, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0832, Scaled: 0.2885, EMA: 0.3018, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1113, Scaled: 0.3336, EMA: 0.3114, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0814, Scaled: 0.2853, EMA: 0.3035, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1147, Scaled: 0.3387, EMA: 0.3141, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0893, Scaled: 0.2988, EMA: 0.3095, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1142, Scaled: 0.3379, EMA: 0.3180, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.2068, Scaled: 0.4547, EMA: 0.3590, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1444, Scaled: 0.3799, EMA: 0.3653, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1288, Scaled: 0.3589, EMA: 0.3634, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0959, Scaled: 0.3097, EMA: 0.3473, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0935, Scaled: 0.3057, EMA: 0.3348, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1141, Scaled: 0.3378, EMA: 0.3357, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1902, Scaled: 0.4362, EMA: 0.3658, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1681, Scaled: 0.4100, EMA: 0.3791, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1311, Scaled: 0.3621, EMA: 0.3740, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.0969, Scaled: 0.3113, EMA: 0.3552, Segments: 4/10
+live-script.js:206 [MIC] RMS: 0.1033, Scaled: 0.3214, EMA: 0.3451, Segments: 4/10
+live-script.js:653 Frontend: Start/Stop button clicked. isStreaming: true
+live-script.js:358 WebSocket closed: CloseEvent {isTrusted: true, wasClean: true, code: 1012, reason: '', type: 'close', …}
+
+
+
+(venv) (base) yegor@tourist BP % make run
+DYLD_LIBRARY_PATH="/opt/homebrew/lib" TORCH_USE_LIBAV=0 TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1 PYTHONHASHSEED=random venv/bin/python3.11 app.py
+INFO:     Started server process [56277]
+INFO:     Waiting for application startup.
+APP: Application startup initiated at 10:14:17
+2025-11-27 10:14:17,817 - INFO - Database tables created/checked.
+APP: Users already exist in the database. Skipping default user creation.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on https://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:53847 - "GET /ui/live-speech/live.html HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53847 - "GET /ui/global-styles.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53847 - "GET /ui/live-speech/live-style.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53855 - "GET /ui/vendor/chart.min.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53860 - "GET /ui/theme-toggle.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53857 - "GET /ui/images/white.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53855 - "GET /ui/live-speech/live-script.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53855 - "GET /api/voices HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:53868 - "WebSocket /ws" [accepted]
+App: WebSocket accepted from 127.0.0.1:53868
+2025-11-27 10:17:08,924 - INFO - Backend: Session 127.0.0.1:53868: Initializing models at 10:17:08...
+2025-11-27 10:17:08,924 - INFO - Backend: Session 127.0.0.1:53868: Initializing FasterWhisperSTT model 'base' at 09:15:06...
+FasterWhisperSTT initialized with model_size=base, device=auto, compute_type=int8
+2025-11-27 10:17:09,458 - INFO - Backend: Session 127.0.0.1:53868: FasterWhisperSTT model 'base' initialized at 09:15:06. Duration: 0.53s
+2025-11-27 10:17:09,459 - INFO - Backend: Session 127.0.0.1:53868: CTranslate2 model for Helsinki-NLP/opus-mt-en-sk already exists at ct2_models/Helsinki-NLP--opus-mt-en-sk.
+2025-11-27 10:17:09,459 - INFO - Backend: Session 127.0.0.1:53868: Initializing CTranslate2MT for en-sk at 10:17:09...
+CTranslate2MT: Using specified device: cpu.
+CTranslate2MT initialized with model_path=ct2_models/Helsinki-NLP--opus-mt-en-sk, device=cpu
+2025-11-27 10:17:10,208 - INFO - Backend: Session 127.0.0.1:53868: CTranslate2MT initialized for en-sk on CPU (MPS fallback) at 10:17:10. Duration: 0.75s
+2025-11-27 10:17:10,209 - INFO - Backend: Session 127.0.0.1:53868: Initializing PiperTTS with 'cs_CZ-jirka-medium' at 10:17:10...
+PiperTTS: Attempting to load model 'cs_CZ-jirka-medium'.
+PiperTTS: Expected ONNX model path: /Users/yegor/Documents/STU/BP/backend/tts/piper_models/cs_CZ-jirka-medium.onnx
+PiperTTS: Expected JSON config path: /Users/yegor/Documents/STU/BP/backend/tts/piper_models/cs_CZ-jirka-medium.onnx.json
+PiperTTS: os.path.exists(onnx_model_path): True
+PiperTTS: os.path.exists(json_config_path): True
+PiperTTS: MPS device explicitly requested and available.
+PiperTTS initialized with model: cs_CZ-jirka-medium, device: mps, speaker_id: 0
+2025-11-27 10:17:11,070 - INFO - Backend: Session 127.0.0.1:53868: PiperTTS 'cs_CZ-jirka-medium' initialized at 10:17:11. Duration: 0.86s.
+2025-11-27 10:17:11,070 - INFO - Backend: Session 127.0.0.1:53868: Initializing WebRTC VAD with aggressiveness=3 at 10:17:11...
+2025-11-27 10:17:11,070 - INFO - Backend: Session 127.0.0.1:53868: WebRTC VAD initialized at 10:17:11. Duration: 0.00s
+2025-11-27 10:17:11,070 - INFO - Backend: Session 127.0.0.1:53868: All models initialized (or attempted to initialize) at 10:17:11.
+App: Sending personal models_loading_status to new websocket 127.0.0.1:53868: fully_loaded=True
+INFO:     connection open
+2025-11-27 10:17:11,072 - INFO - Client connected from 127.0.0.1:53868
+INFO:     127.0.0.1:53855 - "GET /ui/images/black.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53855 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54241 - "GET /ui/live-speech/live.html HTTP/1.1" 200 OK
+2025-11-27 10:18:31,661 - ERROR - An unexpected error occurred in handle_audio_stream for 127.0.0.1:53868: Cannot call "receive" once a disconnect message has been received.
+2025-11-27 10:18:31,661 - ERROR - Backend: Error sending error message to client 127.0.0.1:53868: Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2025-11-27 10:18:31,661 - INFO - Client 127.0.0.1:53868 handler finished. Cleaning up session.
+2025-11-27 10:18:31,662 - INFO - Backend: Session 127.0.0.1:53868 removed from active_sessions. Models unloaded.
+2025-11-27 10:18:31,662 - INFO - Backend: Cleanup complete for client 127.0.0.1:53868.
+INFO:     connection closed
+INFO:     127.0.0.1:54241 - "GET /ui/global-styles.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54257 - "GET /ui/theme-toggle.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54251 - "GET /ui/live-speech/live-style.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54253 - "GET /ui/vendor/chart.min.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54255 - "GET /ui/images/white.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54257 - "GET /ui/live-speech/live-script.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54257 - "GET /api/voices HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54257 - "GET /ui/images/black.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54261 - "WebSocket /ws" [accepted]
+App: WebSocket accepted from 127.0.0.1:54261
+2025-11-27 10:18:31,777 - INFO - Backend: Session 127.0.0.1:54261: Initializing models at 10:18:31...
+2025-11-27 10:18:31,778 - INFO - Backend: Session 127.0.0.1:54261: Initializing FasterWhisperSTT model 'base' at 09:16:29...
+FasterWhisperSTT initialized with model_size=base, device=auto, compute_type=int8
+2025-11-27 10:18:32,233 - INFO - Backend: Session 127.0.0.1:54261: FasterWhisperSTT model 'base' initialized at 09:16:29. Duration: 0.46s
+2025-11-27 10:18:32,233 - INFO - Backend: Session 127.0.0.1:54261: CTranslate2 model for Helsinki-NLP/opus-mt-en-sk already exists at ct2_models/Helsinki-NLP--opus-mt-en-sk.
+2025-11-27 10:18:32,233 - INFO - Backend: Session 127.0.0.1:54261: Initializing CTranslate2MT for en-sk at 10:18:32...
+CTranslate2MT: Using specified device: cpu.
+CTranslate2MT initialized with model_path=ct2_models/Helsinki-NLP--opus-mt-en-sk, device=cpu
+2025-11-27 10:18:32,552 - INFO - Backend: Session 127.0.0.1:54261: CTranslate2MT initialized for en-sk on CPU (MPS fallback) at 10:18:32. Duration: 0.32s
+2025-11-27 10:18:32,552 - INFO - Backend: Session 127.0.0.1:54261: Initializing PiperTTS with 'cs_CZ-jirka-medium' at 10:18:32...
+PiperTTS: Attempting to load model 'cs_CZ-jirka-medium'.
+PiperTTS: Expected ONNX model path: /Users/yegor/Documents/STU/BP/backend/tts/piper_models/cs_CZ-jirka-medium.onnx
+PiperTTS: Expected JSON config path: /Users/yegor/Documents/STU/BP/backend/tts/piper_models/cs_CZ-jirka-medium.onnx.json
+PiperTTS: os.path.exists(onnx_model_path): True
+PiperTTS: os.path.exists(json_config_path): True
+PiperTTS: MPS device explicitly requested and available.
+PiperTTS initialized with model: cs_CZ-jirka-medium, device: mps, speaker_id: 0
+2025-11-27 10:18:33,209 - INFO - Backend: Session 127.0.0.1:54261: PiperTTS 'cs_CZ-jirka-medium' initialized at 10:18:33. Duration: 0.66s.
+2025-11-27 10:18:33,209 - INFO - Backend: Session 127.0.0.1:54261: Initializing WebRTC VAD with aggressiveness=3 at 10:18:33...
+2025-11-27 10:18:33,209 - INFO - Backend: Session 127.0.0.1:54261: WebRTC VAD initialized at 10:18:33. Duration: 0.00s
+2025-11-27 10:18:33,209 - INFO - Backend: Session 127.0.0.1:54261: All models initialized (or attempted to initialize) at 10:18:33.
+App: Sending personal models_loading_status to new websocket 127.0.0.1:54261: fully_loaded=True
+INFO:     connection open
+2025-11-27 10:18:33,210 - INFO - Client connected from 127.0.0.1:54261
+INFO:     127.0.0.1:54343 - "GET /ui/live-speech/live.html HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54343 - "GET /ui/global-styles.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54350 - "GET /ui/images/white.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54351 - "GET /ui/theme-toggle.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54348 - "GET /ui/live-speech/live-style.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54349 - "GET /ui/vendor/chart.min.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54349 - "GET /ui/live-speech/live-script.js HTTP/1.1" 200 OK
+APP: Received initialization request at 10:18:50: source_lang=en, target_lang=sk, tts_model_choice=piper, stt_model_size=base, vad_enabled_param=True, speaker_wav_path=None, speaker_text=None, speaker_lang=None
+2025-11-27 10:18:50,478 - INFO - Backend: Session http_init_client: Initializing models at 10:18:50...
+2025-11-27 10:18:50,478 - INFO - Backend: Session http_init_client: Initializing FasterWhisperSTT model 'base' at 09:16:47...
+FasterWhisperSTT initialized with model_size=base, device=auto, compute_type=int8
+2025-11-27 10:18:50,937 - INFO - Backend: Session http_init_client: FasterWhisperSTT model 'base' initialized at 09:16:48. Duration: 0.46s
+2025-11-27 10:18:50,937 - INFO - Backend: Session http_init_client: CTranslate2 model for Helsinki-NLP/opus-mt-en-sk already exists at ct2_models/Helsinki-NLP--opus-mt-en-sk.
+2025-11-27 10:18:50,937 - INFO - Backend: Session http_init_client: Initializing CTranslate2MT for en-sk at 10:18:50...
+CTranslate2MT: Using specified device: cpu.
+CTranslate2MT initialized with model_path=ct2_models/Helsinki-NLP--opus-mt-en-sk, device=cpu
+2025-11-27 10:18:51,258 - INFO - Backend: Session http_init_client: CTranslate2MT initialized for en-sk on CPU (MPS fallback) at 10:18:51. Duration: 0.32s
+2025-11-27 10:18:51,259 - INFO - Backend: Session http_init_client: Initializing PiperTTS with 'cs_CZ-jirka-medium' at 10:18:51...
+PiperTTS: Attempting to load model 'cs_CZ-jirka-medium'.
+PiperTTS: Expected ONNX model path: /Users/yegor/Documents/STU/BP/backend/tts/piper_models/cs_CZ-jirka-medium.onnx
+PiperTTS: Expected JSON config path: /Users/yegor/Documents/STU/BP/backend/tts/piper_models/cs_CZ-jirka-medium.onnx.json
+PiperTTS: os.path.exists(onnx_model_path): True
+PiperTTS: os.path.exists(json_config_path): True
+PiperTTS: MPS device explicitly requested and available.
+PiperTTS initialized with model: cs_CZ-jirka-medium, device: mps, speaker_id: 0
+2025-11-27 10:18:51,941 - INFO - Backend: Session http_init_client: PiperTTS 'cs_CZ-jirka-medium' initialized at 10:18:51. Duration: 0.68s.
+2025-11-27 10:18:51,941 - INFO - Backend: Session http_init_client: Initializing WebRTC VAD with aggressiveness=3 at 10:18:51...
+2025-11-27 10:18:51,941 - INFO - Backend: Session http_init_client: WebRTC VAD initialized at 10:18:51. Duration: 0.00s
+2025-11-27 10:18:51,941 - INFO - Backend: Session http_init_client: All models initialized (or attempted to initialize) at 10:18:51.
+APP: initialize_all_models completed at 10:18:51. Duration: 1.46s
+APP: Model status check initiated at 10:18:51
+APP: Broadcasting models_loading_status: fully_loaded=True at 10:18:51
+Error broadcasting to a connection: Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+APP: Initialization endpoint finished at 10:18:51. Total endpoint duration: 1.46s
+INFO:     127.0.0.1:54350 - "POST /initialize?source_lang=en&target_lang=sk&tts_model_choice=piper HTTP/1.1" 200 OK
+2025-11-27 10:18:51,951 - INFO - Backend: Retrieved 3 voices for user 2
+INFO:     127.0.0.1:54349 - "GET /api/voices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54351 - "GET /ui/images/black.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54353 - "WebSocket /ws" [accepted]
+App: WebSocket accepted from 127.0.0.1:54353
+2025-11-27 10:18:51,955 - INFO - Backend: Session 127.0.0.1:54353: Initializing models at 10:18:51...
+2025-11-27 10:18:51,955 - INFO - Backend: Session 127.0.0.1:54353: Initializing FasterWhisperSTT model 'base' at 09:16:49...
+FasterWhisperSTT initialized with model_size=base, device=auto, compute_type=int8
+2025-11-27 10:18:52,341 - INFO - Backend: Session 127.0.0.1:54353: FasterWhisperSTT model 'base' initialized at 09:16:49. Duration: 0.39s
+2025-11-27 10:18:52,341 - INFO - Backend: Session 127.0.0.1:54353: CTranslate2 model for Helsinki-NLP/opus-mt-en-sk already exists at ct2_models/Helsinki-NLP--opus-mt-en-sk.
+2025-11-27 10:18:52,341 - INFO - Backend: Session 127.0.0.1:54353: Initializing CTranslate2MT for en-sk at 10:18:52...
+CTranslate2MT: Using specified device: cpu.
+CTranslate2MT initialized with model_path=ct2_models/Helsinki-NLP--opus-mt-en-sk, device=cpu
+2025-11-27 10:18:52,625 - INFO - Backend: Session 127.0.0.1:54353: CTranslate2MT initialized for en-sk on CPU (MPS fallback) at 10:18:52. Duration: 0.28s
+2025-11-27 10:18:52,625 - INFO - Backend: Session 127.0.0.1:54353: Initializing PiperTTS with 'cs_CZ-jirka-medium' at 10:18:52...
+PiperTTS: Attempting to load model 'cs_CZ-jirka-medium'.
+PiperTTS: Expected ONNX model path: /Users/yegor/Documents/STU/BP/backend/tts/piper_models/cs_CZ-jirka-medium.onnx
+PiperTTS: Expected JSON config path: /Users/yegor/Documents/STU/BP/backend/tts/piper_models/cs_CZ-jirka-medium.onnx.json
+PiperTTS: os.path.exists(onnx_model_path): True
+PiperTTS: os.path.exists(json_config_path): True
+PiperTTS: MPS device explicitly requested and available.
+PiperTTS initialized with model: cs_CZ-jirka-medium, device: mps, speaker_id: 0
+2025-11-27 10:18:53,289 - INFO - Backend: Session 127.0.0.1:54353: PiperTTS 'cs_CZ-jirka-medium' initialized at 10:18:53. Duration: 0.66s.
+2025-11-27 10:18:53,289 - INFO - Backend: Session 127.0.0.1:54353: Initializing WebRTC VAD with aggressiveness=3 at 10:18:53...
+2025-11-27 10:18:53,289 - INFO - Backend: Session 127.0.0.1:54353: WebRTC VAD initialized at 10:18:53. Duration: 0.00s
+2025-11-27 10:18:53,289 - INFO - Backend: Session 127.0.0.1:54353: All models initialized (or attempted to initialize) at 10:18:53.
+App: Sending personal models_loading_status to new websocket 127.0.0.1:54353: fully_loaded=True
+INFO:     connection open
+2025-11-27 10:18:53,290 - INFO - Client connected from 127.0.0.1:54353
+APP: Received initialization request at 10:18:55: source_lang=en, target_lang=sk, tts_model_choice=xtts, stt_model_size=base, vad_enabled_param=True, speaker_wav_path=None, speaker_text=None, speaker_lang=None
+2025-11-27 10:18:55,521 - INFO - Backend: Session http_init_client: Initializing models at 10:18:55...
+2025-11-27 10:18:55,521 - INFO - Backend: Session http_init_client: FasterWhisperSTT model 'base' already initialized.
+2025-11-27 10:18:55,521 - INFO - Backend: Session http_init_client: CTranslate2MT for en-sk already initialized.
+2025-11-27 10:18:55,521 - INFO - Backend: Session http_init_client: Initializing CoquiTTS (XTTS v2) at 10:18:55...
+2025-11-27 10:18:55,521 - WARNING - CoquiTTS: XTTS v2 on MPS (Apple Silicon) may encounter 'NotImplementedError' due to limited operator support. Forcing CPU for stability.
+2025-11-27 10:18:55,521 - INFO - CoquiTTS: Initializing XTTS v2 model on device: cpu
+ > tts_models/multilingual/multi-dataset/xtts_v2 is already downloaded.
+ > Using model: xtts
+/Users/yegor/Documents/STU/BP/venv/lib/python3.11/site-packages/TTS/tts/layers/xtts/xtts_manager.py:5: UserWarning: Environment variable TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD detected, since the`weights_only` argument was not explicitly passed to `torch.load`, forcing weights_only=False.
+  self.speakers = torch.load(speaker_file_path)
+/Users/yegor/Documents/STU/BP/venv/lib/python3.11/site-packages/TTS/utils/io.py:54: UserWarning: Environment variable TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD detected, since the`weights_only` argument was not explicitly passed to `torch.load`, forcing weights_only=False.
+  return torch.load(f, map_location=map_location, **kwargs)
+GPT2InferenceModel has generative capabilities, as `prepare_inputs_for_generation` is explicitly overwritten. However, it doesn't directly inherit from `GenerationMixin`. From 👉v4.50👈 onwards, `PreTrainedModel` will NOT inherit from `GenerationMixin`, and this model will lose the ability to call `generate` and other related functions.
+  - If you're using `trust_remote_code=True`, you can get rid of this warning by loading the model with an auto class. See https://huggingface.co/docs/transformers/en/model_doc/auto#auto-classes
+  - If you are the owner of the model architecture code, please modify your model class such that it inherits from `GenerationMixin` (after `PreTrainedModel`, otherwise you'll get an exception).
+  - If you are not the owner of the model architecture class, please contact the model code owner to update it.
+2025-11-27 10:19:24,513 - INFO - CoquiTTS: XTTS v2 model loaded successfully.
+2025-11-27 10:19:24,513 - INFO - CoquiTTS: Running model warmup...
+ > Text splitted to sentences.
+['Warmup.']
+The attention mask is not set and cannot be inferred from input because pad token is same as eos token. As a consequence, you may observe unexpected behavior. Please pass your input's `attention_mask` to obtain reliable results.
+ > Processing time: 6.4577600955963135
+ > Real-time factor: 1.4869842325386249
+2025-11-27 10:19:30,982 - INFO - CoquiTTS: Model warmup completed in 6.47s
+2025-11-27 10:19:30,982 - INFO - Backend: Session http_init_client: CoquiTTS (XTTS v2) initialized at 10:19:30. Duration: 35.46s.
+2025-11-27 10:19:31,006 - INFO - Backend: Session http_init_client: WebRTC VAD already initialized.
+2025-11-27 10:19:31,006 - INFO - Backend: Session http_init_client: All models initialized (or attempted to initialize) at 10:19:31.
+APP: initialize_all_models completed at 10:19:31. Duration: 35.49s
+APP: Model status check initiated at 10:19:31
+APP: Broadcasting models_loading_status: fully_loaded=True at 10:19:31
+APP: Initialization endpoint finished at 10:19:31. Total endpoint duration: 35.49s
+INFO:     127.0.0.1:54351 - "POST /initialize?source_lang=en&target_lang=sk&tts_model_choice=xtts HTTP/1.1" 200 OK
+APP: Received initialization request at 10:19:31: source_lang=en, target_lang=sk, tts_model_choice=piper, stt_model_size=base, vad_enabled_param=True, speaker_wav_path=None, speaker_text=None, speaker_lang=None
+2025-11-27 10:19:31,022 - INFO - Backend: Session http_init_client: Initializing models at 10:19:31...
+2025-11-27 10:19:31,022 - INFO - Backend: Session http_init_client: FasterWhisperSTT model 'base' already initialized.
+2025-11-27 10:19:31,022 - INFO - Backend: Session http_init_client: CTranslate2MT for en-sk already initialized.
+2025-11-27 10:19:31,022 - INFO - Backend: Session http_init_client: Initializing PiperTTS with 'cs_CZ-jirka-medium' at 10:19:31...
+PiperTTS: Attempting to load model 'cs_CZ-jirka-medium'.
+PiperTTS: Expected ONNX model path: /Users/yegor/Documents/STU/BP/backend/tts/piper_models/cs_CZ-jirka-medium.onnx
+PiperTTS: Expected JSON config path: /Users/yegor/Documents/STU/BP/backend/tts/piper_models/cs_CZ-jirka-medium.onnx.json
+PiperTTS: os.path.exists(onnx_model_path): True
+PiperTTS: os.path.exists(json_config_path): True
+PiperTTS: MPS device explicitly requested and available.
+PiperTTS initialized with model: cs_CZ-jirka-medium, device: mps, speaker_id: 0
+2025-11-27 10:19:31,721 - INFO - Backend: Session http_init_client: PiperTTS 'cs_CZ-jirka-medium' initialized at 10:19:31. Duration: 0.70s.
+2025-11-27 10:19:31,783 - INFO - Backend: Session http_init_client: WebRTC VAD already initialized.
+2025-11-27 10:19:31,783 - INFO - Backend: Session http_init_client: All models initialized (or attempted to initialize) at 10:19:31.
+APP: initialize_all_models completed at 10:19:31. Duration: 0.76s
+APP: Model status check initiated at 10:19:31
+APP: Broadcasting models_loading_status: fully_loaded=True at 10:19:31
+APP: Initialization endpoint finished at 10:19:31. Total endpoint duration: 0.76s
+INFO:     127.0.0.1:54349 - "POST /initialize?source_lang=en&target_lang=sk&tts_model_choice=piper HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54540 - "GET /ui/live-speech/live.html HTTP/1.1" 200 OK
+2025-11-27 10:19:31,826 - ERROR - An unexpected error occurred in handle_audio_stream for 127.0.0.1:54261: Cannot call "receive" once a disconnect message has been received.
+2025-11-27 10:19:31,826 - ERROR - Backend: Error sending error message to client 127.0.0.1:54261: Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2025-11-27 10:19:31,827 - INFO - Client 127.0.0.1:54261 handler finished. Cleaning up session.
+2025-11-27 10:19:31,827 - INFO - Backend: Session 127.0.0.1:54261 removed from active_sessions. Models unloaded.
+2025-11-27 10:19:31,827 - INFO - Backend: Cleanup complete for client 127.0.0.1:54261.
+INFO:     connection closed
+INFO:     127.0.0.1:54542 - "GET /ui/images/white.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54540 - "GET /ui/live-speech/live-style.css HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:54542 - "GET /api/voices HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54546 - "WebSocket /ws" [accepted]
+App: WebSocket accepted from 127.0.0.1:54546
+2025-11-27 10:19:31,962 - INFO - Backend: Session 127.0.0.1:54546: Initializing models at 10:19:31...
+2025-11-27 10:19:31,962 - INFO - Backend: Session 127.0.0.1:54546: Initializing FasterWhisperSTT model 'base' at 09:17:29...
+FasterWhisperSTT initialized with model_size=base, device=auto, compute_type=int8
+2025-11-27 10:19:32,340 - INFO - Backend: Session 127.0.0.1:54546: FasterWhisperSTT model 'base' initialized at 09:17:29. Duration: 0.38s
+2025-11-27 10:19:32,340 - INFO - Backend: Session 127.0.0.1:54546: CTranslate2 model for Helsinki-NLP/opus-mt-en-sk already exists at ct2_models/Helsinki-NLP--opus-mt-en-sk.
+2025-11-27 10:19:32,340 - INFO - Backend: Session 127.0.0.1:54546: Initializing CTranslate2MT for en-sk at 10:19:32...
+CTranslate2MT: Using specified device: cpu.
+CTranslate2MT initialized with model_path=ct2_models/Helsinki-NLP--opus-mt-en-sk, device=cpu
+2025-11-27 10:19:32,642 - INFO - Backend: Session 127.0.0.1:54546: CTranslate2MT initialized for en-sk on CPU (MPS fallback) at 10:19:32. Duration: 0.30s
+2025-11-27 10:19:32,642 - INFO - Backend: Session 127.0.0.1:54546: Initializing PiperTTS with 'cs_CZ-jirka-medium' at 10:19:32...
+PiperTTS: Attempting to load model 'cs_CZ-jirka-medium'.
+PiperTTS: Expected ONNX model path: /Users/yegor/Documents/STU/BP/backend/tts/piper_models/cs_CZ-jirka-medium.onnx
+PiperTTS: Expected JSON config path: /Users/yegor/Documents/STU/BP/backend/tts/piper_models/cs_CZ-jirka-medium.onnx.json
+PiperTTS: os.path.exists(onnx_model_path): True
+PiperTTS: os.path.exists(json_config_path): True
+PiperTTS: MPS device explicitly requested and available.
+PiperTTS initialized with model: cs_CZ-jirka-medium, device: mps, speaker_id: 0
+2025-11-27 10:19:33,314 - INFO - Backend: Session 127.0.0.1:54546: PiperTTS 'cs_CZ-jirka-medium' initialized at 10:19:33. Duration: 0.67s.
+2025-11-27 10:19:33,314 - INFO - Backend: Session 127.0.0.1:54546: Initializing WebRTC VAD with aggressiveness=3 at 10:19:33...
+2025-11-27 10:19:33,316 - INFO - Backend: Session 127.0.0.1:54546: WebRTC VAD initialized at 10:19:33. Duration: 0.00s
+2025-11-27 10:19:33,316 - INFO - Backend: Session 127.0.0.1:54546: All models initialized (or attempted to initialize) at 10:19:33.
+App: Sending personal models_loading_status to new websocket 127.0.0.1:54546: fully_loaded=True
+INFO:     connection open
+2025-11-27 10:19:33,317 - INFO - Client connected from 127.0.0.1:54546
+INFO:     127.0.0.1:54349 - "GET /ui/live-speech/live.html HTTP/1.1" 200 OK
+2025-11-27 10:19:33,336 - ERROR - An unexpected error occurred in handle_audio_stream for 127.0.0.1:54353: Cannot call "receive" once a disconnect message has been received.
+2025-11-27 10:19:33,336 - ERROR - Backend: Error sending error message to client 127.0.0.1:54353: Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2025-11-27 10:19:33,336 - INFO - Client 127.0.0.1:54353 handler finished. Cleaning up session.
+2025-11-27 10:19:33,336 - INFO - Backend: Session 127.0.0.1:54353 removed from active_sessions. Models unloaded.
+2025-11-27 10:19:33,336 - INFO - Backend: Cleanup complete for client 127.0.0.1:54353.
+INFO:     connection closed
+INFO:     127.0.0.1:54349 - "GET /ui/live-speech/live-style.css HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:54351 - "GET /ui/images/white.png HTTP/1.1" 200 OK
+APP: Received initialization request at 10:19:33: source_lang=en, target_lang=sk, tts_model_choice=piper, stt_model_size=base, vad_enabled_param=True, speaker_wav_path=None, speaker_text=None, speaker_lang=None
+2025-11-27 10:19:33,470 - INFO - Backend: Session http_init_client: Initializing models at 10:19:33...
+2025-11-27 10:19:33,470 - INFO - Backend: Session http_init_client: FasterWhisperSTT model 'base' already initialized.
+2025-11-27 10:19:33,470 - INFO - Backend: Session http_init_client: CTranslate2MT for en-sk already initialized.
+2025-11-27 10:19:33,470 - INFO - Backend: Session http_init_client: PiperTTS model 'cs_CZ-jirka-medium' already initialized.
+2025-11-27 10:19:33,470 - INFO - Backend: Session http_init_client: WebRTC VAD already initialized.
+2025-11-27 10:19:33,470 - INFO - Backend: Session http_init_client: All models initialized (or attempted to initialize) at 10:19:33.
+APP: initialize_all_models completed at 10:19:33. Duration: 0.00s
+APP: Model status check initiated at 10:19:33
+APP: Broadcasting models_loading_status: fully_loaded=True at 10:19:33
+Error broadcasting to a connection: Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+Error broadcasting to a connection: Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+APP: Initialization endpoint finished at 10:19:33. Total endpoint duration: 0.00s
+INFO:     127.0.0.1:54349 - "POST /initialize?source_lang=en&target_lang=sk&tts_model_choice=piper HTTP/1.1" 200 OK
+2025-11-27 10:19:33,478 - INFO - Backend: Retrieved 3 voices for user 2
+INFO:     127.0.0.1:54351 - "GET /api/voices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54556 - "WebSocket /ws" [accepted]
+App: WebSocket accepted from 127.0.0.1:54556
+2025-11-27 10:19:33,501 - INFO - Backend: Session 127.0.0.1:54556: Initializing models at 10:19:33...
+2025-11-27 10:19:33,501 - INFO - Backend: Session 127.0.0.1:54556: Initializing FasterWhisperSTT model 'base' at 09:17:30...
+FasterWhisperSTT initialized with model_size=base, device=auto, compute_type=int8
+2025-11-27 10:19:33,875 - INFO - Backend: Session 127.0.0.1:54556: FasterWhisperSTT model 'base' initialized at 09:17:31. Duration: 0.37s
+2025-11-27 10:19:33,875 - INFO - Backend: Session 127.0.0.1:54556: CTranslate2 model for Helsinki-NLP/opus-mt-en-sk already exists at ct2_models/Helsinki-NLP--opus-mt-en-sk.
+2025-11-27 10:19:33,875 - INFO - Backend: Session 127.0.0.1:54556: Initializing CTranslate2MT for en-sk at 10:19:33...
+CTranslate2MT: Using specified device: cpu.
+CTranslate2MT initialized with model_path=ct2_models/Helsinki-NLP--opus-mt-en-sk, device=cpu
+2025-11-27 10:19:34,163 - INFO - Backend: Session 127.0.0.1:54556: CTranslate2MT initialized for en-sk on CPU (MPS fallback) at 10:19:34. Duration: 0.29s
+2025-11-27 10:19:34,163 - INFO - Backend: Session 127.0.0.1:54556: Initializing PiperTTS with 'cs_CZ-jirka-medium' at 10:19:34...
+PiperTTS: Attempting to load model 'cs_CZ-jirka-medium'.
+PiperTTS: Expected ONNX model path: /Users/yegor/Documents/STU/BP/backend/tts/piper_models/cs_CZ-jirka-medium.onnx
+PiperTTS: Expected JSON config path: /Users/yegor/Documents/STU/BP/backend/tts/piper_models/cs_CZ-jirka-medium.onnx.json
+PiperTTS: os.path.exists(onnx_model_path): True
+PiperTTS: os.path.exists(json_config_path): True
+PiperTTS: MPS device explicitly requested and available.
+PiperTTS initialized with model: cs_CZ-jirka-medium, device: mps, speaker_id: 0
+2025-11-27 10:19:34,827 - INFO - Backend: Session 127.0.0.1:54556: PiperTTS 'cs_CZ-jirka-medium' initialized at 10:19:34. Duration: 0.66s.
+2025-11-27 10:19:34,827 - INFO - Backend: Session 127.0.0.1:54556: Initializing WebRTC VAD with aggressiveness=3 at 10:19:34...
+2025-11-27 10:19:34,827 - INFO - Backend: Session 127.0.0.1:54556: WebRTC VAD initialized at 10:19:34. Duration: 0.00s
+2025-11-27 10:19:34,827 - INFO - Backend: Session 127.0.0.1:54556: All models initialized (or attempted to initialize) at 10:19:34.
+App: Sending personal models_loading_status to new websocket 127.0.0.1:54556: fully_loaded=True
+INFO:     connection open
+2025-11-27 10:19:34,828 - INFO - Client connected from 127.0.0.1:54556
+INFO:     127.0.0.1:54609 - "GET /ui/live-speech/audio-processor.js HTTP/1.1" 200 OK
+2025-11-27 10:20:16,037 - INFO - Backend: Pre-VAD buffer RMS: 0.1406 (Threshold: 0.02)
+2025-11-27 10:20:16,037 - INFO - Backend: Pre-VAD silence threshold met. Starting VAD processing.
+2025-11-27 10:20:16,038 - INFO - Backend: Speech segment STARTED at 116293.265s
+2025-11-27 10:20:30,564 - WARNING - Backend: Speech segment exceeded 15s (15.02s). Forcing processing.
+2025-11-27 10:20:30,565 - INFO - Backend: Processing speech segment (Final: True). Session Config: source_lang=en, target_lang=sk, TTS choice=piper, VAD enabled: True, Speaker: None
+2025-11-27 10:20:30,567 - INFO - Processing audio with duration 00:15.020
+2025-11-27 10:20:31,100 - INFO - Backend: Session 127.0.0.1:54556: STT completed. Transcribed: ' Hello, can you hear me?' (Detected Lang: en). Time: 0.54s. Input->STT Latency: 0.54s
+Translated ' Hello, can you hear me?' (en) to 'Haló, počujete ma?' (sk) in 0.0645s
+2025-11-27 10:20:31,166 - INFO - Backend: Session 127.0.0.1:54556: MT completed for en-sk. Translated: 'Haló, počujete ma?'. Time: 0.07s
+2025-11-27 10:20:31,166 - INFO - Backend: Session 127.0.0.1:54556: Starting TTS synthesis...
+2025-11-27 10:20:31,166 - INFO - Backend: Session 127.0.0.1:54556: Starting Piper TTS synthesis...
+Piper synthesized text: 'Haló, počujete ma?' in 0.1153s (language: sk, speaker: 0)
+2025-11-27 10:20:31,285 - INFO - Backend: Session 127.0.0.1:54556: TTS completed. Time: 0.12s
+2025-11-27 10:20:31,285 - INFO - Backend: Sending final_metrics: {'stt_time': 0.5350932919973275, 'mt_time': 0.06541404100426007, 'tts_time': 0.1155910419911379, 'input_to_stt_latency': 0.5360182090080343, 'total_latency': 0.7160983749927254}
+2025-11-27 10:20:31,289 - INFO - Backend: Pre-VAD buffer RMS: 0.0665 (Threshold: 0.02)
+2025-11-27 10:20:31,289 - INFO - Backend: Pre-VAD silence threshold met. Starting VAD processing.
+2025-11-27 10:20:31,289 - INFO - Backend: Speech segment STARTED at 116308.517s
+2025-11-27 10:20:33,228 - WARNING - Backend: Received an all-zero audio chunk. Skipping processing.
+2025-11-27 10:20:33,258 - WARNING - Backend: Received an all-zero audio chunk. Skipping processing.
+INFO:     127.0.0.1:54618 - "GET /ui/live-speech/live-style.css HTTP/1.1" 304 Not Modified
+2025-11-27 10:20:57,887 - ERROR - An unexpected error occurred in handle_audio_stream for 127.0.0.1:54546: Cannot call "receive" once a disconnect message has been received.
+2025-11-27 10:20:57,887 - ERROR - Backend: Error sending error message to client 127.0.0.1:54546: Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2025-11-27 10:20:57,887 - INFO - Client 127.0.0.1:54546 handler finished. Cleaning up session.
+2025-11-27 10:20:57,887 - INFO - Backend: Session 127.0.0.1:54546 removed from active_sessions. Models unloaded.
+2025-11-27 10:20:57,887 - INFO - Backend: Cleanup complete for client 127.0.0.1:54546.
+INFO:     connection closed
+^CINFO:     Shutting down
+2025-11-27 10:21:25,241 - ERROR - An unexpected error occurred in handle_audio_stream for 127.0.0.1:54556: Cannot call "receive" once a disconnect message has been received.
+2025-11-27 10:21:25,242 - ERROR - Backend: Error sending error message to client 127.0.0.1:54556: Unexpected ASGI message 'websocket.send', after sending 'websocket.close' or response already completed.
+2025-11-27 10:21:25,242 - INFO - Client 127.0.0.1:54556 handler finished. Cleaning up session.
+2025-11-27 10:21:25,242 - INFO - Backend: Session 127.0.0.1:54556 removed from active_sessions. Models unloaded.
+2025-11-27 10:21:25,242 - INFO - Backend: Cleanup complete for client 127.0.0.1:54556.
+INFO:     connection closed
+INFO:     Waiting for application shutdown.
+APP: Application shutdown completed at 10:21:25
+INFO:     Application shutdown complete.
+INFO:     Finished server process [56277]
+
+(venv) (base) yegor@tourist BP % 

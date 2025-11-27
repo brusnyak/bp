@@ -1,30 +1,129 @@
-hey there, i'm starting to work on my @/bp project - live speech translation during the call/conference.
+Basic information
+Type of work:	Bachelor thesis
+Topic:	Preklad reči v reálnom čase počas online konferencie
+Title of topic in English:	Real Time Speech Translation in Online Conference
+Progress of registration:	approved
+State of topic:	approved (doc. Ing. Radoslav Vargic, PhD. - Study programme supervisor)
+Thesis supervisor:	I. Minárik
+Faculty:	Faculty of Electrical Engineering and Information Technology
+Supervising department:	Institute of Multimedia Information and Communication Technologies - FEI
+Max. no. of students:	1
+Academic year:	2024/2025
+Proposed by:	Ing. Ivan Minárik
+Summary:	Online konferencie často narážajú na jazykové bariéry medzi účastníkmi. 
+Moderné technológie na rozpoznávanie, preklad a syntézu reči umožňujú tieto prekážky prekonávať. 
+Cieľom práce je vytvoriť prototyp systému, ktorý zabezpečí preklad reči v reálnom čase medzi angličtinou a ďalším vybraným jazykom počas online stretnutí, s využitím dostupných nástrojov a so zameraním na backendové riešenie a overenie funkčnosti. 
+Úlohy: 1. Preskúmajte existujúce technológie na rozpoznávanie reči, strojový preklad a syntézu reči pre angličtinu a vybraný cieľový jazyk. 
+2. Navrhnite architektúru a implementujte prototyp systému pre preklad reči v reálnom čase s využitím vhodných nástrojov (napr. Whisper, prekladové API, TTS). 
+3. Realizujte jednoduché používateľské rozhranie na testovanie prototypu (napríklad zobrazenie titulkov alebo prehrávanie syntetizovanej reči). 
+4. Otestujte funkčnosť riešenia a analyzujte presnosť a oneskorenie prekladu v typickom online konferenčnom prostredí.
 
-it will be a simple backend + frontend project based on modules -> STT, MT and TTS.
-
-i want you to check entire information i have about the project, let me know if you have any questions.
-
-then help me create modular tests, cmpare models, after decision and succesfull test update requirements to include all necesaty dependencies.
-
-the crucial and hard thing will be dependencies configuration.
-so please note, i'm programing on mac with m1 pro chip and mps support.
-using conda env ->(base) yegor@tourist BP % conda deactivate && conda activate BP
-(BP) yegor@tourist BP % 
-
-the testing will happen based on the @"/test/My test speech_xtts_speaker_clean.wav" and @/test/Voice-Training.wav for voice training of TTS
 
 
-check info, and help me with STT models, we should test many of them on 'my test speech'.  mlx, faster-whisper, deepspeech, Wav2vec, kaldi, SpeechBrain, groq-whisper-large-v3-turbo, Kyutai STT, Agora's Real-Time Speech to Text 
+**UI/UX Design Guidance - Inspired by Lingonberry Mail**
 
-next for mt we should test:
-marian, SeamlessM4T-v2 or NLLB-200, model mentioned in @/comaprison.txt, Qwen-MT, opus mt
+This document outlines the design principles, color palette, typography, and layout patterns to be applied to the frontend, drawing heavily from the "Lingonberry Mail" website (`ui/index.html` and `ui/css/styles.css`). The goal is to achieve a sleek, modern, and stylish aesthetic with a focus on clear, full-screen content sections and intuitive navigation.
 
-after for tts we should test models that support voice cloning/training, multilanguage, and simple pretrained voice but super fast:
-chatterbox, piper, Mozilla TTS, ChatTTS (i tied before xtts v2, and it's too slow for live speech translation), MeloTTS, Mimic 3,  Bark, Higgs Audio V2
+---
 
-but we should also make our reaserch and decision and which is more prior to this project. and remeber that we only need to test it step by step. first with stt then mt and finaly when the first 2 are fit/set and are best with minimal latency - tts.
+**1. Color Palette & Theming:**
 
-info of the project @/description.txt @/Makefile 
+The primary color scheme will be based on the "Lingonberry Mail" design, adapted for both light and complementary dark themes.
 
-the project should be built on free/open source. be robust/fast and multilanguage
-main testing in en->sk and vice versa
+**Light Theme (Default - Lingonberry Mail Inspired):**
+*   `--primary-color`: `#C41E3A` (Lingonberry Red) - Used for main accents, CTA buttons, active states.
+*   `--secondary-color`: `#666666` (Text Light) - Used for secondary text, subtle elements.
+*   `--accent-color`: `#468742` (Leaf Green) - Used for hover states, success indicators, complementary accents.
+*   `--danger-color`: `#D32F2F` (Darker Red) - Used for error states, warnings.
+*   `--background-color-start-light`: `#FFF8E1` (Warm Cream) - Start of page background gradient.
+*   `--background-color-end-light`: `#F5F5F5` (Soft Gray) - End of page background gradient.
+*   `--surface-color`: `#FFFFFF` (White) - Background for content containers/cards.
+*   `--text-color`: `#333333` (Text Dark) - Primary text color.
+*   `--border-color`: `#E0E0E0` (Light Gray) - Subtle borders.
+*   `--shadow-color`: `rgba(0, 0, 0, 0.1)` - Soft shadows.
+*   `--log-info-color`: `#333333`
+*   `--log-success-color`: `#00A300`
+*   `--log-warning-color`: `#FFA500`
+*   `--log-error-color`: `#C41E3A`
+*   `--secondary-text-grey`: `#666666`
+*   `--secondary-text-deep-blue`: `#333333`
+
+**Dark Theme (Complementary):**
+*   `--primary-color`: `#E94560` (Slightly brighter Lingonberry Red) - Main accents.
+*   `--secondary-color`: `#A0A0A0` (Lighter grey) - Secondary text.
+*   `--accent-color`: `#4CAF50` (Green accent) - Hover states, success.
+*   `--danger-color`: `#FF5252` (Red danger) - Error states.
+*   `--background-color-start-dark`: `#121212` (Very dark grey/black) - Start of page background gradient.
+*   `--background-color-end-dark`: `#1E1E1E` (Slightly lighter dark grey) - End of page background gradient.
+*   `--surface-color`: `#2C2C2C` (Darker surface) - Background for content containers/cards.
+*   `--text-color`: `#E0E0E0` (Light text) - Primary text color.
+*   `--border-color`: `#444444` (Darker border) - Borders.
+*   `--shadow-color`: `rgba(0, 0, 0, 0.8)` - Stronger shadows.
+*   `--log-info-color`: `#ffffff`
+*   `--log-success-color`: `#74d878`
+*   `--log-warning-color`: `#FFEB3B`
+*   `--log-error-color`: `#EF9A9A`
+*   `--secondary-text-grey`: `#888888`
+*   `--secondary-text-deep-blue`: `#666666`
+
+---
+
+**2. Typography:**
+*   **Headings (H1, H2, H3, H4)**: `Playfair Display`, serif (for a sophisticated, impactful look).
+*   **Body Text (Paragraphs, Lists, Buttons)**: `Montserrat`, sans-serif (for readability and modern feel).
+*   **Font Loading**: Ensure these fonts are correctly loaded (e.g., via Google Fonts in `frontend/src/app/layout.tsx` or `globals.css`).
+
+---
+
+**3. Layout & Structure (Home Page - `frontend/src/app/page.tsx`):**
+
+*   **Full-Screen Sections ("Slideshow" Effect)**:
+    *   Each major section (Hero, About, Testimonials, FAQ) should occupy `min-h-screen` and be designed as a distinct "slide".
+    *   Content within each section should be centered horizontally using `max-w-6xl mx-auto` (or similar responsive container).
+    *   Sections should have a `relative` position and `overflow-hidden` to manage internal elements and decorations.
+    *   Implement smooth scrolling between sections (e.g., using `scroll-smooth` on `html` or `scroll-behavior: smooth` in CSS, combined with `scroll-mt-20` for fixed header offset).
+*   **"Floating Container" for Content**:
+    *   Within each full-screen section, the actual content (text, images, diagrams) should reside within a "floating container" (e.g., a `div` with `bg-surface-color`, `p-8`, `rounded-xl`, `shadow-lg`, `border border-border-color`). This creates a visual separation from the main page background.
+    *   Text alignment within these containers should be carefully managed (e.g., `text-center` for titles, `text-left` for paragraphs as appropriate).
+*   **Header (`Header` component)**:
+    *   Fixed at the top (`fixed w-full top-0 z-40`).
+    *   Initially transparent background, but could potentially change on scroll (advanced, optional).
+    *   Uses `font-montserrat` for navigation links and buttons.
+    *   Theme toggle icon should correctly reflect the current theme and change color with the theme.
+    *   Login/Register button should use `bg-primary-color` and `text-white`.
+*   **Footer (`Footer` component)**:
+    *   Should be a distinct section at the bottom, using `p-8 text-center text-text-color font-montserrat`.
+    *   Copyright text: `© {currentYear}/{nextYear} Lingonberry`.
+
+---
+
+**4. Floating Sidebar Navigation (`FloatingSidebar` component):**
+
+*   **"Bubble" Aesthetic**: The sidebar should consist of small, circular "bubbles" (e.g., `w-5 h-5 rounded-full`) for each section.
+*   **Positioning**: Fixed on the left side of the screen (`fixed left-8 top-1/2 -translate-y-1/2 z-30`).
+*   **Visibility**:
+    *   Hidden when the user is in the `HeroSection` (or scrolled to the very top).
+    *   Visible when scrolling down past the `HeroSection`.
+    *   Smooth transition for appearance/disappearance.
+*   **Active State**: The active bubble should be visually distinct (e.g., `bg-primary-color scale-125 shadow-md`) and display its corresponding section label on hover or when active.
+*   **Interaction**: Clicking a bubble should smoothly scroll to the corresponding section.
+
+---
+
+**5. Diagrams and Visuals:**
+
+*   **Mermaid Integration**: The `MermaidChart` component should be used to render the pipeline diagrams visually within the `AboutSection`. Ensure it respects the theme colors (e.g., by passing theme to `mermaid.initialize`).
+*   **Illustrations/Animations**: Consider adding placeholder `img` tags for illustrative images (e.g., `images/berry-growth.gif`, `images/languages.png` from `ui/`) in relevant sections (e.g., About, Testimonials) to enhance visual appeal. These can be replaced with actual assets later.
+
+---
+
+**6. General Styling Principles:**
+
+*   **Whitespace**: Utilize ample whitespace to create a clean and uncluttered look, similar to "Lingonberry Mail".
+*   **Subtle Shadows & Borders**: Use `shadow-lg` and `border border-border-color` to give elements a "floating" or defined appearance without being heavy.
+*   **Transitions**: Apply smooth `transition-all duration-300 ease-in-out` to interactive elements (buttons, links, sidebar items) for a polished feel.
+*   **Responsiveness**: Ensure all elements are fully responsive and adapt well to different screen sizes.
+
+---
+
+This detailed guidance should provide a clear direction for the next phase of UI development.

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+    <title>Give Feedback</title>
+    <link rel="stylesheet" href="/ui/global-styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <a href="javascript:history.back()" class="back-button">
+          <span class="material-symbols-outlined">arrow_back</span>
+          Back
+        </a>
+        <div class="theme-toggle-wrapper">
+          <button
+            id="theme-toggle"
+            class="theme-toggle-btn"
+            aria-label="Toggle theme"
+          >
+            <span class="material-symbols-outlined"></span>
+          </button>
+        </div>
+      </div>
+      <div class="content-section floating-container">
+        <h1>Give Feedback</h1>
+        <p>
+          We value your feedback! Please use the form below to share your
+          thoughts, suggestions, or report any issues you encounter while using
+          the Real-Time Speech Translation application.
+        </p>
+
+        <form id="feedbackForm" class="feedback-form">
+          <div class="form-group">
+            <label for="feedbackName">Your Name (Optional)</label>
+            <input type="text" id="feedbackName" placeholder="John Doe" />
+          </div>
+          <div class="form-group">
+            <label for="feedbackEmail">Your Email (Optional)</label>
+            <input
+              type="email"
+              id="feedbackEmail"
+              placeholder="your@example.com"
+            />
+          </div>
+          <div class="form-group">
+            <label for="feedbackType">Feedback Type</label>
+            <select id="feedbackType" required>
+              <option value="">Select a type</option>
+              <option value="suggestion">Suggestion</option>
+              <option value="bug">Bug Report</option>
+              <option value="general">General Feedback</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="feedbackMessage">Message</label>
+            <textarea
+              id="feedbackMessage"
+              rows="6"
+              placeholder="Please describe your feedback or issue in detail..."
+              required
+            ></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Submit Feedback</button>
+        </form>
+        <div id="feedbackMessageStatus" class="auth-message"></div>
+      </div>
+    </div>
+    <script src="/ui/theme-toggle.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const feedbackForm = document.getElementById("feedbackForm");
+        const feedbackMessageStatus = document.getElementById(
+          "feedbackMessageStatus"
+        );
+
+        if (feedbackForm) {
+          feedbackForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const name = document.getElementById("feedbackName").value;
+            const email = document.getElementById("feedbackEmail").value;
+            const type = document.getElementById("feedbackType").value;
+            const message = document.getElementById("feedbackMessage").value;
+
+            // In a real application, you would send this data to a backend API
+            console.log("Feedback Submitted:", { name, email, type, message });
+
+            // Simulate API call
+            try {
+              // const response = await fetch('/api/feedback', {
+              //     method: 'POST',
+              //     headers: {
+              //         'Content-Type': 'application/json',
+              //     },
+              //     body: JSON.stringify({ name, email, type, message }),
+              // });
+              // const data = await response.json();
+
+              // if (response.ok) {
+              feedbackMessageStatus.textContent =
+                "Thank you for your feedback!";
+              feedbackMessageStatus.classList.remove("error");
+              feedbackMessageStatus.classList.add("success");
+              feedbackForm.reset();
+              // } else {
+              //     feedbackMessageStatus.textContent = data.message || 'Failed to submit feedback.';
+              //     feedbackMessageStatus.classList.remove('success');
+              //     feedbackMessageStatus.classList.add('error');
+              // }
+            } catch (error) {
+              console.error("Error submitting feedback:", error);
+              feedbackMessageStatus.textContent =
+                "Network error or server unreachable.";
+              feedbackMessageStatus.classList.remove("success");
+              feedbackMessageStatus.classList.add("error");
+            }
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

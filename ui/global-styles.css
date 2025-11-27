@@ -1,0 +1,381 @@
+/* Global CSS Variables for Theming */
+
+:root {
+    /* Light Theme (Default) */
+    --primary-color: #C41E3A; /* Lingonberry Red */
+    --primary-color-dark: #8A0F24; /* Deep Berry */
+    --secondary-color: #666666; /* Text Light */
+    --accent-color: #4CAF50; /* Green accent */
+    --danger-color: #D32F2F; /* Darker Red */
+    --background-color-start: #F7F9FC; /* Winter Snow */
+    --background-color-end: #E6EEF2; /* Misty Fjord */
+    --surface-color: #FFFFFF; /* White */
+    --text-color: #333333; /* Text Dark */
+    --text-color-rgb: 51, 51, 51; /* RGB for dynamic opacity */
+    --border-color: #E0E0E0; /* Light Gray */
+    --shadow-color: rgba(0, 0, 0, 0.1); /* Soft shadows */
+    --log-info-color: #333333;
+    --log-success-color: #00A300;
+    --log-warning-color: #FFA500;
+    --log-error-color: #D32F2F;
+    --secondary-text-grey: #666666;
+    --secondary-text-deep-blue: #333333;
+
+    /* New Color Palette Variables */
+    --lingonberry-red: #C41E3A;
+    --light-berry: #fff9f9;
+    --dark-purple: #0A1C4F; /* Updated to faculty's RGB: R: 10, G: 28, B: 79 */
+    --soft-gray: #F5F5F5;
+    --light-gray: #E0E0E0;
+    --dark-blue: #19252C;
+    --white: #FFFFFF;
+    --text-dark: #333333;
+    --text-light: #666666;
+    --warm-cream: #FFF8E1;
+    --highlight2: #ff8484;
+    --deep-berry: #8A0F24;
+    --berry-juice: #e6cfd4;
+    --forest-green: #2C5545;
+    --leaf-green: #468742;
+    --pine-light: #f1fff0;
+    --nordic-sky: #A4C8E1;
+    --winter-snow: #F7F9FC;
+    --autumn-leaf: #D2691E;
+    --birch-bark: #fef9ee;
+    --misty-fjord: #E6EEF2;
+    --language: #ebe5f0;
+    --green: #00A300;
+    --orange: #FFA500;
+
+    /* New Section Colors */
+    --architecture-blue: #f6f4fd;
+    --implementation-gray: #f5f5f5;
+
+    /* Theme-agnostic section background colors for default mode */
+    --section-bg-hero: var(--dark-blue);
+    --section-bg-demo: var(--winter-snow);
+    --section-bg-features: var(--light-berry);
+    --section-bg-how-to: var(--birch-bark);
+    --section-bg-about: var(--misty-fjord);
+    --section-bg-pipeline: var(--pine-light);
+    --section-bg-faq: var(--winter-snow); /* Light background for FAQ */
+
+    /* Table Category Colors */
+    --table-frontend-color: #E0F7FA; /* Light Cyan */
+    --table-backend-color: #FFF3E0; /* Light Orange */
+    --table-deployment-color: #E8F5E9; /* Light Green */
+
+    /* Typography */
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Montserrat', sans-serif;
+}
+
+[data-theme="dark"] {
+    /* Dark Theme (Deep Blue/Purple inspired by UX Walkaround) */
+    --primary-color: #FF4081; /* Vibrant Pink/Red for accents */
+    --primary-color-dark: #D81B60; /* Darker shade for hover states */
+    --secondary-color: #A0A0A0; /* Lighter grey */
+    --accent-color: #4CAF50; /* Green accent */
+    --danger-color: #FF5252; /* Red danger */
+    --background-color-start: #1A1A2E; /* Deep, dark blue/purple */
+    --background-color-end: #2C2C4A; /* Slightly lighter dark blue/purple for sections */
+    --surface-color: #2C2C4A; /* Darker surface for cards */
+    --text-color: #E0E0E0; /* Light text */
+    --text-color-rgb: 224, 224, 224; /* RGB for dynamic opacity */
+    --border-color: #444444; /* Darker border */
+    --shadow-color: rgba(0, 0, 0, 0.8); /* Stronger shadows */
+    --log-info-color: #ffffff;
+    --log-success-color: #74d878;
+    --log-warning-color: #FFEB3B;
+    --log-error-color: #EF9A9A;
+    --secondary-text-grey: #888888;
+    --secondary-text-deep-blue: #666666;
+    --faq-section-bg: #30304b; /* Dark background for FAQ section */
+
+    /* Theme-agnostic section background colors for default mode - Dark Theme */
+    --section-bg-hero: var(--background-color-start); /* Use dark background for hero */
+    --section-bg-demo: var(--background-color-end); /* Use slightly lighter dark for demo */
+    --section-bg-features: #3A3A5E; /* A distinct dark shade */
+    --section-bg-how-to: #4A4A6E; /* Another distinct dark shade */
+    --section-bg-about: var(--background-color-end); /* Use slightly lighter dark for about */
+    --section-bg-pipeline: #3A3A5E; /* A distinct dark shade */
+    --section-bg-faq: var(--faq-section-bg); /* Dark background for FAQ */
+}
+
+/* Base Styles */
+body {
+    font-family: var(--font-body);
+    color: var(--text-color);
+    background: linear-gradient(135deg, var(--background-color-start) 0%, var(--background-color-end) 100%);
+    min-height: 100vh;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-heading);
+    color: var(--text-color);
+}
+
+/* General styles for new pages */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 1.5rem;
+}
+
+.header .back-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: var(--text-color);
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.header .back-button:hover {
+    color: var(--primary-color);
+}
+
+.header .back-button .material-symbols-outlined {
+    font-size: 1.5rem;
+}
+
+.header .theme-toggle-wrapper {
+    position: static;
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header .theme-toggle-btn {
+    font-size: 1.8rem;
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+}
+
+.header .theme-toggle-btn:hover {
+    color: var(--primary-color);
+}
+
+.content-section.floating-container {
+    background: var(--surface-color);
+    padding: 2.5rem;
+    border-radius: 1.25rem;
+    box-shadow: 0 1.25rem 2.5rem var(--shadow-color);
+    border: 1px solid var(--border-color);
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.content-section.floating-container h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2.5rem;
+    color: var(--primary-color);
+}
+
+.content-section.floating-container h2 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.content-section.floating-container p {
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.content-section.floating-container ul {
+    list-style: disc;
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.content-section.floating-container ul li {
+    margin-bottom: 0.5rem;
+}
+
+.content-section.floating-container a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: text-decoration 0.3s ease;
+}
+
+.content-section.floating-container a:hover {
+    text-decoration: underline;
+}
+
+/* FAQ Specific Styles */
+.faq-item {
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    background-color: var(--surface-color); /* Ensure faq items have a theme-aware background */
+}
+
+.faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background-color: var(--background-color-end);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.faq-question:hover {
+    background-color: var(--border-color);
+}
+
+.faq-question h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+.faq-icon .material-symbols-outlined {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    transition: transform 0.3s ease;
+}
+
+.faq-answer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--surface-color);
+}
+
+.faq-answer.hidden {
+    display: none;
+}
+
+/* Feedback Form Specific Styles */
+.feedback-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.feedback-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.feedback-form input[type="text"],
+.feedback-form input[type="email"],
+.feedback-form select,
+.feedback-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    background-color: var(--background-color-end);
+    color: var(--text-color);
+    transition: border-color 0.3s ease;
+}
+
+.feedback-form input:focus,
+.feedback-form select:focus,
+.feedback-form textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.feedback-form textarea {
+    resize: vertical;
+}
+
+.feedback-form .btn-primary {
+    width: auto;
+    padding: 0.75rem 2rem;
+    margin-top: 1rem;
+}
+
+/* Reusable Components - Placeholder, will be expanded */
+.btn {
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: var(--surface-color);
+}
+
+.btn-primary:hover {
+    background: var(--primary-color);
+    /* Adjust hover color if needed */
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: var(--surface-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.floating-container {
+    background: var(--surface-color);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px var(--shadow-color);
+    border: 1px solid var(--border-color);
+}
+
+.modal-content {
+    background: var(--surface-color);
+    color: var(--text-color);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+.error {
+    background: var(--danger-color);
+    color: var(--surface-color);
+}
+
+.success {
+    background: var(--accent-color);
+    color: var(--surface-color);
+}

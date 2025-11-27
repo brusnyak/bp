@@ -1,2 +1,0 @@
-Please place your Slovak test speech audio file (e.g., slovak_test_speech.wav) in the 'test/' directory.
-This file serves as a placeholder.

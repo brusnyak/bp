@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark light">
+    <title>Authentication</title>
+    <link rel="stylesheet" href="/ui/global-styles.css">
+    <link rel="stylesheet" href="auth.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+</head>
+<body>
+    <div class="auth-container">
+            <div class="auth-card">
+                <div class="theme-toggle-wrapper">
+                    <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
+                        <span class="material-symbols-outlined"></span>
+                    </button>
+                </div>
+                <div class="auth-header">
+                    <h1>🌐 Live Speech Translation</h1>
+                    <p>Real-time translation with voice cloning</p>
+                </div>
+                <div class="auth-tabs">
+                    <button id="login-tab" class="tab-button active">Login</button>
+                    <button id="register-tab" class="tab-button">Register</button>
+                </div>
+
+            <div id="login-form" class="auth-form">
+                <h2>Login to your account</h2>
+                <form>
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" placeholder="your@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="auth-button">Login</button>
+                </form>
+                <div class="social-login">
+                    <button class="google-button">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_of_Google__G_Suite.svg" alt="Google icon" width="20" height="20">
+                        Sign in with Google
+                    </button>
+                </div>
+            </div>
+
+            <div id="register-form" class="auth-form hidden">
+                <h2>Create a new account</h2>
+                <form>
+                    <div class="form-group">
+                        <label for="register-username">Username</label>
+                        <input type="text" id="register-username" placeholder="yourusername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" placeholder="your@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Password</label>
+                        <input type="password" id="register-password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="auth-button">Register</button>
+                </form>
+                <div class="social-login">
+                    <button class="google-button">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_of_Google__G_Suite.svg" alt="Google icon" width="20" height="20">
+                        Sign up with Google
+                    </button>
+                </div>
+            </div>
+            <div id="auth-message" class="auth-message"></div>
+        </div>
+    </div>
+    <script src="/ui/theme-toggle.js"></script>
+    <script src="auth.js"></script>
+</body>
+</html>

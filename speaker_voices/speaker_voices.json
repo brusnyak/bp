@@ -1,0 +1,26 @@
+[
+  {
+    "id": "64d5355e-347c-4f8e-b991-4d7744254257",
+    "name": "Can you hear me_",
+    "language": "en",
+    "path": "speaker_voices/Can you hear me_.wav",
+    "transcribed_text": " Hey laddy can you hear me well?",
+    "user_id": null
+  },
+  {
+    "id": "fd2dd830-c257-4b45-89d0-ac6097518e0e",
+    "name": "My test speech_xtts_speaker_clean",
+    "language": "en",
+    "path": "speaker_voices/My test speech_xtts_speaker_clean.wav",
+    "transcribed_text": " In this experiment, the system converts spoken English into text.  Translate it into Slava and then send the sizes it back into speech.  The process involves three stages, speech recognition, machine translation and text to speech.  Each model introduces a small delay, so we will measure the overall latency.  The main objective is to achieve natural communication despite language barriers.",
+    "user_id": null
+  },
+  {
+    "id": "56a075c1-5507-41e7-906c-bd73c1e69a46",
+    "name": "hello",
+    "language": "en",
+    "path": "speaker_voices/hello.wav",
+    "transcribed_text": " Hello, this is a test of my voice for cloning purposes.",
+    "user_id": null
+  }
+]

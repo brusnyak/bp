@@ -1,0 +1,1616 @@
+/* General Layout */
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    scroll-behavior: smooth;
+    font-family: var(--font-body); /* Ensure body uses global font */
+    color: var(--text-color); /* Ensure body text uses global color */
+    background-color: var(--background-color-start); /* Consistent background */
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem; /* Increased padding for better spacing */
+}
+
+.content-container {
+    padding: 8rem 0; /* Increased padding for more breathing room */
+    position: relative;
+    overflow: hidden;
+}
+
+.full-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column; /* Allow content to stack vertically */
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    color: var(--text-color);
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+h1 { font-size: 3.5rem; }
+h2 { font-size: 2.5rem; }
+h3 { font-size: 1.8rem; }
+h4 { font-size: 1.4rem; }
+
+p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+}
+
+ul, ol {
+    list-style-position: inside;
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+    text-align: left; /* Default to left align for lists */
+}
+
+ul li, ol li {
+    color: var(--text-color);
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+}
+
+/* Links */
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--primary-color-dark);
+    text-decoration: underline;
+}
+
+/* Navigation Bar */
+.main-nav {
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 40;
+    background-color: transparent;
+    padding: 1rem 0;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.main-nav.scrolled {
+    background-color: var(--surface-color);
+    box-shadow: 0 2px 10px var(--shadow-color);
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem; /* Add gap for spacing between columns */
+}
+
+.nav-column {
+    display: flex;
+    align-items: center;
+}
+
+.nav-column.left-column {
+    flex-grow: 0; /* Don't grow */
+}
+
+.nav-column.center-column {
+    flex-grow: 1; /* Allow center column to take available space */
+    justify-content: center; /* Center the title */
+}
+
+.nav-column.right-column {
+    flex-grow: 0; /* Don't grow */
+    justify-content: flex-end; /* Align items to the right */
+}
+
+.nav-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: var(--text-color);
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    white-space: nowrap; /* Prevent wrapping */
+}
+
+.nav-title .material-symbols-outlined {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+}
+
+.nav-cta .cta-button {
+    background-color: var(--primary-color);
+    color: var(--surface-color);
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    white-space: nowrap; /* Prevent wrapping */
+}
+
+.nav-cta .cta-button:hover {
+    transform: translateY(-2px);
+}
+
+/* Hamburger Menu (Mobile) */
+.hamburger-menu {
+    display: block; /* Always show hamburger menu */
+    position: relative;
+    z-index: 50;
+}
+
+.hamburger-icon {
+    width: 30px;
+    height: 20px;
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.hamburger-icon span {
+    display: block;
+    height: 2px;
+    width: 100%;
+    background-color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+.hamburger-menu.open .hamburger-icon span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-menu.open .hamburger-icon span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger-menu.open .hamburger-icon span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
+
+.menu-containers {
+    display: none; /* Hidden by default */
+    position: absolute;
+    top: calc(100% + 10px); /* Position below the nav */
+    left: 0;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 5px 15px var(--shadow-color);
+    min-width: 200px;
+    z-index: 45; /* Ensure it's above other content but below hamburger icon */
+}
+
+.hamburger-menu.open .menu-containers {
+    display: block;
+}
+
+.menu-container h3 {
+    font-size: 1.1rem;
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    color: var(--primary-color);
+}
+
+.menu-container ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu-container ul li a {
+    display: block;
+    padding: 0.5rem 0;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.menu-container ul li a:hover {
+    color: var(--primary-color);
+}
+
+.menu-container.mobile-theme-toggle {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.menu-container.mobile-theme-toggle h3 {
+    margin-bottom: 0.5rem;
+}
+
+/* Theme Toggle in Nav */
+.main-nav .theme-toggle-wrapper {
+    margin-left: 1rem;
+    position: static;
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.main-nav .theme-toggle-btn {
+    font-size: 1.8rem;
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+}
+
+.main-nav .theme-toggle-btn:hover {
+    color: var(--primary-color);
+}
+
+/* Hide header in thesis mode */
+.main-nav.hide-in-thesis-mode {
+    transform: translateY(-100%);
+}
+
+/* Hide header on scroll down in default mode */
+.main-nav.nav-hidden {
+    transform: translateY(-100%);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .main-nav .nav-cta,
+    .main-nav .theme-toggle-wrapper {
+        display: none; /* Hide CTA and theme toggle in nav for mobile */
+    }
+
+    .hamburger-menu {
+        display: block; /* Ensure hamburger menu is always visible on small screens */
+    }
+}
+
+/* Hero Section */
+.hero {
+    background: linear-gradient(135deg, var(--background-color-start) 0%, var(--background-color-end) 100%);
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding-top: 80px; /* Offset for fixed nav */
+}
+
+/* Full-screen sections with different colors */
+.content-container.full-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6rem 0; /* Ensure consistent padding */
+}
+
+/* Default Mode Section Colors */
+/* Default Mode Section Colors */
+.default-mode-section #hero {
+    background-color: var(--section-bg-hero);
+    color: var(--text-color); /* Use theme-agnostic text color */
+}
+
+.default-mode-section #demo {
+    background-color: var(--section-bg-demo);
+    color: var(--text-color); /* Use theme-agnostic text color */
+}
+
+.default-mode-section #features {
+    background-color: var(--section-bg-features);
+    color: var(--text-color); /* Use theme-agnostic text color */
+}
+
+.default-mode-section #how-to {
+    background-color: var(--section-bg-how-to);
+    color: var(--text-color); /* Use theme-agnostic text color */
+}
+
+.default-mode-section #about {
+    background-color: var(--section-bg-about);
+    color: var(--text-color); /* Use theme-agnostic text color */
+}
+
+.default-mode-section #pipeline-diagram {
+    background-color: var(--section-bg-pipeline);
+    color: var(--text-color); /* Use theme-agnostic text color */
+}
+
+/* Thesis Mode Section Colors */
+.thesis-mode-section #thesis-cover-page {
+    background-color: var(--dark-purple); /* Dark purple for cover page */
+    color: var(--white);
+}
+
+.thesis-mode-section #thesis-abstract {
+    background-color: var(--winter-snow); /* Light background for abstract */
+    color: var(--text-dark);
+}
+
+.thesis-mode-section #thesis-introduction {
+    background-color: var(--light-berry); /* Light berry for introduction */
+    color: var(--text-dark);
+}
+
+.thesis-mode-section #thesis-methodology {
+    background-color: var(--birch-bark); /* Birch bark for methodology */
+    color: var(--text-dark);
+}
+
+.thesis-mode-section #thesis-implementation {
+    background-color: var(--misty-fjord); /* Misty fjord for implementation */
+    color: var(--text-dark);
+}
+
+.thesis-mode-section #thesis-results {
+    background-color: var(--winter-snow); /* Light background for results */
+    color: var(--text-dark);
+}
+
+.thesis-mode-section #thesis-conclusion {
+    background-color: var(--light-berry); /* Light berry for conclusion */
+    color: var(--text-dark);
+}
+
+/* How-To Section */
+.how-to-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Force 4 columns */
+    gap: 1.5rem; /* Smaller gap */
+    margin-top: 2rem;
+}
+
+.how-to-steps .step-item {
+    background-color: var(--surface-color);
+    padding: 1.5rem; /* Smaller padding */
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
+}
+
+.how-to-steps .step-item:hover {
+    transform: translateY(-5px);
+}
+
+.how-to-steps .step-item h3 {
+    color: var(--primary-color);
+    font-size: 1.2rem; /* Smaller font size */
+    margin-bottom: 0.5rem; /* Smaller margin */
+}
+
+.how-to-steps .step-item .step-icon {
+    font-size: 3rem; /* Slightly smaller icons */
+    color: var(--primary-color);
+    margin-bottom: 0.75rem; /* Smaller margin */
+}
+
+.how-to-steps .step-item p {
+    color: var(--secondary-color); /* Use secondary color for step descriptions */
+}
+
+.how-to .cta-section {
+    margin-top: 3rem;
+    text-align: center;
+}
+
+.how-to .cta-section .cta-button {
+    background-color: var(--primary-color);
+    color: var(--surface-color);
+    padding: 1rem 2.5rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.2rem;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.how-to .cta-section .cta-button:hover {
+    transform: translateY(-3px);
+}
+
+/* Demo Section */
+.demo-video {
+    margin-top: 2rem;
+    margin-bottom: 4rem;
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+    height: 0;
+    overflow: hidden;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 20px var(--shadow-color);
+}
+
+.demo-video iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.example-data {
+    margin-top: 2rem;
+}
+
+.section-subtitle {
+    font-size: 1.2rem;
+    color: var(--secondary-color);
+    margin-top: -1rem;
+    margin-bottom: 3rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.example-data h3 {
+    font-size: 2rem;
+    margin-bottom: 2rem; /* Increased margin for better spacing */
+    color: var(--text-color);
+}
+
+.example-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    text-align: left;
+}
+
+.example-item {
+    background-color: var(--background-color-end);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.example-item h4 {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.example-item p {
+    color: var(--text-color);
+    line-height: 1.5;
+}
+
+.demo .cta-section {
+    margin-top: 3rem;
+    text-align: center;
+}
+
+.demo .cta-section .cta-button {
+    background-color: var(--primary-color);
+    color: var(--surface-color);
+    padding: 1rem 2.5rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.2rem;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.demo .cta-section .cta-button:hover {
+    transform: translateY(-3px);
+}
+
+.hero-content .hero-illustration {
+    max-width: 80%;
+    height: auto;
+    margin-bottom: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px var(--shadow-color);
+}
+
+.hero-content h1 {
+    font-size: 4rem; /* Larger font size for impact */
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+    color: var(--text-color); /* Ensure consistent color */
+}
+
+.hero-content .highlight {
+    color: var(--primary-color);
+}
+
+.hero-subtitle {
+    font-size: 1.6rem; /* Slightly larger subtitle */
+    margin-bottom: 3rem;
+    color: var(--secondary-color);
+    max-width: 900px; /* Wider for better readability */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 1.5rem; /* Space between buttons */
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+}
+
+.hero-buttons .cta-button {
+    background-color: var(--primary-color);
+    color: var(--surface-color);
+    padding: 1.2rem 2.5rem; /* Larger padding for prominent buttons */
+    border-radius: 0.75rem; /* More rounded corners */
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.2rem; /* Larger font size */
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 5px 15px rgba(var(--primary-color-rgb), 0.3); /* Subtle shadow */
+}
+
+.hero-buttons .cta-button:hover {
+    background-color: var(--primary-color-dark);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(var(--primary-color-rgb), 0.4);
+}
+
+.hero-buttons .secondary-cta {
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    box-shadow: none;
+}
+
+.hero-buttons .secondary-cta:hover {
+    background-color: rgba(var(--primary-color-rgb), 0.1);
+    color: var(--primary-color-dark);
+    border-color: var(--primary-color-dark);
+    transform: translateY(-3px);
+    box-shadow: none;
+}
+
+/* Floating Container for Content */
+.floating-container {
+    background: var(--surface-color);
+    padding: 2.5rem;
+    border-radius: 1.25rem;
+    box-shadow: 0 1.25rem 2.5rem var(--shadow-color);
+    border: 1px solid var(--border-color);
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.floating-container h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2.5rem;
+    color: var(--primary-color);
+}
+
+/* Features Section */
+.features .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Force 4 columns */
+    gap: 1.5rem; /* Smaller gap */
+    text-align: center;
+}
+
+.features .feature-item {
+    background-color: var(--background-color-end);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
+}
+
+.features .feature-item:hover {
+    transform: translateY(-5px);
+}
+
+.features .feature-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background-color: var(--background-color-end);
+    padding: 1rem; /* Smaller padding */
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
+}
+
+.features .feature-item:hover {
+    transform: translateY(-5px);
+}
+
+.features .feature-item .feature-icon {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.features .feature-item h3 {
+    color: var(--text-color);
+    font-size: 1.2rem; /* Smaller font size */
+    margin-bottom: 0.5rem; /* Smaller margin */
+}
+
+.features .feature-item p {
+    color: var(--secondary-color);
+}
+
+/* KPIs Section */
+.kpis .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.kpis .kpi-item {
+    background-color: var(--background-color-end);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.kpis .kpi-item h3 {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.kpis .kpi-item p {
+    color: var(--secondary-color);
+    font-size: 1.1rem;
+}
+
+.kpis .diagram-container {
+    margin-top: 4rem;
+    text-align: center;
+}
+
+.kpis .diagram-container h3 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+}
+
+.kpis .diagram-container .responsive-img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 20px var(--shadow-color);
+}
+
+.kpis .diagram-caption {
+    margin-top: 1rem;
+    font-style: italic;
+    color: var(--secondary-color);
+}
+
+/* About Section */
+.about .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 900px; /* Adjust as needed */
+}
+
+.about h2 {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+}
+
+.about p {
+    margin-bottom: 1.5rem;
+    line-height: 1.8;
+    color: var(--secondary-color);
+    max-width: 800px;
+}
+
+.about .key-emphases-table {
+    width: 100%;
+    max-width: 800px;
+    margin: 1.5rem auto 2rem auto;
+    border-collapse: collapse;
+    text-align: left;
+    background-color: var(--surface-color);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 5px 15px var(--shadow-color);
+}
+
+.about .key-emphases-table th,
+.about .key-emphases-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+.about .key-emphases-table th {
+    background-color: var(--background-color-end);
+    font-weight: 600;
+    color: var(--primary-color);
+    width: 30%; /* Adjust width for emphasis column */
+}
+
+.about .key-emphases-table td {
+    background-color: var(--surface-color);
+}
+
+.about .key-emphases-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.about .cta-button {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: var(--surface-color);
+    padding: 1rem 2.5rem;
+    border-radius: 0.75rem;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.2rem;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 5px 15px rgba(var(--primary-color-rgb), 0.3);
+    margin-top: 1rem;
+}
+
+.about .cta-button:hover {
+    background-color: var(--primary-color-dark);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(var(--primary-color-rgb), 0.4);
+}
+
+/* Footer */
+footer {
+    background-color: var(--background-color-start);
+    color: var(--text-color);
+    padding: 2rem 0;
+    text-align: center;
+    border-top: 1px solid var(--border-color);
+}
+
+footer p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+}
+
+footer .signature {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+}
+
+footer .signature a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+footer .signature a:hover {
+    text-decoration: underline;
+}
+
+/* New Footer Styles */
+footer {
+    background-color: var(--background-color-start); /* Use global variable */
+    color: var(--text-color); /* Use global variable */
+    padding: 4rem 0 2rem;
+    border-top: 1px solid var(--border-color); /* Use global variable */
+}
+
+footer .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: 1.5fr 2fr 1fr; /* Adjusted for logo, links, contact */
+    gap: 3rem;
+    margin-bottom: 2.5rem;
+    text-align: left; /* Align footer content to the left */
+}
+
+.footer-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.footer-logo-img {
+    height: 80px; /* Adjust as needed */
+    margin-bottom: 1rem;
+}
+
+.footer-slogan {
+    color: var(--secondary-color); /* Use global variable */
+    font-size: 0.95rem;
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.footer-slogan-icon {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.footer-links {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+}
+
+.footer-column h4 {
+    color: var(--text-color); /* Use global variable */
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.footer-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-column ul li {
+    margin-bottom: 0.5rem;
+}
+
+.footer-column ul li a {
+    color: var(--secondary-color); /* Use global variable */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-column ul li a:hover {
+    color: var(--primary-color); /* Use global variable */
+}
+
+.footer-contact h4 {
+    color: var(--text-color); /* Use global variable */
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.footer-contact p {
+    color: var(--primary-color); /* Use global variable */
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+}
+
+.social-links {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.social-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(var(--text-color-rgb), 0.1); /* Dynamic opacity */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color); /* Use global variable */
+    font-size: 1.2rem;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.social-icon:hover {
+    background-color: var(--primary-color); /* Use global variable */
+    color: var(--surface-color); /* Use global variable */
+}
+
+.footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color); /* Use global variable */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 1rem; /* Spacing between items */
+}
+
+.footer-copyright p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--secondary-color); /* Use global variable */
+}
+
+.footer-signature {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.signature-img {
+    height: 60px; /* Adjust as needed */
+    transition: opacity 0.3s ease;
+}
+
+/* Theme-specific signature images */
+[data-theme="light"] .dark-theme-sign {
+    display: none;
+}
+
+[data-theme="dark"] .light-theme-sign {
+    display: none;
+}
+
+[data-theme="dark"] .dark-theme-sign {
+    display: block;
+}
+
+.footer-mode-switcher {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center the switcher in the footer-bottom */
+}
+
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--secondary-color); /* Inactive state color */
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: var(--surface-color); /* Slider knob color */
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--primary-color); /* Active state color */
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px var(--primary-color);
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .footer-content {
+        grid-template-columns: 1fr 1fr; /* Two columns on medium screens */
+    }
+    .footer-contact {
+        grid-column: span 2; /* Span two columns */
+        text-align: center;
+    }
+    .footer-contact .social-links {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 1024px) { /* Adjust breakpoint for wider horizontal layout */
+    .features .feature-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns on medium screens */
+    }
+    .how-to-steps {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns on medium screens */
+    }
+}
+
+@media (max-width: 768px) {
+    .main-nav .nav-cta,
+    .main-nav .theme-toggle-wrapper {
+        display: none; /* Hide CTA and theme toggle in nav for mobile */
+    }
+
+    .hamburger-menu {
+        display: block;
+    }
+
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.2rem;
+    }
+
+    .section-nav {
+        display: none; /* Hide bubble nav on smaller screens */
+    }
+
+    .floating-container {
+        padding: 1.5rem;
+        border-radius: 1rem;
+    }
+
+    .floating-container h2 {
+        font-size: 2rem;
+    }
+
+    .kpis .kpi-grid,
+    .features .feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .how-to-steps {
+        grid-template-columns: 1fr; /* Stack on very small screens */
+    }
+
+    .footer-content {
+        grid-template-columns: 1fr; /* Single column on small screens */
+        text-align: center;
+    }
+    .footer-logo, .footer-links, .footer-contact {
+        align-items: center;
+    }
+    .footer-logo-img {
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .footer-links {
+        grid-template-columns: 1fr;
+    }
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+/* Specific styling for the pipeline diagram section */
+.pipeline-diagram-section {
+    background-color: var(--pine-light); /* Distinct background color */
+    color: var(--text-color); /* Use theme-agnostic text color */
+    padding: 8rem 0; /* Add padding to the section */
+}
+
+.faq-section {
+    background-color: var(--section-bg-faq);
+    color: var(--text-color);
+}
+
+.faq-items-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    text-align: left;
+}
+
+/* Thesis Mode Styles */
+body.thesis-mode .default-mode-section {
+    display: none;
+}
+
+body:not(.thesis-mode) .thesis-mode-section {
+    display: none;
+}
+
+/* Ensure thesis content is left-aligned and lists are properly formatted */
+.thesis-mode-section .container p,
+.thesis-mode-section .container h1,
+.thesis-mode-section .container h2,
+.thesis-mode-section .container h3,
+.thesis-mode-section .container h4,
+.thesis-mode-section .container ul,
+.thesis-mode-section .container ol,
+.thesis-mode-section .container li {
+    text-align: left;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.thesis-mode-section .container ul {
+    list-style: disc; /* Default bullet points */
+    padding-left: 1.5rem; /* Indent lists */
+}
+
+.thesis-mode-section .container ol {
+    list-style: decimal; /* Default numbering */
+    padding-left: 1.5rem; /* Indent lists */
+}
+
+/* Specific styling for the thesis cover page */
+.thesis-cover-page .cover-page-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: var(--surface-color);
+    border-radius: 1rem;
+    box-shadow: 0 5px 15px var(--shadow-color);
+    text-align: center; /* Center content on cover page */
+}
+
+.thesis-cover-page .university-name {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.thesis-cover-page .faculty-name {
+    font-size: 1.8rem;
+    color: var(--text-color);
+    margin-bottom: 2rem;
+}
+
+.thesis-cover-page .thesis-type {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+}
+
+.thesis-cover-page .thesis-title {
+    font-size: 3rem;
+    color: var(--text-color);
+    margin-bottom: 2rem;
+    line-height: 1.2;
+}
+
+.thesis-cover-page .author-info,
+.thesis-cover-page .enrollment-number {
+    font-size: 1.1rem;
+    color: var(--secondary-color);
+    line-height: 1.8;
+    margin-bottom: 0.5rem;
+}
+
+/* Specific styling for the thesis abstract section */
+.thesis-abstract-section {
+    background-color: var(--background-color-end);
+    padding: 4rem 0;
+}
+
+.thesis-abstract-section h2 {
+    text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 2rem;
+}
+
+.thesis-abstract-section p {
+    text-align: left;
+    max-width: 900px;
+    margin: 0 auto 1rem auto;
+    color: var(--text-color);
+}
+
+.thesis-abstract-section p strong {
+    color: var(--text-color); /* Ensure bold text uses the main text color */
+    font-weight: 700; /* Explicitly set a strong font-weight for bold */
+}
+
+/* Thesis Sidebar Navigation - REMOVED, consolidated into section-nav */
+/* The styles below are for the consolidated section-nav (bubble navigation) */
+
+/* Styling for the consolidated section-nav (bubble navigation) */
+.section-nav {
+    position: fixed;
+    left: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 900;
+    display: flex; /* Always flex, visibility of inner modes handled by JS */
+    flex-direction: column;
+    gap: 0.5rem;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    padding: 1rem 0.5rem;
+    box-shadow: 0 5px 15px var(--shadow-color);
+}
+
+/* Frontend Implementation Gap Fix */
+.thesis-implementation h3 {
+    margin-top: 2rem; /* Add top margin to h3 to create space */
+    margin-bottom: 1rem;
+}
+
+.thesis-implementation p {
+    margin-bottom: 1rem;
+}
+
+.thesis-implementation ul {
+    margin-top: 1rem; /* Add top margin to ul to create space */
+    margin-bottom: 1rem;
+}
+
+.thesis-implementation ul li {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+}
+
+.thesis-implementation ul li strong {
+    display: inline-block; /* Ensure strong tag behaves as inline-block to prevent unwanted gaps */
+    vertical-align: middle; /* Align text vertically */
+    margin: 0;
+    padding: 0;
+}
+
+
+
+.section-nav .default-mode-nav,
+.section-nav .thesis-mode-nav {
+    display: flex; /* Controlled by JS */
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%; /* Ensure it takes full width of parent */
+}
+
+.section-nav-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.section-nav-item:hover {
+    background-color: var(--background-color-end);
+    transform: translateX(5px);
+}
+
+.section-nav-item.active {
+    background-color: var(--primary-color);
+    color: var(--surface-color);
+    transform: translateX(5px);
+}
+
+.section-nav-item.active .nav-icon {
+    color: var(--surface-color);
+}
+
+.section-nav-item .nav-icon {
+    font-size: 1.5rem;
+    margin-right: 0.75rem;
+    color: var(--text-color);
+    transition: color 0.3s ease;
+}
+
+.section-nav-item.active .nav-icon {
+    color: var(--surface-color);
+}
+
+.section-nav-item .nav-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.3s ease;
+}
+
+.section-nav-item.active .nav-label {
+    color: var(--surface-color);
+}
+
+/* Hide labels by default on smaller screens or when not hovered/active */
+@media (max-width: 1024px) {
+    .section-nav-item .nav-label {
+        display: none;
+    }
+    .section-nav-item:hover .nav-label,
+    .section-nav-item.active .nav-label {
+        display: block;
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: var(--surface-color);
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 10px var(--shadow-color);
+        z-index: 901;
+        margin-left: 10px;
+    }
+}
+
+/* Example thesis section styling */
+.thesis-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6rem 0;
+    color: var(--text-color);
+}
+
+.thesis-introduction {
+    background-color: var(--background-color-start);
+}
+
+.thesis-methodology {
+    background-color: var(--birch-bark); /* Keep existing color for methodology */
+}
+
+.thesis-architecture {
+    background-color: var(--architecture-blue); /* New color for architecture */
+}
+
+.thesis-implementation {
+    background-color: var(--implementation-gray); /* New color for implementation */
+}
+
+.thesis-results {
+    background-color: var(--surface-color);
+}
+
+.thesis-conclusion {
+    background-color: var(--background-color-start);
+}
+
+.thesis-table-container {
+    margin: 2rem auto;
+    max-width: 900px;
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 5px 15px var(--shadow-color);
+    text-align: left;
+}
+
+.thesis-table-container h3 {
+    background-color: var(--surface-color);
+    padding: 1rem;
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--background-color-end);
+}
+
+.data-table th, .data-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+.data-table th {
+    background-color: var(--surface-color);
+    font-weight: 600;
+    text-align: left;
+    color: var(--primary-color);
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Table 3.1 Category Styling */
+.data-table .category-row {
+    background-color: var(--primary-color); /* A distinct color for category headers */
+    color: var(--surface-color);
+    font-weight: 700;
+}
+
+.data-table tbody tr {
+    background-color: var(--surface-color); /* Default background for all rows to avoid alternating grey */
+}
+
+.data-table .category-row td {
+    border-bottom: 2px solid var(--surface-color); /* Stronger border for separation */
+}
+
+.data-table .frontend-category {
+    background-color: var(--table-frontend-color); /* Light Cyan */
+}
+
+.data-table .backend-category {
+    background-color: var(--table-backend-color); /* Light Orange */
+}
+
+.data-table .deployment-category {
+    background-color: var(--table-deployment-color); /* Light Green */
+}
+
+.thesis-table-container .table-caption {
+    padding: 1rem;
+    background-color: var(--surface-color);
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+    font-style: italic;
+    border-top: 1px solid var(--border-color);
+    margin: 0;
+    text-align: center;
+}
+
+.thesis-figure {
+    margin: 2rem auto;
+    text-align: center;
+    max-width: 1100px; /* Increased max-width for charts/diagrams */
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 5px 15px var(--shadow-color);
+    background-color: var(--surface-color); /* Ensure consistent background for figures */
+}
+
+.thesis-figure .responsive-img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.thesis-figure .figure-caption {
+    padding: 1rem;
+    background-color: var(--surface-color);
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+    font-style: italic;
+    border-top: 1px solid var(--border-color);
+    margin: 0;
+}
+
+.pipeline-diagram-img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto; /* Center the image */
+    padding: 1.5rem; /* Add some padding around the image */
+    box-sizing: border-box;
+}
+
+/* Chart.js specific styling */
+.thesis-figure canvas {
+    max-height: 500px; /* Limit chart height to prevent excessive expansion */
+    width: 100% !important; /* Ensure canvas takes full width */
+    height: 100% !important; /* Ensure canvas takes full height within max-height */
+    padding: 1rem; /* Add padding inside the figure for charts */
+    box-sizing: border-box; /* Include padding in element's total width and height */
+}
+
+/* Mermaid diagram styling */
+.thesis-figure .mermaid {
+    width: 100%;
+    min-height: 300px; /* Ensure a minimum height for rendering */
+    height: auto;
+    max-width: 1200px; /* Increased max-width for larger diagrams */
+    margin: 0 auto;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    display: block; /* Ensure it takes up block space for centering */
+}
+
+.thesis-figure .mermaid svg {
+    max-width: 100%;
+    height: auto;
+    min-height: inherit; /* Inherit min-height from parent */
+}
+
+/* Code Snippet Styling (Notion-like) */
+.code-snippet-container {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    margin: 2rem auto;
+    max-width: 900px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px var(--shadow-color);
+    text-align: left;
+}
+
+.code-snippet-header {
+    background-color: var(--background-color-end);
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.code-snippet-header .language-label {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.code-snippet-header .copy-button {
+    background-color: var(--primary-color);
+    color: var(--surface-color);
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background-color 0.3s ease;
+}
+
+.code-snippet-header .copy-button:hover {
+    background-color: var(--primary-color-dark);
+}
+
+.code-snippet-content {
+    padding: 1rem;
+    overflow-x: auto;
+}
+
+.code-snippet-content pre {
+    margin: 0;
+    padding: 0;
+}
+
+.code-snippet-content code {
+    font-family: 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--text-color);
+    display: block; /* Ensures code block takes full width */
+    white-space: pre-wrap; /* Wraps long lines */
+}

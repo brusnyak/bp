@@ -1,11 +1,37 @@
 import numpy as np
 import soundfile as sf
-import torchaudio
-import torch
-from typing import Tuple, Union
+from typing import Tuple, Optional
 import os
+import sys
+import logging
 
-from typing import Optional
+# Removed explicit FFmpeg environment variable settings as soundfile is now used for audio I/O
+# and torchaudio is no longer a core dependency for the pipeline.
+# if sys.platform == "darwin":
+#     venv_lib_path = os.path.join(os.path.dirname(sys.executable), "..", "lib")
+#     homebrew_lib_path = "/opt/homebrew/lib"
+    
+#     dyld_paths = []
+#     if os.path.exists(venv_lib_path):
+#         dyld_paths.append(venv_lib_path)
+#     if os.path.exists(homebrew_lib_path):
+#         dyld_paths.append(homebrew_lib_path)
+    
+#     if dyld_paths:
+#         new_dyld_library_path = ":".join(dyld_paths)
+#         if "DYLD_LIBRARY_PATH" in os.environ:
+#             os.environ["DYLD_LIBRARY_PATH"] = f"{new_dyld_library_path}:{os.environ['DYLD_LIBRARY_PATH']}"
+#         else:
+#             os.environ["DYLD_LIBRARY_PATH"] = new_dyld_library_path
+#         logging.info(f"AudioUtils: DYLD_LIBRARY_PATH set to: {os.environ['DYLD_LIBRARY_PATH']}")
+#     else:
+#         logging.warning("AudioUtils: Neither venv lib path nor Homebrew lib path found. FFmpeg linking might fail.")
+
+# Removed explicit FFmpeg environment variable settings as soundfile is now used for audio I/O
+# and torchaudio is no longer a core dependency for the pipeline.
+# os.environ["TORCH_USE_LIBAV"] = "0"
+# os.environ["TORCH_USE_EXTERNAL_FFMPEG"] = "1" # Ensure external FFmpeg is preferred
+# logging.info("AudioUtils: TORCH_USE_LIBAV set to 0. TORCH_USE_EXTERNAL_FFMPEG set to 1.")
 
 
 def load_audio(
@@ -27,19 +53,46 @@ def load_audio(
     if audio_data.ndim > 1:
         audio_data = audio_data.mean(axis=1)
 
+    logging.debug(f"AudioUtils: load_audio - Before resampling: audio_data min: {np.min(audio_data)}, max: {np.max(audio_data)}, sr: {sr}")
+
     if target_sr is not None and sr != target_sr:
-        # Use torchaudio for resampling for better quality and GPU support if available
-        audio_tensor = torch.from_numpy(audio_data).float()
-        resampler = torchaudio.transforms.Resample(orig_freq=sr, new_freq=target_sr)
-        audio_data = resampler(audio_tensor).numpy()
+        audio_data = resample_audio(audio_data, original_sr=sr, target_sr=target_sr)
         sr = target_sr
+        logging.debug(f"AudioUtils: load_audio - After resampling: audio_data min: {np.min(audio_data)}, max: {np.max(audio_data)}, sr: {sr}")
 
     return audio_data, sr
+
+def resample_audio(audio_data: np.ndarray, original_sr: int, target_sr: int) -> np.ndarray:
+    """
+    Resamples audio data to a new sample rate.
+
+    Args:
+        audio_data (np.ndarray): Input audio data.
+        original_sr (int): Original sample rate of the audio data.
+        target_sr (int): Target sample rate for resampling.
+
+    Returns:
+        np.ndarray: Resampled audio data.
+    """
+    from scipy.signal import resample_poly
+    if original_sr == target_sr:
+        return audio_data
+    
+    logging.debug(f"AudioUtils: resample_audio - Input audio_data min: {np.min(audio_data)}, max: {np.max(audio_data)}")
+
+    # Calculate the number of samples for the new array
+    num_samples = int(round(len(audio_data) * float(target_sr) / original_sr))
+    
+    # Perform resampling
+    resampled_data = resample_poly(audio_data, target_sr, original_sr)
+    
+    logging.debug(f"AudioUtils: resample_audio - Output resampled_data min: {np.min(resampled_data)}, max: {np.max(resampled_data)}")
+    return resampled_data
 
 
 def save_audio(file_path: str, audio_data: np.ndarray, sample_rate: int):
     """
-    Saves audio data to a file.
+    Saves audio data to a file using soundfile.
 
     Args:
         file_path (str): Path to save the audio file.
