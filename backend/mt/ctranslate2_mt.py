@@ -18,9 +18,10 @@ class CTranslate2MT:
             device (str): Device to run the model on ("cpu", "cuda", "auto"). "auto" will use MPS on Apple Silicon.
         """
         if device == "auto":
+            # CTranslate2 does not directly support "mps" device. Fallback to "cpu" on Apple Silicon.
             if torch.backends.mps.is_available():
-                self.device = "mps"
-                print("CTranslate2MT: MPS device detected and will be used.")
+                self.device = "cpu" # Explicitly use CPU for CTranslate2 on MPS
+                print("CTranslate2MT: MPS device detected, but CTranslate2 will use CPU.")
             else:
                 self.device = "cpu"
                 print("CTranslate2MT: MPS not available, falling back to CPU.")
@@ -32,30 +33,32 @@ class CTranslate2MT:
         # For simplicity, we'll assume the model_path points to a converted directory.
         # If it's a Hugging Face ID, a conversion step would be needed.
         # For this test, we'll use a pre-converted Opus-MT model.
-        # Use the newly converted CTranslate2 models
-        self.model_path = os.path.join("ct2_models", model_path.replace("/", "--"))
+        # Determine the actual path to the CTranslate2 converted model directory
+        # If model_path is a Hugging Face ID, convert it to the local directory name
+        if "/" in model_path and not os.path.exists(model_path):
+            # Assume it's a Hugging Face ID, construct the local path
+            model_dir_name = model_path.replace("/", "--")
+            self.ctranslate2_model_dir = os.path.join("ct2_models", model_dir_name)
+            self.hf_model_id = model_path # Store original HF ID for tokenizer
+        else:
+            # Assume it's already a path to a converted model directory
+            self.ctranslate2_model_dir = model_path
+            # Try to infer HF model ID from the directory name for tokenizer
+            # This is a heuristic and might need refinement if directory names don't match HF IDs
+            self.hf_model_id = model_path.replace("ct2_models/", "").replace("--", "/")
 
-        if not os.path.exists(os.path.join(self.model_path, "model.bin")):
+
+        if not os.path.exists(os.path.join(self.ctranslate2_model_dir, "model.bin")):
             raise FileNotFoundError(
-                f"CTranslate2 model.bin not found in {self.model_path}. Please ensure the model is converted."
+                f"CTranslate2 model.bin not found in {self.ctranslate2_model_dir}. Please ensure the model is converted."
             )
 
-        # The tokenizer still needs to be loaded from the original Hugging Face model ID
-        # as CTranslate2 conversion only handles the model weights.
-        # Example conversion (if needed, but now handled by convert_opus_mt_to_ct2.py):
-        # from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
-        # model_name = "Helsinki-NLP/opus-mt-en-sk"
-        # model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
-        # tokenizer = AutoTokenizer.from_pretrained(model_name)
-        # converter = ctranslate2.converters.TransformersConverter(model, tokenizer)
-        # converter.convert(self.model_path, quantization="int8")
-
-        self.translator = ctranslate2.Translator(self.model_path, device=self.device)
+        self.translator = ctranslate2.Translator(self.ctranslate2_model_dir, device=self.device)
         self.tokenizer = AutoTokenizer.from_pretrained(
-            model_path
+            self.hf_model_id
         )  # Use original HF ID for tokenizer
         print(
-            f"CTranslate2MT initialized with model_path={self.model_path}, device={self.device}"
+            f"CTranslate2MT initialized with model_path={self.ctranslate2_model_dir}, device={self.device}"
         )
 
     def translate(self, text: str, src_lang: str, tgt_lang: str) -> Tuple[str, float]:

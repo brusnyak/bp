@@ -5,24 +5,25 @@ from typing import Optional, Tuple
 
 class FasterWhisperSTT:
     def __init__(
-        self, model_size: str = "tiny", device: str = "auto", compute_type: str = "int8"
+        self, model_size: str = "base", device: str = "auto", compute_type: str = "int8"
     ):
         """
         Initializes the FasterWhisperSTT model.
 
         Args:
-            model_size (str): Size of the Whisper model to use (e.g., "tiny", "base", "small", "medium", "large").
+            model_size (str): Size of the Whisper model to use (e.g., "tiny", "base", "small", "medium", "reset").
             device (str): Device to run the model on ("cpu", "cuda", "auto"). For M1/M2 Macs, "auto" should use MPS.
             compute_type (str): Type of computation to use (e.g., "int8", "float16", "float32").
         """
+        self.model_size = model_size # Store model_size as an instance attribute
         self.model = WhisperModel(model_size, device=device, compute_type=compute_type)
         print(
-            f"FasterWhisperSTT initialized with model_size={model_size}, device={device}, compute_type={compute_type}"
+            f"FasterWhisperSTT initialized with model_size={self.model_size}, device={device}, compute_type={compute_type}"
         )
 
     def transcribe_audio(
-        self, audio_data: np.ndarray, sample_rate: int, language: Optional[str] = None
-    ) -> Tuple[list, float]: # Changed return type to list of segments
+        self, audio_data: np.ndarray, sample_rate: int, language: Optional[str] = None, vad_filter: bool = True
+    ) -> Tuple[list, float, Optional[str]]: # Changed return type to list of segments, transcription time, and detected language
         """
         Transcribes audio data using Faster-Whisper.
 
@@ -49,19 +50,23 @@ class FasterWhisperSTT:
 
         start_time = time.time()
 
-        # Enable VAD filter to ignore non-speech segments
-        segments, info = self.model.transcribe(
-            audio_data, language=language, beam_size=5, vad_filter=True
-        )
+        # Adjust Faster-Whisper's internal thresholds when an external VAD is used
+        transcribe_options = {
+            "language": language,
+            "beam_size": 5,
+            "vad_filter": vad_filter,
+        }
+        if not vad_filter: # If external VAD is enabled (and FasterWhisper's is disabled)
+            transcribe_options["no_speech_threshold"] = None # Disable FasterWhisper's internal no-speech detection
+
+        segments, info = self.model.transcribe(audio_data, **transcribe_options)
 
         end_time = time.time()
         transcription_time = end_time - start_time
 
         # Return the list of segments directly
-        # print(
-        #     f"Transcribed {len(segments)} segments in {transcription_time:.2f}s (language: {language or 'detected'})"
-        # )
-        return list(segments), transcription_time
+        detected_language = info.language if info and hasattr(info, 'language') else None
+        return list(segments), transcription_time, detected_language
 
 
 if __name__ == "__main__":

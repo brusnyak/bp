@@ -1,0 +1,287 @@
+/* Global CSS Variables for Theming (Auth specific) */
+:root {
+  /* Light Theme (Default - Lingonberry Mail Inspired) */
+  --primary-color: #C41E3A; /* Lingonberry Red */
+  --secondary-color: #666666; /* Text Light */
+  --accent-color: #468742; /* Leaf Green */
+  --danger-color: #D32F2F; /* Darker Red */
+  --background-color-start-light: #FFF8E1; /* Warm Cream */
+  --background-color-end-light: #F5F5F5; /* Soft Gray */
+  --surface-color: #FFFFFF; /* White */
+  --text-color: #333333; /* Text Dark */
+  --border-color: #E0E0E0; /* Light Gray */
+  --shadow-color: rgba(0, 0, 0, 0.1); /* Soft shadows */
+  --log-info-color: #333333;
+  --log-success-color: #00A300;
+  --log-warning-color: #FFA500;
+  --log-error-color: #C41E3A;
+  --secondary-text-grey: #666666;
+  --secondary-text-deep-blue: #333333;
+  --primary-color-rgb: 196, 30, 58; /* RGB for primary-color */
+}
+
+/* Dark Theme Overrides (Complementary) */
+[data-theme="dark"] {
+  --primary-color: #E94560; /* Slightly brighter Lingonberry Red */
+  --secondary-color: #A0A0A0; /* Lighter grey */
+  --accent-color: #4CAF50; /* Green accent */
+  --danger-color: #FF5252; /* Red danger */
+  --background-color-start-dark: #121212; /* Very dark grey/black */
+  --background-color-end-dark: #1E1E1E; /* Slightly lighter dark grey */
+  --surface-color: #2C2C2C; /* Darker surface */
+  --text-color: #E0E0E0; /* Light text */
+  --border-color: #444444; /* Darker border */
+  --shadow-color: rgba(0, 0, 0, 0.8); /* Stronger shadows */
+  --log-info-color: #ffffff;
+  --log-success-color: #74d878;
+  --log-warning-color: #FFEB3B;
+  --log-error-color: #EF9A9A;
+  --secondary-text-grey: #888888;
+  --secondary-text-deep-blue: #666666;
+  --primary-color-rgb: 233, 69, 96; /* RGB for primary-color in dark mode */
+}
+
+body {
+  font-family: 'Montserrat', sans-serif; /* Updated font */
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--background-color-start-light) 0%, var(--background-color-end-light) 100%);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+[data-theme="dark"] body {
+  background: linear-gradient(135deg, var(--background-color-start-dark) 0%, var(--background-color-end-dark) 100%);
+  color: var(--text-color);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif; /* Updated font */
+}
+
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 1rem;
+}
+
+.auth-card {
+  background-color: var(--surface-color);
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 25px var(--shadow-color);
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  position: relative; /* For theme toggle positioning */
+}
+
+[data-theme="dark"] .auth-card {
+  background-color: var(--surface-color); /* Dark surface color */
+  box-shadow: 0 10px 25px var(--shadow-color);
+  border-color: var(--border-color);
+}
+
+.auth-tabs {
+  display: flex;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tab-button {
+  flex-grow: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  background-color: transparent;
+  color: var(--secondary-text-grey);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.3s ease, border-bottom-color 0.3s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-button.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
+html.dark .tab-button.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
+.auth-header {
+    margin-bottom: 1.5rem;
+}
+
+.auth-header h1 {
+    font-size: 2rem;
+    margin: 0;
+    color: var(--primary-color);
+}
+
+.auth-header p {
+    margin: 0.5rem 0 0;
+    color: var(--secondary-color);
+    font-size: 0.9rem;
+}
+
+.auth-form h2 {
+  font-size: 1.75rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-color);
+}
+
+.form-group {
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-color);
+}
+
+.form-group input {
+  width: 92%; /* Adjusted width */
+  align-self: left;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  transition: border-color 0.3s ease;
+  margin: 0 auto; /* Center the input */
+  
+}
+
+html.dark .form-group input {
+  background-color: var(--surface-color); /* Darker input background */
+  border-color: var(--border-color);
+  color: var(--text-color);
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.auth-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--primary-color);
+  color: var(--surface-color); /* Ensure white text in light theme */
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 1rem;
+}
+
+.auth-button:hover {
+  background-color: var(--primary-color); /* Use primary-color for hover */
+}
+
+.social-login {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.google-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+html.dark .google-button {
+  background-color: var(--surface-color);
+  border-color: var(--border-color);
+  color: var(--text-color);
+}
+
+.google-button:hover {
+  background-color: var(--background-color-end-light); /* Lighter hover for light theme */
+  border-color: var(--primary-color);
+}
+
+html.dark .google-button:hover {
+  background-color: #3A3A3A; /* Darker hover for dark theme */
+  border-color: var(--primary-color);
+}
+
+.auth-message {
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: var(--text-color);
+}
+
+.auth-message.success {
+  color: var(--log-success-color);
+  background-color: var(--background-color-end-light); /* Use a lighter background for success */
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+html.dark .auth-message.success {
+  background-color: #2C4A2C; /* Darker background for success in dark theme */
+}
+
+.auth-message.error {
+  color: var(--log-error-color);
+  background-color: var(--background-color-end-light); /* Use a lighter background for error */
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+html.dark .auth-message.error {
+  background-color: #4A1C1C; /* Darker background for error in dark theme */
+}
+
+/* Theme toggle specific styles */
+.theme-toggle-wrapper {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.theme-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-color);
+  font-size: 1.5rem;
+  transition: color 0.3s ease;
+}
+
+.theme-toggle-btn:hover {
+  color: var(--primary-color);
+}
+
+.hidden {
+  display: none;
+}

@@ -84,7 +84,7 @@ class PiperTTS:
 
     def synthesize(
         self, text: str, language: str = "sk", output_path: Optional[str] = None
-    ) -> Tuple[np.ndarray, int, float]:
+    ) -> Tuple[np.ndarray, int, float]: # Keep output_path for now, but make it optional and don't use it for primary return
         """
         Synthesizes speech from text using Piper.
 
