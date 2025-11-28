@@ -329,4 +329,6 @@ if __name__ == "__main__":
         ssl_keyfile="./certs/key.pem",
         ssl_certfile="./certs/cert.pem",
         log_level="info", # Set log level to info for cleaner output
+        limit_concurrency=100, # Increase concurrency limit
+        backlog=1024, # Increase backlog
     )

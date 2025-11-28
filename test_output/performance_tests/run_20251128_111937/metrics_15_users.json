@@ -1,0 +1,286 @@
+[
+  {
+    "session_id": 1,
+    "audio_file": "test/Hello.wav",
+    "status": "completed",
+    "start_time": 165423.058297708,
+    "end_time": 165442.931794875,
+    "first_audio_sent": 165434.131371458,
+    "last_tts_received": null,
+    "transcriptions": [
+      " Hello, this is a test of my voice for cloning purposes."
+    ],
+    "translations": [],
+    "stt_latencies": [],
+    "mt_latencies": [],
+    "tts_latencies": [],
+    "e2e_latency": null,
+    "error": null
+  },
+  {
+    "session_id": 2,
+    "audio_file": "test/Can you hear me_.wav",
+    "status": "completed",
+    "start_time": 165422.151123625,
+    "end_time": 165444.501993916,
+    "first_audio_sent": 165426.727322291,
+    "last_tts_received": null,
+    "transcriptions": [],
+    "translations": [],
+    "stt_latencies": [],
+    "mt_latencies": [],
+    "tts_latencies": [],
+    "e2e_latency": null,
+    "error": null
+  },
+  {
+    "session_id": 3,
+    "audio_file": "test/My test speech_xtts_speaker_clean.wav",
+    "status": "completed",
+    "start_time": 165421.671915958,
+    "end_time": 165455.468338541,
+    "first_audio_sent": 165425.330727916,
+    "last_tts_received": 165449.985196458,
+    "transcriptions": [
+      " In this experiment, the system converts spoken English into text, translates it into Slovak,  and then synthesizes it back into speech.  The process involves three stages, speech recognition, machine translation, and text-to-speech.",
+      " Each model introduces a small delay, so we will measure the overall latency.  The main objective is to achieve natural communication despite language barriers."
+    ],
+    "translations": [
+      "V tomto experimente syst\u00e9m konvertuje hovoren\u00fa angli\u010dtinu do textu, preklad\u00e1 ju do sloven\u010diny a potom ju syntetizuje sp\u00e4\u0165 do re\u010di. Proces zah\u0155\u0148a tri etapy, rozpozn\u00e1vanie re\u010di, strojov\u00fd preklad a text-do-slova.",
+      "Ka\u017ed\u00fd model predstavuje mal\u00e9 oneskorenie, tak\u017ee zmeriame celkov\u00fa latenciu. Hlavn\u00fdm cie\u013eom je dosiahnu\u0165 prirodzen\u00fa komunik\u00e1ciu napriek jazykov\u00fdm bari\u00e9ram."
+    ],
+    "stt_latencies": [
+      6.467458541010274
+    ],
+    "mt_latencies": [
+      1.872398291976424
+    ],
+    "tts_latencies": [
+      1.424186166987056
+    ],
+    "e2e_latency": 24.654468541993992,
+    "error": null
+  },
+  {
+    "session_id": 4,
+    "audio_file": "test/Hello.wav",
+    "status": "completed",
+    "start_time": 165419.930898541,
+    "end_time": 165441.016687875,
+    "first_audio_sent": 165422.100149583,
+    "last_tts_received": null,
+    "transcriptions": [],
+    "translations": [],
+    "stt_latencies": [],
+    "mt_latencies": [],
+    "tts_latencies": [],
+    "e2e_latency": null,
+    "error": null
+  },
+  {
+    "session_id": 5,
+    "audio_file": "test/Can you hear me_.wav",
+    "status": "failed",
+    "start_time": 165426.56441275,
+    "end_time": 165436.940174916,
+    "first_audio_sent": null,
+    "last_tts_received": null,
+    "transcriptions": [],
+    "translations": [],
+    "stt_latencies": [],
+    "mt_latencies": [],
+    "tts_latencies": [],
+    "e2e_latency": null,
+    "error": "Unexpected error: "
+  },
+  {
+    "session_id": 6,
+    "audio_file": "test/My test speech_xtts_speaker_clean.wav",
+    "status": "failed",
+    "start_time": 165423.83969025,
+    "end_time": 165434.131693083,
+    "first_audio_sent": null,
+    "last_tts_received": null,
+    "transcriptions": [],
+    "translations": [],
+    "stt_latencies": [],
+    "mt_latencies": [],
+    "tts_latencies": [],
+    "e2e_latency": null,
+    "error": "Unexpected error: "
+  },
+  {
+    "session_id": 7,
+    "audio_file": "test/Hello.wav",
+    "status": "completed",
+    "start_time": 165422.918272666,
+    "end_time": 165442.931318208,
+    "first_audio_sent": 165434.134741333,
+    "last_tts_received": null,
+    "transcriptions": [],
+    "translations": [],
+    "stt_latencies": [],
+    "mt_latencies": [],
+    "tts_latencies": [],
+    "e2e_latency": null,
+    "error": null
+  },
+  {
+    "session_id": 8,
+    "audio_file": "test/Can you hear me_.wav",
+    "status": "completed",
+    "start_time": 165419.213940208,
+    "end_time": 165438.462499166,
+    "first_audio_sent": 165420.65432425,
+    "last_tts_received": null,
+    "transcriptions": [],
+    "translations": [],
+    "stt_latencies": [],
+    "mt_latencies": [],
+    "tts_latencies": [],
+    "e2e_latency": null,
+    "error": null
+  },
+  {
+    "session_id": 9,
+    "audio_file": "test/My test speech_xtts_speaker_clean.wav",
+    "status": "completed",
+    "start_time": 165415.733128708,
+    "end_time": 165456.387077083,
+    "first_audio_sent": 165418.23817725,
+    "last_tts_received": 165444.447603041,
+    "transcriptions": [
+      " In this experiment, the system converts spoken English into text."
+    ],
+    "translations": [
+      "V tomto experimente syst\u00e9m premie\u0148a hovoren\u00fa angli\u010dtinu na text."
+    ],
+    "stt_latencies": [
+      3.638398707989836
+    ],
+    "mt_latencies": [
+      2.378681416012114
+    ],
+    "tts_latencies": [
+      1.4362087920017075
+    ],
+    "e2e_latency": 26.2094257909921,
+    "error": null
+  },
+  {
+    "session_id": 10,
+    "audio_file": "test/Hello.wav",
+    "status": "completed",
+    "start_time": 165413.605137375,
+    "end_time": 165425.385782125,
+    "first_audio_sent": 165415.252176291,
+    "last_tts_received": null,
+    "transcriptions": [
+      " Hello, this is a test of my voice for cloning purposes."
+    ],
+    "translations": [
+      "Dobr\u00fd de\u0148, toto je test m\u00f4jho hlasu na klonovanie."
+    ],
+    "stt_latencies": [],
+    "mt_latencies": [],
+    "tts_latencies": [],
+    "e2e_latency": null,
+    "error": null
+  },
+  {
+    "session_id": 11,
+    "audio_file": "test/Can you hear me_.wav",
+    "status": "completed",
+    "start_time": 165422.705491708,
+    "end_time": 165441.921289833,
+    "first_audio_sent": 165434.139280833,
+    "last_tts_received": null,
+    "transcriptions": [
+      " Hey, Ladi, can you hear me well?"
+    ],
+    "translations": [],
+    "stt_latencies": [],
+    "mt_latencies": [],
+    "tts_latencies": [],
+    "e2e_latency": null,
+    "error": null
+  },
+  {
+    "session_id": 12,
+    "audio_file": "test/My test speech_xtts_speaker_clean.wav",
+    "status": "failed",
+    "start_time": 165424.914089416,
+    "end_time": 165435.515544625,
+    "first_audio_sent": null,
+    "last_tts_received": null,
+    "transcriptions": [],
+    "translations": [],
+    "stt_latencies": [],
+    "mt_latencies": [],
+    "tts_latencies": [],
+    "e2e_latency": null,
+    "error": "Unexpected error: "
+  },
+  {
+    "session_id": 13,
+    "audio_file": "test/Hello.wav",
+    "status": "completed",
+    "start_time": 165415.199533375,
+    "end_time": 165426.727510666,
+    "first_audio_sent": 165416.721417,
+    "last_tts_received": null,
+    "transcriptions": [
+      " Hello, this is a test of my voice for cloning purposes."
+    ],
+    "translations": [],
+    "stt_latencies": [],
+    "mt_latencies": [],
+    "tts_latencies": [],
+    "e2e_latency": null,
+    "error": null
+  },
+  {
+    "session_id": 14,
+    "audio_file": "test/Can you hear me_.wav",
+    "status": "failed",
+    "start_time": 165426.449998791,
+    "end_time": 165436.939826,
+    "first_audio_sent": null,
+    "last_tts_received": null,
+    "transcriptions": [],
+    "translations": [],
+    "stt_latencies": [],
+    "mt_latencies": [],
+    "tts_latencies": [],
+    "e2e_latency": null,
+    "error": "Unexpected error: "
+  },
+  {
+    "session_id": 15,
+    "audio_file": "test/My test speech_xtts_speaker_clean.wav",
+    "status": "completed",
+    "start_time": 165420.7760415,
+    "end_time": 165455.4744045,
+    "first_audio_sent": 165425.385459958,
+    "last_tts_received": 165449.773952,
+    "transcriptions": [
+      " In this experiment, the system converts spoken English into text, translates it into Slovak,  and then synthesizes it back into speech.  The process involves three stages, speech recognition, machine translation, and text-to-speech.",
+      " Each model introduces a small delay, so we will measure the overall latency.  The main objective is to achieve natural communication despite language barriers."
+    ],
+    "translations": [
+      "V tomto experimente syst\u00e9m konvertuje hovoren\u00fa angli\u010dtinu do textu, preklad\u00e1 ju do sloven\u010diny a potom ju syntetizuje sp\u00e4\u0165 do re\u010di. Proces zah\u0155\u0148a tri etapy, rozpozn\u00e1vanie re\u010di, strojov\u00fd preklad a text-do-slova.",
+      "Ka\u017ed\u00fd model predstavuje mal\u00e9 oneskorenie, tak\u017ee zmeriame celkov\u00fa latenciu. Hlavn\u00fdm cie\u013eom je dosiahnu\u0165 prirodzen\u00fa komunik\u00e1ciu napriek jazykov\u00fdm bari\u00e9ram."
+    ],
+    "stt_latencies": [
+      6.976190249988576
+    ],
+    "mt_latencies": [
+      1.1957297089975327
+    ],
+    "tts_latencies": [
+      1.3818461670016404
+    ],
+    "e2e_latency": 24.38849204199505,
+    "error": null
+  }
+]
