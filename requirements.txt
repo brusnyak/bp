@@ -61,6 +61,10 @@ onnxruntime==1.19.2
 # === VOICE ACTIVITY DETECTION (VAD) ===
 webrtcvad==2.0.10
 
+# === Plotting and Analysis ===
+matplotlib==3.9.1
+seaborn==0.13.2
+
 # === Optional: Pre-commit, etc. ===
 pre-commit==4.3.0
 argon2-cffi==23.1.0
