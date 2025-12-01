@@ -1,210 +1,159 @@
 # Real-Time Speech Translation System
 
-Real-time multilingual speech translation system with voice cloning capabilities, designed for seamless integration with virtual microphones (BlackHole 2ch on macOS, VB-Cable on Windows) for use in video conferencing applications like Google Meet, Zoom, and Microsoft Teams.
+## Project Overview
 
-## Features
-- **Real-time Speech-to-Text (STT)**: faster-whisper (CTranslate2-optimized Whisper)
-- **Machine Translation (MT)**: Helsinki-NLP Opus-MT models (CTranslate2-optimized)
-- **Text-to-Speech (TTS)**:
-  - **Piper TTS**: Fast, generic voice synthesis
-  - **Coqui XTTS v2**: Zero-shot voice cloning with speaker embedding caching
-- **Voice Activity Detection (VAD)**: WebRTC VAD for real-time speech detection
-- **Browser-Based Virtual Mic Routing**: Route translated audio to conferencing apps via Web Audio API
-- **Concurrent User Support**: Session-based model isolation with proper cleanup
-- **Web Interface**: Real-time latency monitoring with Chart.js
+This project implements a real-time live speech translation system designed for conference environments. It leverages state-of-the-art open-source models for Speech-to-Text (STT), Machine Translation (MT), and Text-to-Speech (TTS) to provide low-latency, high-quality translation. The system is optimized for Apple Silicon (M1/M2/M3) hardware and features a modern web-based user interface.
 
----
+### Live Demo & Examples
 
-## Hardware Requirements
+Witness the seamless real-time speech translation in action. See how our system effortlessly bridges language gaps.
 
-### Recommended Hardware by Platform
+<div class="demo-video">
+  <iframe
+  title="Real-Time Speech Translation Demo"
+    src="https://www.youtube.com/embed/_-jwEyGxDYs"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen
+  ></iframe>
+</div>
 
-| Platform | Device Mode | Minimum Requirements | Performance (XTTS RTF) | Notes |
-|----------|-------------|---------------------|------------------------|-------|
-| **macOS (Apple Silicon)** | CPU | 8GB RAM, M1 or later | 1.7-2.0 | Recommended for development |
-| **Windows** | CUDA | NVIDIA GPU (6GB+ VRAM), CUDA 11.8+ | 0.8-1.2 | Best performance |
-| **Windows** | CPU | 16GB RAM, modern CPU (i5/Ryzen 5+) | 2.5-3.5 | Slower but functional |
-| **Linux** | CUDA | NVIDIA GPU (6GB+ VRAM), CUDA 11.8+ | 0.8-1.2 | Best performance |
-| **Linux** | CPU | 16GB RAM | 2.5-3.5 | Slower but functional |
+**Key Features:**
+*   **Real-time Performance:** Optimized for minimal end-to-end latency, targeting <1 seconds for standard TTS and 2.5-3.5 seconds for voice cloning.
+*   **Modular Architecture:** Built with FastAPI for the backend and a responsive web UI (HTML, CSS, JavaScript) for easy interaction.
+*   **Speech-to-Text (STT):** Utilizes `faster-whisper` for efficient and accurate transcription.
+*   **Machine Translation (MT):** Employs `SeamlessM4T v2` for high-quality, multilingual translation.
+*   **Text-to-Speech (TTS):** Integrates `Piper TTS` for fast, natural-sounding speech synthesis, and `F5-TTS` for real-time voice cloning.
+*   **Voice Activity Detection (VAD):** Incorporates `webrtcvad` for robust speech segment detection, crucial for streaming performance.
+*   **Dynamic Language Switching:** Supports on-the-fly switching of input and output languages.
+*   **Latency Visualization:** The UI includes a real-time timeline chart to visualize pipeline latency.
+*   **Speaker Voice Management:** Frontend and backend support for recording, uploading, and managing speaker voice profiles for cloning.
 
-> **Note**: RTF (Real-Time Factor) measures synthesis speed. RTF < 2.0 means audio is synthesized faster than real-time (e.g., 1.7 RTF = 1 second of audio generated in 0.59 seconds).
+## Architecture
 
-### Device Detection
+The system follows a client-server architecture:
 
-The system automatically detects the best available device:
-1. **CUDA** (NVIDIA GPU) - Best performance
-2. **MPS** (Apple Silicon) - Note: XTTS v2 has limited MPS support, automatically falls back to CPU
-3. **CPU** - Universal fallback
+1.  **Frontend (UI):** A web application built with HTML, CSS, and JavaScript. It captures microphone audio, sends it to the backend via WebSockets, displays real-time transcriptions and translations, and plays back synthesized audio. It also manages language selection and speaker voice profiles.
+2.  **Backend (FastAPI):** A Python application using FastAPI. It handles WebSocket connections, orchestrates the STT, MT, and TTS models, performs VAD, and streams results back to the frontend.
 
----
+**Pipeline Flow:**
+Audio Stream (Frontend) -> VAD -> STT (FasterWhisper) -> MT (SeamlessM4T v2) -> TTS (Piper/F5-TTS) -> Audio Playback (Frontend)
 
-## Installation
+## Setup and Installation
 
 ### Prerequisites
 
-- **Python 3.9-3.11** (3.11 recommended)
-- **FFmpeg** (required for audio processing)
-- **Node.js** (for frontend dependencies)
+*   **Python 3.9+**
+*   **pip** (Python package installer)
+*   **Git**
+*   **FFmpeg** (for audio processing, usually pre-installed or easily installed via Homebrew on macOS: `brew install ffmpeg`)
+*   **BlackHole 2ch** (or similar virtual audio device for macOS, recommended for routing audio output for testing: `brew install blackhole-2ch`)
 
-### Platform-Specific Setup
+### Steps
 
-#### macOS
+1.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/brusnyak/bp.git
+    cd bp
+    ```
 
+2.  **Create and Activate a Virtual Environment:**
+    It's highly recommended to use a virtual environment to manage dependencies.
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+
+3.  **Install Dependencies:**
+    Install the required Python packages. The `requirements.txt` file is optimized for Apple Silicon.
+    ```bash
+    pip install -r requirements.txt
+    ```
+    *Note: If you encounter issues with `torch` or `torchaudio` on Apple Silicon, refer to the official PyTorch installation guide for specific commands for your macOS version and chip.*
+
+4.  **Download Models:**
+    *   **Piper TTS Models:** The system will attempt to download Piper TTS models on first initialization if they are not found locally. However, you can manually download them using the provided script:
+        ```bash
+        python backend/tts/download_piper_models.py en_US-ryan-medium
+        python backend/tts/download_piper_models.py sk_SK-lili-medium
+        python backend/tts/download_piper_models.py cs_CZ-jirka-medium
+        # Download other languages as needed from PIPER_MODEL_MAPPING in backend/main.py
+        ```
+    *   **CTranslate2 MT Models:** You need to convert Opus-MT models to CTranslate2 format.
+        ```bash
+        python backend/mt/convert_opus_mt_to_ct2.py --model_name Helsinki-NLP/opus-mt-en-sk
+        python backend/mt/convert_opus-mt-to-ct2.py --model_name Helsinki-NLP/opus-mt-sk-en
+        python backend/mt/convert_opus-mt-to-ct2.py --model_name Helsinki-NLP/opus-mt-en-cs
+        # Convert other language pairs as needed
+        ```
+    *   **FasterWhisper STT Model:** The `FasterWhisperSTT` model (`large-v3`) will be downloaded automatically on first use.
+    *   **F5-TTS (for Voice Cloning):** This model will be downloaded automatically on first use if selected.
+
+5.  **Generate SSL Certificates (for HTTPS):
+    The FastAPI server runs with HTTPS. Generate self-signed certificates:
+    ```bash
+    openssl req -x509 -newkey rsa:4096 -nodes -out certs/cert.pem -keyout certs/key.pem -days 365 -subj "/CN=localhost"
+    ```
+
+6.  **Run the Application:**
+    ```bash
+    python app.py
+    ```
+    The application will start on `https://localhost:8000`. You might need to accept the self-signed certificate in your browser.
+
+## Usage
+
+1.  **Open in Browser:** Navigate to `https://localhost:8000` in your web browser.
+2.  **Initialize Pipeline:** Click the "Initialize Pipeline" button. This will load all necessary models. The first load may take some time.
+3.  **Select Languages:** Choose your desired input and output languages from the dropdowns.
+4.  **Record Voice (Optional for F5-TTS):** If you plan to use F5-TTS for voice cloning, select "F5" as the TTS model, then click the "Record Voice" button. Follow the prompts to record a short audio sample of your voice or upload an existing WAV file. This voice profile will be used for synthesis.
+5.  **Start Speaking:** Once initialized, the system will automatically start listening for speech. Speak into your microphone.
+6.  **Real-time Translation:** Observe the transcription and translation appearing in real-time. The translated speech will be played back through your selected audio output.
+7.  **Monitor Latency:** The "Latency Breakdown" section and the timeline chart will show real-time performance metrics.
+
+## Testing
+
+A comprehensive testing framework is provided in the `test/` directory.
+
+To run the streaming pipeline tests:
 ```bash
-# Install FFmpeg via Homebrew
-brew install ffmpeg
-
-# Install Python dependencies
-make install
-
-# Or manually:
-python3.11 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+python test/streaming_pipeline_tests.py
 ```
 
-#### Linux (Debian/Ubuntu)
+**Note on Test Audio:**
+For full testing, you will need to provide actual `.wav` audio files for the following paths:
+*   `test/My test speech_xtts_speaker_clean.wav` (English speech for general testing)
+*   `test/slovak_test_speech.wav` (Slovak speech for multi-language testing)
+*   `test/Voice-Training.wav` (Speaker reference audio for XTTS voice cloning)
 
-```bash
-# Install FFmpeg
-sudo apt update && sudo apt install ffmpeg
+Ensure these files are placed in the `test/` directory. The corresponding `_transcript.txt` and `_translation.txt` files should contain the accurate text references for evaluation.
 
-# Install Python dependencies
-make install
+## Future Enhancements
 
-# Or manually:
-python3.11 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
+*   **Multi-speaker Support:** Extend the system to handle multiple speakers in a conference setting.
+*   **Production Optimization:** Explore model quantization, `whisper.cpp` or `mlx-whisper` for STT, and cloud deployment options.
+*   **`pip` Packaging:** Simplify installation by packaging the project as a Python library.
 
-## Project Goal
+## Thesis Suggestions
 
-To develop a standalone, web-accessible application capable of real-time speech translation during online conferences for multiple simultaneous users. The system focuses on a robust backend solution with client-side audio routing, enabling translated audio to be seamlessly integrated into existing web conferencing platforms (Google Meet, Zoom, Teams) using virtual audio devices and browser Web Audio API.
+Refer to `documentation/thesis_suggestions.txt` for detailed content suggestions for your bachelor's thesis, covering introduction, literature review, methodology, implementation details, results, and future work.
 
-## Key Features
+---
 
-*   **Real-Time Speech-to-Text (STT):** Transcribes spoken language into text using optimized models.
-*   **Real-Time Machine Translation (MT):** Translates transcribed text into the target language.
-*   **Real-Time Text-to-Speech (TTS):** Synthesizes translated text into speech, offering both generic and voice-cloned output.
-*   **Voice Activity Detection (VAD):** Efficiently segments speech from silence to optimize processing.
-*   **Dynamic Language Switching:** Users can select input and target languages on the fly.
-*   **Voice Cloning:** Utilizes advanced TTS models to synthesize translated speech in the original speaker's voice.
-*   **Session-Based Scalability:** Backend designed to handle multiple simultaneous users with isolated model instances.
-*   **Browser-Based Audio Routing:** Uses Web Audio API to route translated audio through virtual audio devices (BlackHole/VB-Cable) directly in the browser, compatible with multi-user server deployment.
-*   **Real-time Latency Visualization:** UI provides metrics and charts for pipeline performance.
-*   **User Authentication & Voice Management:** Secure user registration, login, and management of speaker voice profiles.
+**Current Development Status: F5-TTS Integration & Frontend/Backend Stability**
 
-## Core Technologies
+**Objective:** Successfully integrate F5-TTS for real-time voice cloning and resolve critical frontend and backend issues.
 
-The system is built on a modular client-server architecture:
+**Completed Actions:**
+*   **Frontend JavaScript Errors Resolved:**
+    *   Fixed `ReferenceError: loadF5Voices is not defined` in `ui/js/main.js` by correctly calling `fetchStoredVoices(populateF5VoiceSelect)`.
+    *   Resolved `TypeError: Cannot read properties of undefined (reading 'inputSampleRate')` in `ui/audio-processor.js` by passing `processorOptions` to `AudioWorkletNode` in `ui/js/audio_processing.js`.
+    *   Improved F5-TTS UI logic in `ui/index.html` and `ui/js/main.js` for better display of voice selection and record button.
+*   **Backend FFmpeg Integration Improved:**
+    *   Replaced `torchaudio.save` with `soundfile.write` in `backend/tts/f5_tts.py` to bypass `torchaudio`'s problematic FFmpeg integration, ensuring consistent audio handling with `soundfile`.
+*   **F5-TTS Integration:** F5-TTS is now integrated as a selectable TTS model with voice cloning capabilities.
 
-*   **Frontend:** HTML, CSS, JavaScript, Web Audio API, WebSockets, Chart.js
-*   **Backend:** Python, FastAPI, `faster-whisper` (STT), `CTranslate2` with `Helsinki-NLP Opus-MT` (MT), `Piper TTS` & `Coqui TTS` (TTS), `webrtcvad` (VAD).
-*   **Deployment/Dev:** Apple Silicon (M1/M2/M3) for local development, `ffmpeg` for audio processing, `openssl` for SSL certificates.
-
-## How to Use the Application (First-Time User Workflow)
-
-To use the real-time speech translation system with your preferred online conferencing application (e.g., Google Meet, Zoom), follow these steps:
-
-### 1. Install Virtual Audio Device
-
-This application routes translated audio through a virtual microphone. You need to install a specific driver for your operating system:
-
-*   **macOS:** Install [BlackHole](https://github.com/ExistentialAudio/BlackHole).
-    *   Download and install the appropriate BlackHole package (e.g., `BlackHole 2ch`).
-    *   Restart your browser after installation.
-*   **Windows:** Install [VB-Cable](https://vb-audio.com/Cable/).
-    *   Download and extract the VB-Cable archive.
-    *   Run `VBCABLE_Setup_x64.exe` (or `VBCABLE_Setup.exe`) as administrator and click "Install Driver".
-    *   Restart your browser after installation.
-
-### 2. Run the Application
-
-Ensure you have the project dependencies installed (refer to `Makefile` for `make install` instructions).
-
-```bash
-# Navigate to the project root directory
-cd /path/to/your/bp
-
-# Run the FastAPI backend server
-make run
-```
-This will start the backend server, typically accessible at `https://localhost:8000`.
-
-### 3. Access the Web Application
-
-Open your web browser (Chrome or Edge recommended) and navigate to:
-```
-https://localhost:8000/ui/live-speech/live.html
-```
-
-*   **Grant Microphone Permission:** When prompted, allow the application to access your microphone.
-*   **Select Audio Output Device:**
-    *   Locate the "Audio Output" dropdown in the web interface (below the TTS Model selector).
-    *   The system will automatically detect and pre-select BlackHole (macOS) or VB-Cable (Windows) if installed.
-    *   If not auto-detected, manually select your virtual audio device from the dropdown.
-    *   A green checkmark (✓) will appear if a virtual device is successfully selected.
-
-### 4. Configure Your Conferencing Application
-
-Open your online conferencing application (Google Meet, Zoom, Teams) in a separate browser tab or desktop app.
-
-*   **Select Virtual Microphone Input:**
-    *   Go to the audio/microphone settings in your conferencing application.
-    *   Select the virtual audio device as your **microphone input**:
-      - **macOS**: "BlackHole 2ch" or "BlackHole 16ch"  
-      - **Windows**: "CABLE Output (VB-Audio Virtual Cable)"
-
-### 5. Start Translation
-
-1.  In the web application, click "Initialize Pipeline" and wait for models to load.
-2.  Select your desired **input language** and **target language**.
-3.  Choose your preferred **TTS model**:
-    - **Piper**: Fast, generic voice
-    - **XTTS**: Voice cloning (requires recording or uploading a voice sample)
-4.  Click "Start" and begin speaking into your physical microphone.
-5.  **Verify**: 
-    - You should **NOT** hear the translation through your speakers (to prevent echo).
-    - Your conferencing app should show microphone activity when translation plays.
-    - Other participants will hear your translated speech.
-
-## Project Structure
-
-```
-.
-├── backend/                    # FastAPI backend for STT, MT, TTS, VAD, Auth
-│   ├── main.py                 # Main FastAPI app, WebSocket handler
-│   ├── stt/                    # Speech-to-Text module (Faster-Whisper)
-│   ├── mt/                     # Machine Translation module (CTranslate2 Opus-MT)
-│   ├── tts/                    # Text-to-Speech modules (Piper, Coqui TTS)
-│   └── utils/                  # Audio utilities, DB manager, Auth functions
-├── ui/                         # Frontend (HTML, CSS, JavaScript)
-│   ├── home/                   # Home page, thesis content
-│   ├── auth/                   # User authentication pages
-│   ├── live-speech/            # Real-time translation interface
-│   ├── global-styles.css       # Global styling
-│   └── ...
-├── documentation/              # Project documentation
-│   ├── bp                      # Bachelor's Project Outline
-│   ├── plan.txt                # Detailed Project Plan
-│   └── thesis_draft.md         # Thesis content (expanded with justifications, results)
-├── speaker_voices/             # Stores user voice profiles for Coqui TTS
-├── test/                       # Unit and integration tests
-│   ├── full_pipeline_test.py   # End-to-end pipeline tests
-│   ├── latency_pipeline_test.py# Latency benchmarks
-│   ├── stt_comparison.py       # STT model comparison
-│   └── ...
-├── app.py                      # Main application entry point
-├── Makefile                    # Build and run commands
-├── requirements.txt            # Python dependencies
-└── README.md                   # This file
-```
-
-## Demo
-
-A live demo showcasing the real-time translation from English to a target language, with the translated audio routed through a virtual device for other participants to hear, will be available in the home UI and linked here upon completion.
-
-## Contact
-
-Developed by brusnyak for Bachelor's Thesis 2024/2025.
+**Next Steps:**
+*   **Implement UI Error Handling and Feedback:** Enhance the frontend to provide clear user feedback for backend initialization failures (e.g., F5-TTS without a voice).
+*   **Run Performance Tests:** Execute `test/tts_performance_test.py` to gather data on Piper vs F5-TTS performance and quality.
+*   **Update Documentation:** Ensure all documentation, including `documentation/thesis.docx`, reflects the current state of the project.
