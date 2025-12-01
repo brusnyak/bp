@@ -66,6 +66,19 @@ document.addEventListener('DOMContentLoaded', () => {
         // Implementation for notifications
     }
 
+    // Activity Log Helper Function with colored event types
+    function logActivity(message, type = 'info') {
+        const activityLog = document.getElementById('activityLog');
+        if (!activityLog) return;
+        
+        const timestamp = new Date().toLocaleTimeString();
+        const logEntry = document.createElement('div');
+        logEntry.className = `log-entry log-${type}`; // CSS classes: log-info, log-success, log-warning, log-error
+        logEntry.textContent = `[${timestamp}] ${message}`;
+        activityLog.appendChild(logEntry);
+        activityLog.scrollTop = activityLog.scrollHeight; // Auto-scroll to bottom
+    }
+
     // Audio output device management
     const audioOutputSelect = document.getElementById('audioOutputSelect');
     const virtualMicHint = document.getElementById('virtualMicHint');
@@ -254,6 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         statusIndicator.classList.remove('off');
                         statusIndicator.classList.add('on');
                         showNotification('Models are fully loaded and ready!', 'success');
+                        logActivity('All models initialized successfully', 'success');
                     } else {
                         initBtn.disabled = false; // Enable initialize button
                         initBtn.classList.add('btn-active'); // Light up initialize button (if it was dimmed)
@@ -263,20 +277,101 @@ document.addEventListener('DOMContentLoaded', () => {
                         statusIndicator.classList.remove('on');
                         statusIndicator.classList.add('off');
                         showNotification('Model loading failed or is incomplete.', 'error');
+                        logActivity('Model initialization failed', 'error');
                     }
                 } else if (message.type === 'transcription_result') {
                     document.getElementById('transcriptionOutput').textContent = message.transcribed;
+                    
+                    // Update state indicator: Translating
+                    const stateTranslating = document.getElementById('stateTranslating');
+                    if (stateTranslating) {
+                        stateTranslating.classList.remove('idle');
+                        stateTranslating.classList.add('active');
+                    }
+                    
+                    if (latencyChart) latencyChart.update();
                 } else if (message.type === 'translation_result') {
                     document.getElementById('translationOutput').textContent = message.translated;
+                    
+                    // Update state indicator: Speaking
+                    const stateSpeaking = document.getElementById('stateSpeaking');
+                    if (stateSpeaking) {
+                        stateSpeaking.classList.remove('idle');
+                        stateSpeaking.classList.add('active');
+                    }
+                    
+                    if (latencyChart) latencyChart.update();
                 } else if (message.type === 'final_metrics') {
                     console.log('Frontend: Final Metrics:', message.metrics);
+                    
+                    // Update text metrics
+                    const sttLatencyEl = document.getElementById('sttLatency');
+                    const mtLatencyEl = document.getElementById('mtLatency');
+                    const ttsLatencyEl = document.getElementById('ttsLatency');
+                    const totalLatencyEl = document.getElementById('totalLatency');
+
+                    if (sttLatencyEl) sttLatencyEl.textContent = (message.metrics.stt_time || 0).toFixed(2) + 's';
+                    if (mtLatencyEl) mtLatencyEl.textContent = (message.metrics.mt_time || 0).toFixed(2) + 's';
+                    if (ttsLatencyEl) ttsLatencyEl.textContent = (message.metrics.tts_time || 0).toFixed(2) + 's';
+                    if (totalLatencyEl) totalLatencyEl.textContent = (message.metrics.total_latency || 0).toFixed(2) + 's';
+
+                    // Update activity log
+                    const activityLog = document.getElementById('activityLog');
+                    if (activityLog) {
+                        const timestamp = new Date().toLocaleTimeString();
+                        const logEntry = document.createElement('div');
+                        logEntry.className = 'log-entry';
+                        logEntry.textContent = `[${timestamp}] Processed speech - STT: ${(message.metrics.stt_time || 0).toFixed(2)}s, MT: ${(message.metrics.mt_time || 0).toFixed(2)}s, TTS: ${(message.metrics.tts_time || 0).toFixed(2)}s`;
+                        activityLog.appendChild(logEntry);
+                        activityLog.scrollTop = activityLog.scrollHeight; // Auto-scroll to bottom
+                    }
+
+                    // Update settings status
+                    const settingsStatusText = document.getElementById('settingsStatusText');
+                    if (settingsStatusText) {
+                        settingsStatusText.textContent = `Last processed: ${new Date().toLocaleTimeString()} | Total: ${(message.metrics.total_latency || 0).toFixed(2)}s`;
+                    }
+
+                    // Reset state indicators after processing complete
+                    setTimeout(() => {
+                        const stateListening = document.getElementById('stateListening');
+                        const stateTranslating = document.getElementById('stateTranslating');
+                        const stateSpeaking = document.getElementById('stateSpeaking');
+                        
+                        if (stateListening) {
+                            stateListening.classList.remove('active');
+                            stateListening.classList.add('idle');
+                        }
+                        if (stateTranslating) {
+                            stateTranslating.classList.remove('active');
+                            stateTranslating.classList.add('idle');
+                        }
+                        if (stateSpeaking) {
+                            stateSpeaking.classList.remove('active');
+                            stateSpeaking.classList.add('idle');
+                        }
+                    }, 1000); // Reset after 1 second
+
                     if (latencyChart) {
-                        const currentTime = performance.now() / 1000; // Current time in seconds
+                        const currentTime = performance.now() / 1000;
                         const relativeTime = currentTime - sessionStartTime;
-                        const inputActive = message.metrics.stt_time > 0; // If STT happened, input was active
-                        const translationActive = message.metrics.tts_time > 0; // If TTS happened, translation was active
-                        updateLatencyChart(relativeTime, inputActive, translationActive);
-                        console.log(`Frontend: Chart updated at ${relativeTime.toFixed(2)}s. Input Active: ${inputActive}, Translation Active: ${translationActive}`);
+                        
+                        // Calculate timing for chart visualization
+                        const sttDuration = message.metrics.stt_time || 0;
+                        const mtDuration = message.metrics.mt_time || 0;
+                        const ttsDuration = message.metrics.tts_time || 0;
+                        const totalDuration = sttDuration + mtDuration + ttsDuration;
+                        
+                        // Add speech period marker (input active during STT)
+                        const speechStart = relativeTime - totalDuration;
+                        const speechEnd = speechStart + sttDuration;
+                        
+                        // Add translation period marker (translation active during MT + TTS)
+                        const translationStart = speechEnd;
+                        const translationEnd = translationStart + mtDuration + ttsDuration;
+                        
+                        updateLatencyChart(relativeTime, speechStart, speechEnd, translationStart, translationEnd);
+                        console.log(`Frontend: Chart updated - Speech: ${speechStart.toFixed(2)}s-${speechEnd.toFixed(2)}s, Translation: ${translationStart.toFixed(2)}s-${translationEnd.toFixed(2)}s`);
                     } else {
                         console.warn('Frontend: Latency chart not initialized when receiving final_metrics.');
                     }
@@ -497,18 +592,11 @@ document.addEventListener('DOMContentLoaded', () => {
             mainAnalyser.connect(mainAudioWorkletNode); // Connect analyser to AudioWorkletNode
             // mainAudioWorkletNode.connect(mainAudioContext.destination); // Disconnect AudioWorkletNode from destination to prevent mic loopback
 
-            // Start interval for chart idle state updates (500ms)
-            // Start interval for chart idle state updates (500ms)
-            // Start interval for chart idle state updates (500ms)
+            // Set session start time for chart
             if (typeof window.updateLatencyChart === 'function') {
-                sessionStartTime = performance.now() / 1000; // Set session start time
-                chartIdleInterval = setInterval(() => {
-                    // Always update chart during idle (no need to check isProcessingSpeech)
-                    const currentTime = performance.now() / 1000;
-                    const relativeTime = currentTime - sessionStartTime;
-                    window.updateLatencyChart(relativeTime, false, false);
-                }, 500);
+                sessionStartTime = performance.now() / 1000;
             }
+
 
             isStreaming = true;
             startStopBtn.textContent = 'Stop';
@@ -516,6 +604,7 @@ document.addEventListener('DOMContentLoaded', () => {
             statusIndicator.classList.remove('off');
             statusIndicator.classList.add('on');
             showNotification('Real-time streaming started.', 'success');
+            logActivity('Session started - real-time streaming active', 'success');
         } catch (err) {
             console.error('Error starting real-time audio streaming:', err);
             showNotification('Failed to start real-time audio streaming. Check microphone access.', 'error');
@@ -636,7 +725,8 @@ document.addEventListener('DOMContentLoaded', () => {
         statusLabel.textContent = 'Ready';
         statusIndicator.classList.remove('on');
         statusIndicator.classList.add('off');
-        updateMainMicLevel(0); // Reset mic level display
+        showNotification('Real-time streaming stopped.', 'info');
+        logActivity('Session ended - streaming stopped', 'info');
         updateMainMicLevel(0); // Reset mic level display
 
         // Reset chart if it exists
@@ -659,20 +749,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Function to send VAD config to backend
-    async function sendVadConfigToBackend(vadAggressiveness, silenceRmsThreshold) {
-        showNotification('Updating VAD configuration...', 'info');
-        const userToken = localStorage.getItem('userToken');
-        if (!userToken) {
-            showNotification('You must be logged in to update VAD settings.', 'error');
+    // Function to send configuration update via WebSocket
+    function sendConfigUpdate() {
+        if (!websocket || websocket.readyState !== WebSocket.OPEN) {
+            console.warn('Frontend: WebSocket not ready. Cannot send config update.');
+            showNotification('WebSocket not connected. Cannot update configuration.', 'error');
             return;
         }
 
         const sourceLang = inputLanguageSelect.value;
         const targetLang = document.getElementById('outputLanguageSelect').value;
         const ttsModelChoice = ttsModelSelect.value;
-        const sttModelSize = "tiny"; // Default STT model size
-        const vadEnabled = true; // VAD is always enabled if config is being sent
+        const vadEnabled = true; // Always enabled for now
+        
+        // Get VAD settings if available (or use defaults)
+        const vadAggressiveness = 3; 
+        const silenceRmsThreshold = 0.02;
 
         let speakerWavPath = null;
         let speakerText = null;
@@ -686,177 +778,106 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        const queryParams = new URLSearchParams({
+        const configMessage = {
+            type: "config_update", // Correct message type for backend
             source_lang: sourceLang,
             target_lang: targetLang,
-            tts_model_choice: ttsModelChoice
-        });
+            tts_model_choice: ttsModelChoice,
+            speaker_wav_path: speakerWavPath,
+            speaker_text: speakerText,
+            speaker_lang: speakerLang,
+            vad_enabled: vadEnabled,
+            vad_aggressiveness: vadAggressiveness,
+            silence_rms_threshold: silenceRmsThreshold
+        };
 
-        try {
-            const response = await fetch(`/initialize?${queryParams.toString()}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${userToken}`
-                },
-                body: JSON.stringify({
-                    stt_model_size: sttModelSize,
-                    vad_enabled_param: vadEnabled,
-                    speaker_wav_path: speakerWavPath,
-                    speaker_text: speakerText,
-                    speaker_lang: speakerLang,
-                    vad_aggressiveness: vadAggressiveness, // Send VAD aggressiveness
-                    silence_rms_threshold: silenceRmsThreshold // Send silence RMS threshold
-                })
-            });
+        console.log('Frontend: Sending config_update:', configMessage);
+        websocket.send(JSON.stringify(configMessage));
+        
+        // Update UI to loading state
+        startStopBtn.disabled = true;
+        startStopBtn.classList.remove('btn-active');
+        statusLabel.textContent = 'Loading...';
+        statusIndicator.classList.remove('on');
+        statusIndicator.classList.add('off');
+    }
 
-            if (response.ok) {
-                const result = await response.json();
-                showNotification('VAD configuration updated successfully!', 'success');
-                console.log('VAD config update result:', result);
-            } else {
-                let errorData;
-                const contentType = response.headers.get('content-type');
-                if (contentType && contentType.includes('application/json')) {
-                    errorData = await response.json();
-                } else {
-                    errorData = await response.text();
-                    showNotification(`Failed to update VAD config: ${errorData}`, 'error');
-                }
-                console.error('VAD config update failed:', errorData);
-            }
-        } catch (error) {
-            showNotification('Network error during VAD config update.', 'error');
-            console.error('Error during VAD config update:', error);
-        }
+    // Add event listeners for immediate updates
+    if (inputLanguageSelect) {
+        inputLanguageSelect.addEventListener('change', sendConfigUpdate);
+    }
+    const outputLanguageSelect = document.getElementById('outputLanguageSelect');
+    if (outputLanguageSelect) {
+        outputLanguageSelect.addEventListener('change', sendConfigUpdate);
     }
 
     // Event listener for the Initialize Pipeline button
     if (initBtn) {
-        initBtn.addEventListener('click', async () => {
+        initBtn.addEventListener('click', () => {
             showNotification('Initializing models...', 'info');
+            
             const userToken = localStorage.getItem('userToken');
             if (!userToken) {
                 showNotification('You must be logged in to initialize models.', 'error');
                 return;
             }
 
-            const sourceLang = inputLanguageSelect.value;
-            const targetLang = document.getElementById('outputLanguageSelect').value;
-            const ttsModelChoice = ttsModelSelect.value;
-            const sttModelSize = "tiny"; // Default STT model size
-            const vadEnabled = true; // Default VAD enabled state
+            // Send config update to trigger initialization via WebSocket
+            sendConfigUpdate();
 
-            let speakerWavPath = null;
-            let speakerText = null;
-            let speakerLang = null;
+            // UI feedback (optimistic, actual status comes from WebSocket)
+            initBtn.disabled = true;
+            initBtn.classList.remove('btn-active');
+        });
+    }
 
-            if (ttsModelChoice === 'xtts') {
-                const selectedVoiceOption = speakerVoiceSelect.options[speakerVoiceSelect.selectedIndex];
-                if (selectedVoiceOption && selectedVoiceOption.value) {
-                    speakerWavPath = selectedVoiceOption.value;
-                    speakerLang = selectedVoiceOption.dataset.voiceLang || 'en'; // Fallback to 'en'
-                } else {
-                    showNotification('Please select a voice for XTTS.', 'warning');
-                    // Do not return here, allow initialization with null speaker if XTTS is selected but no voice
-                }
+    // Toggle visibility of speaker voice selection based on TTS model and re-initialize
+    if (ttsModelSelect && mainControlsTopRow) {
+        const updateVoiceSelectionVisibilityAndReinitialize = () => {
+            const currentTtsModelChoice = ttsModelSelect.value;
+            if (currentTtsModelChoice === 'xtts') { // Show for XTTS
+                voiceSelectionGroup.classList.remove('hidden');
+                mainControlsTopRow.classList.add('expanded');
+            } else {
+                voiceSelectionGroup.classList.add('hidden');
+                mainControlsTopRow.classList.remove('expanded');
             }
 
-            // Construct query parameters for source_lang, target_lang, tts_model_choice
-            const queryParams = new URLSearchParams({
-                source_lang: sourceLang,
-                target_lang: targetLang,
-                tts_model_choice: ttsModelChoice
+            // Trigger re-initialization when TTS model changes
+            const ttsModelName = ttsModelSelect.options[ttsModelSelect.selectedIndex].text;
+            showNotification('TTS model changed. Re-initializing models...', 'info');
+            logActivity(`TTS model changed to: ${ttsModelName}`, 'info');
+            sendConfigUpdate();
+        };
+
+        ttsModelSelect.addEventListener('change', updateVoiceSelectionVisibilityAndReinitialize);
+        
+        // Also trigger update when voice changes
+        if (speakerVoiceSelect) {
+            speakerVoiceSelect.addEventListener('change', () => {
+                const voiceName = speakerVoiceSelect.options[speakerVoiceSelect.selectedIndex].text;
+                showNotification('Voice changed. Re-initializing...', 'info');
+                logActivity(`Voice changed to: ${voiceName}`, 'info');
+                sendConfigUpdate();
             });
-
-            try {
-                const response = await fetch(`/initialize?${queryParams.toString()}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${userToken}`
-                    },
-                    body: JSON.stringify({
-                        stt_model_size: sttModelSize,
-                        vad_enabled_param: vadEnabled,
-                        speaker_wav_path: speakerWavPath,
-                        speaker_text: speakerText,
-                        speaker_lang: speakerLang
-                    })
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    showNotification('Models initialized successfully!', 'success');
-                    console.log('Initialization result:', result);
-                    // Immediate UI feedback for success
-                    initBtn.disabled = true;
-                    initBtn.classList.remove('btn-active');
-                    startStopBtn.disabled = false;
-                    startStopBtn.classList.add('btn-active');
-                    statusLabel.textContent = 'Ready';
-                    statusIndicator.classList.remove('off');
-                    statusIndicator.classList.add('on');
-                } else {
-                    let errorData;
-                    const contentType = response.headers.get('content-type');
-                    if (contentType && contentType.includes('application/json')) {
-                        errorData = await response.json();
-                    } else { // If not JSON, it's plain text
-                        errorData = await response.text();
-                        showNotification(`Failed to initialize models: ${errorData}`, 'error'); // Display raw text directly
-                    }
-                    console.error('Initialization failed:', errorData);
-                    // Immediate UI feedback for failure
-                    initBtn.disabled = false;
-                    initBtn.classList.add('btn-active');
-                    startStopBtn.disabled = true;
-                    startStopBtn.classList.remove('btn-active');
-                    statusLabel.textContent = 'Error';
-                    statusIndicator.classList.remove('on');
-                    statusIndicator.classList.add('off');
-                }
-            } catch (error) {
-                showNotification('Network error during model initialization.', 'error');
-                console.error('Error during initialization:', error);
-                // Immediate UI feedback for network error
-                initBtn.disabled = false;
-                initBtn.classList.add('btn-active');
-                startStopBtn.disabled = true;
-                startStopBtn.classList.remove('btn-active');
-                statusLabel.textContent = 'Error';
-                statusIndicator.classList.remove('on');
-                statusIndicator.classList.add('off');
-            }
-        });
-    }
-
-    // Sidebar toggle
-    if (burgerMenuBtn) {
-        burgerMenuBtn.addEventListener('click', () => {
-            sidebar.classList.add('open');
-        });
-    }
-
-    if (closeSidebarBtn) {
-        closeSidebarBtn.addEventListener('click', () => {
-            sidebar.classList.remove('open');
-        });
-    }
-
-    // Close sidebar when clicking outside (optional, but good UX)
-    document.addEventListener('click', (event) => {
-        if (!sidebar.contains(event.target) && !burgerMenuBtn.contains(event.target) && sidebar.classList.contains('open')) {
-            sidebar.classList.remove('open');
         }
-    });
+
+        // Set initial state (but don't trigger update on load to avoid double init)
+        const currentTtsModelChoice = ttsModelSelect.value;
+        if (currentTtsModelChoice === 'xtts') {
+            voiceSelectionGroup.classList.remove('hidden');
+            mainControlsTopRow.classList.add('expanded');
+        } else {
+            voiceSelectionGroup.classList.add('hidden');
+            mainControlsTopRow.classList.remove('expanded');
+        }
+    }
 
     const voiceLanguageSections = document.getElementById('voiceLanguageSections');
     const accountButton = document.getElementById('accountButton');
     const accountFloatingContainer = document.getElementById('accountFloatingContainer');
     const logoutButton = document.querySelector('.logout-button');
     const accountUserIcon = document.getElementById('accountUserIcon');
-    const inputLanguageSelect = document.getElementById('inputLanguageSelect');
     const accountDisplayUsername = document.getElementById('accountDisplayUsername');
     const accountDisplayEmail = document.getElementById('accountDisplayEmail');
     const accountUsernameSpan = document.getElementById('accountUsername'); // Span inside the account button
@@ -1143,70 +1164,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            const queryParams = new URLSearchParams({
-                source_lang: sourceLang,
-                target_lang: targetLang,
-                tts_model_choice: ttsModelChoice
-            });
-
-            try {
-                const response = await fetch(`/initialize?${queryParams.toString()}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${userToken}`
-                    },
-                    body: JSON.stringify({
-                        stt_model_size: sttModelSize,
-                        vad_enabled_param: vadEnabled,
-                        speaker_wav_path: speakerWavPath,
-                        speaker_text: speakerText,
-                        speaker_lang: speakerLang
-                    })
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    showNotification('Models re-initialized successfully!', 'success');
-                    console.log('Re-initialization result:', result);
-                    // Immediate UI feedback for success
-                    initBtn.disabled = true;
-                    initBtn.classList.remove('btn-active');
-                    startStopBtn.disabled = false;
-                    startStopBtn.classList.add('btn-active');
-                    statusLabel.textContent = 'Ready';
-                    statusIndicator.classList.remove('off');
-                    statusIndicator.classList.add('on');
-                } else {
-                    let errorData;
-                    const contentType = response.headers.get('content-type');
-                    if (contentType && contentType.includes('application/json')) {
-                        errorData = await response.json();
-                    } else { // If not JSON, it's plain text
-                        errorData = await response.text();
-                        showNotification(`Failed to re-initialize models: ${errorData}`, 'error'); // Display raw text directly
-                    }
-                    console.error('Re-initialization failed:', errorData);
-                    // Immediate UI feedback for failure
-                    initBtn.disabled = false;
-                    initBtn.classList.add('btn-active');
-                    startStopBtn.disabled = true;
-                    startStopBtn.classList.remove('btn-active');
-                    statusLabel.textContent = 'Error';
-                    statusIndicator.classList.remove('on');
-                    statusIndicator.classList.add('off');
-                }
-            } catch (error) {
-                showNotification('Network error during model re-initialization.', 'error');
-                console.error('Error during re-initialization:', error);
-                // Immediate UI feedback for network error
-                initBtn.disabled = false;
-                initBtn.classList.add('btn-active');
+            if (websocket && websocket.readyState === WebSocket.OPEN) {
+                const configMessage = {
+                    type: 'config',
+                    source_lang: sourceLang,
+                    target_lang: targetLang,
+                    tts_model_choice: ttsModelChoice,
+                    stt_model_size: sttModelSize,
+                    vad_enabled: vadEnabled,
+                    speaker_wav_path: speakerWavPath,
+                    speaker_text: speakerText,
+                    speaker_lang: speakerLang
+                };
+                websocket.send(JSON.stringify(configMessage));
+                
+                // Update UI to loading state
                 startStopBtn.disabled = true;
                 startStopBtn.classList.remove('btn-active');
-                statusLabel.textContent = 'Error';
+                statusLabel.textContent = 'Loading...';
                 statusIndicator.classList.remove('on');
                 statusIndicator.classList.add('off');
+            } else {
+                showNotification('WebSocket not connected. Cannot re-initialize.', 'error');
             }
         };
 
@@ -1748,7 +1727,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Chart.js for Latency Timeline
-    // Chart.js for Latency Timeline
     function initializeLatencyChart() {
         const latencyTimelineChartCanvas = document.getElementById('latencyTimelineChart');
         if (latencyTimelineChartCanvas) {
@@ -1756,7 +1734,7 @@ document.addEventListener('DOMContentLoaded', () => {
             latencyChart = new Chart(ctx, { // Assign to the global latencyChart
                 type: 'line',
                 data: {
-                    labels: Array.from({ length: 300 }, (_, i) => `${i}s`), // 0s to 5 minutes (300 seconds)
+                    labels: Array.from({ length: 60 }, (_, i) => `${i}s`), // 0s to 60 seconds
                     datasets: [
                         {
                             label: 'Input',
@@ -1783,13 +1761,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         x: {
                             type: 'linear', // Change to linear scale
                             min: 0,
-                            max: 300, // Show 5 minutes (300 seconds) of data
+                            max: 60, // Show 60 seconds of data
                             title: {
                                 display: true,
                                 text: 'Time (seconds)'
                             },
                             ticks: {
-                                stepSize: 30 // Show ticks every 30 seconds
+                                stepSize: 10 // Show ticks every 10 seconds
                             }
                         },
                         y: {
@@ -1813,28 +1791,47 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            // Function to update chart data (to be integrated with actual pipeline events)
-            window.updateLatencyChart = function (timeInSeconds, inputActive, translationActive) {
+            // Function to update chart data with speech/translation timing
+            window.updateLatencyChart = function (currentTime, speechStart, speechEnd, translationStart, translationEnd) {
                 if (!latencyChart) return;
 
                 const inputDataset = latencyChart.data.datasets[0];
                 const translationDataset = latencyChart.data.datasets[1];
 
-                // Add new data points
-                inputDataset.data.push({ x: timeInSeconds, y: inputActive ? 1 : 0 });
-                translationDataset.data.push({ x: timeInSeconds, y: translationActive ? 2 : 0 });
-
-                // Keep only the last 300 seconds (5 minutes) of data
-                const maxDataPoints = 300;
-                if (inputDataset.data.length > maxDataPoints) {
-                    inputDataset.data.shift();
-                    translationDataset.data.shift();
+                // Add data points for speech period
+                if (speechStart !== undefined && speechEnd !== undefined) {
+                    // Mark speech start
+                    inputDataset.data.push({ x: speechStart, y: 1 });
+                    translationDataset.data.push({ x: speechStart, y: 0 });
+                    
+                    // Mark speech end
+                    inputDataset.data.push({ x: speechEnd, y: 1 });
+                    translationDataset.data.push({ x: speechEnd, y: 0 });
+                    
+                    // Mark translation start
+                    inputDataset.data.push({ x: translationStart, y: 0 });
+                    translationDataset.data.push({ x: translationStart, y: 2 });
+                    
+                    // Mark translation end
+                    inputDataset.data.push({ x: translationEnd, y: 0 });
+                    translationDataset.data.push({ x: translationEnd, y: 2 });
+                    
+                    // Return to idle
+                    inputDataset.data.push({ x: currentTime, y: 0 });
+                    translationDataset.data.push({ x: currentTime, y: 0 });
                 }
 
-                // Update x-axis min/max to follow the latest data point, keeping a 5-minute window
-                const latestTime = timeInSeconds;
-                latencyChart.options.scales.x.min = Math.max(0, latestTime - maxDataPoints);
-                latencyChart.options.scales.x.max = latestTime;
+                // Keep only the last 60 seconds of data for better visibility
+                const maxTime = 60;
+                const minTime = Math.max(0, currentTime - maxTime);
+                
+                // Filter out old data points
+                inputDataset.data = inputDataset.data.filter(point => point.x >= minTime);
+                translationDataset.data = translationDataset.data.filter(point => point.x >= minTime);
+
+                // Update x-axis to show a rolling 60-second window
+                latencyChart.options.scales.x.min = minTime;
+                latencyChart.options.scales.x.max = Math.max(maxTime, currentTime);
 
                 latencyChart.update();
             };
@@ -1858,4 +1855,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize the chart
     initializeLatencyChart();
+
+    // Sidebar handlers
+    if (burgerMenuBtn) {
+        burgerMenuBtn.addEventListener('click', () => {
+            if (sidebar) {
+                sidebar.classList.add('open');
+                logActivity('Sidebar opened', 'info');
+            }
+        });
+    }
+
+    if (closeSidebarBtn) {
+        closeSidebarBtn.addEventListener('click', () => {
+            if (sidebar) {
+                sidebar.classList.remove('open');
+                logActivity('Sidebar closed', 'info');
+            }
+        });
+    }
+
+    // Log initial page load
+    logActivity('Application loaded', 'success');
 });

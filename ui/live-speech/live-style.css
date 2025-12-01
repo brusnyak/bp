@@ -923,6 +923,31 @@ body {
   color: var(--text-color);
 }
 
+/* Log entry styles with colors */
+.log-entry {
+  margin-bottom: 0.25rem;
+  padding: 0.25rem 0;
+}
+
+.log-entry.log-info {
+  color: var(--text-color);
+}
+
+.log-entry.log-success {
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+.log-entry.log-warning {
+  color: #f59e0b; /* Amber/warning color */
+  font-weight: 500;
+}
+
+.log-entry.log-error {
+  color: var(--danger-color);
+  font-weight: 600;
+}
+
 .log-message {
   margin-bottom: 0.5rem;
 }
