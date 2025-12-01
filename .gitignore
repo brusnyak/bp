@@ -32,3 +32,6 @@ dist/
 
 # Output files
 output_*.wav
+*.png
+*.mp4
+*.mov

@@ -541,40 +541,46 @@ async def rename_voice(
     Renames an existing speaker voice file and updates its metadata.
     """
     metadata = _read_speaker_voices_metadata()
-    voice_found = False
-    for voice in metadata:
-        if voice.get("user_id") == current_user.id and voice.get("name") == request.old_name:
-            # Check if new name already exists for this user
-            if any(v.get("user_id") == current_user.id and v.get("name") == request.new_name for v in metadata):
-                raise HTTPException(status_code=409, detail=f"Voice with name '{request.new_name}' already exists for this user.")
-
-            old_filename = voice["filename"]
-            file_extension = os.path.splitext(old_filename)[1]
-            new_filename = f"{current_user.id}_{request.new_name}{file_extension}"
-            
-            old_file_path = os.path.join(SPEAKER_VOICES_DIR, old_filename)
-            new_file_path = os.path.join(SPEAKER_VOICES_DIR, new_filename)
-
-            try:
-                os.rename(old_file_path, new_file_path)
-                voice["name"] = request.new_name
-                voice["filename"] = new_filename
-                voice["path"] = new_file_path
-                _write_speaker_voices_metadata(metadata)
-                logging.info(f"Backend: Renamed voice from '{request.old_name}' to '{request.new_name}' for user {current_user.id}")
-                voice_found = True
-                break
-            except FileNotFoundError:
-                logging.error(f"Backend: File not found for voice '{request.old_name}' at {old_file_path}")
-                raise HTTPException(status_code=404, detail=f"Voice file '{request.old_name}' not found.")
-            except Exception as e:
-                logging.error(f"Backend: Error renaming voice '{request.old_name}': {e}")
-                raise HTTPException(status_code=500, detail=f"Failed to rename voice: {e}")
     
-    if not voice_found:
-        raise HTTPException(status_code=404, detail=f"Voice '{request.old_name}' not found for this user.")
+    # 1. Find all voices with the requested name
+    matching_voices = [v for v in metadata if v.get("name") == request.old_name]
     
-    return {"status": "success", "message": f"Voice '{request.old_name}' renamed to '{request.new_name}' successfully."}
+    if not matching_voices:
+        raise HTTPException(status_code=404, detail=f"Voice '{request.old_name}' not found.")
+
+    # 2. Check if the user owns any of these voices
+    user_voice = next((v for v in matching_voices if v.get("user_id") == current_user.id), None)
+
+    if user_voice:
+        # User owns the voice, proceed with rename
+        # Check if new name already exists for this user
+        if any(v.get("user_id") == current_user.id and v.get("name") == request.new_name for v in metadata):
+            raise HTTPException(status_code=409, detail=f"Voice with name '{request.new_name}' already exists for this user.")
+
+        old_filename = user_voice["filename"]
+        file_extension = os.path.splitext(old_filename)[1]
+        new_filename = f"{current_user.id}_{request.new_name}{file_extension}"
+        
+        old_file_path = os.path.join(SPEAKER_VOICES_DIR, old_filename)
+        new_file_path = os.path.join(SPEAKER_VOICES_DIR, new_filename)
+
+        try:
+            os.rename(old_file_path, new_file_path)
+            user_voice["name"] = request.new_name
+            user_voice["filename"] = new_filename
+            user_voice["path"] = new_file_path
+            _write_speaker_voices_metadata(metadata)
+            logging.info(f"Backend: Renamed voice from '{request.old_name}' to '{request.new_name}' for user {current_user.id}")
+            return {"status": "success", "message": f"Voice '{request.old_name}' renamed to '{request.new_name}' successfully."}
+        except FileNotFoundError:
+            logging.error(f"Backend: File not found for voice '{request.old_name}' at {old_file_path}")
+            raise HTTPException(status_code=404, detail=f"Voice file '{request.old_name}' not found.")
+        except Exception as e:
+            logging.error(f"Backend: Error renaming voice '{request.old_name}': {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to rename voice: {e}")
+    else:
+        # Voice exists but belongs to someone else (e.g., system default)
+        raise HTTPException(status_code=403, detail="Sorry, but you don't have permission to edit this file, deal with it")
 
 @router.delete("/voices/delete", summary="Delete a speaker voice", response_model=Dict[str, str])
 async def delete_voice(
@@ -769,23 +775,13 @@ async def _process_speech_segment_pipeline(
     # Standard non-streaming synthesis (Piper or fallback)
     logging.info(f"Backend: Session {client_info}: Starting TTS synthesis...")
 
-    # Handle Slovak fallback for XTTS if it's the chosen model but target_lang is 'sk'
-    if tts_model_choice == "xtts" and target_lang == "sk":
-        logging.warning(f"Backend: Session {client_info}: XTTS does not support Slovak. Falling back to Piper for generic voice.")
-        await safe_send("error", {"type": "error", "message": "XTTS does not support Slovak. Using generic voice (Piper) instead."})
-        if piper_tts_model_instance:
-            tts_model_instance = piper_tts_model_instance # Use Piper for fallback
-        else:
-                logging.error(f"Backend: Session {client_info}: Piper TTS model not initialized for Slovak fallback.")
-                await safe_send("error", {"type": "error", "message": "Piper TTS not ready for Slovak fallback."})
-                return
-        
-        # Check for speaker_wav_path requirement for XTTS if it's still the chosen model
-        if tts_model_choice == "xtts" and not speaker_wav_path:
-            logging.warning(f"Backend: Session {client_info}: XTTS selected but no valid speaker voice provided. Sending error to client.")
-            await safe_send("error", {"type": "error", "message": "XTTS requires a selected voice. Please choose or record one."})
-            return
-     # --- TTS ---
+    # Check for speaker_wav_path requirement for XTTS if it's still the chosen model
+    if tts_model_choice == "xtts" and not speaker_wav_path:
+        logging.warning(f"Backend: Session {client_info}: XTTS selected but no valid speaker voice provided. Sending error to client.")
+        await safe_send("error", {"type": "error", "message": "XTTS requires a selected voice. Please choose or record one."})
+        return
+
+    # --- TTS ---
     websocket.timestamps["tts_start"].append(time.perf_counter())
     tts_start_time = time.perf_counter()
     
@@ -799,6 +795,11 @@ async def _process_speech_segment_pipeline(
     if tts_model_choice == "xtts" and coqui_tts_model_instance:
         logging.info(f"Backend: Session {client_info}: Starting XTTS streaming synthesis...")
         
+        # Map Slovak (sk) to Czech (cs) for XTTS as it doesn't support sk natively
+        tts_lang = "cs" if target_lang == "sk" else target_lang
+        if tts_lang != target_lang:
+             logging.info(f"Backend: Session {client_info}: XTTS using '{tts_lang}' (Czech) for '{target_lang}' (Slovak) input.")
+
         queue = asyncio.Queue()
         
         def run_streaming_tts():
@@ -806,7 +807,7 @@ async def _process_speech_segment_pipeline(
                 # synthesize_stream yields numpy arrays
                 for chunk in coqui_tts_model_instance.synthesize_stream(
                     text=translated_text,
-                    language=target_lang,
+                    language=tts_lang,
                     speaker_wav_path=speaker_wav_path
                 ):
                     loop.call_soon_threadsafe(queue.put_nowait, chunk)
@@ -1025,6 +1026,7 @@ async def handle_audio_stream(websocket: WebSocket):
                                 session_config["vad_enabled"] = new_vad_enabled # Update session VAD state
                                 
                                 await websocket.send_text(json.dumps({"type": "status", "message": "Configuration updated and models re-initialized."}))
+                                await websocket.send_text(json.dumps({"type": "models_loading_status", "fully_loaded": True}))
                             else:
                                 logging.info(f"Backend: Session {client_info}: Configuration updated, but no model re-initialization needed.")
                                 await websocket.send_text(json.dumps({"type": "status", "message": "Configuration updated."}))

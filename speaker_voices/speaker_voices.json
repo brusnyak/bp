@@ -22,5 +22,14 @@
     "path": "speaker_voices/hello.wav",
     "transcribed_text": " Hello, this is a test of my voice for cloning purposes.",
     "user_id": null
+  },
+  {
+    "id": "4",
+    "user_id": 2,
+    "name": "my voice 1",
+    "filename": "2_my voice 1.wav",
+    "path": "speaker_voices/2_my voice 1.wav",
+    "language": "en",
+    "upload_time": 1764565381.449187
   }
 ]
