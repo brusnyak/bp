@@ -729,7 +729,7 @@ The artifacts were traced to two primary sources:
 
 The following chart visualizes the reduction in artifact severity across debugging iterations:
 
-![Artifact Elimination Timeline](../documentation/visuals/chart5_artifact_timeline.png)
+![Artifact Elimination Timeline](visuals/chart5_artifact_timeline.png)
 
 As shown, artifacts were completely eliminated by iteration 7 through the combination of hybrid synthesis, intelligent trimming, and parameter tuning.
 
@@ -745,7 +745,7 @@ Speaker embeddings are computed from the reference voice sample and used to guid
 - Subsequent syntheses with the same voice reuse the cached embedding.
 - **Impact:** Approximately 1.9% reduction in synthesis time for repeated use of the same voice.
 
-![Optimization Impact](../documentation/visuals/chart3_optimization_impact.png)
+![Optimization Impact](visuals/chart3_optimization_impact.png)
 
 **2. Model Warmup:**
 
@@ -767,7 +767,7 @@ Initial testing revealed instability with Apple Silicon's MPS (Metal Performance
 
 Extensive benchmarking was performed to identify optimal thread count and speed multiplier settings for Apple M1 Pro:
 
-![Tuning Heatmap](../documentation/visuals/chart2_tuning_heatmap.png)
+![Tuning Heatmap](visuals/chart2_tuning_heatmap.png)
 
 **Optimal Configuration:**
 
@@ -791,9 +791,9 @@ The following table summarizes Coqui TTS performance metrics on Apple M1 Pro (CP
 
 **Comparison with Piper TTS:**
 
-![Latency Comparison](../documentation/visuals/chart1_latency_comparison.png)
+![Latency Comparison](visuals/chart1_latency_comparison.png)
 
-![RTF Comparison](../documentation/visuals/chart4_rtf_comparison.png)
+![RTF Comparison](visuals/chart4_rtf_comparison.png)
 
 As shown, Piper TTS significantly outperforms Coqui TTS in terms of speed (RTF ~0.05 vs. 1.72), but Coqui TTS provides the critical voice cloning capability that Piper lacks. This trade-off aligns with the project's dual-pronged TTS strategy.
 
@@ -1104,11 +1104,11 @@ A critical requirement for a real-time speech translation system in conferencing
 The following Gantt charts visualize the timeline of events for 12 and 15 concurrent users, illustrating the system's behavior under load.
 
 **Figure 5.X: Timeline of 12 Concurrent Users (Stable)**
-![Timeline 12 Users](/Users/yegor/Documents/STU/BP/test_output/performance_tests/run_20251128_111937/timeline_gantt_12_users.png)
+![Timeline 12 Users](../test_output/performance_tests/run_20251128_111937/timeline_gantt_12_users.png)
 _The system maintains stability with 12 users, though latency increases due to queuing._
 
 **Figure 5.Y: Timeline of 15 Concurrent Users (Overload)**
-![Timeline 15 Users](/Users/yegor/Documents/STU/BP/test_output/performance_tests/run_20251128_111937/timeline_gantt_15_users.png)
+![Timeline 15 Users](../test_output/performance_tests/run_20251128_111937/timeline_gantt_15_users.png)
 _At 15 users, resource saturation leads to task failures and significant processing delays._
 
 **Issue Identified:** Resource Exhaustion
@@ -1121,52 +1121,104 @@ _At 15 users, resource saturation leads to task failures and significant process
 
 **Root Cause:** Memory and CPU saturation due to per-user model instantiation. The M1 Pro's 16GB Unified Memory is likely fully utilized at >12 users.
 
-##### 5.2.5.3 Visual Analysis
+##### 5.2.5.4 Performance Breakdown
 
-**Timeline Gantt Chart (5 Users):**
+**Component Efficiency (5 Users - Successful Sessions):**
 
-The Gantt chart for 5 concurrent users demonstrates true parallel processing:
+1.  **Speech-to-Text (STT):**
 
-![Concurrent Session Timeline - 5 Users](../test_output/performance_tests/run_20251128_081120/timeline_gantt_5_users.png)
+    - Average: 0.92s
+    - Range: 0.52s - 2.04s
+    - **Analysis:** Scales linearly with audio length; most consistent component
+    - **Optimization Status:** Well-optimized via `faster-whisper` + CTranslate2
 
-**Key Observations:**
+2.  **Machine Translation (MT):**
 
-- All 5 green bars indicate successful session completion
-- Overlapping session execution proves true concurrency (no serialization)
-- Sessions started within milliseconds of each other
-- Processing occurred in parallel without blocking
-- Longest session (Session 3) was the 65-word audio file with 8 speech segments
+    - Average: 0.16s
+    - Range: 0.03s - 0.50s
+    - **Analysis:** Extremely fast; not a bottleneck
+    - **Optimization Status:** CTranslate2 provides excellent performance
 
-**Latency Distribution Analysis:**
+3.  **Text-to-Speech (TTS) - Piper:**
+    - Average: 0.27s
+    - Range: 0.05s - 0.67s
+    - **Analysis:** Very efficient; Piper TTS performs well under load
+    - **Optimization Status:** Real-Time Factor (RTF) ~0.05, suitable for concurrency
 
-![Latency Distributions - 5 Users](../test_output/performance_tests/run_20251128_081120/latency_distributions_5_users.png)
+**Latency Pattern for Short Utterances:**
 
-The box plots reveal performance consistency:
+- **Target:** <5s for good conversational experience
+- **Achieved:** 4.45s - 5.34s for 7-word utterances ✅
+- **Status:** Meets conversational requirements
 
-- **STT:** Tight distribution (low variance) indicating consistent performance
-- **MT:** Very tight distribution (extremely consistent, fastest component)
-- **TTS:** Moderate spread (depends on text length)
-- **E2E:** Wider spread (affected by total audio length and segment count)
+**Latency Pattern for Long Speech:**
 
-**Timeline Gantt Chart (12 Users):**
+- **Observed:** 27.40s for 65-word, 8-segment speech
+- **Expected:** High latency due to VAD segmentation (sequential processing)
+- **Status:** Normal behavior; each segment processed independently
 
-![Concurrent Session Timeline - 12 Users](../test_output/performance_tests/run_20251128_111937/timeline_gantt_12_users.png)
+##### 5.2.5.5 Scalability Conclusions
 
-The 12-user test shows successful completion of all sessions, but with longer duration bars indicating queuing and increased processing time.
+**Current Capacity:**
 
-**Latency Distribution (12 Users):**
+- **Verified:** 12 concurrent users with 100% success rate
+- **Limitation Identified:** Memory/CPU saturation at 15 users
+- **Resource Usage:** 16GB Unified Memory fully utilized at ~12-14 users
 
-![Latency Distributions - 12 Users](../test_output/performance_tests/run_20251128_111937/latency_distributions_12_users.png)
+**Bottleneck Analysis:**
 
-**Overload Visualization (15 Users):**
+The testing revealed that the system is **not** limited by:
 
-![Concurrent Session Timeline - 15 Users](../test_output/performance_tests/run_20251128_111937/timeline_gantt_15_users.png)
+- ✅ Network bandwidth (WebSocket connections stable up to overload)
+- ✅ Translation quality (maintained across successful sessions)
 
-The 15-user chart reveals the breaking point:
+The system **is** limited by:
 
-- Red bars indicate failed sessions
-- Green bars show successful but delayed processing
-- Clear visual evidence of resource exhaustion
+- ❌ **Memory Capacity:** Per-user model instantiation consumes ~1GB+ per user
+- ❌ **CPU Saturation:** Concurrent inference slows down significantly >10 users
+
+**Scalability Potential:**
+
+Based on stress testing results:
+
+- **Current Safe Limit:** 10 users (low latency)
+- **Maximum Capacity:** 12 users (higher latency, but stable)
+- **Scaling Strategy:**
+  1.  **Vertical Scaling:** Upgrade to 64GB+ RAM (estimated 40-50 users)
+  2.  **Horizontal Scaling:** Deploy multiple backend instances behind a load balancer
+
+**Recommendations for Production:**
+
+1.  **Immediate Action:** Increase WebSocket connection limit in uvicorn configuration:
+
+    ```python
+    uvicorn.run(app, limit_concurrency=20, backlog=100)
+    ```
+
+2.  **Medium-term Optimization:**
+
+    - Implement model sharing between sessions (reduce memory per user)
+    - Add request queuing for graceful degradation at capacity
+    - Consider GPU acceleration for STT/MT (further increase capacity)
+
+3.  **Long-term Scaling:**
+
+    - Deploy multiple backend instances with load balancing
+    - Implement Redis-based session management for distributed setup
+    - Containerize with Docker for easier horizontal scaling
+
+##### 5.2.5.6 Comparison with Project Goals
+
+| Requirement          | Target | Achieved               | Status              |
+| :------------------- | :----- | :--------------------- | :------------------ |
+| **Concurrent Users** | 20     | 12 verified            | ⚠️ Hardware limit   |
+| **E2E Latency**      | <5s    | 4.45s (5 users)        | ✅ For short speech |
+| **Success Rate**     | >95%   | 100% (at 12 users)     | ✅                  |
+| **CPU Usage**        | <80%   | Saturation at 12 users | ⚠️ At capacity      |
+| **Memory**           | Stable | Saturation at 12 users | ⚠️ At capacity      |
+| **True Concurrency** | Yes    | Verified via Gantt     | ✅                  |
+
+**Key Achievement:** The system successfully handles 12 concurrent users on a single consumer-grade laptop (M1 Pro), exceeding typical requirements for small-group meetings. Scaling beyond this requires architectural changes (model sharing) or hardware upgrades.
 
 ##### 5.2.5.4 Performance Breakdown
 
