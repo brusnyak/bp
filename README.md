@@ -8,15 +8,7 @@ This project implements a real-time live speech translation system designed for 
 
 Witness the seamless real-time speech translation in action. See how our system effortlessly bridges language gaps.
 
-<div class="demo-video">
-  <iframe
-  title="Real-Time Speech Translation Demo"
-    src="https://www.youtube.com/embed/_-jwEyGxDYs"
-    frameborder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowfullscreen
-  ></iframe>
-</div>
+[![Real-Time Speech Translation Demo](https://img.youtube.com/vi/_-jwEyGxDYs/maxresdefault.jpg)](https://www.youtube.com/watch?v=_-jwEyGxDYs)
 
 **Key Features:**
 *   **Real-time Performance:** Optimized for minimal end-to-end latency, targeting <1 seconds for standard TTS and 2.5-3.5 seconds for voice cloning.
