@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Auto-detect virtual device (BlackHole or VB-Cable)
                 const label = device.label.toLowerCase();
-                if (label.includes('blackhole') || label.includes('vb-cable') || label.includes('vb cable')) {
+                if (label.includes('blackhole') || label.includes('vb-cable') || label.includes('vb cable') || label.includes('vb-audio')) {
                     option.selected = true;
                     selectedAudioOutputDeviceId = device.deviceId;
                     virtualDeviceFound = true;
@@ -492,7 +492,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let selectedMicId = null;
             for (const device of audioInputs) {
                 const label = device.label.toLowerCase();
-                const isVirtualDevice = label.includes('blackhole') || label.includes('cable');
+                const isVirtualDevice = label.includes('blackhole') || label.includes('cable') || label.includes('vb-audio');
                 console.log(`Frontend: Found audio input: ${device.label} (Virtual Device: ${isVirtualDevice})`);
 
                 if (!isVirtualDevice && !selectedMicId) {
@@ -527,7 +527,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Verify we're not using a virtual device (BlackHole or VB-CABLE)
             const track = mainAudioStream.getAudioTracks()[0];
             const trackLabel = track.label.toLowerCase();
-            if (trackLabel.includes('blackhole') || trackLabel.includes('cable')) {
+            if (trackLabel.includes('blackhole') || trackLabel.includes('cable') || trackLabel.includes('vb-audio')) {
                 console.error('Frontend: CRITICAL ERROR - Microphone input is a virtual device! This will cause feedback loop!');
                 showNotification('ERROR: Microphone input is a virtual device (BlackHole/VB-CABLE)! This will cause feedback. Please change your system audio settings.', 'error');
                 stopRealtimeAudioStreaming();
