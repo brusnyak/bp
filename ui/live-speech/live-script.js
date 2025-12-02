@@ -483,17 +483,19 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             console.log('Frontend: Calling navigator.mediaDevices.getUserMedia...'); // Added log before getUserMedia
 
-            // CRITICAL FIX: Enumerate devices and explicitly exclude BlackHole from mic input
+
+            // CRITICAL FIX: Enumerate devices and explicitly exclude BlackHole/VB-CABLE from mic input
             const devices = await navigator.mediaDevices.enumerateDevices();
             const audioInputs = devices.filter(d => d.kind === 'audioinput');
 
-            // Find a non-BlackHole microphone
+            // Find a non-virtual-device microphone (exclude BlackHole and VB-CABLE)
             let selectedMicId = null;
             for (const device of audioInputs) {
-                const isBlackHole = device.label.toLowerCase().includes('blackhole');
-                console.log(`Frontend: Found audio input: ${device.label} (BlackHole: ${isBlackHole})`);
+                const label = device.label.toLowerCase();
+                const isVirtualDevice = label.includes('blackhole') || label.includes('cable');
+                console.log(`Frontend: Found audio input: ${device.label} (Virtual Device: ${isVirtualDevice})`);
 
-                if (!isBlackHole && !selectedMicId) {
+                if (!isVirtualDevice && !selectedMicId) {
                     selectedMicId = device.deviceId;
                     console.log(`Frontend: Selected mic: ${device.label}`);
                 }
@@ -522,11 +524,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             mainAudioStream = await navigator.mediaDevices.getUserMedia(audioConstraints);
 
-            // Verify we're not using BlackHole
+            // Verify we're not using a virtual device (BlackHole or VB-CABLE)
             const track = mainAudioStream.getAudioTracks()[0];
-            if (track.label.toLowerCase().includes('blackhole')) {
-                console.error('Frontend: CRITICAL ERROR - Microphone input is BlackHole! This will cause feedback loop!');
-                showNotification('ERROR: Microphone input is BlackHole! This will cause feedback. Please change your system audio settings.', 'error');
+            const trackLabel = track.label.toLowerCase();
+            if (trackLabel.includes('blackhole') || trackLabel.includes('cable')) {
+                console.error('Frontend: CRITICAL ERROR - Microphone input is a virtual device! This will cause feedback loop!');
+                showNotification('ERROR: Microphone input is a virtual device (BlackHole/VB-CABLE)! This will cause feedback. Please change your system audio settings.', 'error');
                 stopRealtimeAudioStreaming();
                 return;
             }
