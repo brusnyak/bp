@@ -1,7 +1,11 @@
 .PHONY: install install-deps run test certs clean help
 
 # Detect operating system
-UNAME_S := $(shell uname -s 2>/dev/null || echo Windows)
+ifeq ($(OS),Windows_NT)
+    UNAME_S := Windows
+else
+    UNAME_S := $(shell uname -s 2>/dev/null || echo Unknown)
+endif
 
 # Python version
 PYTHON_VERSION = 3.11
@@ -13,18 +17,21 @@ ifeq ($(UNAME_S),Darwin)  # macOS
     PIP_EXEC = $(VENV_NAME)/bin/pip
     DYLD_ENV = DYLD_LIBRARY_PATH="/opt/homebrew/lib"
     FFMPEG_INSTALL = brew install ffmpeg || true
+    OPENSSL_CMD = openssl
 else ifeq ($(UNAME_S),Linux)
     VENV_NAME = venv
     PYTHON_EXEC = $(VENV_NAME)/bin/python$(PYTHON_VERSION)
     PIP_EXEC = $(VENV_NAME)/bin/pip
     DYLD_ENV = 
     FFMPEG_INSTALL = @echo "Please install FFmpeg: sudo apt-get install ffmpeg (Debian/Ubuntu) or sudo yum install ffmpeg (RHEL/CentOS)"
-else  # Windows (assumes running in Git Bash or WSL)
+    OPENSSL_CMD = openssl
+else  # Windows
     VENV_NAME = venv
-    PYTHON_EXEC = $(VENV_NAME)/Scripts/python.exe
-    PIP_EXEC = $(VENV_NAME)/Scripts/pip.exe
+    PYTHON_EXEC = $(VENV_NAME)\Scripts\python.exe
+    PIP_EXEC = $(VENV_NAME)\Scripts\pip.exe
     DYLD_ENV = 
-    FFMPEG_INSTALL = @echo "Please install FFmpeg manually or use Chocolatey: choco install ffmpeg"
+    FFMPEG_INSTALL = @echo "FFmpeg should be installed via winget or setup_windows.ps1"
+    OPENSSL_CMD = "C:\Program Files\Git\usr\bin\openssl.exe"
 endif
 
 install: ## Install all Python and Node.js dependencies, including models.
@@ -58,7 +65,7 @@ test: ## Run the comprehensive backend test suite.
 
 certs: ## Generate SSL certificates for HTTPS/WSS.
 	@mkdir -p certs
-	openssl req -x509 -newkey rsa:4096 -nodes -out certs/cert.pem -keyout certs/key.pem -days 365
+	$(OPENSSL_CMD) req -x509 -newkey rsa:4096 -nodes -out certs/cert.pem -keyout certs/key.pem -days 365 -subj "/CN=localhost"
 
 clean: ## Clean up generated files and caches.
 	find . -name "__pycache__" -type d -exec rm -rf {} +

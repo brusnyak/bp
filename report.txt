@@ -1,3 +1,150 @@
-1. check 'Speaker Voice:' dropdown design it is looking well, we should apply the same design to TTS model
-2. remove 'Audio Output:', save only check for '✓ Virtual device detected: BlackHole 2ch (Virtual)'
-3. ensure mic input level is in the middle
+error 1:
+PowerShell Extension v2025.4.0
+Copyright (c) Microsoft Corporation.
+
+https://aka.ms/vscode-powershell
+Type 'help' to get help.
+
+PS C:\Users\Irina\OneDrive\Документи\test bp> & "c:/Users/Irina/OneDrive/Документи/test bp/venv/Scripts/Activate.ps1"
+(venv) PS C:\Users\Irina\OneDrive\Документи\test bp> make run    
+make : The term 'make' is not recognized as the name of a cmdlet, function, script file, or operable progr
+am. Check the spelling of the name, or if a path was included, verify that the path is correct and try aga
+in.
+At line:1 char:1
++ make run
++ ~~~~
+    + CategoryInfo          : ObjectNotFound: (make:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(venv) PS C:\Users\Irina\OneDrive\Документи\test bp> reset
+reset : The term 'reset' is not recognized as the name of a cmdlet, function, script file, or operable pro
+gram. Check the spelling of the name, or if a path was included, verify that the path is correct and try a 
+gain.
+At line:1 char:1
++ reset
++ ~~~~~
+    + CategoryInfo          : ObjectNotFound: (reset:String) [], CommandNotFoundException
+    + FullyQualifiedErrorId : CommandNotFoundException
+
+(venv) PS C:\Users\Irina\OneDrive\Документи\test bp> 
+
+
+error 2:
+
+:8000/api/voices:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
+live-script.js:906 Error loading voices: Error: HTTP error! status: 401
+    at loadVoices (live-script.js:901:23)
+    at async renderVoices (live-script.js:913:24)
+loadVoices @ live-script.js:906Understand this error
+live-script.js:248 WebSocket opened: Event {isTrusted: true, type: 'open', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+live-script.js:743 Frontend: Start/Stop button clicked. isStreaming: false
+live-script.js:482 Frontend: Attempting to start real-time audio streaming...
+live-script.js:484 Frontend: Calling navigator.mediaDevices.getUserMedia...
+live-script.js:494 Frontend: Found audio input:  (BlackHole: false)
+live-script.js:498 Frontend: Selected mic: 
+live-script.js:534 Frontend: MediaStream obtained. Active: true Tracks: [MediaStreamTrack]
+live-script.js:536 Frontend: Audio Track 0: id=5a768d58-da99-4dc8-aa94-f41ce03eae26, label=Microphone Array (AMD Audio Device), readyState=live, enabled=true
+live-script.js:541 Frontend: AudioContext created with sampleRate: 16000 and state: running
+live-script.js:553 Frontend: Added GainNode with initial gain: 4
+live-script.js:219 [MIC] RMS: 0.0029, Scaled: 0.0538, EMA: 0.0161, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0044, Scaled: 0.0665, EMA: 0.0312, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0052, Scaled: 0.0721, EMA: 0.0435, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0055, Scaled: 0.0743, EMA: 0.0528, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0046, Scaled: 0.0676, EMA: 0.0572, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0049, Scaled: 0.0703, EMA: 0.0611, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0042, Scaled: 0.0645, EMA: 0.0621, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0051, Scaled: 0.0713, EMA: 0.0649, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0050, Scaled: 0.0708, EMA: 0.0667, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0043, Scaled: 0.0658, EMA: 0.0664, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0049, Scaled: 0.0697, EMA: 0.0674, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0049, Scaled: 0.0701, EMA: 0.0682, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0054, Scaled: 0.0735, EMA: 0.0698, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0053, Scaled: 0.0728, EMA: 0.0707, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0050, Scaled: 0.0704, EMA: 0.0706, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0057, Scaled: 0.0754, EMA: 0.0720, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0101, Scaled: 0.1005, EMA: 0.0806, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0059, Scaled: 0.0771, EMA: 0.0795, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0048, Scaled: 0.0696, EMA: 0.0766, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0052, Scaled: 0.0718, EMA: 0.0751, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0047, Scaled: 0.0685, EMA: 0.0732, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0083, Scaled: 0.0911, EMA: 0.0785, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0048, Scaled: 0.0690, EMA: 0.0757, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0055, Scaled: 0.0741, EMA: 0.0752, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0095, Scaled: 0.0974, EMA: 0.0819, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0054, Scaled: 0.0732, EMA: 0.0793, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0086, Scaled: 0.0930, EMA: 0.0834, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.2995, Scaled: 0.5472, EMA: 0.2225, Segments: 3/10
+live-script.js:219 [MIC] RMS: 0.5183, Scaled: 0.7199, EMA: 0.3717, Segments: 4/10
+live-script.js:219 [MIC] RMS: 0.4605, Scaled: 0.6786, EMA: 0.4638, Segments: 5/10
+live-script.js:219 [MIC] RMS: 0.4956, Scaled: 0.7040, EMA: 0.5359, Segments: 6/10
+live-script.js:219 [MIC] RMS: 0.6006, Scaled: 0.7750, EMA: 0.6076, Segments: 7/10
+live-script.js:219 [MIC] RMS: 0.6347, Scaled: 0.7967, EMA: 0.6643, Segments: 7/10
+live-script.js:219 [MIC] RMS: 0.5812, Scaled: 0.7623, EMA: 0.6937, Segments: 7/10
+live-script.js:219 [MIC] RMS: 0.5706, Scaled: 0.7554, EMA: 0.7122, Segments: 8/10
+live-script.js:219 [MIC] RMS: 0.3761, Scaled: 0.6132, EMA: 0.6825, Segments: 7/10
+live-script.js:219 [MIC] RMS: 0.2703, Scaled: 0.5199, EMA: 0.6337, Segments: 7/10
+live-script.js:219 [MIC] RMS: 0.0862, Scaled: 0.2935, EMA: 0.5317, Segments: 6/10
+live-script.js:219 [MIC] RMS: 0.0757, Scaled: 0.2752, EMA: 0.4547, Segments: 5/10
+live-script.js:219 [MIC] RMS: 0.0455, Scaled: 0.2133, EMA: 0.3823, Segments: 4/10
+live-script.js:219 [MIC] RMS: 0.2955, Scaled: 0.5436, EMA: 0.4307, Segments: 5/10
+live-script.js:219 [MIC] RMS: 0.2550, Scaled: 0.5050, EMA: 0.4530, Segments: 5/10
+live-script.js:219 [MIC] RMS: 0.1717, Scaled: 0.4144, EMA: 0.4414, Segments: 5/10
+live-script.js:219 [MIC] RMS: 0.1802, Scaled: 0.4245, EMA: 0.4363, Segments: 5/10
+live-script.js:219 [MIC] RMS: 0.1941, Scaled: 0.4406, EMA: 0.4376, Segments: 5/10
+live-script.js:219 [MIC] RMS: 0.1511, Scaled: 0.3887, EMA: 0.4229, Segments: 5/10
+live-script.js:219 [MIC] RMS: 0.1007, Scaled: 0.3174, EMA: 0.3913, Segments: 4/10
+live-script.js:219 [MIC] RMS: 0.0466, Scaled: 0.2158, EMA: 0.3386, Segments: 4/10
+live-script.js:219 [MIC] RMS: 0.0329, Scaled: 0.1813, EMA: 0.2914, Segments: 3/10
+live-script.js:219 [MIC] RMS: 0.0210, Scaled: 0.1448, EMA: 0.2475, Segments: 3/10
+live-script.js:219 [MIC] RMS: 0.0142, Scaled: 0.1192, EMA: 0.2090, Segments: 3/10
+live-script.js:219 [MIC] RMS: 0.1564, Scaled: 0.3955, EMA: 0.2649, Segments: 3/10
+live-script.js:219 [MIC] RMS: 0.1825, Scaled: 0.4272, EMA: 0.3136, Segments: 4/10
+live-script.js:219 [MIC] RMS: 0.2248, Scaled: 0.4741, EMA: 0.3618, Segments: 4/10
+live-script.js:219 [MIC] RMS: 0.1084, Scaled: 0.3292, EMA: 0.3520, Segments: 4/10
+live-script.js:219 [MIC] RMS: 0.1290, Scaled: 0.3591, EMA: 0.3541, Segments: 4/10
+live-script.js:219 [MIC] RMS: 0.1478, Scaled: 0.3844, EMA: 0.3632, Segments: 4/10
+live-script.js:219 [MIC] RMS: 0.1277, Scaled: 0.3573, EMA: 0.3615, Segments: 4/10
+live-script.js:219 [MIC] RMS: 0.1235, Scaled: 0.3514, EMA: 0.3584, Segments: 4/10
+live-script.js:219 [MIC] RMS: 0.2105, Scaled: 0.4588, EMA: 0.3885, Segments: 4/10
+live-script.js:219 [MIC] RMS: 0.1831, Scaled: 0.4280, EMA: 0.4004, Segments: 5/10
+live-script.js:219 [MIC] RMS: 0.1960, Scaled: 0.4428, EMA: 0.4131, Segments: 5/10
+live-script.js:219 [MIC] RMS: 0.1854, Scaled: 0.4306, EMA: 0.4183, Segments: 5/10
+live-script.js:219 [MIC] RMS: 0.1660, Scaled: 0.4074, EMA: 0.4151, Segments: 5/10
+live-script.js:219 [MIC] RMS: 0.1227, Scaled: 0.3503, EMA: 0.3956, Segments: 4/10
+live-script.js:219 [MIC] RMS: 0.0682, Scaled: 0.2612, EMA: 0.3553, Segments: 4/10
+live-script.js:219 [MIC] RMS: 0.0481, Scaled: 0.2193, EMA: 0.3145, Segments: 4/10
+live-script.js:219 [MIC] RMS: 0.0364, Scaled: 0.1909, EMA: 0.2774, Segments: 3/10
+live-script.js:219 [MIC] RMS: 0.0229, Scaled: 0.1513, EMA: 0.2396, Segments: 3/10
+live-script.js:219 [MIC] RMS: 0.0140, Scaled: 0.1184, EMA: 0.2032, Segments: 3/10
+live-script.js:219 [MIC] RMS: 0.0094, Scaled: 0.0971, EMA: 0.1714, Segments: 2/10
+live-script.js:219 [MIC] RMS: 0.0066, Scaled: 0.0814, EMA: 0.1444, Segments: 2/10
+live-script.js:219 [MIC] RMS: 0.0052, Scaled: 0.0722, EMA: 0.1227, Segments: 2/10
+live-script.js:219 [MIC] RMS: 0.0039, Scaled: 0.0623, EMA: 0.1046, Segments: 2/10
+live-script.js:219 [MIC] RMS: 0.0038, Scaled: 0.0618, EMA: 0.0918, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0033, Scaled: 0.0578, EMA: 0.0816, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0032, Scaled: 0.0564, EMA: 0.0740, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0034, Scaled: 0.0583, EMA: 0.0693, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0035, Scaled: 0.0590, EMA: 0.0662, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0036, Scaled: 0.0604, EMA: 0.0645, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0047, Scaled: 0.0687, EMA: 0.0657, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0037, Scaled: 0.0611, EMA: 0.0644, Segments: 1/10
+live-script.js:219 [MIC] RMS: 0.0036, Scaled: 0.0601, EMA: 0.0631, Segments: 1/10
+live-script.js:453 WebSocket closed: CloseEvent {isTrusted: true, wasClean: false, code: 1006, reason: '', type: 'close', …}
+live-script.js:245 WebSocket connection to 'wss://localhost:8000/ws' failed: 
+setupWebSocket @ live-script.js:245Understand this error
+live-script.js:448 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+websocket.onerror @ live-script.js:448Understand this error
+live-script.js:453 WebSocket closed: CloseEvent {isTrusted: true, wasClean: false, code: 1006, reason: '', type: 'close', …}
+live-script.js:245 WebSocket connection to 'wss://localhost:8000/ws' failed: 
+setupWebSocket @ live-script.js:245Understand this error
+live-script.js:448 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+websocket.onerror @ live-script.js:448Understand this error
+live-script.js:453 WebSocket closed: CloseEvent {isTrusted: true, wasClean: false, code: 1006, reason: '', type: 'close', …}
+live-script.js:245 WebSocket connection to 'wss://localhost:8000/ws' failed: 
+setupWebSocket @ live-script.js:245Understand this error
+live-script.js:448 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+websocket.onerror @ live-script.js:448Understand this error
+live-script.js:453 WebSocket closed: CloseEvent {isTrusted: true, wasClean: false, code: 1006, reason: '', type: 'close', …}
+
+
+3. not sure if 
