@@ -277,19 +277,19 @@ async def _initialize_mt_model(session_data: Dict[str, Any], source_lang: str, t
             if os.path.exists(mt_model_path):
                 logging.info(f"Backend: Session {session_data['client_info']}: CTranslate2 model for {mt_model_name} already exists at {mt_model_path}.")
             else:
-                logging.info(f"Backend: Session {session_data['client_info']}: MT model not found locally at {mt_model_path}. Attempting dynamic conversion for {model_name}...")
+                logging.info(f"Backend: Session {session_data['client_info']}: MT model not found locally at {mt_model_path}. Attempting dynamic conversion for {mt_model_name}...")
                 if websocket:
-                    await websocket.send_text(json.dumps({"type": "mt_conversion_status", "status": "started", "model_name": model_name}))
+                    await websocket.send_text(json.dumps({"type": "mt_conversion_status", "status": "started", "model_name": mt_model_name}))
                 try:
-                    await _convert_mt_model(model_name, websocket)
-                    logging.info(f"Backend: Session {session_data['client_info']}: Dynamic conversion for {model_name} completed successfully.")
+                    await _convert_mt_model(mt_model_name, websocket)
+                    logging.info(f"Backend: Session {session_data['client_info']}: Dynamic conversion for {mt_model_name} completed successfully.")
                     if websocket:
-                        await websocket.send_text(json.dumps({"type": "mt_conversion_status", "status": "completed", "model_name": model_name}))
+                        await websocket.send_text(json.dumps({"type": "mt_conversion_status", "status": "completed", "model_name": mt_model_name}))
                 except Exception as e:
-                    logging.error(f"Backend: Session {session_data['client_info']}: ERROR: Dynamic conversion failed for {model_name}: {e}")
+                    logging.error(f"Backend: Session {session_data['client_info']}: ERROR: Dynamic conversion failed for {mt_model_name}: {e}")
                     if websocket:
-                        await websocket.send_text(json.dumps({"type": "mt_conversion_status", "status": "failed", "model_name": model_name, "error": str(e)}))
-                    raise HTTPException(status_code=500, detail=f"Failed to dynamically convert MT model {model_name}: {e}")
+                        await websocket.send_text(json.dumps({"type": "mt_conversion_status", "status": "failed", "model_name": mt_model_name, "error": str(e)}))
+                    raise HTTPException(status_code=500, detail=f"Failed to dynamically convert MT model {mt_model_name}: {e}")
 
             init_start = time.time()
             logging.info(f"Backend: Session {session_data['client_info']}: Initializing CTranslate2MT for {model_key} at {time.strftime('%H:%M:%S', time.localtime(init_start))}...")
@@ -420,6 +420,25 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     # For now, we'll return a mock JWT token
     mock_token = f"mock-jwt-token-for-{user.email}"
     return {"access_token": mock_token, "token_type": "bearer"}
+
+@router.post("/login", summary="Login endpoint for frontend")
+async def login(user_login: UserLogin, db: Session = Depends(get_db_dependency)):
+    """
+    Login endpoint that matches the frontend's expected format.
+    Accepts JSON with email and password, returns token and user info.
+    """
+    user = db.query(User).filter(User.email == user_login.email).first()
+    if not user or not verify_password(user_login.password, user.hashed_password):
+        raise HTTPException(status_code=401, detail="Incorrect email or password")
+    
+    # Return mock token with user info in the format frontend expects
+    mock_token = f"mock-jwt-token-for-{user.email}"
+    return {
+        "message": "Login successful",
+        "token": mock_token,
+        "username": user.username,
+        "email": user.email
+    }
 
 @router.post("/voices/upload", summary="Upload a new speaker voice", response_model=Dict[str, str])
 async def upload_voice(
@@ -617,17 +636,43 @@ async def delete_voice(
 
 @router.get("/voices", summary="Get all speaker voices for the current user", response_model=List[Dict[str, Any]])
 async def get_voices(
-    current_user: User = Depends(get_current_user)
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(HTTPBearer(auto_error=False)),
+    db: Session = Depends(get_db_dependency)
 ):
     """
-    Retrieves a list of all speaker voices uploaded by the current authenticated user.
+    Retrieves a list of speaker voices.
+    - If authenticated: returns default voices (user_id=null) + user's own voices
+    - If not authenticated: returns only default voices (user_id=null)
     """
     metadata = _read_speaker_voices_metadata()
-    user_voices = [
-        {"id": v.get("id", str(uuid.uuid4())), "name": v["name"], "filename": v.get("filename", "unknown_filename.wav"), "path": v.get("path", "unknown_path"), "language": v.get("language", "unknown"), "upload_time": v.get("upload_time", 0)}
-        for v in metadata if v.get("user_id") is None or v.get("user_id") == current_user.id
-    ]
-    logging.info(f"Backend: Retrieved {len(user_voices)} voices for user {current_user.id}")
+    
+    # Try to get current user if credentials provided
+    current_user = None
+    if credentials:
+        try:
+            token = credentials.credentials
+            if token.startswith("mock-jwt-token-for-"):
+                email = token.replace("mock-jwt-token-for-", "")
+                current_user = db.query(User).filter(User.email == email).first()
+        except Exception as e:
+            logging.warning(f"Backend: Failed to authenticate user for voices endpoint: {e}")
+    
+    # Return voices based on authentication status
+    if current_user:
+        # Authenticated: return default voices + user's voices
+        user_voices = [
+            {"id": v.get("id", str(uuid.uuid4())), "name": v["name"], "filename": v.get("filename", "unknown_filename.wav"), "path": v.get("path", "unknown_path"), "language": v.get("language", "unknown"), "upload_time": v.get("upload_time", 0)}
+            for v in metadata if v.get("user_id") is None or v.get("user_id") == current_user.id
+        ]
+        logging.info(f"Backend: Retrieved {len(user_voices)} voices for authenticated user {current_user.id}")
+    else:
+        # Unauthenticated: return only default voices
+        user_voices = [
+            {"id": v.get("id", str(uuid.uuid4())), "name": v["name"], "filename": v.get("filename", "unknown_filename.wav"), "path": v.get("path", "unknown_path"), "language": v.get("language", "unknown"), "upload_time": v.get("upload_time", 0)}
+            for v in metadata if v.get("user_id") is None
+        ]
+        logging.info(f"Backend: Retrieved {len(user_voices)} default voices for unauthenticated user")
+    
     return user_voices
 
 def get_initialized_models(client_info: str, session_config: Dict[str, Any]) -> Tuple[Optional[FasterWhisperSTT], Optional[CTranslate2MT], Optional[Any], Optional[Any], str]:
