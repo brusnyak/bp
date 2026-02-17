@@ -35,3 +35,12 @@ output_*.wav
 *.png
 *.mp4
 *.mov
+test_output/
+*.wav
+
+# Models and temporary files
+models/
+temp/
+processed/
+.agent/
+Walkthrough*

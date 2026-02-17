@@ -25,6 +25,9 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 # Initialize the database for the main application
 from backend.utils.db_manager import SQLALCHEMY_DATABASE_URL, get_db_session_and_engine, init_db, User # Import init_db and User
 from backend.utils.auth import get_password_hash, verify_password # Import auth functions
+from backend.tts.piper_tts import PiperTTS
+from backend.tts.coqui_tts import CoquiTTS
+from backend.tts.hybrid_tts import HybridTTS
 
 # Get engine and SessionLocal
 engine, SessionLocal = get_db_session_and_engine(SQLALCHEMY_DATABASE_URL)
@@ -342,10 +345,28 @@ async def _initialize_tts_models(session_data: Dict[str, Any], tts_model_choice:
         else:
             logging.info(f"Backend: Session {session_data['client_info']}: CoquiTTS (XTTS v2) model already initialized.")
         session_data["piper_tts_model"] = None # Ensure Piper is not active for this session
+    elif tts_model_choice == "hybrid":
+        current_hybrid_tts_model = session_data.get("hybrid_tts_model")
+        if current_hybrid_tts_model is None:
+            init_start = time.time()
+            logging.info(f"Backend: Session {session_data['client_info']}: Initializing HybridTTS at {time.strftime('%H:%M:%S', time.localtime(init_start))}...")
+            try:
+                session_data["hybrid_tts_model"] = HybridTTS(device="mps" if torch.backends.mps.is_available() else "cpu")
+                init_end = time.time()
+                logging.info(f"Backend: Session {session_data['client_info']}: HybridTTS initialized at {time.strftime('%H:%M:%S', time.localtime(init_end))}. Duration: {init_end - init_start:.2f}s.")
+            except Exception as e:
+                logging.error(f"Backend: Session {session_data['client_info']}: ERROR: Failed to initialize HybridTTS: {e}")
+                session_data["hybrid_tts_model"] = None
+                raise HTTPException(status_code=500, detail=f"Failed to initialize HybridTTS: {e}")
+        else:
+            logging.info(f"Backend: Session {session_data['client_info']}: HybridTTS model already initialized.")
+        session_data["piper_tts_model"] = None
+        session_data["coqui_tts_model"] = None
     else:
         logging.warning(f"Backend: Session {session_data['client_info']}: Skipping TTS initialization as '{tts_model_choice}' is selected or invalid.")
         session_data["piper_tts_model"] = None
         session_data["coqui_tts_model"] = None # Ensure Coqui is not active for this session
+        session_data["hybrid_tts_model"] = None
 
 async def _initialize_vad_instance(session_data: Dict[str, Any]):
     """Initializes the WebRTC VAD instance for a given session."""
@@ -369,6 +390,7 @@ async def initialize_all_models(client_info: str, source_lang: str, target_lang:
         "mt_models": {},
         "piper_tts_model": None,
         "coqui_tts_model": None, # Add Coqui TTS model to session data
+        "hybrid_tts_model": None, # Add Hybrid TTS model to session data
         "vad_instance": None,
         "session_config": { # Store a copy of the config for easy access
             "source_lang": source_lang,
@@ -890,6 +912,16 @@ async def _process_speech_segment_pipeline(
         )
         tts_total_time = time.perf_counter() - tts_start_time
     
+    elif tts_model_choice == "hybrid" and session_data.get("hybrid_tts_model"):
+        # Hybrid TTS (Piper + OpenVoice V2)
+        hybrid_engine = session_data.get("hybrid_tts_model")
+        logging.info(f"Backend: Session {client_info}: Starting Hybrid TTS synthesis with cloning...")
+        audio_wav, sample_rate, tts_latency = await loop.run_in_executor(
+            None,
+            lambda: hybrid_engine.synthesize(translated_text, speaker_wav_path=speaker_wav_path)
+        )
+        tts_total_time = time.perf_counter() - tts_start_time
+    
     else:
         logging.warning(f"Backend: Session {client_info}: Selected TTS model '{tts_model_choice}' not initialized or invalid. No TTS will be performed.")
         await safe_send("error", {"type": "error", "message": f"TTS model '{tts_model_choice}' not ready or invalid. No TTS output."})
@@ -1091,8 +1123,9 @@ async def handle_audio_stream(websocket: WebSocket):
                         audio_np = np.nan_to_num(audio_np, nan=0.0, posinf=0.0, neginf=0.0)
 
                     logging.debug(f"Backend: Received {audio_np.size} audio samples from frontend. First 10 samples: {audio_np[:10]}")
-                    logging.debug(f"Backend: audio_np min: {np.min(audio_np)}, max: {np.max(audio_np)}")
-                    logging.debug(f"Backend: audio_np contains NaN: {np.isnan(audio_np).any()}, Inf: {np.isinf(audio_np).any()}")
+                    if audio_np.size > 0:
+                        logging.debug(f"Backend: audio_np min: {np.min(audio_np)}, max: {np.max(audio_np)}")
+                        logging.debug(f"Backend: audio_np contains NaN: {np.isnan(audio_np).any()}, Inf: {np.isinf(audio_np).any()}")
                     logging.debug(f"Backend: audio_np shape: {audio_np.shape}, dtype: {audio_np.dtype}")
                     # Skip all-zero audio chunks entirely to prevent false VAD triggers
                     if not audio_np.any():
