@@ -19,22 +19,21 @@ This bachelor's thesis presents the design, implementation, and evaluation of a 
 
 ### 1.1 Background and Motivation
 
-In an increasingly interconnected world, the demand for effective cross-lingual communication is paramount. Traditional methods of translation, such as human interpreters or delayed text translation, often introduce significant latency and cost, hindering real-time interaction. This is particularly evident in dynamic environments like international conferences, business meetings, or educational settings where immediate understanding is crucial. The advent of advanced artificial intelligence models in speech processing has opened new avenues for bridging these communication gaps, making real-time speech translation a tangible and impactful solution.
+The rapid expansion of global digital collaboration has made real-time cross-lingual communication an essential requirement in academic and professional settings. Within the context of the department of Multimedia Information and Communication Technologies (ÚMIKT), there is a specific interest in integrating high-quality speech translation into hybrid teleconferencing systems. Conventional solutions often rely on proprietary cloud APIs, which introduce variable network latency, ongoing costs, and data privacy concerns. This project is motivated by the potential of optimizing state-of-the-art open-source models (STT, MT, and TTS) to run locally on Apple Silicon hardware. By leveraging a unified memory architecture (M1/M2/M3 chips), we can achieve low-latency performance suitable for live streaming without external dependencies.
 
 ### 1.2 Problem Statement
 
-The primary challenge in developing a real-time speech translation system lies in achieving a delicate balance between low latency, high translation quality, and broad accessibility. Existing solutions often compromise on one or more of these aspects. High-quality models can be computationally intensive, leading to unacceptable delays, while faster models may sacrifice accuracy. Furthermore, the integration of multiple complex AI models (STT, MT, TTS) into a cohesive, efficient, and user-friendly pipeline presents significant engineering hurdles, especially when targeting specific hardware optimizations like Apple Silicon.
+Developing a real-time speech translation pipeline requires a complex orchestration of several specialized AI models. The primary challenge is the "Latency-Quality" trade-off: high-fidelity models like XTTS v2 provide impressive zero-shot voice cloning but are computationally demanding, whereas smaller models like Piper offer instant synthesis but lack personalization. Integrating these models into a cohesive system with a backend capable of handling continuous WebSocket streams and a frontend that visualizes performance in real-time presents a non-trivial engineering task. Specifically, the system must maintain an end-to-end latency below the human conversational threshold (~3 seconds) while running on a single local device.
 
 ### 1.3 Goals and Objectives
 
-This project aims to design, implement, and evaluate a real-time live speech translation system with the following objectives:
+The objective of this thesis is to demonstrate a viable real-time speech translation system optimized for local execution. The specific goals are:
 
-- **Low-Latency Performance:** Achieve end-to-end translation latency of 2-3 seconds for standard TTS and 2.5-3.5 seconds for voice cloning, suitable for live communication.
-- **Modular Architecture:** Develop a robust and scalable system using a client-server architecture with a FastAPI backend and a responsive web-based user interface.
-- **State-of-the-Art Open-Source Models:** Integrate and optimize leading open-source models for STT (`faster-whisper`), MT (`CTranslate2` with `Helsinki-NLP Opus-MT`), and TTS (`Piper TTS`, `Coqui TTS (XTTS v2)` for voice cloning).
-- **Hardware Optimization:** Ensure efficient performance on Apple Silicon (M1/M2/M3) hardware.
-- **Dynamic Functionality:** Implement dynamic language switching, robust Voice Activity Detection (VAD), and real-time latency visualization within the user interface.
-- **User Experience:** Provide a modern, intuitive, and visually appealing web UI that supports both default and thesis-specific content presentation.
+- **Low-Latency Inference**: Targeting end-to-end latency below 1.5s for fast-path TTS (Piper) and below 3.5s for zero-shot voice cloning (XTTS v2), bridging the gap between automated transcription and natural conversation.
+- **Hardware-Targeted Optimization**: Leveraging Apple Silicon's unified memory for efficient model switching and tensor operations using `CTranslate2` and `Faster-Whisper`.
+- **Dual-Engine TTS Strategy**: Implementing a hybrid approach that provides both instant generic voice output and high-fidelity personalized cloning to showcase the practical utility of modern TTS architectures.
+- **Full-Duplex Communication**: Utilizing WebSockets and FastAPI to manage continuous audio buffering and minimize I/O overhead.
+- **Empirical Evaluation**: Conducting a comparative benchmark of Slovak TTS performance (speed vs. quality) across several candidates including Piper, XTTS, and OpenVoice V2.
 
 ### 1.4 Thesis Structure
 
@@ -486,10 +485,11 @@ function connectWebSocket() {
       document.getElementById("translation-output").innerText = data.text;
     } else if (data.type === "audio") {
       // Play synthesized audio
-      const audioContext = new (window.AudioContext ||
-        window.webkitAudioContext)();
+      const audioContext = new (
+        window.AudioContext || window.webkitAudioContext
+      )();
       const audioBuffer = audioContext.decodeAudioData(
-        base64ToArrayBuffer(data.audio)
+        base64ToArrayBuffer(data.audio),
       );
       audioBuffer.then((buffer) => {
         const source = audioContext.createBufferSource();
@@ -644,7 +644,6 @@ The evaluation focused on key performance indicators (KPIs) to assess the system
 The primary objective was to achieve low end-to-end latency. The system's UI includes a real-time timeline chart to visualize latency breakdown, providing immediate feedback on pipeline performance.
 
 - **End-to-End Latency:**
-
   - **Target:** 2-3 seconds (Piper TTS), 2.5-3.5 seconds (Coqui TTS voice cloning)
   - **Achieved (Piper TTS):** 1.09 seconds (from `parsed_test_results.json`)
   - **Achieved (Coqui TTS XTTS v2, en-en, speed 1.0, nfe 2.0, cfg_strength 2.0):** 1.84 seconds (from `parsed_test_results.json`)
@@ -662,7 +661,6 @@ The primary objective was to achieve low end-to-end latency. The system's UI inc
   _Note: The TTS latency for Coqui TTS is significantly higher for total synthesis but is mitigated by streaming, resulting in a perceived latency of ~2-3s._
 
   **Latency Contribution (Conceptual, based on average values):**
-
   - STT Inference: ~2%
   - MT Inference: ~3%
   - TTS Inference (Piper): ~2%
@@ -708,12 +706,10 @@ The artifacts were traced to two primary sources:
 **Solutions Implemented:**
 
 1.  **Hybrid Synthesis Strategy:**
-
     - **Short texts (<200 characters):** Single-shot synthesis generates the entire audio at once, completely eliminating chunk boundary artifacts.
     - **Long texts (≥200 characters):** Sentence-level streaming synthesis reduces perceived latency while maintaining quality.
 
 2.  **Intelligent Energy-Based Trimming:**
-
     - Implemented an adaptive trimming algorithm using RMS (Root Mean Square) energy analysis to detect and remove trailing artifacts.
     - Language-specific parameters were tuned for optimal results:
       - **English:** 300ms window, 0.02 threshold, 30ms buffer
@@ -828,12 +824,10 @@ This section documents the key technical decisions made during development, alon
 During development, **XTTS v2** was selected for voice cloning based on its promising zero-shot capabilities. The decision was driven by the following factors:
 
 1.  **Cross-Lingual Support:**
-
     - XTTS v2 is specifically designed for cross-lingual scenarios, a core requirement for this translation system.
     - It can take a voice sample in English and synthesize speech in Czech with the same voice characteristics.
 
 2.  **Zero-Shot Cloning:**
-
     - The model requires only a short (6s) reference audio clip to clone a voice, eliminating the need for extensive fine-tuning or retraining.
 
 3.  **Community and Documentation:**
@@ -851,13 +845,11 @@ During development, **XTTS v2** was selected for voice cloning based on its prom
 The following parameters were tuned through extensive experimentation:
 
 1.  **Temperature = 0.2** (default: 0.75)
-
     - **Rationale:** Lower temperature reduces randomness in the model's output, minimizing hallucinations and unwanted artifacts.
     - **Impact:** Significantly reduced the occurrence of trailing sounds and improved consistency across syntheses.
     - **Trade-off:** Slightly less expressive output, but acceptable for translation use case.
 
 2.  **Repetition Penalty = 10.0** (default: 2.0)
-
     - **Rationale:** High repetition penalty prevents the model from generating repeated phonemes or stuttering.
     - **Impact:** Eliminated stuttering artifacts observed in early testing.
     - **Trade-off:** None observed; higher values only improved quality.
@@ -872,7 +864,6 @@ The following parameters were tuned through extensive experimentation:
 The hybrid approach (single-shot for short texts, streaming for long texts) was adopted to balance quality and latency:
 
 1.  **Short Texts (<200 chars): Single-Shot Synthesis**
-
     - **Rationale:** Chunk boundary artifacts were most noticeable in short texts where context loss had a larger relative impact.
     - **Impact:** Completely eliminated artifacts in short translations (e.g., "Hello, how are you?").
     - **Trade-off:** Slightly higher latency for short texts, but still acceptable (<2s).
@@ -889,13 +880,11 @@ This strategy provided the best of both worlds: artifact-free short translations
 Despite Apple Silicon's MPS backend offering potential GPU acceleration:
 
 1.  **MPS Instability:**
-
     - Frequent crashes during synthesis, especially with longer texts.
     - Inconsistent output quality, with some syntheses producing garbled audio.
     - PyTorch's MPS backend for XTTS v2 was not production-ready at the time of development.
 
 2.  **CPU Reliability:**
-
     - 100% stable across all test cases.
     - Consistent output quality.
     - Acceptable latency (2-3s perceived) for the project's requirements.
@@ -1126,14 +1115,12 @@ _At 15 users, resource saturation leads to task failures and significant process
 **Component Efficiency (5 Users - Successful Sessions):**
 
 1.  **Speech-to-Text (STT):**
-
     - Average: 0.92s
     - Range: 0.52s - 2.04s
     - **Analysis:** Scales linearly with audio length; most consistent component
     - **Optimization Status:** Well-optimized via `faster-whisper` + CTranslate2
 
 2.  **Machine Translation (MT):**
-
     - Average: 0.16s
     - Range: 0.03s - 0.50s
     - **Analysis:** Extremely fast; not a bottleneck
@@ -1196,13 +1183,11 @@ Based on stress testing results:
     ```
 
 2.  **Medium-term Optimization:**
-
     - Implement model sharing between sessions (reduce memory per user)
     - Add request queuing for graceful degradation at capacity
     - Consider GPU acceleration for STT/MT (further increase capacity)
 
 3.  **Long-term Scaling:**
-
     - Deploy multiple backend instances with load balancing
     - Implement Redis-based session management for distributed setup
     - Containerize with Docker for easier horizontal scaling
@@ -1225,14 +1210,12 @@ Based on stress testing results:
 **Component Efficiency (5 Users - Successful Sessions):**
 
 1.  **Speech-to-Text (STT):**
-
     - Average: 0.92s
     - Range: 0.52s - 2.04s
     - **Analysis:** Scales linearly with audio length; most consistent component
     - **Optimization Status:** Well-optimized via `faster-whisper` + CTranslate2
 
 2.  **Machine Translation (MT):**
-
     - Average: 0.16s
     - Range: 0.03s - 0.50s
     - **Analysis:** Extremely fast; not a bottleneck
@@ -1295,13 +1278,11 @@ Based on stress testing results:
     ```
 
 2.  **Medium-term Optimization:**
-
     - Implement model sharing between sessions (reduce memory per user)
     - Add request queuing for graceful degradation at capacity
     - Consider GPU acceleration for STT/MT (further increase capacity)
 
 3.  **Long-term Scaling:**
-
     - Deploy multiple backend instances with load balancing
     - Implement Redis-based session management for distributed setup
     - Containerize with Docker for easier horizontal scaling

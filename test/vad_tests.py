@@ -7,7 +7,7 @@ import soundfile as sf
 import os
 import time
 from unittest.mock import AsyncMock, MagicMock
-from starlette.websockets import WebSocketDisconnect
+from starlette.websockets import WebSocketDisconnect, WebSocketState
 
 # Assuming backend.main is accessible in the path
 # For testing, we might need to adjust sys.path or mock imports
@@ -15,7 +15,7 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../backend')))
 
-from backend.main import handle_audio_stream, initialize_all_models, AUDIO_SAMPLE_RATE, VAD_FRAME_DURATION, MIN_SPEECH_DURATION, SILENCE_TIMEOUT, STREAMING_CHUNK_LENGTH
+from backend.main import handle_audio_stream, initialize_all_models, AUDIO_SAMPLE_RATE, VAD_FRAME_DURATION, SILENCE_TIMEOUT, STREAMING_CHUNK_LENGTH
 from backend.utils.audio_utils import resample_audio # Import resample_audio
 
 # Mock WebSocket for testing
@@ -24,6 +24,14 @@ class MockWebSocket:
         self.received_messages = []
         self.accepted = False
         self.client = MagicMock(host="test_host", port=12345)
+        self.client_state = WebSocketState.CONNECTED
+        self.scope = {"client": ("test_host", 12345), "type": "websocket"}
+        self.query_params = {}
+        self.timestamps = {
+            "stt_start": [], "stt_end": [],
+            "mt_start": [], "mt_end": [],
+            "tts_start": [], "tts_end": []
+        }
 
     async def accept(self):
         self.accepted = True
@@ -34,7 +42,8 @@ class MockWebSocket:
             chunk = self.audio_to_send.pop(0)
             return {"type": "websocket.receive", "bytes": chunk.tobytes()}
         else:
-            # After sending all audio, simulate a disconnect
+            # Simulate a slight delay before disconnecting to allow background tasks to finish
+            await asyncio.sleep(0.5)
             raise WebSocketDisconnect(code=1000, reason="Test finished")
 
     async def receive_bytes(self):
@@ -73,6 +82,7 @@ async def test_vad_speech_detection_and_processing():
     """
     # Initialize models directly within the test
     await initialize_all_models(
+        client_info="test_host:12345",
         source_lang="en",
         target_lang="sk",
         tts_model_choice="piper",
@@ -97,6 +107,10 @@ async def test_vad_speech_detection_and_processing():
         audio_np = resample_audio(audio_np, original_sr=sr, target_sr=AUDIO_SAMPLE_RATE)
         sr = AUDIO_SAMPLE_RATE # Update sample rate to the new target
 
+    # Normalize audio to a louder range (peak at 0.9)
+    if np.max(np.abs(audio_np)) > 0:
+        audio_np = audio_np / np.max(np.abs(audio_np)) * 0.9
+
     # Create a short speech segment (e.g., 1 second)
     speech_segment = audio_np[:AUDIO_SAMPLE_RATE] # 1 second of speech
     
@@ -105,6 +119,8 @@ async def test_vad_speech_detection_and_processing():
     silence_segment = np.zeros(int(AUDIO_SAMPLE_RATE * silence_duration_seconds), dtype=np.float32)
 
     full_audio = np.concatenate([speech_segment, silence_segment])
+    # Ensure no NaNs and proper float32
+    full_audio = np.nan_to_num(full_audio).astype(np.float32)
     
     # Chunk the audio for streaming
     chunk_length_seconds = VAD_FRAME_DURATION / 1000 # Send in VAD frame durations
@@ -113,6 +129,9 @@ async def test_vad_speech_detection_and_processing():
 
     start_time = time.time()
     await handle_audio_stream(websocket)
+    
+    # Give background tasks a moment to complete
+    await asyncio.sleep(2) 
     end_time = time.time()
 
     # Assertions
@@ -148,6 +167,7 @@ async def test_vad_silence_handling(): # Removed setup_models fixture
     """
     # Initialize models directly within the test
     await initialize_all_models(
+        client_info="test_host:12345",
         source_lang="en",
         target_lang="sk",
         tts_model_choice="piper",
@@ -160,13 +180,14 @@ async def test_vad_silence_handling(): # Removed setup_models fixture
     # Create a long silence segment
     silence_duration_seconds = 5 # 5 seconds of silence
     silence_segment = np.zeros(int(AUDIO_SAMPLE_RATE * silence_duration_seconds), dtype=np.float32)
-
+    
     # Chunk the audio for streaming
     chunk_length_seconds = VAD_FRAME_DURATION / 1000
     audio_chunks = create_audio_chunks(silence_segment, chunk_length_seconds)
     websocket.set_audio_to_send(audio_chunks)
 
     await handle_audio_stream(websocket)
+    await asyncio.sleep(0.5)
 
     # Assertions
     assert websocket.accepted is True
@@ -188,6 +209,7 @@ async def test_vad_aggressiveness_and_short_speech(): # Removed setup_models fix
     """
     # Initialize models directly within the test
     await initialize_all_models(
+        client_info="test_host:12345",
         source_lang="en",
         target_lang="sk",
         tts_model_choice="piper",
@@ -213,12 +235,14 @@ async def test_vad_aggressiveness_and_short_speech(): # Removed setup_models fix
     short_speech_segment = audio_np[:int(AUDIO_SAMPLE_RATE * 0.2)]
     silence_segment = np.zeros(int(AUDIO_SAMPLE_RATE * SILENCE_TIMEOUT * 2), dtype=np.float32)
     full_audio = np.concatenate([short_speech_segment, silence_segment])
+    full_audio = np.nan_to_num(full_audio).astype(np.float32)
 
     chunk_length_seconds = VAD_FRAME_DURATION / 1000
     audio_chunks = create_audio_chunks(full_audio, chunk_length_seconds)
     websocket.set_audio_to_send(audio_chunks)
 
     await handle_audio_stream(websocket)
+    await asyncio.sleep(1)
 
     transcription_found = False
     for msg in websocket.received_messages:
@@ -240,6 +264,7 @@ async def test_vad_long_speech_streaming(): # Removed setup_models fixture
     """
     # Initialize models directly within the test
     await initialize_all_models(
+        client_info="test_host:12345",
         source_lang="en",
         target_lang="sk",
         tts_model_choice="piper",
@@ -265,12 +290,14 @@ async def test_vad_long_speech_streaming(): # Removed setup_models fixture
     long_speech_segment = audio_np[:int(AUDIO_SAMPLE_RATE * 4)] # 4 seconds of speech
     silence_segment = np.zeros(int(AUDIO_SAMPLE_RATE * SILENCE_TIMEOUT * 2), dtype=np.float32)
     full_audio = np.concatenate([long_speech_segment, silence_segment])
+    full_audio = np.nan_to_num(full_audio).astype(np.float32)
 
     chunk_length_seconds = VAD_FRAME_DURATION / 1000
     audio_chunks = create_audio_chunks(full_audio, chunk_length_seconds)
     websocket.set_audio_to_send(audio_chunks)
 
     await handle_audio_stream(websocket)
+    await asyncio.sleep(3)
 
     streaming_transcriptions = 0
     final_transcription_found = False
