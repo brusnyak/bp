@@ -16,7 +16,7 @@ Witness the seamless real-time speech translation in action. See how our system 
 - **Modular Architecture:** Built with FastAPI for the backend and a responsive web UI (HTML, CSS, JavaScript) for easy interaction.
 - **Speech-to-Text (STT):** Utilizes `faster-whisper` for efficient and accurate transcription.
 - **Machine Translation (MT):** Employs `CTranslate2` optimized Opus-MT models for high-quality, multilingual translation.
-- **Text-to-Speech (TTS):** Integrates `Piper TTS` for fast, natural-sounding speech synthesis, with research underway on low-latency zero-shot voice cloning alternatives (Voxtral, Qwen3-TTS).
+- **Text-to-Speech (TTS):** Integrates `Piper TTS` for fast, natural-sounding speech synthesis, with `OmniVoice` for low-latency zero-shot voice cloning (40x real-time, Apache 2.0 licensed).
 - **Voice Activity Detection (VAD):** Incorporates `webrtcvad` for robust speech segment detection, crucial for streaming performance.
 - **Dynamic Language Switching:** Supports on-the-fly switching of input and output languages.
 - **Latency Visualization:** The UI includes a real-time timeline chart to visualize pipeline latency.
