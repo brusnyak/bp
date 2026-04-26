@@ -7,6 +7,7 @@ torchcodec
 # === TTS MODELS ===
 piper-tts==1.3.0
 TTS==0.22.0  # Coqui TTS (zero-shot cloning with XTTS_v2)
+omnivoice==0.1.4
 
 
 # === STT: Faster-Whisper (PyTorch + CTranslate2 + MPS) ===
