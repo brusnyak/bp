@@ -12,15 +12,16 @@ Witness the seamless real-time speech translation in action. See how our system 
 
 **Key Features:**
 
-- **Real-time Performance:** Optimized for minimal end-to-end latency, targeting <1 seconds for standard TTS and 2.5-3.5 seconds for voice cloning.
+- **Real-time Performance:** Optimized for minimal end-to-end latency, targeting <1.5 seconds for standard translation and <2 seconds for voice cloning with upcoming TTS optimizations.
 - **Modular Architecture:** Built with FastAPI for the backend and a responsive web UI (HTML, CSS, JavaScript) for easy interaction.
 - **Speech-to-Text (STT):** Utilizes `faster-whisper` for efficient and accurate transcription.
-- **Machine Translation (MT):** Employs `SeamlessM4T v2` for high-quality, multilingual translation.
-- **Text-to-Speech (TTS):** Integrates `Piper TTS` for fast, natural-sounding speech synthesis, and `F5-TTS` for real-time voice cloning.
+- **Machine Translation (MT):** Employs `CTranslate2` optimized Opus-MT models for high-quality, multilingual translation.
+- **Text-to-Speech (TTS):** Integrates `Piper TTS` for fast, natural-sounding speech synthesis, with research underway on low-latency zero-shot voice cloning alternatives (Voxtral, Qwen3-TTS).
 - **Voice Activity Detection (VAD):** Incorporates `webrtcvad` for robust speech segment detection, crucial for streaming performance.
 - **Dynamic Language Switching:** Supports on-the-fly switching of input and output languages.
 - **Latency Visualization:** The UI includes a real-time timeline chart to visualize pipeline latency.
 - **Speaker Voice Management:** Frontend and backend support for recording, uploading, and managing speaker voice profiles for cloning.
+- **Future-Ready Design:** Modular architecture allows easy integration of end-to-end models and streaming translation techniques.
 
 ## Architecture
 
@@ -30,7 +31,9 @@ The system follows a client-server architecture:
 2.  **Backend (FastAPI):** A Python application using FastAPI. It handles WebSocket connections, orchestrates the STT, MT, and TTS models, performs VAD, and streams results back to the frontend.
 
 **Pipeline Flow:**
-Audio Stream (Frontend) -> VAD -> STT (FasterWhisper) -> MT (SeamlessM4T v2) -> TTS (Piper/F5-TTS) -> Audio Playback (Frontend)
+Audio Stream (Frontend) -> VAD -> STT (FasterWhisper) -> MT (CTranslate2 Opus-MT) -> TTS (Piper/Experimental Zero-Shot) -> Audio Playback (Frontend)
+
+*Note: TTS module is designed for easy swapping between Piper TTS (fast) and experimental zero-shot voice cloning models (Voxtral, Qwen3-TTS) for voice preservation.*
 
 ## Setup and Installation
 
