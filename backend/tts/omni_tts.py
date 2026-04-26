@@ -139,13 +139,20 @@ class OmniVoiceTTS:
             elif isinstance(result, dict) and "audio" in result and "sampling_rate" in result:
                 audio_wav = result["audio"]
                 sample_rate = result["sampling_rate"]
+            elif isinstance(result, list):
+                # OmniVoice may return a list of audio chunks
+                audio_wav = result
+                sample_rate = self.sample_rate
             else:
                 # Assume it returns the audio directly and we know the sample rate
                 audio_wav = result
                 sample_rate = self.sample_rate
 
             # Ensure audio is numpy array
-            if torch.is_tensor(audio_wav):
+            if isinstance(audio_wav, list):
+                # Concatenate list of audio chunks
+                audio_wav = np.concatenate(audio_wav)
+            elif torch.is_tensor(audio_wav):
                 audio_wav = audio_wav.cpu().numpy()
 
             # Normalize audio if needed (OmniVoice might output in [-1, 1] or [0, 1])
