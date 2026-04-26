@@ -67,30 +67,40 @@
 
 ## Recommendation for BP Project
 
-### Primary Recommendation: OmniVoice (K2-FSA Team)
+### Primary Recommendation: OmniVoice (K2-FSA Team) - with caveats
 
-Based on our evaluation, **OmniVoice** is the recommended TTS solution for this project:
+Based on our evaluation, **OmniVoice** has the best features but with limitations:
 
+**Features (as advertised):**
 - ✅ **Supports Czech & Slovak** (confirmed in 600+ language list)
-- ⚡ **40x real-time inference** (~25ms latency vs XTTS 2-5s)
+- ⚡ **40x real-time inference** (~25ms latency) - **on NVIDIA GPU only**
 - 🎤 **State-of-the-art voice cloning** (0.830 speaker similarity)
 - 🎤 **Voice Design feature** (text-controlled voice attributes)
 - 🔓 **Apache 2.0 license** (commercial friendly)
 - 💻 **Self-hosting capable** (privacy/compliance)
 - 📊 **2.85% WER** (beats competitors)
 
+**Actual Performance on Apple Silicon (MPS):**
+- ❌ MPS (Metal GPU): ~0.3-0.5x real-time (NOT real-time)
+- ❌ CPU: ~0.2x real-time (very slow)
+- ✅ **Requires NVIDIA GPU** for advertised 40x real-time performance
+
 ### Integration Status
 
-OmniVoice is now integrated into the backend:
+OmniVoice is integrated into the backend:
 - Backend module: `backend/tts/omni_tts.py`
 - Select via TTS model choice: `"omnivoice"` in the frontend
 - Requires: `pip install omnivoice`
+- Works but **not suitable for real-time** on Apple Silicon
 
-### Fallback Options
+### Current Recommendations
 
-1. **Piper TTS** - Fast synthesis, no cloning (default, lowest latency)
-2. **XTTS (Coqui)** - Voice cloning, higher latency (~2-5s)
-3. **Hybrid (Piper + OpenVoice)** - Voice cloning via tone conversion
+For **real-time** voice cloning on Apple Silicon:
+1. **Piper TTS** - Fastest synthesis (~0.1s), no cloning
+2. **XTTS (Coqui)** - Voice cloning, ~2-5s latency on CPU
+
+For **future** when NVIDIA GPU is available:
+- **OmniVoice** - Best voice cloning with 40x real-time
 
 For the BP speech-to-speech translation project focusing on Czech/Slovak:
 
