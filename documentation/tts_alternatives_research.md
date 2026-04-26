@@ -67,6 +67,31 @@
 
 ## Recommendation for BP Project
 
+### Primary Recommendation: OmniVoice (K2-FSA Team)
+
+Based on our evaluation, **OmniVoice** is the recommended TTS solution for this project:
+
+- ✅ **Supports Czech & Slovak** (confirmed in 600+ language list)
+- ⚡ **40x real-time inference** (~25ms latency vs XTTS 2-5s)
+- 🎤 **State-of-the-art voice cloning** (0.830 speaker similarity)
+- 🎤 **Voice Design feature** (text-controlled voice attributes)
+- 🔓 **Apache 2.0 license** (commercial friendly)
+- 💻 **Self-hosting capable** (privacy/compliance)
+- 📊 **2.85% WER** (beats competitors)
+
+### Integration Status
+
+OmniVoice is now integrated into the backend:
+- Backend module: `backend/tts/omni_tts.py`
+- Select via TTS model choice: `"omnivoice"` in the frontend
+- Requires: `pip install omnivoice`
+
+### Fallback Options
+
+1. **Piper TTS** - Fast synthesis, no cloning (default, lowest latency)
+2. **XTTS (Coqui)** - Voice cloning, higher latency (~2-5s)
+3. **Hybrid (Piper + OpenVoice)** - Voice cloning via tone conversion
+
 For the BP speech-to-speech translation project focusing on Czech/Slovak:
 
 1. **Primary Recommendation**: Qwen3-TTS 0.6B model
