@@ -28,6 +28,8 @@ from backend.utils.auth import get_password_hash, verify_password # Import auth 
 from backend.tts.piper_tts import PiperTTS
 from backend.tts.coqui_tts import CoquiTTS
 from backend.tts.hybrid_tts import HybridTTS
+from backend.tts.omni_tts import OmniVoiceTTS
+from backend.mt.nllb_mt import NLLBMT
 
 # Get engine and SessionLocal
 engine, SessionLocal = get_db_session_and_engine(SQLALCHEMY_DATABASE_URL)
@@ -156,6 +158,12 @@ _ongoing_conversions: Dict[str, asyncio.Lock] = {}
 
 # Dictionary for per-session locks (prevents race conditions)
 _session_locks: Dict[str, asyncio.Lock] = {}
+
+# Available MT models for hybrid system
+AVAILABLE_MT_MODELS = {
+    "opus_mt": "CTranslate2 optimized Opus-MT models",
+    "nllb": "NLLB-200 model for low-resource language pairs"
+}
 
 def get_session_lock(client_info: str) -> asyncio.Lock:
     """
@@ -362,11 +370,30 @@ async def _initialize_tts_models(session_data: Dict[str, Any], tts_model_choice:
             logging.info(f"Backend: Session {session_data['client_info']}: HybridTTS model already initialized.")
         session_data["piper_tts_model"] = None
         session_data["coqui_tts_model"] = None
+    elif tts_model_choice == "omnivoice":
+        current_omnivoice_tts_model = session_data.get("omnivoice_tts_model")
+        if current_omnivoice_tts_model is None:
+            init_start = time.time()
+            logging.info(f"Backend: Session {session_data['client_info']}: Initializing OmniVoiceTTS at {time.strftime('%H:%M:%S', time.localtime(init_start))}...")
+            try:
+                session_data["omnivoice_tts_model"] = OmniVoiceTTS(device="mps" if torch.backends.mps.is_available() else "cpu")
+                init_end = time.time()
+                logging.info(f"Backend: Session {session_data['client_info']}: OmniVoiceTTS initialized at {time.strftime('%H:%M:%S', time.localtime(init_end))}. Duration: {init_end - init_start:.2f}s.")
+            except Exception as e:
+                logging.error(f"Backend: Session {session_data['client_info']}: ERROR: Failed to initialize OmniVoiceTTS: {e}")
+                session_data["omnivoice_tts_model"] = None
+                raise HTTPException(status_code=500, detail=f"Failed to initialize OmniVoiceTTS: {e}")
+        else:
+            logging.info(f"Backend: Session {session_data['client_info']}: OmniVoiceTTS model already initialized.")
+        session_data["piper_tts_model"] = None
+        session_data["coqui_tts_model"] = None
+        session_data["hybrid_tts_model"] = None
     else:
         logging.warning(f"Backend: Session {session_data['client_info']}: Skipping TTS initialization as '{tts_model_choice}' is selected or invalid.")
         session_data["piper_tts_model"] = None
         session_data["coqui_tts_model"] = None # Ensure Coqui is not active for this session
         session_data["hybrid_tts_model"] = None
+        session_data["omnivoice_tts_model"] = None
 
 async def _initialize_vad_instance(session_data: Dict[str, Any]):
     """Initializes the WebRTC VAD instance for a given session."""
@@ -713,6 +740,8 @@ def get_initialized_models(client_info: str, session_config: Dict[str, Any]) -> 
         tts_model_instance = session_data.get("piper_tts_model")
     elif session_config["tts_model_choice"] == "xtts": # Coqui XTTS
         tts_model_instance = session_data.get("coqui_tts_model")
+    elif session_config["tts_model_choice"] == "omnivoice":
+        tts_model_instance = session_data.get("omnivoice_tts_model")
     
     return stt_model_instance, main_mt_model, tts_model_instance, vad_instance, session_config["tts_model_choice"]
 
@@ -919,6 +948,16 @@ async def _process_speech_segment_pipeline(
         audio_wav, sample_rate, tts_latency = await loop.run_in_executor(
             None,
             lambda: hybrid_engine.synthesize(translated_text, speaker_wav_path=speaker_wav_path)
+        )
+        tts_total_time = time.perf_counter() - tts_start_time
+    
+    elif tts_model_choice == "omnivoice" and session_data.get("omnivoice_tts_model"):
+        # OmniVoice TTS
+        omnivoice_engine = session_data.get("omnivoice_tts_model")
+        logging.info(f"Backend: Session {client_info}: Starting OmniVoice TTS synthesis with cloning...")
+        audio_wav, sample_rate, tts_latency = await loop.run_in_executor(
+            None,
+            lambda: omnivoice_engine.synthesize(translated_text, language=target_lang, speaker_wav_path=speaker_wav_path)
         )
         tts_total_time = time.perf_counter() - tts_start_time
     

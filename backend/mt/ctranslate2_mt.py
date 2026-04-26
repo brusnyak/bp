@@ -53,7 +53,7 @@ class CTranslate2MT:
                 f"CTranslate2 model.bin not found in {self.ctranslate2_model_dir}. Please ensure the model is converted."
             )
 
-        self.translator = ctranslate2.Translator(self.ctranslate2_model_dir, device=self.device)
+        self.translator = ctranslate2.Translator(self.ctranslate2_model_dir, device=self.device, compute_type="int8")
         self.tokenizer = AutoTokenizer.from_pretrained(
             self.hf_model_id
         )  # Use original HF ID for tokenizer
@@ -117,7 +117,7 @@ class CTranslate2MT:
         # Let's try passing the options directly as keyword arguments to `translate_batch`.
 
         results = self.translator.translate_batch(
-            [tokens], max_batch_size=1, beam_size=5, num_hypotheses=1
+            [tokens], max_batch_size=1, beam_size=4, num_hypotheses=1
         )
         translated_tokens = results[0].hypotheses[0]
         translated_text = self.tokenizer.decode(
