@@ -92,7 +92,45 @@ OmniVoice is integrated into the backend:
 - Select via TTS model choice: `"omnivoice"` in the frontend
 - Requires: `pip install omnivoice`
 - Works but **not suitable for real-time** on Apple Silicon
+ 
+## 2026 Apple Silicon Performance Update & Alternatives
 
+### Key Findings (April 2026 Research)
+1. **PyTorch MPS Remains Broken for Diffusion TTS**: OmniVoice's MPS backend produces unintelligible audio due to PyTorch MPS bugs with 4D attention masks. Upstream fix (PR #13) exists but is not production-ready.
+2. **MLX Framework is the Mac Performance Solution**: Apple's MLX framework (replaces PyTorch for Apple Silicon) achieves real-time TTS with voice cloning via native Metal acceleration.
+3. **Complete Pipeline Solutions Exist**: Multiple open-source projects now offer end-to-end speech translation on Mac:
+
+| Solution | Tech Stack | Latency | Voice Cloning | Notes |
+|----------|-------------|---------|---------------|-------|
+| **eris-voice** | Qwen3-TTS (MLX-native) | RTF 0.4-1.0x | ✅ | Pre-allocated KV cache, Metal SDPA, 166x faster generate loop |
+| **Ora** | Qwen3-ASR + Qwen3.5 (MLX) | ~800ms | ❌ | Menu bar app, real-time captioning for macOS 15+ |
+| **local-translate** | Voxtral → TranslateGemma → Kokoro | ~2-3s | ❌ | Medical speech translation use case, 100% local |
+| **MimikaStudio** | Qwen3-TTS + Chatterbox (MLX) | Real-time | ✅ | Audiobook/document reader with voice cloning |
+
+### Recommended Replacements for OmniVoice on Mac
+#### 1. MLX-Audio (Top Pick)
+- Library: `tonkinai/mlx-audio` or `Blaizzy/mlx-audio`
+- Supports: Qwen3-TTS, Kokoro, Voxtral, Parakeet
+- Achieves real-time performance (RTF < 1.0x) with voice cloning
+- Installation: `pip install mlx-audio`
+- Replaces PyTorch OmniVoice for Mac builds
+
+#### 2. Performance Comparison (Mac M-Series)
+| TTS Backend | Device | Latency (Short Text) | RTF | Voice Cloning |
+|-------------|--------|----------------------|-----|---------------|
+| OmniVoice (PyTorch) | CPU | 3-10s | 4.92 | ✅ |
+| OmniVoice (PyTorch) | MPS | Broken | N/A | ❌ |
+| Qwen3-TTS (MLX) | MPS | ~0.4-0.7s | 0.4-1.0x | ✅ |
+| Kokoro (MLX) | MPS | ~0.1s | 19x | ❌ |
+| Piper (CPU) | CPU | ~0.1s | 19x | ❌ |
+
+#### 3. Rust/Candle Port (Experimental)
+- `FerrisMind/omnivoice-rs`: Native Rust port of OmniVoice with Metal support (no PyTorch dependency)
+- Status: Functional but experimental
+
+### Updated Recommendation for BP Project
+Replace OmniVoice with **Qwen3-TTS via MLX-Audio** for Mac builds to achieve real-time voice cloning performance. Keep Piper as the fast non-cloning fallback, XTTS as the CPU voice cloning fallback.
+ 
 ### Current Recommendations
 
 For **real-time** voice cloning on Apple Silicon:
