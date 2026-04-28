@@ -44,3 +44,11 @@ temp/
 processed/
 .agent/
 Walkthrough*
+
+# Office documents and PDFs
+*.pdf
+*.docx
+*.doc
+*.pptx
+*.xlsx
+*.ppt

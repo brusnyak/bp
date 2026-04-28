@@ -16,7 +16,7 @@ Witness the seamless real-time speech translation in action. See how our system 
 - **Modular Architecture:** Built with FastAPI for the backend and a responsive web UI (HTML, CSS, JavaScript) for easy interaction.
 - **Speech-to-Text (STT):** Utilizes `faster-whisper` for efficient and accurate transcription.
 - **Machine Translation (MT):** Employs `CTranslate2` optimized Opus-MT models for high-quality, multilingual translation.
-- **Text-to-Speech (TTS):** Integrates `Piper TTS` for fast, natural-sounding speech synthesis, with `OmniVoice` for low-latency zero-shot voice cloning (40x real-time, Apache 2.0 licensed).
+- **Text-to-Speech (TTS):** Integrates `Piper TTS` for fast, natural-sounding speech synthesis (no cloning, ~0.1s latency), `XTTS` for CPU-based zero-shot voice cloning (~2-5s latency), and `OmniVoice` for high-quality voice cloning (requires NVIDIA GPU for real-time performance, CPU ~3-10s on Mac). For Apple Silicon Macs, `MLX-Audio` with Qwen3-TTS achieves real-time voice cloning (RTF 0.4-1.0x) via Metal acceleration.
 - **Voice Activity Detection (VAD):** Incorporates `webrtcvad` for robust speech segment detection, crucial for streaming performance.
 - **Dynamic Language Switching:** Supports on-the-fly switching of input and output languages.
 - **Latency Visualization:** The UI includes a real-time timeline chart to visualize pipeline latency.
@@ -33,7 +33,7 @@ The system follows a client-server architecture:
 **Pipeline Flow:**
 Audio Stream (Frontend) -> VAD -> STT (FasterWhisper) -> MT (CTranslate2 Opus-MT) -> TTS (Piper/Experimental Zero-Shot) -> Audio Playback (Frontend)
 
-*Note: TTS module is designed for easy swapping between Piper TTS (fast) and experimental zero-shot voice cloning models (Voxtral, Qwen3-TTS) for voice preservation.*
+*Note: TTS module is designed for easy swapping between Piper TTS (fast, no cloning), XTTS (CPU voice cloning), OmniVoice (GPU voice cloning), and MLX-Audio Qwen3-TTS (Apple Silicon real-time voice cloning).*
 
 ## Setup and Installation
 
@@ -99,7 +99,7 @@ Audio Stream (Frontend) -> VAD -> STT (FasterWhisper) -> MT (CTranslate2 Opus-MT
       # Convert other language pairs as needed
       ```
     - **FasterWhisper STT Model:** The `FasterWhisperSTT` model (`large-v3`) will be downloaded automatically on first use.
-    - **F5-TTS (for Voice Cloning):** This model will be downloaded automatically on first use if selected.
+    - **XTTS / OmniVoice (for Voice Cloning):** These models will be downloaded automatically on first use if selected. For Apple Silicon Macs, install `mlx-audio` for MLX-based Qwen3-TTS real-time voice cloning.
 
 5.  \*\*Generate SSL Certificates (for HTTPS):
     The FastAPI server runs with HTTPS. Generate self-signed certificates:
@@ -119,7 +119,7 @@ Audio Stream (Frontend) -> VAD -> STT (FasterWhisper) -> MT (CTranslate2 Opus-MT
 1.  **Open in Browser:** Navigate to `https://localhost:8000` in your web browser.
 2.  **Initialize Pipeline:** Click the "Initialize Pipeline" button. This will load all necessary models. The first load may take some time.
 3.  **Select Languages:** Choose your desired input and output languages from the dropdowns.
-4.  **Record Voice (Optional for F5-TTS):** If you plan to use F5-TTS for voice cloning, select "F5" as the TTS model, then click the "Record Voice" button. Follow the prompts to record a short audio sample of your voice or upload an existing WAV file. This voice profile will be used for synthesis.
+4.  **Record Voice (Optional for Voice Cloning):** If you plan to use XTTS, OmniVoice, or MLX-Audio for voice cloning, select the appropriate TTS model, then upload a short WAV audio sample of your voice. This voice profile will be used for synthesis.
 5.  **Start Speaking:** Once initialized, the system will automatically start listening for speech. Speak into your microphone.
 6.  **Real-time Translation:** Observe the transcription and translation appearing in real-time. The translated speech will be played back through your selected audio output.
 7.  **Monitor Latency:** The "Latency Breakdown" section and the timeline chart will show real-time performance metrics.
@@ -146,7 +146,7 @@ Ensure these files are placed in the `test/` directory. The corresponding `_tran
 ## Future Enhancements
 
 - **Multi-speaker Support:** Extend the system to handle multiple speakers in a conference setting.
-- **Production Optimization:** Explore model quantization, `whisper.cpp` or `mlx-whisper` for STT, and cloud deployment options.
+- **Production Optimization:** Explore model quantization, `whisper.cpp` or `mlx-whisper` for STT, `mlx-audio` for Apple Silicon TTS, and cloud deployment options.
 - **`pip` Packaging:** Simplify installation by packaging the project as a Python library.
 
 ## Thesis Suggestions
@@ -155,22 +155,27 @@ Refer to `documentation/thesis_suggestions.txt` for detailed content suggestions
 
 ---
 
-**Current Development Status: F5-TTS Integration & Frontend/Backend Stability**
+**Current Development Status: Voice Cloning Integration & Apple Silicon Optimization**
 
-**Objective:** Successfully integrate F5-TTS for real-time voice cloning and resolve critical frontend and backend issues.
+**Objective:** Integrate XTTS, OmniVoice, and MLX-Audio for voice cloning, resolve frontend/backend issues, and optimize for Apple Silicon.
 
 **Completed Actions:**
 
-- **Frontend JavaScript Errors Resolved:**
-  - Fixed `ReferenceError: loadF5Voices is not defined` in `ui/js/main.js` by correctly calling `fetchStoredVoices(populateF5VoiceSelect)`.
-  - Resolved `TypeError: Cannot read properties of undefined (reading 'inputSampleRate')` in `ui/audio-processor.js` by passing `processorOptions` to `AudioWorkletNode` in `ui/js/audio_processing.js`.
-  - Improved F5-TTS UI logic in `ui/index.html` and `ui/js/main.js` for better display of voice selection and record button.
-- **Backend FFmpeg Integration Improved:**
-  - Replaced `torchaudio.save` with `soundfile.write` in `backend/tts/f5_tts.py` to bypass `torchaudio`'s problematic FFmpeg integration, ensuring consistent audio handling with `soundfile`.
-- **F5-TTS Integration:** F5-TTS is now integrated as a selectable TTS model with voice cloning capabilities.
+- **TTS Backends Integrated:**
+  - Piper TTS (fast, no cloning, ~0.1s latency)
+  - XTTS (CPU voice cloning, ~2-5s latency)
+  - OmniVoice (GPU voice cloning, 40x real-time on NVIDIA GPU; slow on CPU/MPS)
+  - MLX-Audio Qwen3-TTS (Apple Silicon real-time voice cloning, RTF 0.4-1.0x)
+- **Frontend/Backend Fixes:**
+  - Resolved audio processing and voice selection UI issues
+  - Replaced `torchaudio.save` with `soundfile.write` for consistent audio handling
+  - Added hybrid MT with CTranslate2 Opus-MT + NLLB-200 fallback
+- **Documentation Updated:**
+  - Added 2026 Apple Silicon performance research and MLX-Audio solutions
+  - Updated TTS alternatives research with MPS bug details and fixes
 
 **Next Steps:**
 
-- **Implement UI Error Handling and Feedback:** Enhance the frontend to provide clear user feedback for backend initialization failures (e.g., F5-TTS without a voice).
-- **Run Performance Tests:** Execute `test/tts_performance_test.py` to gather data on Piper vs F5-TTS performance and quality.
-- **Update Documentation:** Ensure all documentation, including `documentation/thesis.docx`, reflects the current state of the project.
+- **MLX-Audio Integration:** Replace OmniVoice with `mlx-audio` for Mac builds to achieve real-time voice cloning
+- **Performance Benchmarking:** Test Qwen3-TTS on M1 Pro 16GB for <1s latency with voice cloning
+- **Conference Use Case:** Align project with department's conference systems work for supervisor alignment
