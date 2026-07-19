@@ -1,181 +1,309 @@
 # Real-Time Speech Translation System
 
-## Project Overview
+[![Python](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-WebSocket-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Whisper](https://img.shields.io/badge/STT-Faster--Whisper-7C3AED)](https://github.com/SYSTRAN/faster-whisper)
+[![CTranslate2](https://img.shields.io/badge/MT-CTranslate2-0F766E)](https://opennmt.net/CTranslate2/)
+[![Piper TTS](https://img.shields.io/badge/TTS-Piper-2563EB)](https://github.com/rhasspy/piper)
+[![Apple Silicon](https://img.shields.io/badge/Optimized-Apple_Silicon-111827?logo=apple&logoColor=white)](https://developer.apple.com/metal/)
 
-This project implements a real-time live speech translation system designed for conference environments. It leverages state-of-the-art open-source models for Speech-to-Text (STT), Machine Translation (MT), and Text-to-Speech (TTS) to provide low-latency, high-quality translation. The system is optimized for Apple Silicon (M1/M2/M3) hardware and features a modern web-based user interface.
+Real-time speech translation system for online conference scenarios. The project captures live speech, detects speech segments, transcribes them, translates the text, synthesizes translated audio, and displays latency metrics through a browser-based interface.
 
-### Live Demo & Examples
+Bachelor thesis context: real-time / near-real-time speech translation during online conferences.
 
-Witness the seamless real-time speech translation in action. See how our system effortlessly bridges language gaps.
+## Overview
+
+This project implements a modular speech translation pipeline:
+
+```text
+Audio input -> VAD -> STT -> MT -> TTS -> translated audio + subtitles
+```
+
+The system is designed around open-source models and local execution, with special attention to Apple Silicon performance. It uses FastAPI and WebSockets for the backend streaming layer, a browser UI for interaction and visualization, and swappable model backends for transcription, translation, and speech synthesis.
+
+## Demo
 
 [![Real-Time Speech Translation Demo](https://img.youtube.com/vi/_-jwEyGxDYs/maxresdefault.jpg)](https://www.youtube.com/watch?v=_-jwEyGxDYs)
 
-**Key Features:**
+## Features
 
-- **Real-time Performance:** Optimized for minimal end-to-end latency, targeting <1.5 seconds for standard translation and <2 seconds for voice cloning with upcoming TTS optimizations.
-- **Modular Architecture:** Built with FastAPI for the backend and a responsive web UI (HTML, CSS, JavaScript) for easy interaction.
-- **Speech-to-Text (STT):** Utilizes `faster-whisper` for efficient and accurate transcription.
-- **Machine Translation (MT):** Employs `CTranslate2` optimized Opus-MT models for high-quality, multilingual translation.
-- **Text-to-Speech (TTS):** Integrates `Piper TTS` for fast, natural-sounding speech synthesis (no cloning, ~0.1s latency), `XTTS` for CPU-based zero-shot voice cloning (~2-5s latency), and `OmniVoice` for high-quality voice cloning (requires NVIDIA GPU for real-time performance, CPU ~3-10s on Mac). For Apple Silicon Macs, `MLX-Audio` with Qwen3-TTS achieves real-time voice cloning (RTF 0.4-1.0x) via Metal acceleration.
-- **Voice Activity Detection (VAD):** Incorporates `webrtcvad` for robust speech segment detection, crucial for streaming performance.
-- **Dynamic Language Switching:** Supports on-the-fly switching of input and output languages.
-- **Latency Visualization:** The UI includes a real-time timeline chart to visualize pipeline latency.
-- **Speaker Voice Management:** Frontend and backend support for recording, uploading, and managing speaker voice profiles for cloning.
-- **Future-Ready Design:** Modular architecture allows easy integration of end-to-end models and streaming translation techniques.
+| Feature | Details |
+| --- | --- |
+| Live audio pipeline | Captures microphone audio, processes speech segments, and streams translation results. |
+| Speech-to-text | Uses Faster-Whisper for transcription. |
+| Machine translation | Uses CTranslate2-optimized Opus-MT models, with NLLB-200 as a fallback path. |
+| Text-to-speech | Supports Piper TTS, XTTS, OmniVoice, and MLX-Audio/Qwen3-TTS experiments. |
+| Voice activity detection | Uses WebRTC VAD and RMS pre-filtering to reduce unnecessary STT calls. |
+| Dynamic language switching | Allows changing source and target languages from the UI. |
+| Speaker voice profiles | Supports recording, uploading, renaming, deleting, and using speaker reference audio. |
+| Latency visualization | Displays latency breakdown and timeline charts in the browser UI. |
+| Local-first research setup | Focuses on open-source models and local hardware constraints. |
 
-## Architecture
+## System design
 
-The system follows a client-server architecture:
+```mermaid
+flowchart TB
+    Speaker([Speaker]) --> Browser[Browser UI]
+    Browser --> WebSocket[WebSocket Audio Stream]
 
-1.  **Frontend (UI):** A web application built with HTML, CSS, and JavaScript. It captures microphone audio, sends it to the backend via WebSockets, displays real-time transcriptions and translations, and plays back synthesized audio. It also manages language selection and speaker voice profiles.
-2.  **Backend (FastAPI):** A Python application using FastAPI. It handles WebSocket connections, orchestrates the STT, MT, and TTS models, performs VAD, and streams results back to the frontend.
+    WebSocket --> Backend[FastAPI Backend]
+    Backend --> VAD[Voice Activity Detection]
+    VAD --> STT[Faster-Whisper STT]
+    STT --> MT[CTranslate2 / NLLB Translation]
+    MT --> TTS[Piper / XTTS / OmniVoice / MLX TTS]
 
-**Pipeline Flow:**
-Audio Stream (Frontend) -> VAD -> STT (FasterWhisper) -> MT (CTranslate2 Opus-MT) -> TTS (Piper/Experimental Zero-Shot) -> Audio Playback (Frontend)
+    TTS --> Playback[Translated Audio Playback]
+    MT --> Subtitles[Translated Text + Subtitles]
+    Backend --> Metrics[Latency Metrics]
+    Browser --> Voices[Speaker Voice Profiles]
+    Voices --> TTS
 
-*Note: TTS module is designed for easy swapping between Piper TTS (fast, no cloning), XTTS (CPU voice cloning), OmniVoice (GPU voice cloning), and MLX-Audio Qwen3-TTS (Apple Silicon real-time voice cloning).*
+    Backend --> DB[(SQLite / Local Metadata)]
+    Metrics --> Browser
+    Playback --> Browser
+    Subtitles --> Browser
 
-## Setup and Installation
+    classDef actor fill:#DBEAFE,stroke:#2563EB,color:#0F172A,stroke-width:1px
+    classDef client fill:#EDE9FE,stroke:#7C3AED,color:#0F172A,stroke-width:1px
+    classDef transport fill:#CCFBF1,stroke:#0F766E,color:#0F172A,stroke-width:1px
+    classDef model fill:#FEF3C7,stroke:#D97706,color:#0F172A,stroke-width:1px
+    classDef output fill:#DCFCE7,stroke:#16A34A,color:#0F172A,stroke-width:1px
+    classDef data fill:#FCE7F3,stroke:#DB2777,color:#0F172A,stroke-width:1px
+
+    class Speaker actor
+    class Browser,Voices client
+    class WebSocket,Backend,VAD transport
+    class STT,MT,TTS model
+    class Playback,Subtitles,Metrics output
+    class DB data
+```
+
+### Runtime flow
+
+| Step | Component | Responsibility |
+| --- | --- | --- |
+| 1 | Browser UI | Captures microphone audio and sends chunks over WebSocket. |
+| 2 | FastAPI backend | Manages sessions, model initialization, WebSocket connections, and API routes. |
+| 3 | VAD layer | Filters silence and detects valid speech segments. |
+| 4 | STT layer | Transcribes speech with Faster-Whisper. |
+| 5 | MT layer | Translates recognized text using CTranslate2 Opus-MT or fallback translation models. |
+| 6 | TTS layer | Synthesizes translated speech through the selected TTS backend. |
+| 7 | UI output | Plays translated audio, displays transcription/translation, and visualizes latency. |
+
+## Tech stack
+
+| Layer | Choice | Notes |
+| --- | --- | --- |
+| Backend | FastAPI, Uvicorn, WebSockets | Streaming API and browser communication. |
+| Frontend | HTML, CSS, JavaScript | Browser UI for capture, playback, language selection, and metrics. |
+| STT | Faster-Whisper | Efficient Whisper inference for transcription. |
+| MT | CTranslate2 Opus-MT, NLLB-200 | Local machine translation with multilingual fallback. |
+| TTS | Piper TTS, XTTS, OmniVoice, MLX-Audio/Qwen3-TTS | Fast synthesis and voice cloning experiments. |
+| VAD | WebRTC VAD | Speech segment detection. |
+| Audio processing | soundfile, librosa, pydub, FFmpeg | Audio loading, conversion, and processing utilities. |
+| Metrics | Chart.js, matplotlib, seaborn | Latency visualization and analysis. |
+| Database/auth | SQLAlchemy, Alembic, python-jose, argon2 | Local metadata, user handling, and auth experiments. |
+| Testing | pytest, pytest-asyncio, Playwright | Backend and UI test support. |
+
+## Model backends
+
+| Stage | Backend | Purpose |
+| --- | --- | --- |
+| STT | Faster-Whisper | Transcribes source speech into text. |
+| MT | CTranslate2 Opus-MT | Fast translation for supported language pairs. |
+| MT fallback | NLLB-200 | Fallback for lower-resource or unsupported language pairs. |
+| TTS | Piper | Fast non-cloning speech synthesis. |
+| TTS | XTTS | CPU-based zero-shot voice cloning. |
+| TTS | OmniVoice | Higher-quality voice cloning; real-time mainly with NVIDIA GPU. |
+| TTS | MLX-Audio/Qwen3-TTS | Apple Silicon voice cloning research path. |
+
+## Performance focus
+
+The project targets low-latency local execution:
+
+| Pipeline mode | Target / observed direction |
+| --- | --- |
+| Standard translation | Target under ~1.5 seconds end-to-end. |
+| Piper TTS | Very low synthesis latency, around ~0.1 seconds in local notes. |
+| XTTS voice cloning | Slower CPU voice cloning path, around ~2–5 seconds. |
+| OmniVoice | Stronger with NVIDIA GPU; CPU/MPS can be too slow for real time. |
+| MLX-Audio/Qwen3-TTS | Apple Silicon optimization path for real-time voice cloning. |
+
+## Quick start
 
 ### Prerequisites
 
-- **Python 3.9+**
-- **pip** (Python package installer)
-- **Git**
-- **FFmpeg** (for audio processing, usually pre-installed or easily installed via Homebrew on macOS: `brew install ffmpeg`)
-- **BlackHole 2ch** (or similar virtual audio device for macOS, recommended for routing audio output for testing: `brew install blackhole-2ch`)
+- Python 3.9+
+- Git
+- FFmpeg
+- BlackHole 2ch or a similar virtual audio device on macOS for audio routing tests
 
-### Steps
+On macOS:
 
-1.  **Clone the Repository:**
+```bash
+brew install ffmpeg blackhole-2ch
+```
 
-    ```bash
-    git clone https://github.com/brusnyak/bp.git
-    cd bp
-    ```
+### Windows setup
 
-    **Windows:**
-    Run the provided PowerShell setup script:
+Run the provided PowerShell setup script:
 
-    ```powershell
-    .\setup_windows.ps1
-    ```
+```powershell
+.\setup_windows.ps1
+```
 
-    This script will automatically install Python 3.11, FFmpeg, Node.js, create a virtual environment, and install all dependencies.
+The script installs Python, FFmpeg, Node.js, creates a virtual environment, and installs dependencies.
 
-    **macOS / Linux:**
+### macOS / Linux setup
 
-2.  **Create and Activate a Virtual Environment:**
-    It's highly recommended to use a virtual environment to manage dependencies.
+Clone the repository:
 
-    ```bash
-    python3 -m venv venv
-    source venv/bin/activate
-    ```
+```bash
+git clone https://github.com/brusnyak/bp.git
+cd bp
+```
 
-3.  **Install Dependencies:**
-    Install the required Python packages. The `requirements.txt` file is optimized for Apple Silicon.
+Create and activate a virtual environment:
 
-    ```bash
-    pip install -r requirements.txt
-    ```
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
 
-    _Note: If you encounter issues with `torch` or `torchaudio` on Apple Silicon, refer to the official PyTorch installation guide for specific commands for your macOS version and chip._
+Install dependencies:
 
-4.  **Download Models:**
+```bash
+pip install -r requirements.txt
+```
 
-    - **Piper TTS Models:** The system will attempt to download Piper TTS models on first initialization if they are not found locally. However, you can manually download them using the provided script:
-      ```bash
-      python backend/tts/download_piper_models.py en_US-ryan-medium
-      python backend/tts/download_piper_models.py sk_SK-lili-medium
-      python backend/tts/download_piper_models.py cs_CZ-jirka-medium
-      # Download other languages as needed from PIPER_MODEL_MAPPING in backend/main.py
-      ```
-    - **CTranslate2 MT Models:** You need to convert Opus-MT models to CTranslate2 format.
-      ```bash
-      python backend/mt/convert_opus_mt_to_ct2.py --model_name Helsinki-NLP/opus-mt-en-sk
-      python backend/mt/convert_opus-mt-to-ct2.py --model_name Helsinki-NLP/opus-mt-sk-en
-      python backend/mt/convert_opus-mt-to-ct2.py --model_name Helsinki-NLP/opus-mt-en-cs
-      # Convert other language pairs as needed
-      ```
-    - **FasterWhisper STT Model:** The `FasterWhisperSTT` model (`large-v3`) will be downloaded automatically on first use.
-    - **XTTS / OmniVoice (for Voice Cloning):** These models will be downloaded automatically on first use if selected. For Apple Silicon Macs, install `mlx-audio` for MLX-based Qwen3-TTS real-time voice cloning.
+Generate local HTTPS certificates:
 
-5.  \*\*Generate SSL Certificates (for HTTPS):
-    The FastAPI server runs with HTTPS. Generate self-signed certificates:
+```bash
+openssl req -x509 -newkey rsa:4096 -nodes \
+  -out certs/cert.pem \
+  -keyout certs/key.pem \
+  -days 365 \
+  -subj "/CN=localhost"
+```
 
-    ```bash
-    openssl req -x509 -newkey rsa:4096 -nodes -out certs/cert.pem -keyout certs/key.pem -days 365 -subj "/CN=localhost"
-    ```
+Run the application:
 
-6.  **Run the Application:**
-    ```bash
-    python app.py
-    ```
-    The application will start on `https://localhost:8000`. You might need to accept the self-signed certificate in your browser.
+```bash
+python app.py
+```
+
+Open:
+
+```text
+https://localhost:8000
+```
+
+Your browser may ask you to accept the self-signed certificate.
+
+## Model setup
+
+### Piper TTS
+
+Piper models can be downloaded manually:
+
+```bash
+python backend/tts/download_piper_models.py en_US-ryan-medium
+python backend/tts/download_piper_models.py sk_SK-lili-medium
+python backend/tts/download_piper_models.py cs_CZ-jirka-medium
+```
+
+### CTranslate2 translation models
+
+Convert Opus-MT models to CTranslate2 format:
+
+```bash
+python backend/mt/convert_opus_mt_to_ct2.py --model_name Helsinki-NLP/opus-mt-en-sk
+python backend/mt/convert_opus_mt_to_ct2.py --model_name Helsinki-NLP/opus-mt-sk-en
+python backend/mt/convert_opus_mt_to_ct2.py --model_name Helsinki-NLP/opus-mt-en-cs
+```
+
+### Faster-Whisper
+
+The Faster-Whisper model is downloaded automatically on first use.
+
+### Voice cloning models
+
+XTTS, OmniVoice, and MLX-Audio models are downloaded automatically when selected, depending on backend support and local hardware.
 
 ## Usage
 
-1.  **Open in Browser:** Navigate to `https://localhost:8000` in your web browser.
-2.  **Initialize Pipeline:** Click the "Initialize Pipeline" button. This will load all necessary models. The first load may take some time.
-3.  **Select Languages:** Choose your desired input and output languages from the dropdowns.
-4.  **Record Voice (Optional for Voice Cloning):** If you plan to use XTTS, OmniVoice, or MLX-Audio for voice cloning, select the appropriate TTS model, then upload a short WAV audio sample of your voice. This voice profile will be used for synthesis.
-5.  **Start Speaking:** Once initialized, the system will automatically start listening for speech. Speak into your microphone.
-6.  **Real-time Translation:** Observe the transcription and translation appearing in real-time. The translated speech will be played back through your selected audio output.
-7.  **Monitor Latency:** The "Latency Breakdown" section and the timeline chart will show real-time performance metrics.
+1. Open `https://localhost:8000`.
+2. Initialize the pipeline.
+3. Select source and target languages.
+4. Choose the TTS backend.
+5. Optionally upload or record a speaker voice sample for voice cloning.
+6. Speak into the microphone.
+7. Monitor transcription, translation, playback, and latency charts.
 
 ## Testing
 
-A comprehensive testing framework is provided in the `test/` directory.
-
-To run the streaming pipeline tests:
+Run the streaming pipeline tests:
 
 ```bash
 python test/streaming_pipeline_tests.py
 ```
 
-**Note on Test Audio:**
-For full testing, you will need to provide actual `.wav` audio files for the following paths:
+For full evaluation, add test audio files to the `test/` directory:
 
-- `test/My test speech_xtts_speaker_clean.wav` (English speech for general testing)
-- `test/slovak_test_speech.wav` (Slovak speech for multi-language testing)
-- `test/Voice-Training.wav` (Speaker reference audio for XTTS voice cloning)
+| File | Purpose |
+| --- | --- |
+| `test/My test speech_xtts_speaker_clean.wav` | English speech test input. |
+| `test/slovak_test_speech.wav` | Slovak speech test input. |
+| `test/Voice-Training.wav` | Speaker reference audio for voice cloning. |
 
-Ensure these files are placed in the `test/` directory. The corresponding `_transcript.txt` and `_translation.txt` files should contain the accurate text references for evaluation.
+Matching transcript and translation reference files should be added for metric-based evaluation.
 
-## Future Enhancements
+## Project structure
 
-- **Multi-speaker Support:** Extend the system to handle multiple speakers in a conference setting.
-- **Production Optimization:** Explore model quantization, `whisper.cpp` or `mlx-whisper` for STT, `mlx-audio` for Apple Silicon TTS, and cloud deployment options.
-- **`pip` Packaging:** Simplify installation by packaging the project as a Python library.
+```text
+bp/
+├── app.py               # FastAPI app, WebSocket server, UI mounting
+├── backend/
+│   ├── main.py          # Model orchestration, routes, sessions, pipeline config
+│   ├── stt/             # Faster-Whisper wrapper
+│   ├── mt/              # Translation backends and model conversion scripts
+│   ├── tts/             # Piper, XTTS, OmniVoice, and hybrid TTS modules
+│   └── utils/           # Audio, auth, and database utilities
+├── ui/                  # Browser interface
+├── test/                # Streaming and pipeline tests
+├── speaker_voices/      # Local speaker reference audio and metadata
+├── documentation/       # Thesis notes and supporting research
+├── requirements.txt
+└── package.json
+```
 
-## Thesis Suggestions
+## Current development status
 
-Refer to `documentation/thesis_suggestions.txt` for detailed content suggestions for your bachelor's thesis, covering introduction, literature review, methodology, implementation details, results, and future work.
+| Area | Status |
+| --- | --- |
+| Piper TTS | Integrated as the fast non-cloning synthesis backend. |
+| XTTS | Integrated for CPU-based voice cloning. |
+| OmniVoice | Integrated but best suited to NVIDIA GPU for real-time use. |
+| MLX-Audio/Qwen3-TTS | Identified as the Apple Silicon optimization path. |
+| Hybrid MT | CTranslate2 Opus-MT with NLLB fallback added. |
+| UI and backend fixes | Audio processing, voice selection, and speaker profile handling improved. |
+| Thesis alignment | Conference use case and latency benchmarking remain the key academic framing. |
 
----
+## Roadmap
 
-**Current Development Status: Voice Cloning Integration & Apple Silicon Optimization**
+- Replace or supplement OmniVoice with MLX-Audio for Mac builds.
+- Benchmark Qwen3-TTS on M1 Pro hardware for real-time voice cloning.
+- Improve multi-speaker handling for conference scenarios.
+- Expand evaluation with consistent Slovak/English test audio.
+- Package the system for simpler installation.
+- Refine thesis documentation around methodology, measurements, and limitations.
 
-**Objective:** Integrate XTTS, OmniVoice, and MLX-Audio for voice cloning, resolve frontend/backend issues, and optimize for Apple Silicon.
+## README style direction
 
-**Completed Actions:**
+This repository follows the shared portfolio README structure:
 
-- **TTS Backends Integrated:**
-  - Piper TTS (fast, no cloning, ~0.1s latency)
-  - XTTS (CPU voice cloning, ~2-5s latency)
-  - OmniVoice (GPU voice cloning, 40x real-time on NVIDIA GPU; slow on CPU/MPS)
-  - MLX-Audio Qwen3-TTS (Apple Silicon real-time voice cloning, RTF 0.4-1.0x)
-- **Frontend/Backend Fixes:**
-  - Resolved audio processing and voice selection UI issues
-  - Replaced `torchaudio.save` with `soundfile.write` for consistent audio handling
-  - Added hybrid MT with CTranslate2 Opus-MT + NLLB-200 fallback
-- **Documentation Updated:**
-  - Added 2026 Apple Silicon performance research and MLX-Audio solutions
-  - Updated TTS alternatives research with MPS bug details and fixes
-
-**Next Steps:**
-
-- **MLX-Audio Integration:** Replace OmniVoice with `mlx-audio` for Mac builds to achieve real-time voice cloning
-- **Performance Benchmarking:** Test Qwen3-TTS on M1 Pro 16GB for <1s latency with voice cloning
-- **Conference Use Case:** Align project with department's conference systems work for supervisor alignment
+- Short project description at the top.
+- Technology labels for fast scanning.
+- Coloured system design diagram when architecture is useful.
+- Structured features, model backends, testing, and roadmap tables.
+- Practical setup instructions separated from research/development notes.
