@@ -78,10 +78,26 @@ description: "Task list for the cross-platform real-time translation pipeline re
 
 ---
 
+## Phase 7: User Story 5 - Fast personal-voice TTS tier (Priority: P2)
+
+- [ ] T023 [US5] Check `requirements.txt` for the TTS package pin: replace unmaintained `TTS` (coqui-ai, dead since 2024) with the maintained `coqui-tts` (idiap/coqui-ai-TTS fork on PyPI) if not already
+- [ ] T024 [US5] Confirm/document exact `speaker_cache` conditioning-latent caching behavior already in `backend/tts/xtts.py` (or equivalent) matches `documentation/coqui_tts_sections.md` — this is already implemented, do not reimplement, this task is verification only
+- [ ] T025 [US5] Set up a Piper single-speaker fine-tuning pipeline (fine-tune from an existing Piper checkpoint, not training from scratch) using the maintained Piper training path
+- [ ] T026 [US5] Record ~10-60 min of reference audio in EN (and SK, once available) for the personal-voice fine-tune, reusing the existing voice-recording UI where possible
+- [ ] T027 [US5] Fine-tune a personal-voice Piper model per recorded language; store alongside existing `speaker_voices/` following its existing metadata convention
+- [ ] T028 [US5] Wire the three-tier TTS selection into the pipeline: personal fine-tuned Piper (if available for the target language) → XTTS zero-shot (if voice sample exists but no fine-tune) → generic Piper (no voice sample at all)
+- [ ] T029 [US5] A/B benchmark: fine-tuned personal Piper voice vs. current XTTS zero-shot path — latency delta and perceived voice-similarity, for the same EN and SK test sentences (independent test from spec.md US5)
+- [ ] T030 [US5] Document the per-language trade-off explicitly in `documentation/` (fast tier requires recording that language; unrecorded languages keep the slower XTTS path) — this is a stated product decision, not a bug
+
+**Checkpoint**: All five user stories independently functional and documented.
+
+---
+
 ## Dependencies & Execution Order
 
-- Phase 1 (Setup) → Phase 2 (Foundational, blocks everything) → Phases 3 & 4 (P1, can run in parallel once Phase 2 lands) → Phase 5 (P2) → Phase 6 (P3, thesis research, can start any time after Phase 2 since it only touches the MT stage)
+- Phase 1 (Setup) → Phase 2 (Foundational, blocks everything) → Phases 3 & 4 (P1, can run in parallel once Phase 2 lands) → Phase 5 (P2) → Phase 6 (P3, thesis research, can start any time after Phase 2 since it only touches the MT stage) → Phase 7 (P2, TTS-stage only, can run in parallel with Phase 5/6 once Phase 3's baseline cloning path exists)
 - Per Constitution Principle II: do not start Phase 6 by re-evaluating S2S/Hibiki again — that question is already closed, cited in `spec.md` Edge Cases.
+- Per Constitution Principle II: do not start Phase 7 by re-litigating whether caching fixes the cloning latency — that's already measured and closed (1.9% improvement, see `spec.md` User Story 5). The open question Phase 7 actually resolves is the fine-tuning implementation, not the diagnosis.
 
 ## Notes
 
