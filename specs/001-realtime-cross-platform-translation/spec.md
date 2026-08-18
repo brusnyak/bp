@@ -69,6 +69,31 @@ The system reduces perceived/actual translation latency using a self-speculative
 
 ---
 
+### User Story 5 - Cloned voice runs at default-voice speed, not as a slow overlay (Priority: P2)
+
+The user records their own voice once; thereafter, for any language they've provided reference audio in, their cloned voice behaves as a fast default TTS voice (same speed class as Piper's generic voice, not the current 2.5–3.5s zero-shot cloning path).
+
+**Why this priority**: Directly requested (2026-08-19) after the user correctly identified the current cloning latency as a possible architecture flaw rather than an unremovable cost — confirmed true, see findings below. P2, not P1: it's a quality-of-experience fix on top of an already-functioning P1 cloning path (US1's fallback-to-generic-voice acceptance scenario still holds), not a blocker for the MVP.
+
+**Research findings (evidence-first, per Constitution Principle II)**:
+
+- **Proven, from this project's own data** (`documentation/COQUI_TTS_PERFORMANCE_REPORT.md` §2.3): speaker-embedding/conditioning-latent caching is *already implemented* (`speaker_cache` dict around `get_conditioning_latents()`, see `documentation/coqui_tts_sections.md` lines ~304-308). Measured effect: 8.31s → 8.15s raw synthesis, a 1.9% improvement. This proves the reference-audio re-encoding step is **not** the source of the 2.5–3.5s perceived latency — that cost was already engineered out and barely moved the number.
+- **Proven, corroborated externally**: the actual cost is XTTS v2's GPT-based autoregressive decoder generating audio tokens step-by-step — architectural, not a caching miss. Independent community consensus confirms cloned-voice XTTS v2 stays slow regardless of caching, even though the same model's non-cloned/base streaming path can hit <200ms. Piper (RTF ~0.05) vs XTTS (RTF ~1.72) is a ~34x gap that caching cannot close.
+- **Verdict**: this is a genuine system-level architecture ceiling of zero-shot autoregressive voice cloning, not a fixable inefficiency in this project's implementation. The user's instinct to ask "is this an architecture flaw" was correct.
+- **Real fix found, proven feasible**: Piper (VITS-based) supports fine-tuning a dedicated single-speaker model from an existing checkpoint on as little as ~5 minutes of target-voice audio (up to ~1hr for best quality) — standard, documented, community-practiced, realistic on modest hardware since it's fine-tuning, not training from scratch. A fine-tuned Piper voice runs at Piper's native speed (no zero-shot conditioning at inference time at all).
+- **Unresolved trade-off, flagged not silently decided**: a Piper voice fine-tuned on English recordings does not inherit XTTS's cross-lingual transfer — VITS-style models are bound to the phoneme/language coverage of their training data. Getting a fast, fine-tuned "your voice, in Slovak" requires recording reference audio *in Slovak*, not just English. This is a real product decision, not an engineering detail: it trades XTTS's "record once in any language, get any-language output" promise for speed, and only for languages actually recorded.
+- **Recommended resolution**: extend the existing two-tier TTS design (Piper generic / XTTS cloned) into three tiers: (1) Piper generic — fastest, no cloning; (2) Piper personally-fine-tuned — fast, cloned, only for languages the user has recorded reference audio in; (3) XTTS zero-shot — slow (2.5–3.5s), cloned, any language, retained as the fallback for languages without a fine-tuned model. This keeps US1's fallback behavior intact while giving the user's stated goal (fast default cloned voice) for EN and SK specifically, once they record ~5-60 min of reference audio in each.
+- **Also flagged, out of this story's scope but worth a task**: `coqui-ai/TTS` (the original PyPI package) has been unmaintained since Coqui.ai shut down in 2024; the community-maintained fork is `idiap/coqui-ai-TTS`, installable as `coqui-tts`. Check which package `requirements.txt` currently pins.
+
+**Independent Test**: Fine-tune a Piper model on ~10 minutes of the user's own EN and SK reference audio; A/B its latency and perceived voice-similarity against the current XTTS zero-shot path for the same sentences.
+
+**Acceptance Scenarios**:
+
+1. **Given** the user has recorded reference audio in a supported language and a fine-tuned Piper model exists for it, **When** they speak in that language, **Then** output uses the fast fine-tuned voice, not the XTTS zero-shot path.
+2. **Given** the user has not recorded/fine-tuned for a given target language, **When** translation targets that language, **Then** the system falls back to XTTS zero-shot cloning (current behavior, unchanged) rather than failing or silently using a generic voice.
+
+---
+
 ### Edge Cases
 
 - What happens when no GPU of any kind is present and the machine is genuinely low-spec? → Must degrade to CPU-only with a visible warning, not silently run at unusable latency with no explanation.
@@ -87,6 +112,7 @@ The system reduces perceived/actual translation latency using a self-speculative
 - **FR-005**: System MUST automate virtual-audio-device setup per OS (BlackHole/VB-Cable/PulseAudio-PipeWire) so the end user does not manually install or configure audio routing beyond one device selection in their meeting app.
 - **FR-006**: System MUST NOT default to any Apple-Silicon-only dependency (e.g. `mlx-whisper`) as the primary path on any stage — such dependencies MAY exist as an opt-in, auto-detected fast path only.
 - **FR-007**: System MUST expose real-time latency metrics (existing latency breakdown UI) so performance claims remain measurable, not assumed.
+- **FR-008**: System MUST support a fine-tuned, personal-voice Piper model as a fast-path TTS tier for languages the user has provided reference audio in, falling back to XTTS zero-shot cloning for any language without one (see User Story 5).
 
 ### Key Entities
 
@@ -98,7 +124,7 @@ The system reduces perceived/actual translation latency using a self-speculative
 
 ### Measurable Outcomes
 
-- **SC-001**: End-to-end latency (mic input to translated audio output) stays within the near-real-time budget already targeted in the project's own docs (<1s standard TTS path, 2.5–3.5s voice-cloning path) on the reference M1 Pro 16GB, for the EN↔SK pair.
+- **SC-001**: End-to-end latency (mic input to translated audio output) stays within the near-real-time budget already targeted in the project's own docs on the reference M1 Pro 16GB, for the EN↔SK pair: <1s standard TTS path; **<1s for the personal fine-tuned voice path (User Story 5) once a language has been fine-tuned**; 2.5–3.5s remains the accepted ceiling only for XTTS zero-shot cloning on languages without a fine-tuned model.
 - **SC-002**: The same codebase, unmodified, runs on a Windows machine and a Linux machine and produces translated audio without manual per-OS code changes — only per-OS setup-script execution.
 - **SC-003**: `requirements.txt`/config no longer hardcodes "prioritize MPS" or any single-vendor GPU path as the default.
 - **SC-004**: Slovak translation quality/latency is not regressed relative to the current (pre-rescope) pipeline, measured against `documentation/PERFORMANCE_TEST_RESULTS.md` baselines.
@@ -107,6 +133,7 @@ The system reduces perceived/actual translation latency using a self-speculative
 ## Assumptions
 
 - Target users have a normal consumer machine (no dedicated GPU assumed as the baseline case); GPU acceleration is a bonus path, not a requirement.
-- The existing Piper + XTTS v2 TTS split stays architecturally as-is (per Constitution Principle VI) — this rescope is about hardware-backend selection and platform support, not swapping the TTS engine.
+- The existing Piper + XTTS v2 TTS split stays architecturally as-is (per Constitution Principle VI) — this rescope is about hardware-backend selection and platform support, not swapping the TTS engine. User Story 5 adds a third tier (personal fine-tuned Piper voices) on top of this split rather than replacing either existing engine — still no new TTS engine introduced.
+- User Story 5's fine-tuned-voice fast path is per-language: it requires the user to record reference audio in each target language they want it for (confirmed EN and SK at minimum). Languages without a fine-tuned model keep using XTTS zero-shot at current latency — this is a stated, accepted trade-off, not a gap to silently paper over.
 - S2S (Hibiki-class) models are out of scope for this feature and are not revisited without new evidence (Constitution Principle II, `documentation/s2s_translation_research_2026-08.md`).
 - SSBD (User Story 4) is a research/thesis-value addition, not a blocking requirement for the MVP defined by User Stories 1–2.
