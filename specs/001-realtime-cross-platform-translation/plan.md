@@ -37,7 +37,7 @@ Fix the pipeline's hardcoded, Mac-only hardware-acceleration default and formali
 - **Principle III (Slovak Non-Negotiable)**: FR-002, SC-004 — PASS, explicit requirement and success criterion.
 - **Principle IV (Real-Time)**: SC-001 — PASS, explicit latency targets carried over from existing README targets, not invented.
 - **Principle V (Plug-and-Play)**: FR-005 — PASS, automated per-OS virtual-audio setup is in scope.
-- **Principle VI (Simplicity/YAGNI)**: PASS — this plan explicitly keeps the existing Piper/XTTS v2 split and existing pipeline architecture; it does not introduce a new TTS/STT engine or a custom-trained model.
+- **Principle VI (Simplicity/YAGNI)**: PASS — this plan keeps the existing Piper/XTTS v2 split and pipeline architecture; User Story 5 adds a fine-tuned personal-voice tier to the existing Piper engine (not a new engine) after confirming, from the project's own measured data, that caching alone cannot close the gap — the added complexity is evidence-justified, not speculative.
 
 No violations requiring Complexity Tracking justification.
 
