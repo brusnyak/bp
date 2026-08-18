@@ -52,3 +52,6 @@ Walkthrough*
 *.pptx
 *.xlsx
 *.ppt
+
+# Claude Code / Spec Kit local state (may hold credentials/session data)
+.claude/settings.local.json
