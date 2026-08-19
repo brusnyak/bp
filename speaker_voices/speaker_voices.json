@@ -31,5 +31,167 @@
     "path": "speaker_voices/2_my voice 1.wav",
     "language": "en",
     "upload_time": 1764565381.449187
+  },
+  {
+    "id": "voice_rec_1m",
+    "name": "voice_rec_1m",
+    "language": "en",
+    "path": "speaker_voices/voice_rec_1m.wav",
+    "transcribed_text": "When the sunlight strikes raindrops in the air, they act as a prism and form a rainbow. The rainbow is a division of white light into many beautiful colors. These take the shape of a long round arch, with its path high above, and its two ends apparently beyond the horizon. There is, according to legend, a boiling pot of gold at one end. People look, but no one ever finds it. When a man looks for something beyond his reach, his friends say he is looking for the pot of gold at the end of the rainbow.",
+    "transcript_source": "given-text (Rainbow Passage), not ASR-verified",
+    "user_id": null
+  },
+  {
+    "id": "64d5355e-347c-4f8e-b991-4d7744254257_dup2",
+    "name": "Can you hear me_",
+    "language": "en",
+    "path": "speaker_voices/Can you hear me_.wav",
+    "transcribed_text": " Hey laddy can you hear me well?",
+    "user_id": null
+  },
+  {
+    "id": "fd2dd830-c257-4b45-89d0-ac6097518e0e_dup2",
+    "name": "My test speech_xtts_speaker_clean",
+    "language": "en",
+    "path": "speaker_voices/My test speech_xtts_speaker_clean.wav",
+    "transcribed_text": " In this experiment, the system converts spoken English into text.  Translate it into Slava and then send the sizes it back into speech.  The process involves three stages, speech recognition, machine translation and text to speech.  Each model introduces a small delay, so we will measure the overall latency.  The main objective is to achieve natural communication despite language barriers.",
+    "user_id": null
+  },
+  {
+    "id": "56a075c1-5507-41e7-906c-bd73c1e69a46_dup2",
+    "name": "hello",
+    "language": "en",
+    "path": "speaker_voices/hello.wav",
+    "transcribed_text": " Hello, this is a test of my voice for cloning purposes.",
+    "user_id": null
+  },
+  {
+    "id": "voice_rec_1m_dup2",
+    "name": "voice_rec_1m",
+    "language": "en",
+    "path": "speaker_voices/voice_rec_1m.wav",
+    "transcribed_text": "When the sunlight strikes raindrops in the air, they act as a prism and form a rainbow. The rainbow is a division of white light into many beautiful colors. These take the shape of a long round arch, with its path high above, and its two ends apparently beyond the horizon. There is, according to legend, a boiling pot of gold at one end. People look, but no one ever finds it. When a man looks for something beyond his reach, his friends say he is looking for the pot of gold at the end of the rainbow.",
+    "transcript_source": "given-text (Rainbow Passage), not ASR-verified",
+    "user_id": null
+  },
+  {
+    "id": "synth_synth_00.wav",
+    "name": "synth_00.wav",
+    "language": "en",
+    "path": "speaker_voices/synth_00.wav",
+    "transcribed_text": "The quick brown fox jumps over the lazy dog near the riverbank.",
+    "source": "gpt-sovits-bootstrap-synthetic"
+  },
+  {
+    "id": "synth_synth_01.wav",
+    "name": "synth_01.wav",
+    "language": "en",
+    "path": "speaker_voices/synth_01.wav",
+    "transcribed_text": "Please remember to bring your umbrella if it looks like rain today.",
+    "source": "gpt-sovits-bootstrap-synthetic"
+  },
+  {
+    "id": "synth_synth_02.wav",
+    "name": "synth_02.wav",
+    "language": "en",
+    "path": "speaker_voices/synth_02.wav",
+    "transcribed_text": "We are testing the translation system for online conference calls.",
+    "source": "gpt-sovits-bootstrap-synthetic"
+  },
+  {
+    "id": "synth_synth_03.wav",
+    "name": "synth_03.wav",
+    "language": "en",
+    "path": "speaker_voices/synth_03.wav",
+    "transcribed_text": "Artificial intelligence continues to change how people communicate across languages.",
+    "source": "gpt-sovits-bootstrap-synthetic"
+  },
+  {
+    "id": "synth_synth_04.wav",
+    "name": "synth_04.wav",
+    "language": "en",
+    "path": "speaker_voices/synth_04.wav",
+    "transcribed_text": "Thank you for joining this meeting, let's begin with a short introduction.",
+    "source": "gpt-sovits-bootstrap-synthetic"
+  },
+  {
+    "id": "synth_synth_05.wav",
+    "name": "synth_05.wav",
+    "language": "en",
+    "path": "speaker_voices/synth_05.wav",
+    "transcribed_text": "The weather forecast predicts sunshine for most of the week ahead.",
+    "source": "gpt-sovits-bootstrap-synthetic"
+  },
+  {
+    "id": "synth_synth_06.wav",
+    "name": "synth_06.wav",
+    "language": "en",
+    "path": "speaker_voices/synth_06.wav",
+    "transcribed_text": "Could you please repeat the last sentence, I did not quite catch it.",
+    "source": "gpt-sovits-bootstrap-synthetic"
+  },
+  {
+    "id": "synth_synth_07.wav",
+    "name": "synth_07.wav",
+    "language": "en",
+    "path": "speaker_voices/synth_07.wav",
+    "transcribed_text": "Our next quarterly review is scheduled for the middle of next month.",
+    "source": "gpt-sovits-bootstrap-synthetic"
+  },
+  {
+    "id": "synth_synth_08.wav",
+    "name": "synth_08.wav",
+    "language": "en",
+    "path": "speaker_voices/synth_08.wav",
+    "transcribed_text": "Learning a new language takes patience, practice, and daily consistency.",
+    "source": "gpt-sovits-bootstrap-synthetic"
+  },
+  {
+    "id": "synth_synth_09.wav",
+    "name": "synth_09.wav",
+    "language": "en",
+    "path": "speaker_voices/synth_09.wav",
+    "transcribed_text": "The train departs from platform three at half past nine in the morning.",
+    "source": "gpt-sovits-bootstrap-synthetic"
+  },
+  {
+    "id": "synth_synth_10.wav",
+    "name": "synth_10.wav",
+    "language": "en",
+    "path": "speaker_voices/synth_10.wav",
+    "transcribed_text": "She carefully organized the documents before the important presentation.",
+    "source": "gpt-sovits-bootstrap-synthetic"
+  },
+  {
+    "id": "synth_synth_11.wav",
+    "name": "synth_11.wav",
+    "language": "en",
+    "path": "speaker_voices/synth_11.wav",
+    "transcribed_text": "Technology keeps evolving faster than most companies can adapt to it.",
+    "source": "gpt-sovits-bootstrap-synthetic"
+  },
+  {
+    "id": "synth_synth_12.wav",
+    "name": "synth_12.wav",
+    "language": "en",
+    "path": "speaker_voices/synth_12.wav",
+    "transcribed_text": "He whispered a quiet apology before leaving the crowded room.",
+    "source": "gpt-sovits-bootstrap-synthetic"
+  },
+  {
+    "id": "synth_synth_13.wav",
+    "name": "synth_13.wav",
+    "language": "en",
+    "path": "speaker_voices/synth_13.wav",
+    "transcribed_text": "The mountains looked breathtaking under the golden evening light.",
+    "source": "gpt-sovits-bootstrap-synthetic"
+  },
+  {
+    "id": "synth_synth_14.wav",
+    "name": "synth_14.wav",
+    "language": "en",
+    "path": "speaker_voices/synth_14.wav",
+    "transcribed_text": "Every member of the team contributed something valuable to the project.",
+    "source": "gpt-sovits-bootstrap-synthetic"
   }
 ]
