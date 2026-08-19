@@ -1,0 +1,107 @@
+[
+  {
+    "id": "de_0",
+    "name": "de_000.wav",
+    "language": "de",
+    "path": "de_000.wav",
+    "transcribed_text": "Hallo, mein Name ist Yegor und dies ist ein Stimmtest."
+  },
+  {
+    "id": "de_1",
+    "name": "de_001.wav",
+    "language": "de",
+    "path": "de_001.wav",
+    "transcribed_text": "Heute ist ein sch\u00f6ner sonniger Tag in Berlin."
+  },
+  {
+    "id": "de_2",
+    "name": "de_002.wav",
+    "language": "de",
+    "path": "de_002.wav",
+    "transcribed_text": "Das System \u00fcbersetzt Sprache in Echtzeit zwischen Sprachen."
+  },
+  {
+    "id": "de_3",
+    "name": "de_003.wav",
+    "language": "de",
+    "path": "de_003.wav",
+    "transcribed_text": "Ich m\u00f6chte wissen, wie sp\u00e4t es jetzt ist."
+  },
+  {
+    "id": "de_4",
+    "name": "de_004.wav",
+    "language": "de",
+    "path": "de_004.wav",
+    "transcribed_text": "Diese Konferenz findet online \u00fcber das Internet statt."
+  },
+  {
+    "id": "de_5",
+    "name": "de_005.wav",
+    "language": "de",
+    "path": "de_005.wav",
+    "transcribed_text": "K\u00fcnstliche Intelligenz ver\u00e4ndert die Art, wie wir kommunizieren."
+  },
+  {
+    "id": "de_6",
+    "name": "de_006.wav",
+    "language": "de",
+    "path": "de_006.wav",
+    "transcribed_text": "K\u00f6nnen Sie bitte den letzten Satz wiederholen?"
+  },
+  {
+    "id": "de_7",
+    "name": "de_007.wav",
+    "language": "de",
+    "path": "de_007.wav",
+    "transcribed_text": "Wir planen morgen ein Treffen um neun Uhr."
+  },
+  {
+    "id": "de_8",
+    "name": "de_008.wav",
+    "language": "de",
+    "path": "de_008.wav",
+    "transcribed_text": "Die deutsche Sprache hat viele sch\u00f6ne und interessante W\u00f6rter."
+  },
+  {
+    "id": "de_9",
+    "name": "de_009.wav",
+    "language": "de",
+    "path": "de_009.wav",
+    "transcribed_text": "Diese Technologie erm\u00f6glicht eine schnellere Kommunikation."
+  },
+  {
+    "id": "de_10",
+    "name": "de_010.wav",
+    "language": "de",
+    "path": "de_010.wav",
+    "transcribed_text": "Wie geht es dir heute, mein Freund?"
+  },
+  {
+    "id": "de_11",
+    "name": "de_011.wav",
+    "language": "de",
+    "path": "de_011.wav",
+    "transcribed_text": "Wir m\u00fcssen die Qualit\u00e4t dieser Stimme gr\u00fcndlich testen."
+  },
+  {
+    "id": "de_12",
+    "name": "de_012.wav",
+    "language": "de",
+    "path": "de_012.wav",
+    "transcribed_text": "Berlin ist die Hauptstadt von Deutschland."
+  },
+  {
+    "id": "de_13",
+    "name": "de_013.wav",
+    "language": "de",
+    "path": "de_013.wav",
+    "transcribed_text": "Die \u00dcbersetzungsgeschwindigkeit ist f\u00fcr Benutzer sehr wichtig."
+  },
+  {
+    "id": "de_14",
+    "name": "de_014.wav",
+    "language": "de",
+    "path": "de_014.wav",
+    "transcribed_text": "Vielen Dank f\u00fcr Ihre Hilfe und Geduld."
+  }
+]
