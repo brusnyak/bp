@@ -55,3 +55,8 @@ Walkthrough*
 
 # Claude Code / Spec Kit local state (may hold credentials/session data)
 .claude/settings.local.json
+
+# Voice-clone bootstrap tooling (2026-08-19) - not part of the shipped project
+.voice-clone-tools/
+.venv-train/
+speaker_voices/synth_*.wav

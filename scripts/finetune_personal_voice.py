@@ -112,8 +112,24 @@ def run_training(
     train_python: str,
 ):
     output_dir.mkdir(parents=True, exist_ok=True)
+    # PyTorch 2.6+ defaults torch.load(weights_only=True), which rejects the pathlib.PosixPath
+    # object embedded in rhasspy/piper-checkpoints .ckpt files. Fix via the officially-recommended
+    # safe_globals allowlist (not the riskier weights_only=False) by shimming the CLI entry point.
+    # Also: the packaged val_mos ModelCheckpoint callback hard-crashes
+    # (MisconfigurationException) instead of soft-skipping when the MOS predictor
+    # doesn't log in time (observed even after downloading SpeechMOS and adding
+    # num_test_examples). Not essential -- val_mel + save_last still select checkpoints.
+    # Strip it from the hardcoded callback list before main() builds the CLI/Trainer.
+    shim = (
+        "import pathlib, torch.serialization, sys; "
+        "torch.serialization.add_safe_globals([pathlib.PosixPath]); "
+        "import piper.train.__main__ as m; "
+        "m._DEFAULT_CALLBACKS = [c for c in m._DEFAULT_CALLBACKS "
+        "if getattr(c, 'monitor', None) != 'val_mos']; "
+        "from piper.train.__main__ import main; sys.argv = ['piper.train'] + sys.argv[1:]; main()"
+    )
     cmd = [
-        train_python, "-m", "piper.train", "fit",
+        train_python, "-c", shim, "fit",
         "--data.voice_name", voice_name,
         "--data.csv_path", str(csv_path),
         "--data.audio_dir", str(audio_dir),
@@ -122,7 +138,10 @@ def run_training(
         "--data.cache_dir", str(cache_dir),
         "--data.config_path", str(output_dir / "config.json"),
         "--data.batch_size", "8",
-        "--data.num_test_examples", "0",
+        # num_test_examples=0 crashes: the val_mos ModelCheckpoint callback hard-fails
+        # (MisconfigurationException) instead of the docstring's assumed soft-skip when
+        # val_mos is never logged at all. >=1 test example is needed for it to log something.
+        "--data.num_test_examples", "2",
         "--trainer.max_steps", str(max_steps),
         "--trainer.accelerator", "cpu",  # verified faster than mps on this hardware, see docstring
         "--trainer.enable_checkpointing", "true",
@@ -130,7 +149,11 @@ def run_training(
         "--trainer.log_every_n_steps", "10",
     ]
     if ckpt_path:
-        cmd += ["--ckpt_path", ckpt_path]
+        # NOT --ckpt_path: that's for resuming an IDENTICAL run and eagerly re-parses the
+        # checkpoint's saved hyperparameters, which fails schema-mismatch ("sample_bytes")
+        # against a pretrained checkpoint from a different piper1-gpl version. warmstart_ckpt
+        # is the documented mechanism for initializing weights from a different checkpoint.
+        cmd += ["--model.warmstart_ckpt", ckpt_path]
     print("Running:", " ".join(cmd))
     subprocess.run(cmd, check=True)
 
@@ -139,7 +162,10 @@ def export_onnx(checkpoint: Path, output_onnx: Path, train_python: str):
     # Piper's packaged `piper.train.export_onnx` uses torch's new default ONNX exporter,
     # which fails on this model (see module docstring). Force the legacy exporter instead.
     export_script = f"""
+import pathlib
 import torch
+import torch.serialization
+torch.serialization.add_safe_globals([pathlib.PosixPath])
 from piper.train.vits.lightning import VitsModel
 
 model = VitsModel.load_from_checkpoint(r"{checkpoint}", map_location="cpu")
@@ -216,7 +242,19 @@ def main():
         train_python=args.train_python,
     )
 
-    ckpt = work_dir / "out" / "lightning_logs" / "version_0" / "checkpoints" / "last.ckpt"
+    # BUG FIXED 2026-08-19: was hardcoded to "version_0", but Lightning auto-increments the
+    # version dir on every run sharing the same work_dir (retries after a crash included) --
+    # silently exporting the wrong (earlier, less-trained) checkpoint otherwise. Pick the
+    # highest version_N with a last.ckpt actually present.
+    lightning_logs = work_dir / "out" / "lightning_logs"
+    version_dirs = sorted(
+        (d for d in lightning_logs.glob("version_*") if (d / "checkpoints" / "last.ckpt").exists()),
+        key=lambda d: int(d.name.split("_")[1]),
+    )
+    if not version_dirs:
+        sys.exit(f"No trained checkpoint found under {lightning_logs}")
+    ckpt = version_dirs[-1] / "checkpoints" / "last.ckpt"
+    print(f"Using {ckpt} (latest of {len(version_dirs)} version dir(s) found)")
     output_dir.mkdir(parents=True, exist_ok=True)
     onnx_out = output_dir / f"{args.voice_name}.onnx"
     export_onnx(ckpt, onnx_out, args.train_python)
