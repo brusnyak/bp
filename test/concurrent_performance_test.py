@@ -29,6 +29,14 @@ from typing import List, Dict, Any, Optional, Tuple
 import ssl
 from dataclasses import dataclass, asdict
 import csv
+import difflib
+
+try:
+    import jiwer
+    JIWER_AVAILABLE = True
+except ImportError:
+    JIWER_AVAILABLE = False
+    logging.warning("jiwer not available. WER accuracy scoring will be disabled.")
 
 # Try to import optional dependencies
 try:
@@ -74,6 +82,53 @@ TEST_AUDIO_FILES = [
     "test/My test speech_xtts_speaker_clean.wav",
 ]
 
+# Ground-truth transcript/translation per audio file, for T037 accuracy scoring.
+# (audio_file -> (transcript_path, translation_path)). Text files already existed in test/
+# from prior manual runs; this is the first time they're wired into the concurrency harness.
+GROUND_TRUTH = {
+    "test/Hello.wav": ("test/Hello_transcript.txt", "test/Hello_translation.txt"),
+    "test/Can you hear me_.wav": ("test/Can you hear me_transcript.txt", "test/Can you hear me_translation.txt"),
+    "test/My test speech_xtts_speaker_clean.wav": ("test/My test speech transcript.txt", "test/My test speech translation.txt"),
+}
+
+
+def _load_text(path: str) -> Optional[str]:
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return f.read().strip()
+    except FileNotFoundError:
+        return None
+
+
+def score_accuracy(audio_file: str, transcriptions: List[str], translations: List[str]) -> Dict[str, Any]:
+    """
+    WER (jiwer) against the known transcript, and a normalized-similarity score
+    (difflib, stdlib — no BLEU dependency in this project) against the known translation.
+    Segments are joined in receipt order since a session's audio can span multiple VAD segments.
+    """
+    result = {"wer": None, "translation_similarity": None, "translation_exact_match": None}
+    gt = GROUND_TRUTH.get(audio_file)
+    if not gt:
+        return result
+
+    transcript_ref = _load_text(gt[0])
+    if transcript_ref and transcriptions and JIWER_AVAILABLE:
+        hypothesis = " ".join(t for t in transcriptions if t)
+        try:
+            result["wer"] = jiwer.wer(transcript_ref, hypothesis) if hypothesis else 1.0
+        except Exception as e:
+            logging.warning(f"WER scoring failed for {audio_file}: {e}")
+
+    translation_ref = _load_text(gt[1])
+    if translation_ref and translations:
+        hypothesis = " ".join(t for t in translations if t)
+        ref_norm = translation_ref.strip().lower()
+        hyp_norm = hypothesis.strip().lower()
+        result["translation_similarity"] = difflib.SequenceMatcher(None, ref_norm, hyp_norm).ratio()
+        result["translation_exact_match"] = (ref_norm == hyp_norm)
+
+    return result
+
 # Output directory
 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 OUTPUT_DIR = f"test_output/performance_tests/run_{timestamp}"
@@ -106,6 +161,9 @@ class SessionMetrics:
     tts_latencies: List[float] = None
     e2e_latency: Optional[float] = None
     error: Optional[str] = None
+    wer: Optional[float] = None
+    translation_similarity: Optional[float] = None
+    translation_exact_match: Optional[bool] = None
     
     def __post_init__(self):
         if self.transcriptions is None:
@@ -343,7 +401,12 @@ async def simulate_user_session(
             event_type="session_end",
             timestamp=metrics.end_time
         ))
-        
+
+        accuracy = score_accuracy(audio_file_path, metrics.transcriptions, metrics.translations)
+        metrics.wer = accuracy["wer"]
+        metrics.translation_similarity = accuracy["translation_similarity"]
+        metrics.translation_exact_match = accuracy["translation_exact_match"]
+
         if progress_bar:
             progress_bar.update(1)
         
@@ -484,7 +547,27 @@ def generate_summary_report(
                            f"{np.std(all_tts):.2f}s |\n")
                 
                 f.write("\n")
-                
+
+                # Accuracy statistics (T037)
+                all_wer = [m.wer for m in successful if m.wer is not None]
+                all_sim = [m.translation_similarity for m in successful if m.translation_similarity is not None]
+                exact_matches = [m.translation_exact_match for m in successful if m.translation_exact_match is not None]
+                if all_wer or all_sim:
+                    f.write("**Accuracy Statistics:**\n\n")
+                    f.write("| Metric | Average | Min | Max |\n")
+                    f.write("|--------|---------|-----|-----|\n")
+                    if all_wer:
+                        f.write(f"| WER (transcription) | {np.mean(all_wer):.3f} | "
+                               f"{np.min(all_wer):.3f} | {np.max(all_wer):.3f} |\n")
+                    if all_sim:
+                        f.write(f"| Translation similarity | {np.mean(all_sim):.3f} | "
+                               f"{np.min(all_sim):.3f} | {np.max(all_sim):.3f} |\n")
+                    if exact_matches:
+                        match_rate = sum(exact_matches) / len(exact_matches) * 100
+                        f.write(f"| Translation exact-match rate | {match_rate:.1f}% "
+                               f"({sum(exact_matches)}/{len(exact_matches)}) | | |\n")
+                    f.write("\n")
+
                 # Resource usage
                 if num_users in resource_stats and resource_stats[num_users]:
                     stats = resource_stats[num_users]
@@ -660,11 +743,19 @@ async def main():
             logging.error(f"Audio file not found: {audio_file}")
             return
     
-    # Test configurations
-    user_counts = [12, 15]
-    tts_model = "piper"
+    # Test configurations (CLI-overridable, T037-T040: needed N=2 and N=5 runs plus a wider
+    # sweep past the old 12/15 boundary, without hand-editing this file for each run)
+    parser = argparse.ArgumentParser(description="Concurrent performance + accuracy test")
+    parser.add_argument("--user-counts", type=str, default="12,15",
+                         help="Comma-separated list of concurrent user counts, e.g. '2' or '5' or '10,12,15,18,20'")
+    parser.add_argument("--tts-model", type=str, default="piper")
+    parser.add_argument("--ramp-up-duration", type=float, default=15.0)
+    args, _ = parser.parse_known_args()
+
+    user_counts = [int(x) for x in args.user_counts.split(",")]
+    tts_model = args.tts_model
     ramp_up_strategy = "random"
-    ramp_up_duration = 15.0 # Spread starts over 15 seconds
+    ramp_up_duration = args.ramp_up_duration
     
     all_metrics = {}
     all_timelines = {}

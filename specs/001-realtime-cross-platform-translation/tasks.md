@@ -61,8 +61,10 @@ description: "Task list for the cross-platform real-time translation pipeline re
 
 ## Phase 5: User Story 3 - Concurrency without falling over (Priority: P2)
 
-- [ ] T018 [US3] Implement the shared-model-pool refactor already prescribed in existing project docs — replace per-session model instantiation in `backend/main.py` with a pooled/shared model manager
-- [ ] T019 [US3] Re-run concurrency load test (existing methodology per `documentation/PERFORMANCE_TEST_RESULTS.md`); document new ceiling vs. the current documented 12-user ceiling (SC-005)
+**Scope decision, 2026-08-21**: demo stays single-person-use for now (user's explicit call). T018/T019 deprioritized — not needed for the demo bar. Revisit only if the project continues past the demo and meeting-scale use becomes a real goal. Measurement work (accuracy+speed under load) still happened anyway via Phase 9/T037-T040, since that data is cheap and already answers "does it fall over," even without the pooling fix.
+
+- [ ] T018 [US3] Implement the shared-model-pool refactor already prescribed in existing project docs — replace per-session model instantiation in `backend/main.py` with a pooled/shared model manager. **Deferred — not in scope for the demo.**
+- [ ] T019 [US3] Re-run concurrency load test (existing methodology per `documentation/PERFORMANCE_TEST_RESULTS.md`); document new ceiling vs. the current documented 12-user ceiling (SC-005). **Superseded by Phase 9/T040 (2026-08-21) for the "is there a ceiling" question — T018's actual fix still open if this ever needs revisiting.**
 
 **Checkpoint**: Concurrency ceiling measured and documented, whether or not it improved — the point is having a number, not guessing.
 
@@ -107,6 +109,28 @@ The more relevant, evidence-backed lead found instead: **`ufal/whisper_streaming
 - [ ] T036 [US6] Document real before/after: does this actually improve perceived latency/UX, and does the hallucination problem stay fixed under the same conditions that caused the original disable? Evidence-first — don't re-enable and assume it's fine.
 
 **Checkpoint**: Live partial captions working without reintroducing the original bug, or a documented reason why not.
+
+---
+
+## Phase 9: User Story 7 - Speed + Accuracy Under Concurrency (Priority: P1, net-new 2026-08-21)
+
+Context: `test/concurrent_performance_test.py` and `documentation/PERFORMANCE_TEST_RESULTS.md` already
+cover concurrency/latency (12 stable, 15 failing, M1 Pro 16GB, 2025-11-28 — pre-dates the TTS registry
+refactor, needs reconfirming). What's missing entirely: accuracy (WER/translation correctness) is never
+measured under load, only latency. Ground-truth already exists for this: `test/Hello_transcript.txt`,
+`test/Can you hear me_transcript.txt`, `test/My test speech transcript.txt` and their `*_translation.txt`
+counterparts. No peer-to-peer relay exists in this backend (confirmed: no room/broadcast/participant code
+in `main.py`) — "N users" means N independent per-user sessions against the shared backend, matching the
+project's own documented "Per-User Isolation" concurrency model, not literal cross-talk between two clients.
+
+- [x] T037 [US7] DONE, 2026-08-21. Added `jiwer.wer()` scoring + a stdlib `difflib.SequenceMatcher` normalized-similarity/exact-match check to `test/concurrent_performance_test.py`, wired against the existing `test/*_transcript.txt`/`*_translation.txt` ground truth via a new `GROUND_TRUTH` map and `score_accuracy()`. Extended the existing harness (`SessionMetrics` gained `wer`/`translation_similarity`/`translation_exact_match` fields, `generate_summary_report()` gained an Accuracy Statistics table) — did not fork a new script. Also made `user_counts`/`tts_model`/`ramp_up_duration` CLI-overridable (`argparse`, already imported but unused before) instead of hand-edited constants, needed for T038-T040 below.
+- [x] T038 [US7] DONE, 2026-08-21, real run against a live local server (not simulated): N=2, `piper` TTS. **100% success (2/2).** E2E latency avg 4.02s (3.44-4.60s). WER avg 0.071 (0.0 and 0.143 — the 0.143 case is a real STT mishear, "Laddy"→"Loddy", not a scoring bug, independently confirmed by reading the raw transcript in the output JSON). Translation similarity avg 0.876 (0.828-0.925); 0% exact-match, expected — MT paraphrases (e.g. "na účely klonovania" → "na klonovanie"), similarity is the meaningful metric here, not exact string match. Full data: `test_output/performance_tests/run_20260821_083317/`.
+- [x] T039 [US7] DONE, 2026-08-21, real run: N=5, `piper` TTS. **100% success (5/5).** E2E latency avg 9.66s (4.28-26.93s, std dev 8.66s — one session (the 65-word "My test speech" clip) took 34.10s wall time due to queuing behind the other 4, consistent with the project's own documented queuing behavior at higher concurrency). WER avg 0.102 (0.0-0.224); translation similarity avg 0.754 (0.268-0.925 — the 0.268 low outlier is the long multi-sentence clip, expected to drift more under MT paraphrasing than short utterances). CPU avg 4.5%/max 17.9%, memory avg 154MB/max 230MB — nowhere near saturation at N=5. Full data: `test_output/performance_tests/run_20260821_083342/`.
+- [~] T040 [US7] DONE (single-trial), 2026-08-21. Real sweep 10/12/15/18/20 against a live server (`test_output/performance_tests/run_20260821_083432/`), JSON read back directly, not trusted from log lines. Success rates: 100%/100%/100%/72.2%/85.0%. Raw pass-rate is a real improvement over the 2025-11-28 baseline (12 stable/100%, 15 unstable/73%) — this run held 100% through 15 and 85% at 20. **Marked partial, not done**, for two reasons found while verifying: (1) single trial per N — the 18-user run (72.2%) scoring *worse* than 20-user (85.0%) proves single-trial noise is large enough to flip the ranking, so this is not yet a trustworthy ceiling number, needs 3+ trials/N averaged; (2) found and confirmed (server-log-corroborated) that the harness's fixed 5s post-stop receive window is too short once STT time exceeds it (true above ~10 users per this run's own STT-latency numbers) — most "completed" sessions at N≥10 got zero transcription/translation events before the client disconnected, so the per-N accuracy numbers in this run are sample-shrinkage noise, not a real trend (N=2/N=5 numbers, T038/T039, are reliable — high completion fraction there). Also found: `ResourceMonitor` profiles the test client's own process, not the server — true of the *original* 2025-11-28 report too, so "16GB fully utilized at 12 users" was never actually shown by this script's own numbers. Full writeup with proven/assumed/unknown split: `documentation/concurrency_accuracy_2026-08-21.md`.
+- [ ] T041 [US7] **NEW 2026-08-21**: make the post-`stop` receive window in `simulate_user_session` latency-aware (wait until the receiver task goes idle, or scale with observed STT time from `final_metrics`) instead of the current fixed 5s — required before N≥10 accuracy numbers from this harness can be trusted (see T040 finding).
+- [ ] T042 [US7] **NEW 2026-08-21**: point `ResourceMonitor` at the server's PID (or cross-process via `psutil`) instead of the test client's own process — the "Resource Usage" section has never measured actual server memory/CPU pressure under load (see T040 finding).
+
+**Checkpoint**: Real speed+accuracy numbers at N=2 and N=5, and a reconfirmed (not assumed-still-true) failure ceiling on this machine.
 
 ---
 
