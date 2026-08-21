@@ -129,6 +129,7 @@ router = APIRouter()
 DEFAULT_STT_MODEL_SIZE = "base" # Default STT model size
 DEFAULT_TTS_MODEL = "piper"
 AUDIO_SAMPLE_RATE = 16000 # Standard sample rate for VAD and STT (Reverted to 16000 Hz for VAD/STT compatibility)
+MAX_VOICE_UPLOAD_BYTES = 50 * 1024 * 1024 # /voices/upload had no size cap - unbounded file.read() into memory
 
 # VAD Configuration (matching BP xtts)
 VAD_FRAME_DURATION = 20 # ms - BP xtts uses 20ms frames
@@ -472,7 +473,12 @@ async def upload_voice(
 
     try:
         contents = await file.read()
-        
+        if len(contents) > MAX_VOICE_UPLOAD_BYTES:
+            raise HTTPException(
+                status_code=413,
+                detail=f"Voice upload too large ({len(contents) / 1_000_000:.1f}MB > {MAX_VOICE_UPLOAD_BYTES / 1_000_000:.0f}MB limit).",
+            )
+
         # Use a BytesIO object for the input to ffmpeg
         input_audio_buffer = io.BytesIO(contents)
         output_audio_buffer = io.BytesIO()
@@ -544,6 +550,10 @@ async def upload_voice(
         _write_speaker_voices_metadata(metadata)
 
         return {"status": "success", "message": f"Voice '{sanitized_voice_name}' uploaded successfully."}
+    except HTTPException:
+        # Don't let a deliberately-raised HTTPException (e.g. the 413 size-limit check above)
+        # get swallowed and rewritten to a generic 500 by the except-Exception clause below.
+        raise
     except Exception as e:
         logging.error(f"Backend: Error uploading voice '{voice_name}': {e}")
         raise HTTPException(status_code=500, detail=f"Failed to upload voice: {e}")
