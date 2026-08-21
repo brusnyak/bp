@@ -6,6 +6,8 @@ import numpy as np
 import soundfile as sf
 from typing import Tuple, Optional
 
+from backend import hardware
+
 # Try to import OmniVoice
 try:
     from omnivoice import OmniVoice
@@ -17,6 +19,9 @@ except ImportError:
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class OmniVoiceTTS:
+    SUPPORTS_CLONING = True
+    REQUIRES_SPEAKER_WAV = False  # falls back to a default voice if none given
+
     def __init__(
         self,
         model_name: str = "k2-fsa/OmniVoice",
@@ -39,35 +44,10 @@ class OmniVoiceTTS:
         self.model_name = model_name
         self.device = device
 
-        # Determine device
+        # Backend selection: cuda -> mps -> rocm -> cpu (backend/hardware.py, shared across TTS-cloning engines)
         if self.device == "auto":
-            if torch.backends.mps.is_available():
-                self.device = "mps"
-                logging.info("OmniVoiceTTS: MPS device detected and will be used.")
-            elif torch.cuda.is_available():
-                self.device = "cuda"
-                logging.info("OmniVoiceTTS: CUDA device detected and will be used.")
-            else:
-                self.device = "cpu"
-                logging.info("OmniVoiceTTS: No MPS/CUDA detected, using CPU.")
-        elif self.device == "mps":
-            if not torch.backends.mps.is_available():
-                logging.warning(
-                    "OmniVoiceTTS: MPS device requested but not available, falling back to CPU."
-                )
-                self.device = "cpu"
-            else:
-                logging.info("OmniVoiceTTS: MPS device explicitly requested and available.")
-        elif self.device == "cuda":
-            if not torch.cuda.is_available():
-                logging.warning(
-                    "OmniVoiceTTS: CUDA device requested but not available, falling back to CPU."
-                )
-                self.device = "cpu"
-            else:
-                logging.info("OmniVoiceTTS: CUDA device explicitly requested and available.")
-        else:  # cpu
-            logging.info("OmniVoiceTTS: CPU device explicitly requested.")
+            self.device = hardware.detect_backend("tts_clone")
+        logging.info(f"OmniVoiceTTS: using backend '{self.device}'.")
 
         # Load the model
         logging.info(f"OmniVoiceTTS: Loading model '{self.model_name}' on device '{self.device}'...")

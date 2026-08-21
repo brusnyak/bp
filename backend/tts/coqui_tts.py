@@ -12,6 +12,8 @@ from TTS.config.shared_configs import BaseDatasetConfig # Import BaseDatasetConf
 from TTS.tts.models.xtts import XttsArgs # Import XttsArgs
 from typing import Dict, Optional, Tuple
 
+from backend import hardware
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # ============================================================================
@@ -26,6 +28,11 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 # ============================================================================
 
 class CoquiTTS:
+    SUPPORTS_CLONING = True
+    REQUIRES_SPEAKER_WAV = True  # zero-shot cloning has no generic-voice fallback
+    SUPPORTS_STREAMING = True
+    LANGUAGE_OVERRIDES = {"sk": "cs"}  # XTTS v2 has no native Slovak; Czech is the documented proxy
+
     def __init__(self, device: Optional[str] = None, enable_warmup: bool = True):
         """
         Initialize Coqui XTTS v2 model with performance optimizations.
@@ -39,16 +46,9 @@ class CoquiTTS:
         for XTTS v2, it's included for future compatibility or other models.
         """
         # OPTIMIZATION 1: Device detection and fallback
-        if device:
-            self.device = device
-        else:
-            if torch.cuda.is_available():
-                self.device = "cuda"
-            elif torch.backends.mps.is_available():
-                self.device = "mps"
-            else:
-                self.device = "cpu"
-        
+        # Backend selection: cuda -> mps -> rocm -> cpu (backend/hardware.py, shared across TTS-cloning engines)
+        self.device = device if device else hardware.detect_backend("tts_clone")
+
         # XTTS v2 on MPS (Apple Silicon) currently has issues with some operators.
         # For XTTS v2, forcing CPU is often more stable.
         # If you intend to use MPS for other models or if XTTS v2 MPS support improves,

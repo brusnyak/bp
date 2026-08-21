@@ -29,6 +29,7 @@ from backend.tts.piper_tts import PiperTTS
 from backend.tts.coqui_tts import CoquiTTS
 from backend.tts.hybrid_tts import HybridTTS
 from backend.tts.omni_tts import OmniVoiceTTS
+from backend.tts.base import TTS_ENGINES
 from backend.mt.nllb_mt import NLLBMT
 
 # Get engine and SessionLocal
@@ -317,83 +318,31 @@ async def _initialize_mt_model(session_data: Dict[str, Any], source_lang: str, t
         logging.info(f"Backend: Session {session_data['client_info']}: CTranslate2MT for {model_key} already initialized.")
 
 async def _initialize_tts_models(session_data: Dict[str, Any], tts_model_choice: str, speaker_wav_path: Optional[str], speaker_text: Optional[str], speaker_lang: Optional[str]):
-    """Initializes the selected TTS model (Piper or CoquiTTS) for a given session."""
-    
-    # Ensure only the selected TTS model is initialized for this session
-    if tts_model_choice == "piper":
-        current_piper_tts_model = session_data.get("piper_tts_model")
-        if current_piper_tts_model is None:
-            init_start = time.time()
-            logging.info(f"Backend: Session {session_data['client_info']}: Initializing PiperTTS with 'cs_CZ-jirka-medium' at {time.strftime('%H:%M:%S', time.localtime(init_start))}...")
-            try:
-                session_data["piper_tts_model"] = PiperTTS(model_id="cs_CZ-jirka-medium", device="mps" if torch.backends.mps.is_available() else "cpu")
-                init_end = time.time()
-                logging.info(f"Backend: Session {session_data['client_info']}: PiperTTS 'cs_CZ-jirka-medium' initialized at {time.strftime('%H:%M:%S', time.localtime(init_end))}. Duration: {init_end - init_start:.2f}s.")
-            except Exception as e:
-                logging.error(f"Backend: Session {session_data['client_info']}: ERROR: Failed to initialize PiperTTS 'cs_CZ-jirka-medium': {e}")
-                session_data["piper_tts_model"] = None
-                raise # Re-raise if Piper also fails, as there's no other fallback
-        else:
-            logging.info(f"Backend: Session {session_data['client_info']}: PiperTTS model 'cs_CZ-jirka-medium' already initialized.")
-        session_data["coqui_tts_model"] = None # Ensure Coqui is not active for this session
-    elif tts_model_choice == "xtts": # Condition for Coqui XTTS
-        current_coqui_tts_model = session_data.get("coqui_tts_model")
-        if current_coqui_tts_model is None:
-            init_start = time.time()
-            logging.info(f"Backend: Session {session_data['client_info']}: Initializing CoquiTTS (XTTS v2) at {time.strftime('%H:%M:%S', time.localtime(init_start))}...")
-            try:
-                # Auto-detect device (CPU/MPS/CUDA) via CoquiTTS logic
-                session_data["coqui_tts_model"] = CoquiTTS() 
-                init_end = time.time()
-                logging.info(f"Backend: Session {session_data['client_info']}: CoquiTTS (XTTS v2) initialized at {time.strftime('%H:%M:%S', time.localtime(init_end))}. Duration: {init_end - init_start:.2f}s.")
-            except Exception as e:
-                logging.error(f"Backend: Session {session_data['client_info']}: ERROR: Failed to initialize CoquiTTS (XTTS v2): {e}")
-                session_data["coqui_tts_model"] = None
-                raise HTTPException(status_code=500, detail=f"Failed to initialize CoquiTTS (XTTS v2): {e}")
-        else:
-            logging.info(f"Backend: Session {session_data['client_info']}: CoquiTTS (XTTS v2) model already initialized.")
-        session_data["piper_tts_model"] = None # Ensure Piper is not active for this session
-    elif tts_model_choice == "hybrid":
-        current_hybrid_tts_model = session_data.get("hybrid_tts_model")
-        if current_hybrid_tts_model is None:
-            init_start = time.time()
-            logging.info(f"Backend: Session {session_data['client_info']}: Initializing HybridTTS at {time.strftime('%H:%M:%S', time.localtime(init_start))}...")
-            try:
-                session_data["hybrid_tts_model"] = HybridTTS(device="mps" if torch.backends.mps.is_available() else "cpu")
-                init_end = time.time()
-                logging.info(f"Backend: Session {session_data['client_info']}: HybridTTS initialized at {time.strftime('%H:%M:%S', time.localtime(init_end))}. Duration: {init_end - init_start:.2f}s.")
-            except Exception as e:
-                logging.error(f"Backend: Session {session_data['client_info']}: ERROR: Failed to initialize HybridTTS: {e}")
-                session_data["hybrid_tts_model"] = None
-                raise HTTPException(status_code=500, detail=f"Failed to initialize HybridTTS: {e}")
-        else:
-            logging.info(f"Backend: Session {session_data['client_info']}: HybridTTS model already initialized.")
-        session_data["piper_tts_model"] = None
-        session_data["coqui_tts_model"] = None
-    elif tts_model_choice == "omnivoice":
-        current_omnivoice_tts_model = session_data.get("omnivoice_tts_model")
-        if current_omnivoice_tts_model is None:
-            init_start = time.time()
-            logging.info(f"Backend: Session {session_data['client_info']}: Initializing OmniVoiceTTS at {time.strftime('%H:%M:%S', time.localtime(init_start))}...")
-            try:
-                session_data["omnivoice_tts_model"] = OmniVoiceTTS(device="mps" if torch.backends.mps.is_available() else "cpu")
-                init_end = time.time()
-                logging.info(f"Backend: Session {session_data['client_info']}: OmniVoiceTTS initialized at {time.strftime('%H:%M:%S', time.localtime(init_end))}. Duration: {init_end - init_start:.2f}s.")
-            except Exception as e:
-                logging.error(f"Backend: Session {session_data['client_info']}: ERROR: Failed to initialize OmniVoiceTTS: {e}")
-                session_data["omnivoice_tts_model"] = None
-                raise HTTPException(status_code=500, detail=f"Failed to initialize OmniVoiceTTS: {e}")
-        else:
-            logging.info(f"Backend: Session {session_data['client_info']}: OmniVoiceTTS model already initialized.")
-        session_data["piper_tts_model"] = None
-        session_data["coqui_tts_model"] = None
-        session_data["hybrid_tts_model"] = None
-    else:
+    """Initializes the selected TTS engine for a session via the TTS_ENGINES registry
+    (backend/tts/base.py) — to add/remove an engine, edit that registry, not this function."""
+    factory = TTS_ENGINES.get(tts_model_choice)
+    if factory is None:
         logging.warning(f"Backend: Session {session_data['client_info']}: Skipping TTS initialization as '{tts_model_choice}' is selected or invalid.")
-        session_data["piper_tts_model"] = None
-        session_data["coqui_tts_model"] = None # Ensure Coqui is not active for this session
-        session_data["hybrid_tts_model"] = None
-        session_data["omnivoice_tts_model"] = None
+        session_data["tts_engine"] = None
+        session_data["tts_engine_name"] = None
+        return
+
+    if session_data.get("tts_engine") is not None and session_data.get("tts_engine_name") == tts_model_choice:
+        logging.info(f"Backend: Session {session_data['client_info']}: TTS engine '{tts_model_choice}' already initialized.")
+        return
+
+    init_start = time.time()
+    logging.info(f"Backend: Session {session_data['client_info']}: Initializing TTS engine '{tts_model_choice}' at {time.strftime('%H:%M:%S', time.localtime(init_start))}...")
+    try:
+        session_data["tts_engine"] = factory()
+        session_data["tts_engine_name"] = tts_model_choice
+        init_end = time.time()
+        logging.info(f"Backend: Session {session_data['client_info']}: TTS engine '{tts_model_choice}' initialized at {time.strftime('%H:%M:%S', time.localtime(init_end))}. Duration: {init_end - init_start:.2f}s.")
+    except Exception as e:
+        logging.error(f"Backend: Session {session_data['client_info']}: ERROR: Failed to initialize TTS engine '{tts_model_choice}': {e}")
+        session_data["tts_engine"] = None
+        session_data["tts_engine_name"] = None
+        raise
 
 async def _initialize_vad_instance(session_data: Dict[str, Any]):
     """Initializes the WebRTC VAD instance for a given session."""
@@ -415,9 +364,8 @@ async def initialize_all_models(client_info: str, source_lang: str, target_lang:
         "client_info": client_info,
         "stt_model": None,
         "mt_models": {},
-        "piper_tts_model": None,
-        "coqui_tts_model": None, # Add Coqui TTS model to session data
-        "hybrid_tts_model": None, # Add Hybrid TTS model to session data
+        "tts_engine": None,
+        "tts_engine_name": None,
         "vad_instance": None,
         "session_config": { # Store a copy of the config for easy access
             "source_lang": source_lang,
@@ -735,14 +683,8 @@ def get_initialized_models(client_info: str, session_config: Dict[str, Any]) -> 
     main_mt_model = session_data["mt_models"].get(f"{session_config['source_lang']}-{session_config['target_lang']}")
     vad_instance = session_data.get("vad_instance")
     
-    tts_model_instance = None
-    if session_config["tts_model_choice"] == "piper":
-        tts_model_instance = session_data.get("piper_tts_model")
-    elif session_config["tts_model_choice"] == "xtts": # Coqui XTTS
-        tts_model_instance = session_data.get("coqui_tts_model")
-    elif session_config["tts_model_choice"] == "omnivoice":
-        tts_model_instance = session_data.get("omnivoice_tts_model")
-    
+    tts_model_instance = session_data.get("tts_engine") if session_data.get("tts_engine_name") == session_config["tts_model_choice"] else None
+
     return stt_model_instance, main_mt_model, tts_model_instance, vad_instance, session_config["tts_model_choice"]
 
 # --- Core Speech Processing Pipeline ---
@@ -800,8 +742,7 @@ async def _process_speech_segment_pipeline(
 
     stt_model_instance = session_data.get("stt_model")
     mt_models_for_session = session_data.get("mt_models", {})
-    piper_tts_model_instance = session_data.get("piper_tts_model")
-    coqui_tts_model_instance = session_data.get("coqui_tts_model") # Get Coqui TTS instance
+    tts_engine = session_data.get("tts_engine") if session_data.get("tts_engine_name") == tts_model_choice else None
 
     # --- STT ---
     websocket.timestamps["stt_start"].append(time.perf_counter())
@@ -871,37 +812,41 @@ async def _process_speech_segment_pipeline(
     # Standard non-streaming synthesis (Piper or fallback)
     logging.info(f"Backend: Session {client_info}: Starting TTS synthesis...")
 
-    # Check for speaker_wav_path requirement for XTTS if it's still the chosen model
-    if tts_model_choice == "xtts" and not speaker_wav_path:
-        logging.warning(f"Backend: Session {client_info}: XTTS selected but no valid speaker voice provided. Sending error to client.")
-        await safe_send("error", {"type": "error", "message": "XTTS requires a selected voice. Please choose or record one."})
+    # Check for speaker_wav_path requirement for engines that have no generic-voice fallback
+    # (declared per-engine via REQUIRES_SPEAKER_WAV in backend/tts/*.py, not hardcoded per name)
+    if tts_engine is not None and getattr(tts_engine, "REQUIRES_SPEAKER_WAV", False) and not speaker_wav_path:
+        logging.warning(f"Backend: Session {client_info}: '{tts_model_choice}' requires a speaker voice but none was provided. Sending error to client.")
+        await safe_send("error", {"type": "error", "message": f"'{tts_model_choice}' requires a selected voice. Please choose or record one."})
         return
 
     # --- TTS ---
     websocket.timestamps["tts_start"].append(time.perf_counter())
     tts_start_time = time.perf_counter()
-    
-    # Initialize tts_model_instance outside the conditional blocks
-    tts_model_instance = None
+
     audio_wav = None
     sample_rate = None
     tts_total_time = 0.0
-    
-    # COQUI TTS (XTTS) - Streaming Synthesis
-    if tts_model_choice == "xtts" and coqui_tts_model_instance:
-        logging.info(f"Backend: Session {client_info}: Starting XTTS streaming synthesis...")
-        
-        # Map Slovak (sk) to Czech (cs) for XTTS as it doesn't support sk natively
-        tts_lang = "cs" if target_lang == "sk" else target_lang
-        if tts_lang != target_lang:
-             logging.info(f"Backend: Session {client_info}: XTTS using '{tts_lang}' (Czech) for '{target_lang}' (Slovak) input.")
 
+    if tts_engine is None:
+        logging.warning(f"Backend: Session {client_info}: Selected TTS model '{tts_model_choice}' not initialized or invalid. No TTS will be performed.")
+        await safe_send("error", {"type": "error", "message": f"TTS model '{tts_model_choice}' not ready or invalid. No TTS output."})
+        return
+
+    # Some engines can't synthesize a requested language directly and proxy through a
+    # supported one instead (e.g. XTTS has no native Slovak -> uses Czech). Declared per-engine
+    # via LANGUAGE_OVERRIDES, not hardcoded here.
+    tts_lang = getattr(tts_engine, "LANGUAGE_OVERRIDES", {}).get(target_lang, target_lang)
+    if tts_lang != target_lang:
+        logging.info(f"Backend: Session {client_info}: '{tts_model_choice}' using '{tts_lang}' as a proxy for '{target_lang}'.")
+
+    if getattr(tts_engine, "SUPPORTS_STREAMING", False):
+        logging.info(f"Backend: Session {client_info}: Starting streaming TTS synthesis with '{tts_model_choice}'...")
         queue = asyncio.Queue()
-        
+
         def run_streaming_tts():
             try:
                 # synthesize_stream yields numpy arrays
-                for chunk in coqui_tts_model_instance.synthesize_stream(
+                for chunk in tts_engine.synthesize_stream(
                     text=translated_text,
                     language=tts_lang,
                     speaker_wav_path=speaker_wav_path
@@ -909,62 +854,35 @@ async def _process_speech_segment_pipeline(
                     loop.call_soon_threadsafe(queue.put_nowait, chunk)
                 loop.call_soon_threadsafe(queue.put_nowait, None) # Sentinel
             except Exception as e:
-                logging.error(f"Backend: Error in XTTS streaming thread: {e}")
+                logging.error(f"Backend: Error in '{tts_model_choice}' streaming thread: {e}")
                 loop.call_soon_threadsafe(queue.put_nowait, None)
 
         # Run the blocking generator in a separate thread
         threading.Thread(target=run_streaming_tts, daemon=True).start()
-        
+
         chunk_count = 0
+        stream_sample_rate = getattr(tts_engine, "sample_rate", 24000)
         while True:
             chunk = await queue.get()
             if chunk is None:
                 break
-            
+
             chunk_count += 1
             # Convert numpy chunk to WAV bytes
             audio_buffer = io.BytesIO()
-            # Write chunk to buffer as WAV
-            sf.write(audio_buffer, chunk, 24000, format="WAV") 
+            sf.write(audio_buffer, chunk, stream_sample_rate, format="WAV")
             await safe_send("tts_audio", audio_buffer.getvalue(), is_bytes=True)
-        
+
         tts_total_time = time.perf_counter() - tts_start_time
-        logging.info(f"Backend: Session {client_info}: XTTS streaming completed. Time: {tts_total_time:.2f}s. Chunks: {chunk_count}")
-        
-    elif tts_model_choice == "piper" and piper_tts_model_instance:
-        # Piper TTS (Non-streaming)
-        tts_model_instance = piper_tts_model_instance
-        logging.info(f"Backend: Session {client_info}: Starting Piper TTS synthesis...")
-        audio_wav, sample_rate, tts_latency = await loop.run_in_executor(
-            None,
-            lambda: tts_model_instance.synthesize(translated_text)
-        )
-        tts_total_time = time.perf_counter() - tts_start_time
-    
-    elif tts_model_choice == "hybrid" and session_data.get("hybrid_tts_model"):
-        # Hybrid TTS (Piper + OpenVoice V2)
-        hybrid_engine = session_data.get("hybrid_tts_model")
-        logging.info(f"Backend: Session {client_info}: Starting Hybrid TTS synthesis with cloning...")
-        audio_wav, sample_rate, tts_latency = await loop.run_in_executor(
-            None,
-            lambda: hybrid_engine.synthesize(translated_text, speaker_wav_path=speaker_wav_path)
-        )
-        tts_total_time = time.perf_counter() - tts_start_time
-    
-    elif tts_model_choice == "omnivoice" and session_data.get("omnivoice_tts_model"):
-        # OmniVoice TTS
-        omnivoice_engine = session_data.get("omnivoice_tts_model")
-        logging.info(f"Backend: Session {client_info}: Starting OmniVoice TTS synthesis with cloning...")
-        audio_wav, sample_rate, tts_latency = await loop.run_in_executor(
-            None,
-            lambda: omnivoice_engine.synthesize(translated_text, language=target_lang, speaker_wav_path=speaker_wav_path)
-        )
-        tts_total_time = time.perf_counter() - tts_start_time
-    
+        logging.info(f"Backend: Session {client_info}: Streaming TTS completed. Time: {tts_total_time:.2f}s. Chunks: {chunk_count}")
+
     else:
-        logging.warning(f"Backend: Session {client_info}: Selected TTS model '{tts_model_choice}' not initialized or invalid. No TTS will be performed.")
-        await safe_send("error", {"type": "error", "message": f"TTS model '{tts_model_choice}' not ready or invalid. No TTS output."})
-        return
+        logging.info(f"Backend: Session {client_info}: Starting TTS synthesis with '{tts_model_choice}'...")
+        audio_wav, sample_rate, tts_latency = await loop.run_in_executor(
+            None,
+            lambda: tts_engine.synthesize(translated_text, language=tts_lang, speaker_wav_path=speaker_wav_path)
+        )
+        tts_total_time = time.perf_counter() - tts_start_time
 
     if audio_wav is not None and sample_rate is not None:
         # Ensure audio_wav is a numpy array
@@ -1014,8 +932,8 @@ async def handle_audio_stream(websocket: WebSocket):
         "client_info": client_info,
         "stt_model": None,
         "mt_models": {},
-        "piper_tts_model": None,
-        "coqui_tts_model": None, # Add Coqui TTS model to session data
+        "tts_engine": None,
+        "tts_engine_name": None,
         "vad_instance": None,
         "session_config": { # Default config, will be updated by client
             "source_lang": "en",
@@ -1369,13 +1287,9 @@ async def handle_audio_stream(websocket: WebSocket):
                 logging.debug(f"Backend: Deleting STT model for session {client_info}")
                 del session_data["stt_model"]
             
-            if session_data.get("piper_tts_model"):
-                logging.debug(f"Backend: Deleting Piper TTS model for session {client_info}")
-                del session_data["piper_tts_model"]
-                
-            if session_data.get("coqui_tts_model"):
-                logging.debug(f"Backend: Deleting Coqui TTS model for session {client_info}")
-                del session_data["coqui_tts_model"]
+            if session_data.get("tts_engine"):
+                logging.debug(f"Backend: Deleting TTS engine ('{session_data.get('tts_engine_name')}') for session {client_info}")
+                del session_data["tts_engine"]
             
             # Clean up all MT models
             mt_models = session_data.get("mt_models", {})
