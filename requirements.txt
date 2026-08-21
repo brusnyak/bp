@@ -1,7 +1,9 @@
-# === CORE FRAMEWORK (PyTorch + MPS) ===
+# === CORE FRAMEWORK ===
+# Backend (cuda/mps/rocm/cpu) is a runtime decision made by backend/hardware.py, not an
+# install-time pin — this requirements.txt installs the standard PyPI torch build, which
+# already ships CUDA/MPS/CPU support; ROCm needs its own index and isn't covered here.
 torch==2.6.0
 torchaudio==2.6.0 # Re-added as FFmpeg issues are resolved
-#  --extra-index-url https://download.pytorch.org/whl/nightly/cpu # Commented out to prioritize MPS support
 torchcodec
 
 # === TTS MODELS ===
