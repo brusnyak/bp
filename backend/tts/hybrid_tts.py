@@ -9,8 +9,19 @@ import logging
 from typing import Tuple, Optional, Dict
 
 from backend.tts.piper_tts import PiperTTS
-from openvoice import se_extractor
-from openvoice.api import ToneColorConverter
+from backend import hardware
+
+# openvoice isn't in requirements.txt (never was) and isn't installable via pip on this
+# toolchain (no PyPI release; building from GitHub source fails on a Cython/pyav
+# incompatibility with newer clang). Guarded the same way omni_tts.py already guards
+# omnivoice, so importing this module doesn't hard-fail backend.tts.base / backend.main
+# in environments without it. See documentation/ for the dated verification note.
+try:
+    from openvoice import se_extractor
+    from openvoice.api import ToneColorConverter
+    OPENVOICE_AVAILABLE = True
+except ImportError:
+    OPENVOICE_AVAILABLE = False
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -19,11 +30,21 @@ class HybridTTS:
     Hybrid TTS engine for BP2.
     Uses Piper for fast Slovak synthesis and OpenVoice V2 for zero-shot voice cloning.
     """
+    SUPPORTS_CLONING = True
+    REQUIRES_SPEAKER_WAV = False  # falls back to plain Piper output if none given
+
     def __init__(self, device: str = "auto"):
+        if not OPENVOICE_AVAILABLE:
+            raise ImportError(
+                "openvoice package is not installed. Install it (pip install "
+                "git+https://github.com/myshell-ai/OpenVoice.git) and place the OpenVoice V2 "
+                "converter checkpoints at models/openvoice_v2/checkpoints_v2/converter/ to use HybridTTS."
+            )
         self.device = device
         if self.device == "auto":
-            self.device = "mps" if torch.backends.mps.is_available() else "cpu"
-        
+            # Backend selection: cuda -> mps -> rocm -> cpu (backend/hardware.py, shared across TTS-cloning engines)
+            self.device = hardware.detect_backend("tts_clone")
+
         logging.info(f"HybridTTS: Initializing on device: {self.device}")
         
         # 1. Initialize Piper
