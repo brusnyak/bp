@@ -11,6 +11,28 @@ piper-tts==1.3.0
 TTS==0.22.0  # Coqui TTS (zero-shot cloning with XTTS_v2)
 omnivoice==0.1.4
 
+# openvoice (HybridTTS: fast Piper output + OpenVoice V2 tone-color conversion — the
+# fast+cloned+cross-lingual path). No PyPI release; pinned deps in its own setup.py are
+# 2022-era and hard-conflict with this project's stack (numpy==1.22.0 doesn't build on
+# Python 3.11; installing it normally drags in numpy 2.x and breaks numba/accelerate/gruut).
+# NOT a plain `pip install -r requirements.txt` line — it needs --no-build-isolation and
+# --no-deps or it'll try to pull its own conflicting pins. Run manually, after everything
+# else above is installed (verified working against those exact pinned versions, 2026-08-21):
+#   pip install --no-build-isolation --no-deps git+https://github.com/myshell-ai/OpenVoice.git
+# Then its transitive deps below (small, low-risk, nothing else in the project needs them):
+whisper_timestamped==1.15.9
+openai-whisper==20250625
+tiktoken==0.14.0
+dtw-python==1.7.5
+eng_to_ipa==0.0.2
+cn2an==0.5.24
+langid==1.1.6
+proces==0.1.7
+wavmark==0.0.3
+resampy==0.4.3
+# OpenVoice V2 checkpoints also required at models/openvoice_v2/checkpoints_v2/converter/
+# (config.json + checkpoint.pth), downloaded from HF hub myshell-ai/OpenVoiceV2 — not pip-installable.
+
 
 # === STT: Faster-Whisper (PyTorch + CTranslate2 + MPS) ===
 faster-whisper==1.2.0

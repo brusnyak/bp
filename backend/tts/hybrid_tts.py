@@ -60,13 +60,39 @@ class HybridTTS:
             raise FileNotFoundError(f"OpenVoice V2 checkpoints not found at {ckpt_converter}")
             
         self.tone_color_converter = ToneColorConverter(
-            os.path.join(ckpt_converter, 'config.json'), 
+            os.path.join(ckpt_converter, 'config.json'),
             device=self.device
         )
         self.tone_color_converter.load_ckpt(os.path.join(ckpt_converter, 'checkpoint.pth'))
-        
+
         # 3. Embedding Caches
         self.target_se_cache: Dict[str, torch.Tensor] = {}
+
+        # 4. Source speaker embedding (Piper's own fixed base voice), extracted ONCE here,
+        # not per-call. Two real problems this fixes:
+        #   - OpenVoice's se_extractor asserts "input audio is too short" on typical
+        #     single-sentence Piper output (~4s) — its embedding extractor needs several
+        #     seconds of audio. Piper's voice never changes between calls, so there's no
+        #     reason to re-derive its embedding from a short, failure-prone clip each time.
+        #   - Re-extracting an unchanging embedding on every synthesize() call was pure
+        #     wasted latency anyway.
+        # Bootstrap text is long/generic on purpose (not the caller's actual text) — it only
+        # needs to sound like Piper's base voice for long enough to embed reliably.
+        bootstrap_text = (
+            "This is a longer sample sentence used only to capture a stable voice "
+            "embedding for the underlying speech synthesizer, so that every future "
+            "request can reuse it instead of recomputing it from a short clip."
+        )
+        bootstrap_wav, bootstrap_sr, _ = self.piper_engine.synthesize(bootstrap_text, language="en")
+        with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as tmp_bootstrap:
+            tmp_bootstrap_path = tmp_bootstrap.name
+            sf.write(tmp_bootstrap_path, bootstrap_wav, bootstrap_sr)
+        try:
+            self.source_se, _ = se_extractor.get_se(tmp_bootstrap_path, self.tone_color_converter, vad=True)
+            logging.info("HybridTTS: cached source (Piper base voice) embedding at init.")
+        finally:
+            if os.path.exists(tmp_bootstrap_path):
+                os.remove(tmp_bootstrap_path)
         
     def _get_target_se(self, speaker_wav_path: str) -> torch.Tensor:
         """Cache and retrieve target speaker embedding."""
@@ -107,9 +133,10 @@ class HybridTTS:
             sf.write(tmp_piper_path, piper_wav, piper_sr)
             
         try:
-            # Extract source SE (from Piper output)
-            source_se, _ = se_extractor.get_se(tmp_piper_path, self.tone_color_converter, vad=True)
-            
+            # Source SE is Piper's own (fixed) voice embedding, cached once at __init__ —
+            # not re-extracted here. See __init__ for why (short-clip crash + wasted latency).
+            source_se = self.source_se
+
             # Get target SE
             target_se = self._get_target_se(speaker_wav_path)
             
