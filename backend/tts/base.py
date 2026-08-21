@@ -45,6 +45,16 @@ def _piper_personal_factory() -> PiperTTS:
     return PiperTTS(model_id="en_US-personal-medium", device=hardware.detect_backend("tts_baseline"))
 
 
+def _piper_personal_v2_factory() -> PiperTTS:
+    # Output of the new repeatable corpus pipeline (scripts/prepare_voice_corpus.py +
+    # scripts/finetune_personal_voice.py, documentation/voice_corpus_pipeline_2026-08-21.md).
+    # Real-audio-only (no GPT-SoVITS synthetic bootstrap this run, unlike en_US-personal-medium)
+    # - kept as a separate, distinctly-named entry rather than overwriting "piper_personal" so
+    # the better-quality GPT-SoVITS-augmented voice stays the default until this one is
+    # actually A/B'd against it.
+    return PiperTTS(model_id="en_US-personal-v2", device=hardware.detect_backend("tts_baseline"))
+
+
 def _xtts_factory() -> CoquiTTS:
     return CoquiTTS(device=hardware.detect_backend("tts_clone"))
 
@@ -60,6 +70,7 @@ def _omnivoice_factory() -> OmniVoiceTTS:
 TTS_ENGINES: Dict[str, Callable[[], object]] = {
     "piper": _piper_factory,
     "piper_personal": _piper_personal_factory,
+    "piper_personal_v2": _piper_personal_v2_factory,
     "xtts": _xtts_factory,
     "hybrid": _hybrid_factory,
     "omnivoice": _omnivoice_factory,
