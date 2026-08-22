@@ -138,6 +138,71 @@ project's own documented "Per-User Isolation" concurrency model, not literal cro
 
 ---
 
+## Phase 10: Final architecture — kill dead time, target Google's 2-3s ceiling (Priority: P1, net-new 2026-08-22)
+
+**Scope decision, 2026-08-22, supersedes 2026-08-21 single-person-demo deferral**: user reviewed
+`documentation/simultaneous_translation_research_2026-08-22.md` and explicitly rejected building a
+from-scratch simultaneous-MT system — no viable path exists without either training a wait-k model
+from scratch (its own ML project) or accepting EMMA/SeamlessStreaming's published 66% BLEU-quality
+collapse. Plugging this project's own voice cloning into Google's Gemini 3.5 Live Translate was also
+considered and rejected: closed-source, no public voice-cloning-injection API, permanent internet
+dependency, and it would eliminate this project's own technical contribution as a bachelor's thesis.
+**Final target**: this project's own STT→MT→TTS chain, engineering-hardened to close the gap between
+today's ~4s (mostly architectural dead time, not real compute — see finding below) and the ~2-3s
+ceiling Google itself deliberately targets for the same feature. No new ML models. German-style
+reordering-heavy languages keep the existing full-utterance-wait behavior by design (already the
+correct/safe handling per the research doc — no special-casing needed). After this phase, feature
+work stops; focus moves to documentation/thesis writeup.
+
+- [x] T043 DONE, 2026-08-22. `_process_speech_segment_pipeline` calls converted to
+  `asyncio.create_task` (tracked per-session as `active_pipeline_task`) at all 6 call sites; capture/VAD
+  loop no longer blocks on translation. **Found and fixed a real correctness bug while verifying this
+  live** (`test/interrupt_smoke_test.py`, kept for reproducibility, not a permanent suite addition): a
+  naive "cancel any in-flight task on new speech-start" rule (the literal original design) silently
+  dropped most sentences in ordinary continuous multi-sentence speech — natural inter-sentence pauses
+  are shorter than one STT+MT round trip, so each new sentence cancelled the previous one's still-running
+  transcription/translation before it could send results. Fixed with a `model_call_lock`
+  (`asyncio.Lock`, per session) around STT+MT only — barge-in cancellation now only fires when the lock
+  is *not* held (previous task is in/past TTS, the only phase where overlapping output is a real
+  problem), never mid-STT/MT. Verified on a real 8-sentence continuous clip: 0 dropped sentences (was
+  3/8 dropped with naive cancellation), interrupt utterance after processed correctly. Also found and
+  fixed: two independent session-dict init sites (`initialize_all_models` at `main.py:364`, called by
+  `app.py`'s `/ws` route *before* `handle_audio_stream`'s own init at `main.py:965`) — the new session
+  keys only existed in one, causing a `KeyError` on first real run. Both now carry the same keys; this
+  divergence is pre-existing tech debt (two hand-maintained copies of the same default-session shape)
+  worth consolidating later, not fixed here (out of scope, minimal diff preferred). Regression: `test/hardware_test.py` 7/7 (unrelated to this file, baseline only), a direct A/B live comparison against
+  unmodified `main.py` confirmed the one server-log error seen (`Cannot call "receive" once a disconnect
+  message has been received`) is pre-existing, not a regression. Real single-utterance smoke test
+  post-fix: correct transcription/translation/audio, WER 0.0, e2e_latency 4.95s (in line with T038's
+  4.02s baseline, single-sample noise).
+- [ ] T044 Wire T035 (already-verified LocalAgreement+VAC streaming STT, RTF ~1.001, first partial
+  3.3s) into the now-non-blocking loop: captions run ahead of the spoken output, and the final STT
+  pass becomes a finalize-of-already-computed-partial instead of a from-zero pass after silence.
+- [ ] T045 Chunk TTS output by stable MT phrase instead of waiting for the full translated sentence —
+  reuse the existing `SUPPORTS_STREAMING` chunk-yield pattern (`main.py:852-887`), extend to
+  Piper/HybridTTS. Target chunk size 100-200ms per the research doc's barge-in section (also required
+  for cancel-without-cutting-mid-word in T046). **Not started.**
+- [~] T046 Barge-in: PARTIALLY done as a side effect of T043's correctness fix — the cancellation
+  mechanism and the "only cancel outside STT/MT" rule are real and live-verified. **Not yet verified**:
+  actually cancelling mid-TTS-send (the core "two voices at once" case). Tried to test this live and
+  concluded the current single-shot (non-chunked) Piper TTS call's window is too short (RTF 0.05-0.2s)
+  to hit reliably/deterministically with real network+event timing — this becomes a clean, reliable test
+  once T045 lands (cancelling a `queue.get()` between 100-200ms chunks is fast and deterministic; cancelling
+  mid a single blocking `run_in_executor` TTS call is not, and — same caveat as STT/MT — asyncio defers
+  the CancelledError until that blocking call returns, so cancellation is not preemptive either way).
+  Blocked on T045 for a trustworthy test, not on T043.
+- [ ] T047 Regression + soak check before calling this phase done: existing `test/hardware_test.py`
+  still green, a live smoke test of a normal (non-interrupted) utterance still round-trips correctly,
+  and a repeated interrupt/resume cycle (10+ cycles) doesn't leak memory or hang. This is the
+  "durable under load on M1 Pro 16GB" bar — not a new concurrency-scaling suite (T018 shared-model-pool
+  remains explicitly out of scope).
+
+**Checkpoint**: real utterance-to-utterance latency measured end to end post-fix (compare against
+today's 4.02s baseline, T038), interrupt/resume verified not to break or leak, and an honest
+statement of how close this lands to the 2-3s ceiling — measured, not assumed.
+
+---
+
 ## Dependencies & Execution Order
 
 - Phase 1 (Setup) → Phase 2 (Foundational, blocks everything) → Phases 3 & 4 (P1, can run in parallel once Phase 2 lands) → Phase 5 (P2) → Phase 6 (P3, thesis research, can start any time after Phase 2 since it only touches the MT stage) → Phase 7 (P2, TTS-stage only, can run in parallel with Phase 5/6 once Phase 3's baseline cloning path exists)

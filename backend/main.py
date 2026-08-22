@@ -368,6 +368,8 @@ async def initialize_all_models(client_info: str, source_lang: str, target_lang:
         "tts_engine": None,
         "tts_engine_name": None,
         "vad_instance": None,
+        "active_pipeline_task": None,  # T043: see handle_audio_stream's session dict for why. This is the OTHER session-init path (app.py's /ws route calls initialize_all_models before handle_audio_stream, so its setdefault runs first) — same keys required here or they're silently missing.
+        "model_call_lock": asyncio.Lock(),  # T046
         "session_config": { # Store a copy of the config for easy access
             "source_lang": source_lang,
             "target_lang": target_lang,
@@ -754,69 +756,78 @@ async def _process_speech_segment_pipeline(
     mt_models_for_session = session_data.get("mt_models", {})
     tts_engine = session_data.get("tts_engine") if session_data.get("tts_engine_name") == tts_model_choice else None
 
-    # --- STT ---
-    websocket.timestamps["stt_start"].append(time.perf_counter())
-    stt_start_time = time.perf_counter()
-    # Use the session-specific STT model
-    transcribed_segments, stt_time, detected_source_lang = await loop.run_in_executor(
-        None,
-        lambda: stt_model_instance.transcribe_audio(
-            audio_segment_np,
-            AUDIO_SAMPLE_RATE,
-            language=None if source_lang == "auto" else source_lang,
-            vad_filter=False if vad_enabled else True # Disable FasterWhisper's VAD if WebRTC VAD is enabled
-        ),
-    )
-    if source_lang == "auto" and detected_source_lang:
-        session_config["source_lang"] = detected_source_lang # Update session config with detected language
-        logging.info(f"Backend: Session {client_info}: Source language detected as: {session_config['source_lang']}")
-    stt_end_time = time.perf_counter()
-    websocket.timestamps["stt_end"].append(stt_end_time)
-    stt_total_time = stt_end_time - stt_start_time
-    input_to_stt_latency = stt_end_time - segment_start_time # Calculate input->STT latency
-    transcribed_text = " ".join([s.text for s in transcribed_segments]) if transcribed_segments else ""
-    logging.debug(f"Backend: Session {client_info}: STT raw segments: {transcribed_segments}")
-    logging.debug(f"Backend: Session {client_info}: Concatenated transcribed_text: '{transcribed_text}'")
-    logging.info(f"Backend: Session {client_info}: STT completed. Transcribed: '{transcribed_text}' (Detected Lang: {detected_source_lang}). Time: {stt_total_time:.2f}s. Input->STT Latency: {input_to_stt_latency:.2f}s")
+    # T046: STT+MT run under the session's model-call lock, NOT cancelled by a new speech-start
+    # (see barge-in trigger below) — these calls are cheap (sub-2s) and produce real text output
+    # that a naive "cancel on any new speech" rule was found (live-tested) to silently drop for
+    # ordinary back-to-back sentences in continuous speech, not just deliberate interruptions.
+    # The lock also prevents two tasks from concurrently calling the same per-session model
+    # instance from different executor threads, which create_task (T043) makes possible for the
+    # first time in this codebase — untested for thread-safety, so serialize rather than assume.
+    async with session_data["model_call_lock"]:
+        # --- STT ---
+        websocket.timestamps["stt_start"].append(time.perf_counter())
+        stt_start_time = time.perf_counter()
+        # Use the session-specific STT model
+        transcribed_segments, stt_time, detected_source_lang = await loop.run_in_executor(
+            None,
+            lambda: stt_model_instance.transcribe_audio(
+                audio_segment_np,
+                AUDIO_SAMPLE_RATE,
+                language=None if source_lang == "auto" else source_lang,
+                vad_filter=False if vad_enabled else True # Disable FasterWhisper's VAD if WebRTC VAD is enabled
+            ),
+        )
+        if source_lang == "auto" and detected_source_lang:
+            session_config["source_lang"] = detected_source_lang # Update session config with detected language
+            logging.info(f"Backend: Session {client_info}: Source language detected as: {session_config['source_lang']}")
+        stt_end_time = time.perf_counter()
+        websocket.timestamps["stt_end"].append(stt_end_time)
+        stt_total_time = stt_end_time - stt_start_time
+        input_to_stt_latency = stt_end_time - segment_start_time # Calculate input->STT latency
+        transcribed_text = " ".join([s.text for s in transcribed_segments]) if transcribed_segments else ""
+        logging.debug(f"Backend: Session {client_info}: STT raw segments: {transcribed_segments}")
+        logging.debug(f"Backend: Session {client_info}: Concatenated transcribed_text: '{transcribed_text}'")
+        logging.info(f"Backend: Session {client_info}: STT completed. Transcribed: '{transcribed_text}' (Detected Lang: {detected_source_lang}). Time: {stt_total_time:.2f}s. Input->STT Latency: {input_to_stt_latency:.2f}s")
 
-    # Filter out transcriptions that are just periods/punctuation (background noise artifacts)
-    cleaned_text = transcribed_text.strip().replace('.', '').replace(',', '').replace('!', '').replace('?', '').strip()
-    if not cleaned_text:
-        logging.info(f"Backend: Session {client_info}: Transcription contains only punctuation (likely background noise). Skipping translation and TTS.")
-        return
-
-    if not transcribed_text.strip():
-        logging.warning(f"Backend: Session {client_info}: STT produced no meaningful text for segment (Final: {is_final}). Skipping translation and TTS.")
-        await safe_send("transcription_result", {"type": "transcription_result", "transcribed": "", "is_final": is_final, "metrics": {"stt_time": stt_total_time}})
-        return
-    await safe_send("transcription_result", {"type": "transcription_result", "transcribed": transcribed_text, "is_final": is_final, "metrics": {"stt_time": stt_total_time}})
-
-    # --- MT ---
-    translated_text = transcribed_text
-    mt_total_time = 0.0
-    if source_lang != target_lang:
-        websocket.timestamps["mt_start"].append(time.perf_counter())
-        main_mt_model = mt_models_for_session.get(f"{source_lang}-{target_lang}")
-        if main_mt_model is None:
-            logging.warning(f"WARNING: Session {client_info}: MT model for {source_lang}-{target_lang} not initialized. Skipping translation.")
-            await safe_send("error", {"type": "error", "message": f"MT model for {source_lang}-{target_lang} not initialized. Skipping translation."})
+        # Filter out transcriptions that are just periods/punctuation (background noise artifacts)
+        cleaned_text = transcribed_text.strip().replace('.', '').replace(',', '').replace('!', '').replace('?', '').strip()
+        if not cleaned_text:
+            logging.info(f"Backend: Session {client_info}: Transcription contains only punctuation (likely background noise). Skipping translation and TTS.")
             return
-        mt_start_time = time.perf_counter()
-        translated_text, _ = await loop.run_in_executor(None, lambda: main_mt_model.translate(transcribed_text, source_lang, target_lang))
-        mt_total_time = time.perf_counter() - mt_start_time
-        websocket.timestamps["mt_end"].append(time.perf_counter())
-    else:
-        logging.info(f"Backend: Session {client_info}: Source and target languages are the same ({source_lang}). Skipping machine translation.")
-    logging.info(f"Backend: Session {client_info}: MT completed for {source_lang}-{target_lang}. Translated: '{translated_text}'. Time: {mt_total_time:.2f}s")
 
-    if not translated_text:
-        logging.warning(f"Backend: Session {client_info}: MT produced no translated text for '{transcribed_text}' (Final: {is_final}). Skipping TTS.")
-        await safe_send("translation_result", {"type": "translation_result", "translated": "", "is_final": is_final, "metrics": {"mt_time": mt_total_time}})
-        return
-    
-    # Send translation result to frontend
-    await safe_send("translation_result", {"type": "translation_result", "translated": translated_text, "is_final": is_final, "metrics": {"mt_time": mt_total_time}})
-    logging.debug(f"Backend: Session {client_info}: Sent translation_result: '{translated_text}'")
+        if not transcribed_text.strip():
+            logging.warning(f"Backend: Session {client_info}: STT produced no meaningful text for segment (Final: {is_final}). Skipping translation and TTS.")
+            await safe_send("transcription_result", {"type": "transcription_result", "transcribed": "", "is_final": is_final, "metrics": {"stt_time": stt_total_time}})
+            return
+        await safe_send("transcription_result", {"type": "transcription_result", "transcribed": transcribed_text, "is_final": is_final, "metrics": {"stt_time": stt_total_time}})
+
+        # --- MT ---
+        translated_text = transcribed_text
+        mt_total_time = 0.0
+        if source_lang != target_lang:
+            websocket.timestamps["mt_start"].append(time.perf_counter())
+            main_mt_model = mt_models_for_session.get(f"{source_lang}-{target_lang}")
+            if main_mt_model is None:
+                logging.warning(f"WARNING: Session {client_info}: MT model for {source_lang}-{target_lang} not initialized. Skipping translation.")
+                await safe_send("error", {"type": "error", "message": f"MT model for {source_lang}-{target_lang} not initialized. Skipping translation."})
+                return
+            mt_start_time = time.perf_counter()
+            translated_text, _ = await loop.run_in_executor(None, lambda: main_mt_model.translate(transcribed_text, source_lang, target_lang))
+            mt_total_time = time.perf_counter() - mt_start_time
+            websocket.timestamps["mt_end"].append(time.perf_counter())
+        else:
+            logging.info(f"Backend: Session {client_info}: Source and target languages are the same ({source_lang}). Skipping machine translation.")
+        logging.info(f"Backend: Session {client_info}: MT completed for {source_lang}-{target_lang}. Translated: '{translated_text}'. Time: {mt_total_time:.2f}s")
+
+        if not translated_text:
+            logging.warning(f"Backend: Session {client_info}: MT produced no translated text for '{transcribed_text}' (Final: {is_final}). Skipping TTS.")
+            await safe_send("translation_result", {"type": "translation_result", "translated": "", "is_final": is_final, "metrics": {"mt_time": mt_total_time}})
+            return
+
+        # Send translation result to frontend
+        await safe_send("translation_result", {"type": "translation_result", "translated": translated_text, "is_final": is_final, "metrics": {"mt_time": mt_total_time}})
+        logging.debug(f"Backend: Session {client_info}: Sent translation_result: '{translated_text}'")
+    # model_call_lock released here — TTS below runs unlocked, is the only phase barge-in cancels.
 
     # --- TTS ---
     # Standard non-streaming synthesis (Piper or fallback)
@@ -921,6 +932,21 @@ async def _process_speech_segment_pipeline(
         logging.debug(f"Backend: Sending streaming metrics: {metrics_payload}")
     await safe_send("final_metrics", {"type": "final_metrics", "metrics": metrics_payload, "is_final": is_final})
 
+# T043: fire-and-forget wrapper so audio capture (the main receive loop) never blocks on
+# translation. Cancellation (T046 barge-in) unwinds cleanly here instead of crashing or leaving
+# an unretrieved-exception warning. NOTE (verified live, see documentation/realtime_pipeline_rearchitecture_2026-08-22.md):
+# cancelling a task that's currently awaiting a run_in_executor() call (STT/MT/non-streaming TTS)
+# does not preempt that specific blocking call — asyncio defers the CancelledError until that
+# call returns, then stops before the next stage/send. Worst-case barge-in lag is bounded by
+# whichever single stage is in flight, not the whole pipeline. Real numbers in the doc above.
+async def _run_pipeline_task(websocket, audio_segment_np, segment_start_time, is_final, session_config, client_info):
+    try:
+        await _process_speech_segment_pipeline(websocket, audio_segment_np, segment_start_time, is_final=is_final, session_config=session_config)
+    except asyncio.CancelledError:
+        logging.info(f"Backend: Session {client_info}: Pipeline task cancelled (superseded by new speech).")
+    except Exception as e:
+        logging.error(f"Backend: Session {client_info}: Unhandled error in pipeline task: {e}")
+
 # --- WebSocket Handler ---
 async def handle_audio_stream(websocket: WebSocket):
     # Use websocket.scope["client"] to get client host and port
@@ -945,6 +971,8 @@ async def handle_audio_stream(websocket: WebSocket):
         "tts_engine": None,
         "tts_engine_name": None,
         "vad_instance": None,
+        "active_pipeline_task": None,  # T043: tracks the in-flight STT->MT->TTS asyncio.Task for this session, so a new speech-start can cancel a stale one (barge-in, T046)
+        "model_call_lock": asyncio.Lock(),  # T046: serializes STT+MT calls on this session's shared model instances; NOT held during TTS, which is the only phase barge-in is allowed to cancel
         "session_config": { # Default config, will be updated by client
             "source_lang": "en",
             "target_lang": "sk",
@@ -991,7 +1019,10 @@ async def handle_audio_stream(websocket: WebSocket):
                     elif data["type"] == "stop":
                         logging.info("Received 'stop' command. Stopping transcription.")
                         if speech_frames:
-                            await _process_speech_segment_pipeline(websocket, np.concatenate(speech_frames), last_speech_time, is_final=True, session_config=session_config)
+                            # 'stop' is a terminal action for this segment (no more audio expected until next 'start') — still task-tracked for consistency, but awaited since nothing else runs concurrently after it.
+                            task = asyncio.create_task(_run_pipeline_task(websocket, np.concatenate(speech_frames), last_speech_time, True, session_config, client_info))
+                            session_data["active_pipeline_task"] = task
+                            await task
                             speech_frames.clear()
                         in_speech_segment = False
                         pre_vad_buffer.clear() # Clear pre-VAD buffer on stop
@@ -1150,7 +1181,8 @@ async def handle_audio_stream(websocket: WebSocket):
                                 if np.isnan(chunk_to_process).any() or np.isinf(chunk_to_process).any():
                                     logging.warning("Backend: Detected NaN or Inf in chunk_to_process (VAD disabled fallback). Sanitizing to 0.")
                                     chunk_to_process = np.nan_to_num(chunk_to_process, nan=0.0, posinf=0.0, neginf=0.0)
-                                await _process_speech_segment_pipeline(websocket, chunk_to_process, time.perf_counter(), is_final=False, session_config=session_config)
+                                task = asyncio.create_task(_run_pipeline_task(websocket, chunk_to_process, time.perf_counter(), False, session_config, client_info))
+                                session_data["active_pipeline_task"] = task
                                 audio_queue.clear()
                             continue
 
@@ -1196,14 +1228,25 @@ async def handle_audio_stream(websocket: WebSocket):
                                 if not in_speech_segment:
                                     logging.info(f"Backend: Speech segment STARTED at {time.perf_counter():.3f}s")
                                     in_speech_segment = True
+                                    # T046 barge-in: only cancel a previous task if it's past STT+MT (lock released) —
+                                    # i.e. it's in/about to enter TTS (the only phase where "two voices at once" is a
+                                    # real problem) or already finished. If it's still inside STT/MT, let it finish:
+                                    # live-tested (test/interrupt_smoke_test.py) confirmed unconditional cancellation
+                                    # silently drops most sentences in ordinary back-to-back continuous speech, since
+                                    # natural inter-sentence pauses are shorter than one STT+MT round trip.
+                                    prev_task = session_data.get("active_pipeline_task")
+                                    if prev_task is not None and not prev_task.done() and not session_data["model_call_lock"].locked():
+                                        logging.info(f"Backend: Session {client_info}: New speech started during TTS/idle — cancelling in-flight pipeline task (barge-in).")
+                                        prev_task.cancel()
                                 last_speech_time = time.perf_counter()
-                                
+
                                 # Safety Valve: Force process if speech segment is too long (e.g., stuck due to noise)
                                 current_speech_duration = len(speech_frames) * (VAD_FRAME_DURATION / 1000.0)
                                 if current_speech_duration > 15.0: # 15 seconds max
                                     logging.warning(f"Backend: Speech segment exceeded 15s ({current_speech_duration:.2f}s). Forcing processing.")
                                     final_speech_segment_np = np.concatenate(speech_frames)
-                                    await _process_speech_segment_pipeline(websocket, final_speech_segment_np, last_speech_time, is_final=True, session_config=session_config)
+                                    task = asyncio.create_task(_run_pipeline_task(websocket, final_speech_segment_np, last_speech_time, True, session_config, client_info))
+                                    session_data["active_pipeline_task"] = task
                                     speech_frames.clear()
                                     in_speech_segment = False
                                     # Reset buffers
@@ -1239,7 +1282,8 @@ async def handle_audio_stream(websocket: WebSocket):
                                             logging.warning("Backend: Detected NaN or Inf in final_speech_segment_np. Sanitizing to 0.")
                                             final_speech_segment_np = np.nan_to_num(final_speech_segment_np, nan=0.0, posinf=0.0, neginf=0.0)
                                         logging.info(f"Backend: Final speech segment ENDED at {time.perf_counter():.3f}s. Duration: {len(final_speech_segment_np) / AUDIO_SAMPLE_RATE:.3f}s")
-                                        await _process_speech_segment_pipeline(websocket, final_speech_segment_np, last_speech_time, is_final=True, session_config=session_config)
+                                        task = asyncio.create_task(_run_pipeline_task(websocket, final_speech_segment_np, last_speech_time, True, session_config, client_info))
+                                        session_data["active_pipeline_task"] = task
                                         speech_frames.clear()
                                     in_speech_segment = False
                                     # Ensure all buffers are cleared after a full speech segment ends
@@ -1257,7 +1301,8 @@ async def handle_audio_stream(websocket: WebSocket):
                             if np.isnan(chunk_to_process).any() or np.isinf(chunk_to_process).any():
                                 logging.warning("Backend: Detected NaN or Inf in chunk_to_process (VAD disabled). Sanitizing to 0.")
                                 chunk_to_process = np.nan_to_num(chunk_to_process, nan=0.0, posinf=0.0, neginf=0.0)
-                            await _process_speech_segment_pipeline(websocket, chunk_to_process, time.perf_counter(), is_final=False, session_config=session_config)
+                            task = asyncio.create_task(_run_pipeline_task(websocket, chunk_to_process, time.perf_counter(), False, session_config, client_info))
+                            session_data["active_pipeline_task"] = task
                             audio_queue.clear()
 
     except WebSocketDisconnect:
@@ -1265,7 +1310,8 @@ async def handle_audio_stream(websocket: WebSocket):
         if speech_frames:
             try:
                 final_speech_segment_np = np.concatenate(speech_frames)
-                await _process_speech_segment_pipeline(websocket, final_speech_segment_np, last_speech_time, is_final=True, session_config=session_config)
+                # Teardown path — await directly so cleanup (below) doesn't race a still-running task.
+                await _run_pipeline_task(websocket, final_speech_segment_np, last_speech_time, True, session_config, client_info)
             except websockets.exceptions.ConnectionClosedOK:
                 logging.info(f"Backend: WebSocket connection already closed for {client_info}. Skipping final segment processing.")
             except Exception as e:
@@ -1291,7 +1337,14 @@ async def handle_audio_stream(websocket: WebSocket):
         
         if client_info in active_sessions:
             session_data = active_sessions.pop(client_info)
-            
+
+            # T043: cancel any pipeline task orphaned by an error/disconnect path that didn't
+            # already await it, so it doesn't keep running against a torn-down session.
+            leftover_task = session_data.get("active_pipeline_task")
+            if leftover_task is not None and not leftover_task.done():
+                logging.info(f"Backend: Session {client_info}: Cancelling leftover pipeline task during cleanup.")
+                leftover_task.cancel()
+
             # Explicitly delete model references to trigger garbage collection
             if session_data.get("stt_model"):
                 logging.debug(f"Backend: Deleting STT model for session {client_info}")
