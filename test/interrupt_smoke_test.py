@@ -37,6 +37,8 @@ async def main():
                     d = json.loads(msg)
                     if d.get("type") in ("transcription_result", "translation_result"):
                         events.append((t, d.get("type"), d.get("transcribed") or d.get("translated")))
+                    elif d.get("type") == "caption_partial":
+                        events.append((t, "caption_partial", d.get("text")))
                 elif isinstance(msg, bytes):
                     events.append((t, "tts_audio", len(msg)))
             except asyncio.TimeoutError:

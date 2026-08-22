@@ -117,6 +117,7 @@ import ffmpeg # Import ffmpeg for audio conversion
 from starlette.websockets import WebSocketState # Import WebSocketState
 
 from backend.stt.faster_whisper_stt import FasterWhisperSTT
+from backend.stt.streaming_captions import SessionCaptioner, STREAMING_CAPTIONS_AVAILABLE  # T044
 from backend.mt.ctranslate2_mt import CTranslate2MT
 from backend.tts.piper_tts import PiperTTS
 from backend.tts.coqui_tts import CoquiTTS # Import CoquiTTS
@@ -263,6 +264,23 @@ async def _initialize_stt_model(session_data: Dict[str, Any], stt_model_size: st
     else:
         logging.info(f"Backend: Session {session_data['client_info']}: FasterWhisperSTT model '{stt_model_size}' already initialized.")
 
+async def _initialize_captioner(session_data: Dict[str, Any], source_lang: str):
+    """T044: lazily create this session's SessionCaptioner (streaming partial-text captions,
+    additive only — see backend/stt/streaming_captions.py). Best-effort: any failure here
+    (missing dep, model load error) disables captions for this session but must never block or
+    break the real STT/MT/TTS pipeline, which doesn't depend on this at all."""
+    if session_data.get("captioner") is not None:
+        return
+    if not STREAMING_CAPTIONS_AVAILABLE:
+        return
+    try:
+        init_start = time.perf_counter()
+        session_data["captioner"] = SessionCaptioner(source_lang=source_lang)
+        logging.info(f"Backend: Session {session_data['client_info']}: SessionCaptioner initialized in {time.perf_counter() - init_start:.2f}s.")
+    except Exception as e:
+        logging.error(f"Backend: Session {session_data['client_info']}: SessionCaptioner init failed, captions disabled for this session: {e}")
+        session_data["captioner"] = None
+
 async def _initialize_mt_model(session_data: Dict[str, Any], source_lang: str, target_lang: str, websocket: Optional[WebSocket] = None):
     """Initializes a specific CTranslate2MT model for a given session."""
     mt_models_for_session = session_data.setdefault("mt_models", {})
@@ -370,6 +388,8 @@ async def initialize_all_models(client_info: str, source_lang: str, target_lang:
         "vad_instance": None,
         "active_pipeline_task": None,  # T043: see handle_audio_stream's session dict for why. This is the OTHER session-init path (app.py's /ws route calls initialize_all_models before handle_audio_stream, so its setdefault runs first) — same keys required here or they're silently missing.
         "model_call_lock": asyncio.Lock(),  # T046
+        "captioner": None,  # T044
+        "captioner_lock": asyncio.Lock(),  # T044
         "session_config": { # Store a copy of the config for easy access
             "source_lang": source_lang,
             "target_lang": target_lang,
@@ -390,6 +410,7 @@ async def initialize_all_models(client_info: str, source_lang: str, target_lang:
         await _initialize_mt_model(session_data, "en", target_lang, websocket)
     await _initialize_tts_models(session_data, tts_model_choice, speaker_wav_path, speaker_text, speaker_lang)
     await _initialize_vad_instance(session_data)
+    await _initialize_captioner(session_data, source_lang)  # T044, best-effort, never blocks the above
 
     logging.info(f"Backend: Session {client_info}: All models initialized (or attempted to initialize) at {time.strftime('%H:%M:%S', time.localtime(time.time()))}.")
     return {"status": "success", "message": "Models initialization triggered."}
@@ -940,12 +961,39 @@ async def _process_speech_segment_pipeline(
 # call returns, then stops before the next stage/send. Worst-case barge-in lag is bounded by
 # whichever single stage is in flight, not the whole pipeline. Real numbers in the doc above.
 async def _run_pipeline_task(websocket, audio_segment_np, segment_start_time, is_final, session_config, client_info):
+    # T044: every real (SILENCE_TIMEOUT-triggered) segment resets the captioner's buffer, so its
+    # partials don't bleed across utterance boundaries. All call sites now funnel through here,
+    # so one reset call covers every trigger point instead of duplicating it at each of them.
+    session_data = active_sessions.get(client_info)
+    if session_data is not None and session_data.get("captioner") is not None:
+        try:
+            session_data["captioner"].reset()
+        except Exception as e:
+            logging.error(f"Backend: Session {client_info}: captioner reset error (non-fatal): {e}")
     try:
         await _process_speech_segment_pipeline(websocket, audio_segment_np, segment_start_time, is_final=is_final, session_config=session_config)
     except asyncio.CancelledError:
         logging.info(f"Backend: Session {client_info}: Pipeline task cancelled (superseded by new speech).")
     except Exception as e:
         logging.error(f"Backend: Session {client_info}: Unhandled error in pipeline task: {e}")
+
+# T044: fire-and-forget per audio chunk. Bounded to one in-flight feed() at a time via
+# captioner_lock — a chunk is dropped, never queued, if the previous call hasn't returned yet, so
+# this can never build backlog the way the old always-full-pipeline streaming path did.
+async def _feed_captioner_task(websocket, session_data, client_info, audio_chunk):
+    captioner = session_data.get("captioner")
+    lock = session_data.get("captioner_lock")
+    if captioner is None or lock is None or lock.locked():
+        return
+    async with lock:
+        try:
+            loop = asyncio.get_event_loop()
+            text = await loop.run_in_executor(None, captioner.feed, audio_chunk)
+            if text:
+                if websocket.client_state != WebSocketState.DISCONNECTED:
+                    await websocket.send_text(json.dumps({"type": "caption_partial", "text": text}))
+        except Exception as e:
+            logging.error(f"Backend: Session {client_info}: captioner feed error (non-fatal): {e}")
 
 # --- WebSocket Handler ---
 async def handle_audio_stream(websocket: WebSocket):
@@ -973,6 +1021,8 @@ async def handle_audio_stream(websocket: WebSocket):
         "vad_instance": None,
         "active_pipeline_task": None,  # T043: tracks the in-flight STT->MT->TTS asyncio.Task for this session, so a new speech-start can cancel a stale one (barge-in, T046)
         "model_call_lock": asyncio.Lock(),  # T046: serializes STT+MT calls on this session's shared model instances; NOT held during TTS, which is the only phase barge-in is allowed to cancel
+        "captioner": None,  # T044
+        "captioner_lock": asyncio.Lock(),  # T044: bounds captioner.feed() to one in-flight call at a time; a chunk is dropped (not queued) if the previous feed hasn't finished — best-effort, never adds backlog
         "session_config": { # Default config, will be updated by client
             "source_lang": "en",
             "target_lang": "sk",
@@ -1129,6 +1179,13 @@ async def handle_audio_stream(websocket: WebSocket):
                     if not audio_np.any():
                         logging.warning("Backend: Received an all-zero audio chunk. Skipping processing.")
                         continue
+
+                    # T044: feed the streaming captioner, fire-and-forget. Never awaited inline —
+                    # a slow feed() call must not reintroduce the capture-blocking bug T043 just
+                    # fixed. Best-effort: errors are logged and swallowed, they never affect the
+                    # real STT/MT/TTS path below, which doesn't read anything this produces.
+                    if session_data.get("captioner") is not None:
+                        asyncio.create_task(_feed_captioner_task(websocket, session_data, client_info, audio_np.copy()))
 
                     # Calculate RMS on raw audio (not normalized) to get accurate level readings
                     # Clip to ensure values are within valid range before RMS calculation
