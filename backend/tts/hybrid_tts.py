@@ -32,6 +32,7 @@ class HybridTTS:
     """
     SUPPORTS_CLONING = True
     REQUIRES_SPEAKER_WAV = False  # falls back to plain Piper output if none given
+    SUPPORTS_STREAMING = True  # T045
 
     def __init__(self, device: str = "auto"):
         if not OPENVOICE_AVAILABLE:
@@ -49,7 +50,13 @@ class HybridTTS:
         
         # 1. Initialize Piper
         self.piper_engine = PiperTTS(device=self.device)
-        self.sample_rate = 16000 # Standard for conversion pass, but Piper is usually 22050
+        # T045: was hardcoded 16000 ("standard for conversion pass") but never actually read
+        # anywhere until now (main.py's non-streaming path reads sample_rate from synthesize()'s
+        # own return tuple, not this attribute) — dormant bug. Confirmed the real value directly:
+        # models/openvoice_v2/checkpoints_v2/converter/config.json -> data.sampling_rate = 22050.
+        # This is now load-bearing (main.py's streaming consumer reads tts_engine.sample_rate
+        # once before the chunk loop), so it has to be correct, not just unused.
+        self.sample_rate = 22050
         
         # 2. Initialize OpenVoice V2 Converter
         base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -169,6 +176,30 @@ class HybridTTS:
             # Fallback to Piper original
             if os.path.exists(tmp_piper_path): os.remove(tmp_piper_path)
             return piper_wav, piper_sr, time.perf_counter() - start_time
+
+    def synthesize_stream(
+        self,
+        text: str,
+        language: str = "sk",
+        speaker_wav_path: Optional[str] = None,
+        **kwargs,
+    ):
+        """T045: yield one (cloned) audio chunk per clause-level phrase instead of waiting for
+        the whole sentence. Each phrase reuses the normal synthesize() path unchanged (same
+        cached source/target embeddings, same fallback-to-uncloned-Piper-on-error behavior) —
+        this is decompose-into-smaller-calls, not a new synthesis path, so it inherits all of
+        synthesize()'s existing correctness. NOTE: assumes every phrase's output shares this
+        instance's self.sample_rate (22050) — true for every Piper voice actually installed in
+        this project (checked: all are 22050) including the uncloned-fallback case, but not a
+        structural guarantee if a differently-configured Piper voice is ever added."""
+        from backend.tts.text_chunking import split_into_phrases, chunk_audio_by_duration
+        phrases = split_into_phrases(text)
+        if not phrases:
+            return
+        for phrase in phrases:
+            wav, sr, _ = self.synthesize(phrase, language=language, speaker_wav_path=speaker_wav_path)
+            if wav is not None and len(wav) > 0:
+                yield from chunk_audio_by_duration(wav, sr)
 
 if __name__ == "__main__":
     # Test script

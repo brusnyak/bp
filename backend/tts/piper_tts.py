@@ -10,6 +10,7 @@ from backend import hardware
 
 class PiperTTS:
     SUPPORTS_CLONING = False
+    SUPPORTS_STREAMING = True  # T045
 
     def __init__(
         self,
@@ -63,6 +64,7 @@ class PiperTTS:
         # piper-tts exposes a `providers=` kwarg, or T013 wires onnxruntime.InferenceSession directly.
         try:
             self.model = PiperVoice.load(onnx_model_path)
+            self.sample_rate = self.model.config.sample_rate  # T045: read by main.py's streaming consumer
             print(
                 f"PiperTTS initialized with model: {model_id}, device: {self.device}, speaker_id: {speaker_id}"
             )
@@ -133,3 +135,26 @@ class PiperTTS:
             print(f"Saved synthesized audio to {output_path}")
 
         return audio_waveform, sample_rate, synthesis_time
+
+    def synthesize_stream(
+        self,
+        text: str,
+        language: str = "sk",
+        speaker_wav_path: Optional[str] = None,
+        **kwargs,
+    ):
+        """T045: yield one audio chunk per clause-level phrase instead of synthesizing (and
+        making the caller wait for) the whole sentence at once. Each phrase is a normal
+        self.synthesize() call — Piper has no internal streaming API, so this is
+        decompose-into-smaller-calls, not true sub-utterance streaming, but it bounds each
+        individual blocking call to one phrase, which is what barge-in cancellation (T046)
+        actually needs (cancellation can't preempt a call already in flight, so keeping each
+        call short bounds the worst case)."""
+        from backend.tts.text_chunking import split_into_phrases, chunk_audio_by_duration
+        phrases = split_into_phrases(text)
+        if not phrases:
+            return
+        for phrase in phrases:
+            wav, sr, _ = self.synthesize(phrase, language=language, speaker_wav_path=speaker_wav_path)
+            if wav is not None and len(wav) > 0:
+                yield from chunk_audio_by_duration(wav, sr)
