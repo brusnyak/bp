@@ -205,19 +205,55 @@ work stops; focus moves to documentation/thesis writeup.
   delivered; captions-as-actual-final-STT-speedup is not, and would need its own dedicated
   correctness pass (word-level alignment between the streaming processor's buffer and the final
   full-segment audio) to do safely.
-- [ ] T045 Chunk TTS output by stable MT phrase instead of waiting for the full translated sentence —
-  reuse the existing `SUPPORTS_STREAMING` chunk-yield pattern (`main.py:852-887`), extend to
-  Piper/HybridTTS. Target chunk size 100-200ms per the research doc's barge-in section (also required
-  for cancel-without-cutting-mid-word in T046). **Not started.**
-- [~] T046 Barge-in: PARTIALLY done as a side effect of T043's correctness fix — the cancellation
-  mechanism and the "only cancel outside STT/MT" rule are real and live-verified. **Not yet verified**:
-  actually cancelling mid-TTS-send (the core "two voices at once" case). Tried to test this live and
-  concluded the current single-shot (non-chunked) Piper TTS call's window is too short (RTF 0.05-0.2s)
-  to hit reliably/deterministically with real network+event timing — this becomes a clean, reliable test
-  once T045 lands (cancelling a `queue.get()` between 100-200ms chunks is fast and deterministic; cancelling
-  mid a single blocking `run_in_executor` TTS call is not, and — same caveat as STT/MT — asyncio defers
-  the CancelledError until that blocking call returns, so cancellation is not preemptive either way).
-  Blocked on T045 for a trustworthy test, not on T043.
+- [x] T045 DONE, 2026-08-22. Added `backend/tts/text_chunking.py` (`split_into_phrases` —
+  punctuation-based clause splitting; `chunk_audio_by_duration` — slices each phrase's synthesized
+  audio into ~150ms pieces). Both `PiperTTS` and `HybridTTS` gained `SUPPORTS_STREAMING = True` and
+  a `synthesize_stream()` that phrase-splits the text, synthesizes each phrase with the engine's
+  existing (unchanged) `synthesize()`, and sub-chunks the result — so multi-clause text is sent as a
+  train of small chunks instead of one blob, without introducing a second synthesis code path.
+  **Two real bugs found and fixed while verifying this live** (not assumed safe): (1) `HybridTTS.sample_rate`
+  was hardcoded 16000 and never actually read anywhere pre-T045 (dormant) — confirmed the real rate
+  directly from `models/openvoice_v2/checkpoints_v2/converter/config.json` (`sampling_rate: 22050`)
+  and fixed it; wrong, it would have played cloned audio at the wrong pitch/speed the moment
+  streaming started reading this attribute. (2) `main.py`'s streaming-vs-non-streaming dispatch had
+  a hardcoded `elif tts_model_choice != "xtts":` fallback-error check, written back when XTTS was the
+  only streaming engine — with piper/hybrid now also streaming, every successful streaming synthesis
+  hit this and sent a false `"TTS model not ready"` error to the client (caught immediately via a live
+  smoke test, not shipped). Fixed by generalizing to `not getattr(tts_engine, "SUPPORTS_STREAMING", False)`,
+  matching the flag the dispatch above it already uses instead of a second hardcoded name check that
+  had silently drifted out of sync with it. Verified: real chunk sizes ~150ms (3307 samples @ 22050Hz),
+  correct concatenated duration, live smoke test clean (WER 0.0, no errors), 8-sentence continuous
+  clip still 0 dropped. HybridTTS's streaming path verified standalone (correct chunking/duration,
+  real cloned audio) but not through a live end-to-end WS test with a real `speaker_wav_path` — the
+  existing test harness doesn't pass one; same integration code path as Piper's (already live-verified),
+  so risk is low but this specific combination wasn't exercised end-to-end.
+- [x] T046 DONE, 2026-08-22, verified live — not by test-construction, by real observed behavior.
+  While re-running the interrupt smoke test after T045, the server log captured a genuine mid-TTS-send
+  cancellation on its own: segment "Speak trick ignition, machine translation, and text to speech."
+  started streaming TTS at 07:15:03.634, and the very next segment's speech began 88ms later —
+  cancellation fired at 07:15:03.723 (within ~1ms of speech-start being detected). Confirmed the
+  streaming-TTS send loop (`main.py`'s `while True: chunk = await queue.get()`) is cancelled near-
+  instantly because it awaits a plain `asyncio.Queue`, not a `run_in_executor` future — the earlier
+  documented "cancellation is deferred until the blocking call returns" caveat applies to STT/MT/
+  non-streaming-TTS `run_in_executor` calls, **not** to the chunk-send loop once T045 made TTS
+  chunked. The background `run_streaming_tts` daemon thread is NOT itself killed (both remaining
+  phrases still printed as synthesized in the log after cancellation — wasted CPU, but bounded and
+  harmless) — what matters is confirmed: the queue-draining/sending loop stopped, so no further
+  `tts_audio` bytes for the cancelled segment reached the client.
+  **Real, non-obvious finding to flag, not silently resolved**: this cancellation fired between two
+  *natural* back-to-back sentences in one continuous test clip, not a deliberate user interruption —
+  the test script never sent a second utterance at that point. This means fast continuous multi-
+  sentence speech (this test clip reads a script with short pauses) can truncate the *previous*
+  sentence's spoken audio output once the next sentence's VAD speech-start fires, same ambiguity
+  already fixed for STT/MT (T043) but now visible at the TTS layer, and NOT fixed here — TTS
+  cancellation was deliberately left unconditional (any new speech-start cancels in-flight TTS)
+  because that IS barge-in's actual job. Whether this is correct behavior depends on framing: for a
+  genuine interruption it's exactly right; for a fast monologue reading many short sentences back to
+  back, it means only the *last* sentence before a real pause reliably gets its full audio delivered
+  from a delivery-completeness standpoint the same class of tradeoff EMMA's own 66%-BLEU-for-speed
+  choice represents at the MT layer (research doc, section 1) — keep pace vs. deliver everything.
+  **This is a product decision, not a bug** — flagging for the user/parent rather than silently
+  picking a side.
 - [ ] T047 Regression + soak check before calling this phase done: existing `test/hardware_test.py`
   still green, a live smoke test of a normal (non-interrupted) utterance still round-trips correctly,
   and a repeated interrupt/resume cycle (10+ cycles) doesn't leak memory or hang. This is the

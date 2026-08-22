@@ -937,8 +937,13 @@ async def _process_speech_segment_pipeline(
         await loop.run_in_executor(None, lambda: sf.write(audio_buffer, audio_wav, sample_rate, format="WAV"))
         # Send the WAV data as bytes over the WebSocket
         await safe_send("tts_audio", audio_buffer.getvalue(), is_bytes=True)
-    elif tts_model_choice != "xtts":
-        # Only log warning if we expected audio (i.e. not xtts which handled it above)
+    elif not getattr(tts_engine, "SUPPORTS_STREAMING", False):
+        # T045: this used to hardcode `!= "xtts"` (the only streaming engine at the time) — now
+        # piper/hybrid also stream (audio already sent chunk-by-chunk above, audio_wav staying
+        # None is expected for them, not an error). Generalized to the same SUPPORTS_STREAMING
+        # flag the dispatch above already uses, instead of a second hardcoded engine-name check
+        # that silently drifts out of sync with it (confirmed live: the old check fired a false
+        # "TTS model not ready" error on every successful piper/hybrid streaming synthesis).
         logging.warning(f"Backend: Session {client_info}: {tts_model_choice} TTS model not initialized or produced no audio. No TTS will be performed for '{translated_text}'.")
         await safe_send("error", {"type": "error", "message": f"{tts_model_choice} TTS model not ready or invalid. No TTS output."})
         return
