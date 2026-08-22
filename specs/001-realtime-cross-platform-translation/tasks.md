@@ -254,15 +254,26 @@ work stops; focus moves to documentation/thesis writeup.
   choice represents at the MT layer (research doc, section 1) — keep pace vs. deliver everything.
   **This is a product decision, not a bug** — flagging for the user/parent rather than silently
   picking a side.
-- [ ] T047 Regression + soak check before calling this phase done: existing `test/hardware_test.py`
-  still green, a live smoke test of a normal (non-interrupted) utterance still round-trips correctly,
-  and a repeated interrupt/resume cycle (10+ cycles) doesn't leak memory or hang. This is the
-  "durable under load on M1 Pro 16GB" bar — not a new concurrency-scaling suite (T018 shared-model-pool
-  remains explicitly out of scope).
+- [x] T047 DONE, 2026-08-22. `test/hardware_test.py` 7/7 throughout (unaffected, tests hardware
+  backend selection not the pipeline). Normal non-interrupted smoke test clean at every stage.
+  New `test/soak_interrupt_cycles.py`: **10 back-to-back interrupt/resume cycles, one session,
+  completed in 84.1s, no hang, 20/20 results received (none dropped), 0 errors.** Server RSS
+  1,954,416 KB → 1,697,088 KB (**-257 MB, no leak** — net decrease, not growth, across 10 real
+  cycles). Real E2E latency post-T043-T046, N=2 (directly comparable to T038's 4.02s baseline):
+  3.64s/5.01s, avg **4.33s — flat vs. baseline, not a reduction**, and correctly so: this work never
+  touched STT/MT/TTS compute speed, only dead time and interruption handling, which single-utterance
+  latency doesn't capture. Full writeup, before/after table, and proven/assumed/unknown split:
+  `documentation/realtime_pipeline_rearchitecture_2026-08-22.md`.
 
-**Checkpoint**: real utterance-to-utterance latency measured end to end post-fix (compare against
-today's 4.02s baseline, T038), interrupt/resume verified not to break or leak, and an honest
-statement of how close this lands to the 2-3s ceiling — measured, not assumed.
+**Checkpoint**: real utterance-to-utterance latency measured end to end post-fix (4.33s avg N=2,
+flat vs. the 4.02s T038 baseline — this work targeted dead time and interruption handling, not raw
+compute speed, so a flat number is the correct/expected result, not a miss). Interrupt/resume
+verified not to break or leak (10-cycle soak, 0 dropped, RSS decreased). Honest statement on the
+2-3s ceiling: **not reached, and this phase was never expected to reach it** — real STT+MT+TTS
+compute for one utterance is still ~4s on this hardware with this chain; what changed is that the
+system no longer wastes time on top of that floor, and can now be interrupted instead of forced to
+finish speaking. Closing the 4s→2-3s compute gap itself would require a different MT/TTS stack
+(the exact tradeoff the 2026-08-22 research doc already priced out and the user declined to pursue).
 
 ---
 
