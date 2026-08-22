@@ -175,9 +175,36 @@ work stops; focus moves to documentation/thesis writeup.
   message has been received`) is pre-existing, not a regression. Real single-utterance smoke test
   post-fix: correct transcription/translation/audio, WER 0.0, e2e_latency 4.95s (in line with T038's
   4.02s baseline, single-sample noise).
-- [ ] T044 Wire T035 (already-verified LocalAgreement+VAC streaming STT, RTF ~1.001, first partial
-  3.3s) into the now-non-blocking loop: captions run ahead of the spoken output, and the final STT
-  pass becomes a finalize-of-already-computed-partial instead of a from-zero pass after silence.
+- [x] T044 DONE, 2026-08-22. New `backend/stt/streaming_captions.py` wraps the vendored
+  LocalAgreement+VAC processor (`SessionCaptioner`), matching the exact construction used in the
+  2026-08-21 benchmark (`--vac`, no `--vad`, min-chunk-size 1.0s, `buffer_trimming=("segment",15)`)
+  so real behavior isn't an untested deviation from what was measured. Wired additively: every
+  incoming audio chunk is fed to it fire-and-forget (`_feed_captioner_task`, bounded by a
+  `captioner_lock` — a chunk is *dropped*, never queued, if the previous feed() call hasn't
+  returned, so this can never build backlog); on a committed partial it sends a new
+  `caption_partial` message. `_run_pipeline_task` (T043's wrapper, now the single funnel point for
+  every trigger) resets the captioner at the start of each real segment. **Does not touch or gate**
+  the existing SILENCE_TIMEOUT final-segment path — captions are informational only, the real
+  transcript/translation/audio still come from the primary STT model exactly as before. Live-verified
+  (`test/interrupt_smoke_test.py`, 8-sentence clip): first caption at 3.41s, well ahead of that
+  sentence's real `transcription_result` at 5.19s — matches the ~3.3s figure from the original
+  benchmark. All 8 sentences' real output still correct (0 dropped, same as T043's fix), interrupt
+  utterance still processed correctly, 0 new server errors, `hardware_test.py` still 7/7.
+  **Known limitation, not fixed**: loads a *second* whisper model ('base', int8) per session for
+  captions, separate from the primary STT model — doubles STT memory per session. Not shared/pooled
+  — same deferred concern as every other per-session model in this project (T018). **UI**: backend
+  only — the frontend doesn't render `caption_partial` yet, out of scope for T044 as written (backend
+  plumbing), noting so it's not mistaken for "captions visible in the demo already."
+  **"Finalize-of-already-computed-partial" (the latency-win half of T044's original wording) was
+  NOT implemented** — the final segment still runs a from-zero STT pass via the primary model, the
+  same as before T044. Wiring `VACOnlineASRProcessor`'s own committed state into the final-segment
+  path was judged out of scope for this pass: it would mean the *final* transcript (not just
+  captions) depends on the streaming processor, which changes the risk profile from "additive,
+  can't break the main path" to "load-bearing" — exactly the kind of change the ground rules for
+  this task say to stop and flag rather than rush. Captions-as-latency-perception-improvement is
+  delivered; captions-as-actual-final-STT-speedup is not, and would need its own dedicated
+  correctness pass (word-level alignment between the streaming processor's buffer and the final
+  full-segment audio) to do safely.
 - [ ] T045 Chunk TTS output by stable MT phrase instead of waiting for the full translated sentence —
   reuse the existing `SUPPORTS_STREAMING` chunk-yield pattern (`main.py:852-887`), extend to
   Piper/HybridTTS. Target chunk size 100-200ms per the research doc's barge-in section (also required
