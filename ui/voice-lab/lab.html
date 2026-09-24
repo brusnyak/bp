@@ -5,18 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="dark light" />
     <title>Voice Lab — review &amp; evaluate</title>
+    <link rel="stylesheet" href="../global-styles.css" />
     <link rel="stylesheet" href="lab-style.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   </head>
   <body>
-    <header class="lab-header">
-      <div>
-        <h1>Voice Lab</h1>
-        <p class="lab-sub">Static review page. No backend needed — open this file or serve the repo over HTTP.</p>
+    <header class="lab-hero">
+      <div class="lab-hero-inner">
+        <div>
+          <h1>Voice Lab</h1>
+          <p class="lab-sub">Static review page: voices, QC candidates, test clips. No backend needed.</p>
+        </div>
+        <nav class="lab-nav">
+          <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
+            <span class="material-symbols-outlined">dark_mode</span>
+          </button>
+          <a href="../live-speech/live.html">Live translation →</a>
+        </nav>
       </div>
-      <nav><a href="../live-speech/live.html">Live translation</a></nav>
     </header>
 
-    <main>
+    <main class="lab-container">
       <section>
         <h2>Upload for future processing</h2>
         <p class="lab-hint">Files stay in the browser only (listen + stage here). To register one: save it into
@@ -32,11 +41,13 @@
         <h2>Refresh this page data</h2>
         <p class="lab-hint"><code>python3 scripts/update_voice_lab_library.py</code> rescans
           <code>speaker_voices/</code>, <code>processed/voice_qc/</code>, <code>test/</code> into
-          <code>ui/voice-lab/library.json</code>. Live system status (engines, hardware backends) is at
-          <code>/api/voice-lab/status</code> while the backend runs.</p>
+          <code>ui/voice-lab/library.json</code>. Or <code>make library</code>. Live system status
+          (engines, hardware backends) is at <code>/api/voice-lab/status</code> while the backend runs
+          (<code>make run</code>).</p>
       </section>
     </main>
 
+    <script src="../theme-toggle.js"></script>
     <script src="lab.js"></script>
   </body>
 </html>

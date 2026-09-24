@@ -15,7 +15,7 @@
     const a = document.createElement("audio");
     a.controls = true;
     a.preload = "metadata";
-    a.src = src;
+    a.src = encodeURI(src); // paths contain spaces (e.g. "2_my voice 1.wav"); blob: URLs survive encodeURI
     return a;
   }
 
