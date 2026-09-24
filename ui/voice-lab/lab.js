@@ -1,4 +1,4 @@
-/* Voice Lab — read-only eval page. No auth, no mutations. Local use only. */
+/* Voice Lab — static page. Reads library.json only. No backend, no auth. */
 (function () {
   "use strict";
 
@@ -19,107 +19,92 @@
     return a;
   }
 
-  async function getJSON(url) {
-    const r = await fetch(url);
-    if (!r.ok) throw new Error(url + " → HTTP " + r.status);
-    return r.json();
+  function metaLine(parts) {
+    return el("p", "lab-meta", parts.filter(Boolean).join(" · "));
   }
 
-  function voiceAudioURL(v) {
-    // metadata `path` looks like "speaker_voices/2_my voice 1.wav"
-    const p = v.path || ("speaker_voices/" + (v.filename || ""));
-    return "/" + encodeURI(p);
-  }
-
-  function renderStatus(status) {
-    const engBody = document.querySelector("#enginesTable tbody");
-    Object.entries(status.engines || {}).forEach(([key, f]) => {
-      const tr = document.createElement("tr");
-      [key, f.cloning ? "yes" : "no", f.streaming ? "yes" : "no",
-       f.requires_speaker_wav ? "yes" : "no"].forEach((t) => tr.appendChild(el("td", null, t)));
-      engBody.appendChild(tr);
-    });
-
-    const beBody = document.querySelector("#backendsTable tbody");
-    Object.entries(status.hardware_backends || {}).forEach(([stage, be]) => {
-      const tr = document.createElement("tr");
-      tr.appendChild(el("td", null, stage));
-      tr.appendChild(el("td", null, String(be)));
-      beBody.appendChild(tr);
-    });
-
-    const pm = document.getElementById("piperModels");
-    (status.piper_models || []).forEach((m) => pm.appendChild(el("li", null, m)));
-    if (!(status.piper_models || []).length) pm.appendChild(el("li", null, "(none found)"));
-  }
-
-  function renderVoices(voices) {
-    const list = document.getElementById("voicesList");
-    if (!voices.length) {
-      list.appendChild(el("p", "lab-hint", "No voices returned by /api/voices."));
-      return;
-    }
-    voices.forEach((v) => {
-      const card = el("div", "lab-card");
-      card.appendChild(el("h4", null, v.name || v.id));
-      card.appendChild(el("p", "lab-meta",
-        "language: " + (v.language || "?") + " · file: " + (v.filename || v.path || "?")));
-      if (v.transcribed_text) card.appendChild(el("p", "lab-meta", "transcript: " + v.transcribed_text));
-      card.appendChild(audioEl(voiceAudioURL(v)));
-      list.appendChild(card);
-    });
-  }
-
-  function renderQC(status) {
-    const list = document.getElementById("qcList");
-    const cands = status.qc_candidates || [];
-    if (!cands.length) {
-      list.appendChild(el("p", "lab-hint",
-        "No candidates.json — run: venv/bin/python scripts/voice_similarity_qc.py --synthesize-only"));
-      return;
-    }
-    const scores = {};
-    (status.qc_scores || []).forEach((s) => { scores[s.label] = s.cosine_similarity; });
-    if (!status.qc_scored) {
-      const note = el("p", "lab-hint",
-        "Not scored yet — run --score-only in the qc venv, then reload.");
-      list.appendChild(note);
-    }
-    cands.forEach((c) => {
-      const card = el("div", "lab-card");
-      card.appendChild(el("h4", null, c.label));
-      card.appendChild(el("p", "lab-meta",
-        "engine: " + c.engine + " · lang: " + c.language + " · " + c.sample_rate + " Hz" +
-        " · synth: " + c.synthesis_latency_s + "s"));
-      const sim = scores[c.label];
-      if (sim === undefined) {
-        card.appendChild(el("p", "lab-meta", "similarity: — (not scored)"));
+  function itemCard(item, sectionId) {
+    const card = el("div", "lab-card");
+    card.appendChild(el("h4", null, item.name));
+    if (sectionId === "voices") {
+      card.appendChild(metaLine([
+        "language: " + (item.language || "?"),
+        "file: " + item.file,
+        item.in_registry ? "in registry ✓" : "NOT in registry ✗",
+      ]));
+      if (item.transcript) card.appendChild(metaLine(["transcript: " + item.transcript]));
+    } else if (sectionId === "qc") {
+      card.appendChild(metaLine([
+        "engine: " + (item.engine || "?"),
+        "lang: " + (item.language || "?"),
+        item.sample_rate ? item.sample_rate + " Hz" : null,
+        item.synthesis_latency_s !== undefined && item.synthesis_latency_s !== null
+          ? "synth: " + item.synthesis_latency_s + "s" : null,
+      ]));
+      if (item.similarity === undefined || item.similarity === null) {
+        card.appendChild(metaLine(["similarity: — (run --score-only in the qc venv)"]));
       } else {
-        const p = el("p", "lab-meta", "similarity: " + sim.toFixed(4) +
-          " (ref " + THRESHOLD + ") " + (sim >= THRESHOLD ? "✓ pass" : "✗ below"));
-        p.classList.add(sim >= THRESHOLD ? "pass" : "fail");
+        const p = el("p", "lab-meta",
+          "similarity: " + item.similarity.toFixed(4) +
+          " (ref " + THRESHOLD + ") " + (item.similarity >= THRESHOLD ? "✓ pass" : "✗ below"));
+        p.classList.add(item.similarity >= THRESHOLD ? "pass" : "fail");
         card.appendChild(p);
       }
-      card.appendChild(audioEl("/voice_qc/" + encodeURIComponent(c.label) + ".wav"));
-      list.appendChild(card);
+    } else if (sectionId === "test") {
+      card.appendChild(metaLine(["file: " + item.file]));
+      if (item.transcript) card.appendChild(metaLine(["ground truth: " + item.transcript]));
+    }
+    card.appendChild(audioEl(item.file));
+    return card;
+  }
+
+  function renderLibrary(library) {
+    const host = document.getElementById("librarySections");
+    library.sections.forEach((section) => {
+      const s = document.createElement("section");
+      s.appendChild(el("h2", null, section.title + " (" + section.items.length + ")"));
+      if (!section.items.length) {
+        s.appendChild(el("p", "lab-hint", "Empty."));
+      }
+      section.items.forEach((item) => s.appendChild(itemCard(item, section.id)));
+      host.appendChild(s);
+    });
+  }
+
+  function setupUpload() {
+    const input = document.getElementById("uploadInput");
+    const list = document.getElementById("uploadList");
+    input.addEventListener("change", () => {
+      list.innerHTML = "";
+      Array.from(input.files).forEach((f) => {
+        const card = el("div", "lab-card");
+        card.appendChild(el("h4", null, f.name));
+        card.appendChild(metaLine([
+          (f.size / 1024).toFixed(0) + " KB",
+          f.type || "unknown type",
+          "staged, not saved →",
+        ]));
+        card.appendChild(metaLine([
+          "next: save to speaker_voices/ → prepare_voice_corpus.py → update_voice_lab_library.py",
+        ]));
+        card.appendChild(audioEl(URL.createObjectURL(f)));
+        list.appendChild(card);
+      });
     });
   }
 
   async function main() {
+    setupUpload();
     try {
-      const status = await getJSON("/api/voice-lab/status");
-      renderStatus(status);
-      renderQC(status);
+      const r = await fetch("library.json");
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      renderLibrary(await r.json());
     } catch (e) {
-      const err = document.getElementById("statusError");
-      err.textContent = "Status failed: " + e.message + " (is the backend running?)";
-      err.classList.remove("hidden");
-    }
-    try {
-      renderVoices(await getJSON("/api/voices"));
-    } catch (e) {
-      document.getElementById("voicesList")
-        .appendChild(el("p", "lab-error", "Voices failed: " + e.message));
+      const host = document.getElementById("librarySections");
+      host.appendChild(el("p", "lab-error",
+        "Could not load library.json (" + e.message + "). " +
+        "If you opened lab.html via file:// and the sections below are empty, serve the repo instead: " +
+        "python3 -m http.server 8080  →  http://localhost:8080/ui/voice-lab/lab.html"));
     }
   }
 
