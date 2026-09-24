@@ -110,6 +110,9 @@ def create_app(db_session_local_override=None) -> FastAPI:
     _app.mount("/ui", StaticFiles(directory="ui"), name="ui")
     _app.mount("/ui/images", StaticFiles(directory="ui/images"), name="images") # Explicitly mount images
     _app.mount("/speaker_voices", StaticFiles(directory="speaker_voices"), name="speaker_voices")
+    # Voice-lab eval page (ui/voice-lab/): serves QC candidate audio + manifests.
+    # Read-only static mount, same pattern as /speaker_voices above.
+    _app.mount("/voice_qc", StaticFiles(directory="processed/voice_qc"), name="voice_qc")
 
     # Templates for serving HTML
     templates = Jinja2Templates(directory="ui")
@@ -322,6 +325,7 @@ if __name__ == "__main__":
     # Ensure piper_models and speaker_voices directories exist
     os.makedirs("backend/tts/piper_models", exist_ok=True)
     os.makedirs("speaker_voices", exist_ok=True)
+    os.makedirs("processed/voice_qc", exist_ok=True)
     uvicorn.run(
         "app:app", # Changed to reference the app object directly
         host="0.0.0.0",

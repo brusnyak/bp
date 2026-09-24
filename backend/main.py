@@ -705,6 +705,67 @@ async def get_voices(
     
     return user_voices
 
+@router.get("/voice-lab/status", summary="Voice-lab system status (no auth, local eval page)")
+async def voice_lab_status():
+    """Read-only status for the local voice-lab eval page (ui/voice-lab/).
+
+    Instantiates nothing — engine flags come from classes, hardware from
+    backend/hardware.py detection, QC state from processed/voice_qc/ manifests.
+    """
+    from backend import hardware
+
+    engine_classes = {
+        "piper": PiperTTS,
+        "piper_personal": PiperTTS,
+        "piper_personal_v2": PiperTTS,
+        "xtts": CoquiTTS,
+        "hybrid": HybridTTS,
+        "omnivoice": OmniVoiceTTS,
+    }
+    engines = {
+        key: {
+            "cloning": bool(getattr(cls, "SUPPORTS_CLONING", False)),
+            "streaming": bool(getattr(cls, "SUPPORTS_STREAMING", False)),
+            "requires_speaker_wav": bool(getattr(cls, "REQUIRES_SPEAKER_WAV", False)),
+        }
+        for key, cls in engine_classes.items()
+    }
+
+    backends = {}
+    for stage in ("stt", "mt", "tts_baseline", "tts_clone"):
+        try:
+            backends[stage] = hardware.detect_backend(stage)
+        except Exception as e:
+            backends[stage] = f"error: {e}"
+
+    piper_dir = os.path.join("backend", "tts", "piper_models")
+    try:
+        piper_models = sorted(f[:-5] for f in os.listdir(piper_dir) if f.endswith(".onnx"))
+    except OSError:
+        piper_models = []
+
+    qc_dir = os.path.join("processed", "voice_qc")
+    qc_manifest, qc_scores = None, None
+    try:
+        with open(os.path.join(qc_dir, "candidates.json")) as f:
+            qc_manifest = json.load(f)
+    except (OSError, ValueError):
+        pass
+    try:
+        with open(os.path.join(qc_dir, "scores.json")) as f:
+            qc_scores = json.load(f)
+    except (OSError, ValueError):
+        pass
+
+    return {
+        "engines": engines,
+        "hardware_backends": backends,
+        "piper_models": piper_models,
+        "qc_candidates": (qc_manifest or {}).get("candidates", []),
+        "qc_scores": (qc_scores or {}).get("results", []),
+        "qc_scored": qc_scores is not None,
+    }
+
 def get_initialized_models(client_info: str, session_config: Dict[str, Any]) -> Tuple[Optional[FasterWhisperSTT], Optional[CTranslate2MT], Optional[Any], Optional[Any], str]:
     """Returns the currently initialized model instances and current TTS choice based on session config."""
     session_data = active_sessions.get(client_info)
