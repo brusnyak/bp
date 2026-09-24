@@ -1,4 +1,4 @@
-.PHONY: install install-deps run test certs clean help
+.PHONY: install install-deps run lab library qc qc-score test certs clean help
 
 # Detect operating system
 ifeq ($(OS),Windows_NT)
@@ -52,7 +52,7 @@ install: ## Install all Python and Node.js dependencies, including models.
 	$(PYTHON_EXEC) backend/tts/download_piper_models.py sk_SK-lili-medium
 	$(PYTHON_EXEC) backend/tts/download_piper_models.py cs_CZ-jirka-medium
 	@echo "--- Installing frontend dependencies ---"
-	cd frontend && npm install
+	npm install
 	@echo "--- Installation complete. ---"
 
 run: ## Run the FastAPI backend server.
@@ -61,18 +61,17 @@ run: ## Run the FastAPI backend server.
 test: ## Run the comprehensive backend test suite.
 	$(DYLD_ENV) TORCH_USE_LIBAV=0 TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1 PYTHONHASHSEED=random $(PYTHON_EXEC) test/piper_pipeline_test.py
 	$(DYLD_ENV) TORCH_USE_LIBAV=0 TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1 PYTHONHASHSEED=random $(PYTHON_EXEC) -m pytest test/vad_tests.py | cat
-	PYTHONPATH=. $(DYLD_ENV) TORCH_USE_LIBAV=0 TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1 PYTHONHASHSEED=random $(PYTHON_EXEC) test/coqui_tts_test.py
+	$(DYLD_ENV) TORCH_USE_LIBAV=0 TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1 PYTHONHASHSEED=random $(PYTHON_EXEC) -m pytest test/hardware_test.py | cat
 
 certs: ## Generate SSL certificates for HTTPS/WSS.
 	@mkdir -p certs
 	$(OPENSSL_CMD) req -x509 -newkey rsa:4096 -nodes -out certs/cert.pem -keyout certs/key.pem -days 365 -subj "/CN=localhost"
 
-clean: ## Clean up generated files and caches.
+clean: ## Clean up generated files and caches (never touches speaker_voices/).
 	find . -name "__pycache__" -type d -exec rm -rf {} +
 	find . -name "*.pyc" -type f -delete
 	rm -f output_*.wav
 	rm -rf ct2_models/*
-	rm -rf speaker_voices/*
 	@echo "Cleaned up build artifacts and generated files."
 
 distclean: clean ## Clean up all generated files, caches, and downloaded models.
@@ -81,6 +80,20 @@ distclean: clean ## Clean up all generated files, caches, and downloaded models.
 	rm -rf backend/tts/piper_models/*.json
 	rm -rf $(VENV_NAME)
 	@echo "Deep clean complete. You may need to run 'make install' again."
+
+lab: ## Serve the Voice Lab review page (no backend needed).
+	@echo "--- Voice Lab at http://localhost:8080/ui/voice-lab/lab.html ---"
+	python3 -m http.server 8080
+
+library: ## Refresh the Voice Lab manifest after new recordings/QC runs.
+	python3 scripts/update_voice_lab_library.py
+
+qc: ## Synthesize QC candidates from live TTS engines (project venv).
+	$(VENV_NAME)/bin/python scripts/voice_similarity_qc.py --synthesize-only
+
+qc-score: ## Score QC candidates (needs isolated qc venv with resemblyzer).
+	@echo "Setup once: python3 -m venv ../qc-venv && ../qc-venv/bin/pip install resemblyzer \"setuptools<81\""
+	@echo "Then:      ../qc-venv/bin/python scripts/voice_similarity_qc.py --score-only"
 
 help: ## Display this help message.
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
