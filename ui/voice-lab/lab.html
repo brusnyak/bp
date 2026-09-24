@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+    <title>Voice Lab — review &amp; evaluate</title>
+    <link rel="stylesheet" href="/ui/global-styles.css" />
+    <link rel="stylesheet" href="/ui/voice-lab/lab-style.css" />
+  </head>
+  <body>
+    <header class="lab-header">
+      <div>
+        <h1>Voice Lab</h1>
+        <p class="lab-sub">Local eval page: voices, QC candidates, system status. No file-hunting.</p>
+      </div>
+      <nav><a href="/ui/live-speech/live.html">← Live translation</a></nav>
+    </header>
+
+    <main>
+      <section id="statusSection">
+        <h2>System status</h2>
+        <div id="statusError" class="lab-error hidden"></div>
+        <div class="lab-grid">
+          <div>
+            <h3>TTS engines</h3>
+            <table id="enginesTable">
+              <thead><tr><th>Engine</th><th>Clone</th><th>Stream</th><th>Needs ref</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div>
+            <h3>Hardware backends</h3>
+            <table id="backendsTable">
+              <thead><tr><th>Stage</th><th>Backend</th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <h3>Piper models on disk</h3>
+            <ul id="piperModels"></ul>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Speaker voices (reference recordings)</h2>
+        <p class="lab-hint">Source: <code>/api/voices</code> + <code>speaker_voices/speaker_voices.json</code>. Audio served from <code>/speaker_voices/</code>.</p>
+        <div id="voicesList"></div>
+      </section>
+
+      <section>
+        <h2>QC candidates</h2>
+        <p class="lab-hint">Source: <code>processed/voice_qc/candidates.json</code> (+ <code>scores.json</code> once <code>--score-only</code> has run). Regenerate: <code>venv/bin/python scripts/voice_similarity_qc.py --synthesize-only</code></p>
+        <div id="qcList"></div>
+      </section>
+    </main>
+
+    <script src="/ui/voice-lab/lab.js"></script>
+  </body>
+</html>
