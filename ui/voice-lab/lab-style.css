@@ -1,4 +1,8 @@
-/* Voice Lab — small local overrides on top of global-styles.css */
+/* Voice Lab — standalone, no dependency on global-styles.css (page works backend-free). */
+:root { --border: #444; }
+@media (prefers-color-scheme: light) { :root { --border: #ccc; } }
+body { font-family: system-ui, sans-serif; margin: 0; }
+a { color: inherit; }
 .lab-header {
   display: flex;
   justify-content: space-between;

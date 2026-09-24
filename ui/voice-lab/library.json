@@ -1,0 +1,115 @@
+{
+  "sections": [
+    {
+      "id": "voices",
+      "title": "Speaker voices (reference recordings)",
+      "items": [
+        {
+          "name": "2_my voice 1",
+          "file": "../../speaker_voices/2_my voice 1.wav",
+          "language": "en",
+          "transcript": "Reading these statements, I agree to provide my voice for cloning in purposes.  My voice will be used to synthesize translated speech within this application.",
+          "in_registry": true
+        },
+        {
+          "name": "Can you hear me_",
+          "file": "../../speaker_voices/Can you hear me_.wav",
+          "language": "en",
+          "transcript": "Hey laddy can you hear me well?",
+          "in_registry": true
+        },
+        {
+          "name": "My test speech_xtts_speaker_clean",
+          "file": "../../speaker_voices/My test speech_xtts_speaker_clean.wav",
+          "language": "en",
+          "transcript": "In this experiment, the system converts spoken English into text.  Translate it into Slava and then send the sizes it back into speech.  The process involves three stages, speech recognition, machine translation and text to speech.  Each model introduces a small delay, so we will measure the overall latency.  The main objective is to achieve natural communication despite language barriers.",
+          "in_registry": true
+        },
+        {
+          "name": "hello",
+          "file": "../../speaker_voices/hello.wav",
+          "language": "en",
+          "transcript": "Hello, this is a test of my voice for cloning purposes.",
+          "in_registry": true
+        },
+        {
+          "name": "voice_rec_1m",
+          "file": "../../speaker_voices/voice_rec_1m.m4a",
+          "language": "?",
+          "transcript": "",
+          "in_registry": false
+        },
+        {
+          "name": "voice_rec_1m",
+          "file": "../../speaker_voices/voice_rec_1m.wav",
+          "language": "en",
+          "transcript": "When the sunlight strikes raindrops in the air, they act as a prism and form a rainbow. The rainbow is a division of white light into many beautiful colors. These take the shape of a long round arch, with its path high above, and its two ends apparently beyond the horizon. There is, according to legend, a boiling pot of gold at one end. People look, but no one ever finds it. When a man looks for something beyond his reach, his friends say he is looking for the pot of gold at the end of the rainbow.",
+          "in_registry": true
+        }
+      ]
+    },
+    {
+      "id": "qc",
+      "title": "QC candidates (engine outputs)",
+      "items": [
+        {
+          "name": "hybrid_en",
+          "file": "../../processed/voice_qc/hybrid_en.wav",
+          "engine": "hybrid",
+          "language": "en",
+          "sample_rate": 22050,
+          "synthesis_latency_s": 1.2692,
+          "similarity": null
+        },
+        {
+          "name": "hybrid_sk",
+          "file": "../../processed/voice_qc/hybrid_sk.wav",
+          "engine": "hybrid",
+          "language": "sk",
+          "sample_rate": 22050,
+          "synthesis_latency_s": 6.9575,
+          "similarity": null
+        },
+        {
+          "name": "piper_generic_sk",
+          "file": "../../processed/voice_qc/piper_generic_sk.wav",
+          "engine": "piper",
+          "language": "sk",
+          "sample_rate": 22050,
+          "synthesis_latency_s": 0.2665,
+          "similarity": null
+        },
+        {
+          "name": "piper_personal_en",
+          "file": "../../processed/voice_qc/piper_personal_en.wav",
+          "engine": "piper_personal",
+          "language": "en",
+          "sample_rate": 22050,
+          "synthesis_latency_s": 0.257,
+          "similarity": null
+        }
+      ]
+    },
+    {
+      "id": "test",
+      "title": "Test clips (pipeline inputs)",
+      "items": [
+        {
+          "name": "Can you hear me_",
+          "file": "../../test/Can you hear me_.wav",
+          "transcript": ""
+        },
+        {
+          "name": "Hello",
+          "file": "../../test/Hello.wav",
+          "transcript": "Hello, this is a test of my voice for cloning purposes."
+        },
+        {
+          "name": "My test speech_xtts_speaker_clean",
+          "file": "../../test/My test speech_xtts_speaker_clean.wav",
+          "transcript": ""
+        }
+      ]
+    }
+  ]
+}
