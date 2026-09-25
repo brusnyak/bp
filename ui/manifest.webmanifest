@@ -1,0 +1,16 @@
+{
+  "name": "Hlas — live voice translation in your own voice",
+  "short_name": "Hlas",
+  "description": "Near-real-time EN↔SK speech translation with voice cloning. Local-first STT→MT→TTS pipeline with floating subtitles.",
+  "id": "/ui/live-speech/live.html",
+  "start_url": "/ui/live-speech/live.html",
+  "scope": "/ui/",
+  "display": "standalone",
+  "background_color": "#0A1C4F",
+  "theme_color": "#0A1C4F",
+  "lang": "en",
+  "icons": [
+    { "src": "/ui/images/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/ui/images/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
