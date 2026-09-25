@@ -145,8 +145,30 @@
     });
   }
 
+  function setupPlanToggle() {
+    const btn = document.getElementById("planToggle");
+    const panel = document.getElementById("planPanel");
+    const pre = document.getElementById("planPre");
+    let loaded = false;
+    btn.addEventListener("click", async () => {
+      const open = panel.classList.toggle("hidden");
+      btn.textContent = open ? "show" : "hide";
+      if (!open || loaded) return;
+      try {
+        const r = await fetch("../../PLAN.md");
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        pre.textContent = await r.text();
+      } catch (e) {
+        pre.textContent = "Could not load PLAN.md (" + e.message + "). " +
+          "Serve the repo over HTTP (make lab) or read PLAN.md at the repo root.";
+      }
+      loaded = true;
+    });
+  }
+
   async function main() {
     setupUpload();
+    setupPlanToggle();
     try {
       const r = await fetch("library.json");
       if (!r.ok) throw new Error("HTTP " + r.status);
