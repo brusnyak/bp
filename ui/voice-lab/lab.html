@@ -15,6 +15,7 @@
         <div>
           <h1>Voice Lab</h1>
           <p class="lab-sub">Static review page: voices, QC candidates, test clips. No backend needed.</p>
+          <div class="lab-stats" id="statStrip"></div>
         </div>
         <nav class="lab-nav">
           <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
@@ -31,7 +32,11 @@
         <p class="lab-hint">Files stay in the browser only (listen + stage here). To register one: save it into
           <code>speaker_voices/</code>, run <code>python3 scripts/prepare_voice_corpus.py --source-dir speaker_voices --write</code>,
           then <code>python3 scripts/update_voice_lab_library.py</code> to refresh this page.</p>
-        <input type="file" id="uploadInput" accept="audio/*" multiple />
+        <div class="lab-dropzone" id="dropzone">
+          <input type="file" id="uploadInput" accept="audio/*" multiple />
+          <p><strong>Drop audio files here</strong> or click to browse</p>
+          <p class="lab-hint">WAV, M4A, MP3 — staged locally, nothing uploads anywhere.</p>
+        </div>
         <div id="uploadList"></div>
       </section>
 
@@ -41,9 +46,8 @@
         <h2>Refresh this page data</h2>
         <p class="lab-hint"><code>python3 scripts/update_voice_lab_library.py</code> rescans
           <code>speaker_voices/</code>, <code>processed/voice_qc/</code>, <code>test/</code> into
-          <code>ui/voice-lab/library.json</code>. Or <code>make library</code>. Live system status
-          (engines, hardware backends) is at <code>/api/voice-lab/status</code> while the backend runs
-          (<code>make run</code>).</p>
+          <code>ui/voice-lab/library.json</code>. Live system status (engines, hardware backends) is at
+          <code>/api/voice-lab/status</code> while the backend runs (<code>make run</code>).</p>
       </section>
     </main>
 

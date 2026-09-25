@@ -19,18 +19,36 @@
     return a;
   }
 
+  function pill(text, kind) {
+    return el("span", "pill " + kind, text);
+  }
+
   function metaLine(parts) {
     return el("p", "lab-meta", parts.filter(Boolean).join(" · "));
   }
 
   function itemCard(item, sectionId) {
     const card = el("div", "lab-card");
-    card.appendChild(el("h4", null, item.name));
+    const top = el("div", "lab-card-top");
+    top.appendChild(el("h4", null, item.name));
+    if (sectionId === "qc") {
+      if (item.similarity === undefined || item.similarity === null) {
+        top.appendChild(pill("not scored", "idle"));
+      } else {
+        top.appendChild(pill(
+          item.similarity >= THRESHOLD ? "✓ pass" : "✗ below",
+          item.similarity >= THRESHOLD ? "pass" : "fail"));
+      }
+    } else if (sectionId === "voices") {
+      top.appendChild(pill(
+        item.in_registry ? "in registry" : "not registered",
+        item.in_registry ? "pass" : "fail"));
+    }
+    card.appendChild(top);
     if (sectionId === "voices") {
       card.appendChild(metaLine([
         "language: " + (item.language || "?"),
         "file: " + item.file,
-        item.in_registry ? "in registry ✓" : "NOT in registry ✗",
       ]));
       if (item.transcript) card.appendChild(metaLine(["transcript: " + item.transcript]));
     } else if (sectionId === "qc") {
@@ -40,16 +58,9 @@
         item.sample_rate ? item.sample_rate + " Hz" : null,
         item.synthesis_latency_s !== undefined && item.synthesis_latency_s !== null
           ? "synth: " + item.synthesis_latency_s + "s" : null,
+        item.similarity !== undefined && item.similarity !== null
+          ? "similarity: " + item.similarity.toFixed(4) + " (ref " + THRESHOLD + ")" : null,
       ]));
-      if (item.similarity === undefined || item.similarity === null) {
-        card.appendChild(metaLine(["similarity: — (run --score-only in the qc venv)"]));
-      } else {
-        const p = el("p", "lab-meta",
-          "similarity: " + item.similarity.toFixed(4) +
-          " (ref " + THRESHOLD + ") " + (item.similarity >= THRESHOLD ? "✓ pass" : "✗ below"));
-        p.classList.add(item.similarity >= THRESHOLD ? "pass" : "fail");
-        card.appendChild(p);
-      }
     } else if (sectionId === "test") {
       card.appendChild(metaLine(["file: " + item.file]));
       if (item.transcript) card.appendChild(metaLine(["ground truth: " + item.transcript]));
@@ -58,7 +69,26 @@
     return card;
   }
 
+  function renderStats(library) {
+    const strip = document.getElementById("statStrip");
+    const counts = {};
+    library.sections.forEach((s) => { counts[s.id] = s.items.length; });
+    const scored = (library.sections.find((s) => s.id === "qc") || { items: [] }).items
+      .filter((i) => i.similarity !== undefined && i.similarity !== null).length;
+    [
+      ["Voices", counts.voices || 0],
+      ["QC candidates", counts.qc || 0],
+      ["Scored", scored],
+      ["Test clips", counts.test || 0],
+    ].forEach(([label, n]) => {
+      const chip = el("span", "lab-stat", label);
+      chip.prepend(el("strong", null, String(n)));
+      strip.appendChild(chip);
+    });
+  }
+
   function renderLibrary(library) {
+    renderStats(library);
     const host = document.getElementById("librarySections");
     library.sections.forEach((section) => {
       const s = document.createElement("section");
@@ -71,25 +101,47 @@
     });
   }
 
-  function setupUpload() {
-    const input = document.getElementById("uploadInput");
+  let stagedURLs = [];
+  function stageFiles(files) {
+    stagedURLs.forEach((u) => URL.revokeObjectURL(u)); // don't leak blobs across re-stages
+    stagedURLs = [];
     const list = document.getElementById("uploadList");
-    input.addEventListener("change", () => {
-      list.innerHTML = "";
-      Array.from(input.files).forEach((f) => {
-        const card = el("div", "lab-card");
-        card.appendChild(el("h4", null, f.name));
-        card.appendChild(metaLine([
-          (f.size / 1024).toFixed(0) + " KB",
-          f.type || "unknown type",
-          "staged, not saved →",
-        ]));
-        card.appendChild(metaLine([
-          "next: save to speaker_voices/ → prepare_voice_corpus.py → update_voice_lab_library.py",
-        ]));
-        card.appendChild(audioEl(URL.createObjectURL(f)));
-        list.appendChild(card);
-      });
+    list.innerHTML = "";
+    Array.from(files).forEach((f) => {
+      const url = URL.createObjectURL(f);
+      stagedURLs.push(url);
+      const card = el("div", "lab-card");
+      const top = el("div", "lab-card-top");
+      top.appendChild(el("h4", null, f.name));
+      top.appendChild(pill("staged, not saved", "idle"));
+      card.appendChild(top);
+      card.appendChild(metaLine([
+        (f.size / 1024).toFixed(0) + " KB",
+        f.type || "unknown type",
+      ]));
+      card.appendChild(metaLine([
+        "next: save to speaker_voices/ → prepare_voice_corpus.py → update_voice_lab_library.py",
+      ]));
+      card.appendChild(audioEl(url));
+      list.appendChild(card);
+    });
+  }
+
+  function setupUpload() {
+    const zone = document.getElementById("dropzone");
+    const input = document.getElementById("uploadInput");
+    zone.addEventListener("click", () => input.click());
+    input.addEventListener("change", () => { if (input.files.length) stageFiles(input.files); });
+    ["dragenter", "dragover"].forEach((ev) => zone.addEventListener(ev, (e) => {
+      e.preventDefault();
+      zone.classList.add("dragover");
+    }));
+    ["dragleave", "drop"].forEach((ev) => zone.addEventListener(ev, (e) => {
+      e.preventDefault();
+      zone.classList.remove("dragover");
+    }));
+    zone.addEventListener("drop", (e) => {
+      if (e.dataTransfer && e.dataTransfer.files.length) stageFiles(e.dataTransfer.files);
     });
   }
 

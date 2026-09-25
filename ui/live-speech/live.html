@@ -188,6 +188,19 @@
         </div>
       </div>
 
+      <!-- Live subtitle strip: streaming captions (caption_partial) + latest final
+        transcript. Doubles as the projector subtitle line for stage demos. -->
+      <div
+        class="subtitle-strip"
+        id="subtitleStrip"
+        role="status"
+        aria-live="polite"
+        aria-label="Live subtitles"
+      >
+        <span class="subtitle-dot" id="subtitleDot" aria-hidden="true"></span>
+        <span id="captionLive">Subtitles appear here once you start speaking…</span>
+      </div>
+
       <!-- Main content: Two columns -->
       <div class="content">
         <!-- Left Column: Transcription -->

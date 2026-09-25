@@ -1,4 +1,4 @@
-/* Voice Lab — same visual language as the main pages (global-styles.css variables). */
+/* Voice Lab — house style: global-styles.css variables, 1rem cards, soft shadow. */
 body {
   margin: 0;
   padding: 0;
@@ -7,14 +7,14 @@ body {
   background-color: var(--background-color-start);
 }
 
-a { color: var(--primary-color); text-decoration: none; }
+a { color: var(--primary-color); text-decoration: none; transition: color 0.3s ease; }
 a:hover { color: var(--primary-color-dark); text-decoration: underline; }
 
-/* Hero band — mirrors the home page hero section color */
+/* Hero band */
 .lab-hero {
-  background-color: var(--section-bg-hero);
+  background: linear-gradient(135deg, var(--dark-blue) 0%, var(--deep-berry) 130%);
   color: #fff;
-  padding: 3rem 1.5rem 2.25rem;
+  padding: 3.5rem 1.5rem 2.5rem;
 }
 .lab-hero-inner {
   max-width: 1100px;
@@ -26,52 +26,104 @@ a:hover { color: var(--primary-color-dark); text-decoration: underline; }
 }
 .lab-hero h1 {
   font-family: var(--font-heading);
-  font-size: 2.5rem;
+  font-size: 2.75rem;
   margin: 0;
   color: #fff;
+  line-height: 1.2;
 }
-.lab-sub { margin: 0.5rem 0 0; color: rgba(255, 255, 255, 0.75); }
+.lab-sub { margin: 0.5rem 0 1.25rem; color: rgba(255, 255, 255, 0.78); font-size: 1.05rem; }
 .lab-nav { display: flex; align-items: center; gap: 1rem; white-space: nowrap; }
 .lab-nav a { color: #fff; font-weight: 600; }
 .theme-toggle-btn {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 10px;
   color: #fff;
   cursor: pointer;
-  padding: 0.35rem 0.5rem;
+  padding: 0.4rem 0.55rem;
   line-height: 0;
 }
+.theme-toggle-btn:hover { background: rgba(255, 255, 255, 0.22); }
+
+/* Stat chips */
+.lab-stats { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.lab-stat {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+.lab-stat strong { font-size: 1.05rem; margin-right: 0.25rem; }
 
 /* Content */
-.lab-container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+.lab-container { max-width: 1100px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
 section { margin-bottom: 2.5rem; }
-h2 {
+section > h2 {
   font-family: var(--font-heading);
   font-size: 1.8rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 3px solid var(--primary-color);
+  display: inline-block;
 }
-.lab-hint { color: var(--secondary-color); font-size: 0.9rem; }
-.lab-hint code { font-size: 0.8rem; }
+.lab-hint { color: var(--secondary-color); font-size: 0.92rem; line-height: 1.6; }
+.lab-hint code { font-size: 0.82rem; }
 
-/* Cards — surface + shadow, like home feature cards */
+/* Upload dropzone */
+.lab-dropzone {
+  border: 2px dashed var(--border-color);
+  border-radius: 1rem;
+  background: var(--surface-color);
+  padding: 1.75rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  margin-top: 1rem;
+}
+.lab-dropzone:hover, .lab-dropzone.dragover {
+  border-color: var(--primary-color);
+  background: var(--light-berry);
+}
+[data-theme="dark"] .lab-dropzone:hover, [data-theme="dark"] .lab-dropzone.dragover {
+  background: rgba(255, 64, 129, 0.08);
+}
+.lab-dropzone input { display: none; }
+.lab-dropzone p { margin: 0.2rem 0; }
+
+/* Cards — same language as home feature cards */
 .lab-card {
   background: var(--surface-color);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
-  box-shadow: 0 2px 8px var(--shadow-color);
-  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  box-shadow: 0 5px 15px var(--shadow-color);
+  padding: 1.1rem 1.35rem;
   margin-bottom: 1rem;
 }
-.lab-card h4 { margin: 0 0 0.3rem; font-family: var(--font-heading); font-size: 1.15rem; }
-.lab-meta { font-size: 0.88rem; color: var(--secondary-color); margin: 0.2rem 0; }
+.lab-card h4 { margin: 0 0 0.3rem; font-family: var(--font-heading); font-size: 1.2rem; }
+.lab-card-top { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+.lab-meta { font-size: 0.88rem; color: var(--secondary-color); margin: 0.2rem 0; line-height: 1.55; }
 .lab-card audio { width: 100%; margin-top: 0.6rem; }
 
-#uploadInput {
-  margin: 0.5rem 0 1rem;
-  color: var(--text-color);
+/* Pills */
+.pill {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.15rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
-
-.lab-error { color: var(--danger-color); margin-bottom: 1rem; }
+.pill.pass { background: rgba(0, 163, 0, 0.12); color: var(--log-success-color); }
+.pill.fail { background: rgba(211, 47, 47, 0.1); color: var(--danger-color); }
+.pill.idle { background: var(--soft-gray); color: var(--secondary-color); }
 .pass { color: var(--log-success-color); }
 .fail { color: var(--danger-color); }
+
+.lab-error { color: var(--danger-color); margin-bottom: 1rem; }
+
+@media (max-width: 700px) {
+  .lab-hero-inner { flex-direction: column; }
+  .lab-hero h1 { font-size: 2rem; }
+}
