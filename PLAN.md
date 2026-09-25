@@ -33,6 +33,7 @@ Thesis rules: faculty guide + §4.1 AI rules → `Deklarácia k využitiu UI` sk
 |---|---|
 | `make lab` | Voice Lab review page, no backend |
 | `make run` | Full backend (https://localhost:8000) |
-| `make library` | Refresh Voice Lab manifest |
-| `make qc` / `make qc-score` | Synthesize / score QC candidates |
 | `make test` | Backend suite (existing files only) |
+| `python3 scripts/update_voice_lab_library.py` | Refresh Voice Lab manifest |
+| `venv/bin/python scripts/voice_similarity_qc.py --synthesize-only` | Synthesize QC candidates |
+| `../qc-venv/bin/python scripts/voice_similarity_qc.py --score-only` | Score QC candidates (qc venv, resemblyzer) |

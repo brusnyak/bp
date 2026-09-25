@@ -107,6 +107,9 @@ def create_app(db_session_local_override=None) -> FastAPI:
     manager = ConnectionManager()
 
     # Mount static files for the UI
+    # makedirs here (not only in __main__): StaticFiles raises at mount time on a
+    # clean checkout where processed/voice_qc doesn't exist yet.
+    os.makedirs("processed/voice_qc", exist_ok=True)
     _app.mount("/ui", StaticFiles(directory="ui"), name="ui")
     _app.mount("/ui/images", StaticFiles(directory="ui/images"), name="images") # Explicitly mount images
     _app.mount("/speaker_voices", StaticFiles(directory="speaker_voices"), name="speaker_voices")

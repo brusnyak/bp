@@ -824,6 +824,35 @@ body {
   font-style: italic;
 }
 
+/* Live subtitle strip (caption_partial + latest final transcript).
+   Projector-friendly: large type on a dark band in both themes. */
+.subtitle-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: #14141f;
+  color: #f4f4f5;
+  border-radius: 0.75rem;
+  padding: 0.9rem 1.25rem;
+  margin-bottom: 1.25rem;
+  font-size: 1.5rem;
+  line-height: 1.45;
+  min-height: 2.5rem;
+}
+.subtitle-strip .subtitle-dot {
+  flex: none;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background-color: #71717a;
+}
+.subtitle-strip.live .subtitle-dot {
+  background-color: #4ade80;
+}
+#captionLive {
+  overflow-wrap: anywhere;
+}
+
 .divider {
   width: 1px;
   background-color: var(--border-color);

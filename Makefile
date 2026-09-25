@@ -1,4 +1,4 @@
-.PHONY: install install-deps run lab library qc qc-score test certs clean help
+.PHONY: install install-deps run lab test certs clean help
 
 # Detect operating system
 ifeq ($(OS),Windows_NT)
@@ -84,16 +84,6 @@ distclean: clean ## Clean up all generated files, caches, and downloaded models.
 lab: ## Serve the Voice Lab review page (no backend needed).
 	@echo "--- Voice Lab at http://localhost:8080/ui/voice-lab/lab.html ---"
 	python3 -m http.server 8080
-
-library: ## Refresh the Voice Lab manifest after new recordings/QC runs.
-	python3 scripts/update_voice_lab_library.py
-
-qc: ## Synthesize QC candidates from live TTS engines (project venv).
-	$(VENV_NAME)/bin/python scripts/voice_similarity_qc.py --synthesize-only
-
-qc-score: ## Score QC candidates (needs isolated qc venv with resemblyzer).
-	@echo "Setup once: python3 -m venv ../qc-venv && ../qc-venv/bin/pip install resemblyzer \"setuptools<81\""
-	@echo "Then:      ../qc-venv/bin/python scripts/voice_similarity_qc.py --score-only"
 
 help: ## Display this help message.
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'

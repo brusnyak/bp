@@ -279,8 +279,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         showNotification('Model loading failed or is incomplete.', 'error');
                         logActivity('Model initialization failed', 'error');
                     }
+                } else if (message.type === 'caption_partial') {
+                    // T044 backend now has a face: streaming LocalAgreement caption,
+                    // shown ~2s ahead of the final transcript on the subtitle strip.
+                    const captionLive = document.getElementById('captionLive');
+                    if (captionLive) captionLive.textContent = message.text;
+                    const subtitleStrip = document.getElementById('subtitleStrip');
+                    if (subtitleStrip) subtitleStrip.classList.add('live');
                 } else if (message.type === 'transcription_result') {
                     document.getElementById('transcriptionOutput').textContent = message.transcribed;
+                    const captionLive = document.getElementById('captionLive');
+                    if (captionLive) captionLive.textContent = message.transcribed;
                     
                     // Update state indicator: Translating
                     const stateTranslating = document.getElementById('stateTranslating');
