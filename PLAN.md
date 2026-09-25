@@ -15,9 +15,11 @@ Thesis rules: faculty guide + §4.1 AI rules → `Deklarácia k využitiu UI` sk
 
 ## Now (one at a time)
 
-- [ ] **Captions in live UI** — render backend `caption_partial` in `ui/live-speech/` (plumbing exists since T044, screen shows nothing)
+- [x] **Captions in live UI** — subtitle strip + PiP pop-out (spec 002, committed)
+- [x] **Lab plan toggle** — live PLAN.md panel (committed)
+- [x] **DESIGN.md + skill** — house tokens, frontend-design global (committed)
 - [ ] **Your recordings** — EN top-up + SK read, 2–3 min each, quiet room (staged via Voice Lab upload box first)
-- [ ] **QC scoring** — qc venv + `make qc-score`, then blind listening (10 raters) → thesis table
+- [ ] **QC scoring** — qc venv + scoring run, then blind listening (10 raters) → thesis table
 
 ## Next
 
