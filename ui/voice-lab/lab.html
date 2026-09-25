@@ -28,6 +28,14 @@
 
     <main class="lab-container">
       <section>
+        <h2>Dev plan <button id="planToggle" class="btn-small">show</button></h2>
+        <p class="lab-hint">Live view of the repo <code>PLAN.md</code> — same file, zero drift.</p>
+        <div id="planPanel" class="hidden">
+          <pre id="planPre" class="lab-plan">loading…</pre>
+        </div>
+      </section>
+
+      <section>
         <h2>Upload for future processing</h2>
         <p class="lab-hint">Files stay in the browser only (listen + stage here). To register one: save it into
           <code>speaker_voices/</code>, run <code>python3 scripts/prepare_voice_corpus.py --source-dir speaker_voices --write</code>,

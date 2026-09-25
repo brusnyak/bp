@@ -286,10 +286,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (captionLive) captionLive.textContent = message.text;
                     const subtitleStrip = document.getElementById('subtitleStrip');
                     if (subtitleStrip) subtitleStrip.classList.add('live');
+                    updatePip(message.text, undefined);
                 } else if (message.type === 'transcription_result') {
                     document.getElementById('transcriptionOutput').textContent = message.transcribed;
                     const captionLive = document.getElementById('captionLive');
                     if (captionLive) captionLive.textContent = message.transcribed;
+                    updatePip(message.transcribed, undefined);
                     
                     // Update state indicator: Translating
                     const stateTranslating = document.getElementById('stateTranslating');
@@ -301,6 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (latencyChart) latencyChart.update();
                 } else if (message.type === 'translation_result') {
                     document.getElementById('translationOutput').textContent = message.translated;
+                    updatePip(undefined, message.translated);
                     
                     // Update state indicator: Speaking
                     const stateSpeaking = document.getElementById('stateSpeaking');
@@ -757,6 +760,88 @@ document.addEventListener('DOMContentLoaded', () => {
                 stopRealtimeAudioStreaming();
             } else {
                 startRealtimeAudioStreaming();
+            }
+        });
+    }
+
+    // PiP floating subtitles (spec 002 US1): hidden canvas-fed video popped out via
+    // requestPictureInPicture. Mirrors the subtitle strip (transcript + translation) so
+    // captions follow across tabs/windows/apps with zero installs. Needs a user gesture;
+    // unsupported browsers get a notice instead of silence.
+    let pipVideo = null, pipCanvas = null, pipCtx = null;
+    const pipLines = { transcript: '', translation: '' };
+
+    function wrapPipText(ctx, text, maxWidth) {
+        const words = String(text || '').split(/\s+/).filter(Boolean);
+        const lines = [];
+        let line = '';
+        words.forEach((w) => {
+            const test = line ? line + ' ' + w : w;
+            if (ctx.measureText(test).width > maxWidth && line) {
+                lines.push(line);
+                line = w;
+            } else {
+                line = test;
+            }
+        });
+        if (line) lines.push(line);
+        return lines.slice(-3); // keep the window to the last 3 lines per block
+    }
+
+    function drawPip() {
+        if (!pipCtx) return;
+        pipCtx.fillStyle = '#14141f';
+        pipCtx.fillRect(0, 0, pipCanvas.width, pipCanvas.height);
+        let y = 52;
+        pipCtx.fillStyle = '#f4f4f5';
+        pipCtx.font = '30px system-ui, sans-serif';
+        wrapPipText(pipCtx, pipLines.transcript, pipCanvas.width - 40).forEach((l) => {
+            pipCtx.fillText(l, 20, y);
+            y += 38;
+        });
+        pipCtx.fillStyle = '#4ade80';
+        pipCtx.font = '26px system-ui, sans-serif';
+        wrapPipText(pipCtx, pipLines.translation, pipCanvas.width - 40).forEach((l) => {
+            pipCtx.fillText(l, 20, y);
+            y += 34;
+        });
+    }
+
+    function updatePip(transcript, translation) {
+        if (transcript !== undefined) pipLines.transcript = transcript;
+        if (translation !== undefined) pipLines.translation = translation;
+        if (pipVideo && document.pictureInPictureElement === pipVideo) drawPip();
+    }
+
+    const pipBtn = document.getElementById('pipBtn');
+    if (pipBtn) {
+        pipBtn.addEventListener('click', async () => {
+            try {
+                if (document.pictureInPictureElement) {
+                    await document.exitPictureInPicture();
+                    return;
+                }
+                if (!('pictureInPictureEnabled' in document) || !document.pictureInPictureEnabled) {
+                    showNotification('Picture-in-Picture is not supported in this browser. The in-page subtitle strip still works.', 'error');
+                    return;
+                }
+                if (!pipCanvas) {
+                    pipCanvas = document.createElement('canvas');
+                    pipCanvas.width = 640;
+                    pipCanvas.height = 220;
+                    pipCtx = pipCanvas.getContext('2d');
+                    pipVideo = document.createElement('video');
+                    pipVideo.muted = true;
+                    pipVideo.playsInline = true;
+                    pipVideo.srcObject = pipCanvas.captureStream();
+                    await pipVideo.play();
+                    drawPip();
+                }
+                await pipVideo.requestPictureInPicture();
+                showNotification('Subtitles popped out — the window stays visible across apps.', 'success');
+            } catch (err) {
+                console.warn('Frontend: PiP failed:', err);
+                showNotification('Could not pop out subtitles: ' + (err && err.message ? err.message : err), 'error');
             }
         });
     }
