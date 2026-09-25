@@ -7,13 +7,14 @@
 subtitle window + virtual-mic routing, not a native shell. Demo target: Monday 2026-09-28,
 owner's Mac + AMD Windows laptop, live with handler if required, both EN→SK and SK→EN.
 
-## Vehicle decision (settled)
+## Vehicle decision (settled 2026-09-25)
 
-Native shells (Tauri/Electron/Swift) are OUT for the demo horizon. The PWA covers the
-app requirements: control-room UI (existing live page), PiP floating captions across
-tabs/windows/apps on the demo machine, virtual-mic device select for Zoom/Meet/Teams
-audio injection. Track B native shell stays parked post-defense. Constitution I
-(cross-platform, no vendor default) and III (Slovak non-negotiable) still govern.
+No separate native app. The existing web app converts to an installable PWA:
+`ui/manifest.webmanifest` + `ui/sw.js` (app-shell cache, API/WS/voices never cached) wired
+into the live page. Control-room UI + PiP floating captions + virtual-mic routing cover the
+app requirements cross-platform with zero new codebase. Track B native shell stays parked
+post-defense. Constitution I (cross-platform, no vendor default) and III (Slovak
+non-negotiable) still govern.
 
 ## User Scenarios & Testing
 
@@ -61,4 +62,5 @@ see done/now/next without asking.
 
 ## Assumptions
 - Owner's voice recordings gate only SK→EN liveness and final voice QC — not PiP, plan panel, DESIGN.md, or EN→SK demo.
-- Working name for the product: **LIVO** (proposed 2026-09-25; owner confirms). Full: live voice translation in your own voice, near real time.
+- Product name shortlist (owner decides): **Hlas** (SK "voice", recommended — short, own, handler-friendly) · LIVO · VoxBridge. Manifest currently ships Hlas.
+- Monday honesty rule: demo shows what is real (EN→SK Hybrid in owner's voice from existing EN clips, captions/PiP, Lab, plan) and labels what is pending (SK→EN live, sk_SK-personal quality voice). Continued-work showcase, not a finished-product claim.

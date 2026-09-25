@@ -17,5 +17,11 @@
 - [x] T008 DESIGN.md house tokens + frontend-design skill installed globally (3 harnesses + agent-rules)
 - [x] T009 Lab banner fixed to solid house hero (gradient banned)
 
+## Phase 5 — PWA conversion (no separate app, 2026-09-25)
+- [x] T011 manifest.webmanifest + icons + live.html wiring (Hlas)
+- [x] T012 ui/sw.js app-shell cache (API/WS/voices bypassed), registration in live.html
+- [ ] T013 Manual verify: install prompt + offline shell load on Mac Chrome + Windows Edge
+  (self-signed cert may block install — fallback: plain HTTPS page, still fully functional)
+
 ## Blocked on owner recordings
 - [ ] T010 Quiet-room sessions: EN top-up + SK read (gates SK→EN liveness, sk_SK-personal build, listening QC)

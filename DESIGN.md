@@ -45,5 +45,6 @@ choices second. Built from `ui/global-styles.css` (the contract) + the
 
 ## Product name
 
-**LIVO** — live voice translation in your own voice, near real time. Use it in titles,
+Shortlist (owner decides): **Hlas** (SK "voice" — recommended: short, own, handler-friendly) ·
+LIVO · VoxBridge. Manifest + icons currently ship Hlas. Use the chosen name in titles,
 demo scripts, and handler-facing material. (Legacy "Lingonberry" footer stays until renamed.)
