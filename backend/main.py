@@ -62,6 +62,9 @@ class UserLogin(BaseModel):
     email: str
     password: str
 
+class GoogleAuthRequest(BaseModel):
+    id_token: str
+
 from sqlalchemy.orm import Session
 from backend.utils.db_manager import get_db # Import get_db
 
@@ -453,6 +456,57 @@ async def login(user_login: UserLogin, db: Session = Depends(get_db_dependency))
         raise HTTPException(status_code=401, detail="Incorrect email or password")
     
     # Return mock token with user info in the format frontend expects
+    mock_token = f"mock-jwt-token-for-{user.email}"
+    return {
+        "message": "Login successful",
+        "token": mock_token,
+        "username": user.username,
+        "email": user.email
+    }
+
+@router.get("/auth/config", summary="Public auth config (Google client id or null)")
+async def auth_config():
+    """Lets the frontend decide whether to render the real Google button.
+    Inert when GOOGLE_CLIENT_ID is unset — password login keeps working."""
+    return {"google_client_id": os.environ.get("GOOGLE_CLIENT_ID")}
+
+@router.post("/auth/google", summary="Login with a Google ID token")
+async def login_with_google(body: GoogleAuthRequest, db: Session = Depends(get_db_dependency)):
+    """Verifies a Google Identity Services ID token, links/creates the user by
+    Google `sub`, and returns the same mock-token shape as /login so the
+    frontend storage flow is unchanged."""
+    client_id = os.environ.get("GOOGLE_CLIENT_ID")
+    if not client_id:
+        raise HTTPException(status_code=501, detail="Google login not configured. Set GOOGLE_CLIENT_ID (see documentation/supabase_auth_db_guide.md).")
+    try:
+        from google.oauth2 import id_token as google_id_token
+        from google.auth.transport import requests as google_requests
+        claims = google_id_token.verify_oauth2_token(body.id_token, google_requests.Request(), client_id)
+    except ImportError:
+        raise HTTPException(status_code=501, detail="google-auth package not installed. Run: pip install -r requirements.txt")
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid Google ID token")
+    sub = claims.get("sub")
+    email = claims.get("email")
+    if not sub or not email:
+        raise HTTPException(status_code=401, detail="Google token missing sub/email")
+    user = db.query(User).filter(User.google_sub == sub).first()
+    if user is None:
+        user = db.query(User).filter(User.email == email).first()
+        if user is None:
+            base = email.split("@")[0] or "user"
+            username = base
+            n = 1
+            while db.query(User).filter(User.username == username).first():
+                n += 1
+                username = f"{base}{n}"
+            user = User(username=username, email=email, hashed_password="", google_sub=sub)
+            db.add(user)
+            db.commit()
+            db.refresh(user)
+        else:
+            user.google_sub = sub
+            db.commit()
     mock_token = f"mock-jwt-token-for-{user.email}"
     return {
         "message": "Login successful",
