@@ -18,7 +18,8 @@ Thesis rules: faculty guide + §4.1 AI rules → `Deklarácia k využitiu UI` sk
 - [x] **Captions in live UI** — subtitle strip + PiP pop-out (spec 002, committed)
 - [x] **Lab plan toggle** — live PLAN.md panel (committed)
 - [x] **DESIGN.md + skill** — house tokens, frontend-design global (committed)
-- [ ] **Your recordings** — EN top-up + SK read, 2–3 min each, quiet room (staged via Voice Lab upload box first)
+- [x] **Google login** — ID-token endpoint + GIS button behind config flag (verified live, 401 on bad token); Supabase guide written, migration parked post-Monday
+- [ ] **Your recordings** — read `documentation/reading_script_bilingual.md` (18 EN+SK pairs, proofread SK first), 2–3 min per language, quiet room
 - [ ] **QC scoring** — qc venv + scoring run, then blind listening (10 raters) → thesis table
 
 ## Next

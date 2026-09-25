@@ -89,6 +89,62 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
 
+    // Google Sign-In (real button only when the backend is configured with
+    // GOOGLE_CLIENT_ID; otherwise the decorative buttons explain the setup).
+    async function setupGoogle() {
+        let clientId = null;
+        try {
+            const r = await fetch('/api/auth/config');
+            if (r.ok) clientId = (await r.json()).google_client_id;
+        } catch (e) { /* backend down — password forms still work */ }
+        const slots = document.querySelectorAll('.gis-slot');
+        const decorative = document.querySelectorAll('.google-button');
+        if (!clientId) {
+            decorative.forEach((b) => b.addEventListener('click', () => {
+                authMessage.textContent = 'Google login is not configured yet (backend needs GOOGLE_CLIENT_ID).';
+                authMessage.classList.add('error');
+            }));
+            return;
+        }
+        // Wait for the GIS script (async) before rendering.
+        let tries = 0;
+        while (!window.google || !window.google.accounts || !window.google.accounts.id) {
+            if (++tries > 50) return;
+            await new Promise((res) => setTimeout(res, 100));
+        }
+        window.google.accounts.id.initialize({
+            client_id: clientId,
+            callback: async (resp) => {
+                try {
+                    const r = await fetch('/api/auth/google', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id_token: resp.credential }),
+                    });
+                    const data = await r.json();
+                    if (!r.ok) {
+                        authMessage.textContent = data.detail || 'Google login failed.';
+                        authMessage.classList.add('error');
+                        return;
+                    }
+                    localStorage.setItem('userToken', data.token);
+                    localStorage.setItem('userName', data.username);
+                    localStorage.setItem('userEmail', data.email);
+                    window.location.href = '/ui/live-speech/live.html';
+                } catch (e) {
+                    authMessage.textContent = 'Network error or server unreachable.';
+                    authMessage.classList.add('error');
+                }
+            },
+        });
+        decorative.forEach((b) => { b.style.display = 'none'; });
+        slots.forEach((s) => window.google.accounts.id.renderButton(s, {
+            theme: 'outline', size: 'large', width: 280,
+            text: s.dataset.gisText === 'signup_with' ? 'signup_with' : 'signin_with',
+        }));
+    }
+    setupGoogle();
+
     // Initial form display
     showForm('login');
 });

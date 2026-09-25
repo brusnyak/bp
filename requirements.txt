@@ -101,6 +101,7 @@ sacremoses
 SQLAlchemy==2.0.30
 alembic==1.13.1
 python-jose[cryptography]==3.3.0
+google-auth==2.35.0  # Google ID-token verification (/api/auth/google); inert unless GOOGLE_CLIENT_ID is set
 
 # === UI Testing ===
 playwright==1.45.0

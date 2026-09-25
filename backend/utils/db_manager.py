@@ -1,5 +1,5 @@
 import logging
-from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy import create_engine, Column, Integer, String, text
 from sqlalchemy.orm import sessionmaker, Session, declarative_base # Import declarative_base from sqlalchemy.orm
 from fastapi import HTTPException
 
@@ -14,6 +14,7 @@ class User(Base):
     username = Column(String, unique=True, index=True) # Added username field
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+    google_sub = Column(String, unique=True, nullable=True) # Google OAuth subject (null = password-only user)
 
 def get_db_session_and_engine(database_url: str):
     """
@@ -33,6 +34,14 @@ SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
 def init_db(engine):
     """Initializes the database by creating all defined tables."""
     Base.metadata.create_all(bind=engine)
+    # Lightweight migration for pre-existing sqlite DBs: create_all() will not
+    # add columns to an existing `users` table. Idempotent — fails silently
+    # once the column exists.
+    try:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE users ADD COLUMN google_sub VARCHAR"))
+    except Exception:
+        pass
     logging.info("Database tables created/checked.")
 
 def get_db(db_session_local):

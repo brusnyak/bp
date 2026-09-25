@@ -40,6 +40,7 @@
                     <button type="submit" class="auth-button">Login</button>
                 </form>
                 <div class="social-login">
+                    <div class="gis-slot" data-gis-text="signin_with"></div>
                     <button class="google-button">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_of_Google__G_Suite.svg" alt="Google icon" width="20" height="20">
                         Sign in with Google
@@ -65,6 +66,7 @@
                     <button type="submit" class="auth-button">Register</button>
                 </form>
                 <div class="social-login">
+                    <div class="gis-slot" data-gis-text="signup_with"></div>
                     <button class="google-button">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_of_Google__G_Suite.svg" alt="Google icon" width="20" height="20">
                         Sign up with Google
@@ -74,6 +76,7 @@
             <div id="auth-message" class="auth-message"></div>
         </div>
     </div>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="/ui/theme-toggle.js"></script>
     <script src="auth.js"></script>
 </body>
