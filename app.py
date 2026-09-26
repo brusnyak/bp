@@ -1,4 +1,8 @@
 import uvicorn
+from dotenv import load_dotenv
+
+load_dotenv()  # local .env (GOOGLE_CLIENT_ID etc.) — untracked, never committed
+
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles

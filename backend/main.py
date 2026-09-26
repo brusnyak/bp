@@ -836,6 +836,25 @@ def get_initialized_models(client_info: str, session_config: Dict[str, Any]) -> 
     return stt_model_instance, main_mt_model, tts_model_instance, vad_instance, session_config["tts_model_choice"]
 
 # --- Core Speech Processing Pipeline ---
+_session_log_files: Dict[str, Any] = {}
+
+def _log_session_event(client_info: str, event: Dict[str, Any]):
+    """Append-only JSONL log per WebSocket session (transcripts, translations,
+    captions, latencies) for later accuracy review. Never raises — logging must
+    not break the pipeline. Files: processed/sessions/<stamp>_<client>.jsonl"""
+    try:
+        f = _session_log_files.get(client_info)
+        if f is None or f.closed:
+            safe = "".join(c if c.isalnum() else "_" for c in (client_info or "unknown"))
+            os.makedirs(os.path.join("processed", "sessions"), exist_ok=True)
+            stamp = time.strftime("%Y%m%d-%H%M%S")
+            f = open(os.path.join("processed", "sessions", f"{stamp}_{safe}.jsonl"), "a")
+            _session_log_files[client_info] = f
+        f.write(json.dumps({"ts": time.time(), **event}, ensure_ascii=False) + "\n")
+        f.flush()
+    except Exception as e:
+        logging.warning(f"Backend: session log write failed (non-fatal): {e}")
+
 async def _process_speech_segment_pipeline(
     websocket: WebSocket, audio_segment_np: np.ndarray, segment_start_time: float, is_final: bool = True,
     session_config: Dict[str, Any] = None # Add session_config parameter
@@ -866,6 +885,9 @@ async def _process_speech_segment_pipeline(
     # _save_audio_segment_for_debug(audio_segment_np, "stt_input", is_final) # Removed for less clutter
 
     client_info = f"{websocket.client.host}:{websocket.client.port}" if websocket.client else "unknown:unknown"
+    _log_session_event(client_info, {"type": "session_config", "dir": "in",
+        "source_lang": source_lang, "target_lang": target_lang,
+        "tts_model_choice": tts_model_choice, "speaker_wav_path": speaker_wav_path})
     session_data = active_sessions.get(client_info)
     if not session_data:
         logging.error(f"Backend: Session {client_info} not found in active_sessions. Cannot process speech segment.")
@@ -881,8 +903,12 @@ async def _process_speech_segment_pipeline(
         try:
             if is_bytes:
                 await websocket.send_bytes(payload)
+                _log_session_event(client_info, {"type": message_type, "dir": "out",
+                    "bytes": len(payload) if hasattr(payload, "__len__") else -1})
             else:
                 await websocket.send_text(json.dumps(payload))
+                if message_type != "tts_audio":
+                    _log_session_event(client_info, {"dir": "out", **payload})
         except websockets.exceptions.ConnectionClosedOK:
             logging.info(f"Backend: WebSocket connection already closed for {websocket.scope['client'][0]}:{websocket.scope['client'][1]}. Skipping send of {message_type}.")
         except Exception as e:
@@ -1112,6 +1138,7 @@ async def _feed_captioner_task(websocket, session_data, client_info, audio_chunk
             if text:
                 if websocket.client_state != WebSocketState.DISCONNECTED:
                     await websocket.send_text(json.dumps({"type": "caption_partial", "text": text}))
+                    _log_session_event(client_info, {"type": "caption_partial", "dir": "out", "text": text})
         except Exception as e:
             logging.error(f"Backend: Session {client_info}: captioner feed error (non-fatal): {e}")
 

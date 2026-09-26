@@ -139,8 +139,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         decorative.forEach((b) => { b.style.display = 'none'; });
         slots.forEach((s) => window.google.accounts.id.renderButton(s, {
-            theme: 'outline', size: 'large', width: 280,
-            text: s.dataset.gisText === 'signup_with' ? 'signup_with' : 'signin_with',
+            theme: "filled_black", size: "large", shape: "pill", width: 300,
+            text: s.dataset.gisText === "signup_with" ? "signup_with" : "signin_with",
         }));
     }
     setupGoogle();
