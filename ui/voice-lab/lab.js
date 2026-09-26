@@ -101,6 +101,58 @@
     });
   }
 
+  // Backend-aware upload: if the FastAPI backend answers, staged files can be
+  // REALLY uploaded (POST /api/voices/upload) instead of just previewed.
+  // Needs a login token (localStorage.userToken from /ui/auth/auth.html);
+  // without one the server 401s and we say so plainly.
+  let backendUp = false;
+  async function probeBackend() {
+    try {
+      const ctl = new AbortController();
+      const t = setTimeout(() => ctl.abort(), 3000);
+      const r = await fetch("/api/auth/config", { signal: ctl.signal });
+      clearTimeout(t);
+      backendUp = r.ok;
+    } catch (e) {
+      backendUp = false;
+    }
+    const hint = document.getElementById("backendHint");
+    if (hint) {
+      hint.textContent = backendUp
+        ? "Backend reachable: staged files can be uploaded for real (needs login)."
+        : "Backend not reachable: staging only (make run to enable real upload).";
+    }
+  }
+
+  async function uploadStaged(file, lang, msgEl) {
+    const token = localStorage.getItem("userToken");
+    const form = new FormData();
+    form.append("file", file, file.name);
+    form.append("voice_name", file.name.replace(/\.[^.]+$/, ""));
+    form.append("speaker_lang", lang);
+    try {
+      const r = await fetch("/api/voices/upload", {
+        method: "POST",
+        headers: token ? { Authorization: "Bearer " + token } : {},
+        body: form,
+      });
+      const data = await r.json().catch(() => ({}));
+      if (r.ok) {
+        msgEl.textContent = "Uploaded ✓ — refresh the manifest: python3 scripts/update_voice_lab_library.py";
+        msgEl.className = "lab-meta pass";
+      } else if (r.status === 401 || r.status === 403) {
+        msgEl.textContent = "Login required: sign in at /ui/auth/auth.html first, then upload again.";
+        msgEl.className = "lab-meta fail";
+      } else {
+        msgEl.textContent = "Upload failed: " + (data.detail || ("HTTP " + r.status));
+        msgEl.className = "lab-meta fail";
+      }
+    } catch (e) {
+      msgEl.textContent = "Upload failed: backend unreachable (" + e.message + ")";
+      msgEl.className = "lab-meta fail";
+    }
+  }
+
   let stagedURLs = [];
   function stageFiles(files) {
     stagedURLs.forEach((u) => URL.revokeObjectURL(u)); // don't leak blobs across re-stages
@@ -123,6 +175,28 @@
         "next: save to speaker_voices/ → prepare_voice_corpus.py → update_voice_lab_library.py",
       ]));
       card.appendChild(audioEl(url));
+      if (backendUp) {
+        const row = el("p", "lab-meta");
+        const sel = document.createElement("select");
+        sel.setAttribute("aria-label", "Speaker language");
+        ["en", "sk", "cs", "de"].forEach((l) => {
+          const o = document.createElement("option");
+          o.value = l;
+          o.textContent = l;
+          sel.appendChild(o);
+        });
+        const btn = el("button", "btn-small", "Upload for real");
+        const msg = el("p", "lab-meta", "");
+        btn.addEventListener("click", () => {
+          msg.textContent = "Uploading…";
+          uploadStaged(f, sel.value, msg);
+        });
+        row.appendChild(sel);
+        row.appendChild(document.createTextNode(" "));
+        row.appendChild(btn);
+        card.appendChild(row);
+        card.appendChild(msg);
+      }
       list.appendChild(card);
     });
   }
@@ -145,30 +219,34 @@
     });
   }
 
+  // Plan panel: fetched EAGERLY on page load (not on click) so a stuck "loading…"
+  // is impossible to confuse with an unfired request — check the server log.
+  async function loadPlan() {
+    const pre = document.getElementById("planPre");
+    try {
+      const r = await fetch("../../PLAN.md");
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      pre.textContent = await r.text();
+    } catch (e) {
+      pre.textContent = "Could not load PLAN.md (" + e.message + "). " +
+        "Serve the repo over HTTP (make lab) or read PLAN.md at the repo root.";
+    }
+  }
+
   function setupPlanToggle() {
     const btn = document.getElementById("planToggle");
     const panel = document.getElementById("planPanel");
-    const pre = document.getElementById("planPre");
-    let loaded = false;
-    btn.addEventListener("click", async () => {
-      const open = panel.classList.toggle("hidden");
-      btn.textContent = open ? "show" : "hide";
-      if (!open || loaded) return;
-      try {
-        const r = await fetch("../../PLAN.md");
-        if (!r.ok) throw new Error("HTTP " + r.status);
-        pre.textContent = await r.text();
-      } catch (e) {
-        pre.textContent = "Could not load PLAN.md (" + e.message + "). " +
-          "Serve the repo over HTTP (make lab) or read PLAN.md at the repo root.";
-      }
-      loaded = true;
+    btn.addEventListener("click", () => {
+      const hidden = panel.classList.toggle("hidden");
+      btn.textContent = hidden ? "show" : "hide";
     });
   }
 
   async function main() {
     setupUpload();
     setupPlanToggle();
+    loadPlan();
+    probeBackend();
     try {
       const r = await fetch("library.json");
       if (!r.ok) throw new Error("HTTP " + r.status);
