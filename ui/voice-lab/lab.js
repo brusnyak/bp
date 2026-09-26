@@ -224,7 +224,7 @@
   async function loadPlan() {
     const pre = document.getElementById("planPre");
     try {
-      const r = await fetch("../../PLAN.md");
+      const r = await fetch("../../PLAN.md", { cache: "no-store" });
       if (!r.ok) throw new Error("HTTP " + r.status);
       pre.textContent = await r.text();
     } catch (e) {
@@ -248,7 +248,7 @@
     loadPlan();
     probeBackend();
     try {
-      const r = await fetch("library.json");
+      const r = await fetch("library.json", { cache: "no-store" });
       if (!r.ok) throw new Error("HTTP " + r.status);
       renderLibrary(await r.json());
     } catch (e) {

@@ -81,8 +81,9 @@ distclean: clean ## Clean up all generated files, caches, and downloaded models.
 	rm -rf $(VENV_NAME)
 	@echo "Deep clean complete. You may need to run 'make install' again."
 
-lab: ## Serve the Voice Lab review page (no backend needed).
-	@echo "--- Voice Lab at http://localhost:8080/ui/voice-lab/lab.html ---"
+lab: ## Serve the Voice Lab review page (static only: no /api, no Google login, no real upload — use `make run` + https://localhost:8000/ui/voice-lab/lab.html for backend features).
+	@echo "--- Voice Lab (STATIC, no backend) at http://localhost:8080/ui/voice-lab/lab.html ---"
+	@echo "--- Need Google login or real upload? Use: make run → https://localhost:8000/ui/voice-lab/lab.html ---"
 	python3 -m http.server 8080
 
 help: ## Display this help message.
