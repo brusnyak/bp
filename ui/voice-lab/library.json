@@ -5,45 +5,17 @@
       "title": "Speaker voices (reference recordings)",
       "items": [
         {
-          "name": "2_my voice 1",
-          "file": "../../speaker_voices/2_my voice 1.wav",
+          "name": "en_script_reading",
+          "file": "../../speaker_voices/en_script_reading.m4a",
           "language": "en",
-          "transcript": "Reading these statements, I agree to provide my voice for cloning in purposes.  My voice will be used to synthesize translated speech within this application.",
+          "transcript": "Good morning, and welcome to this live demonstration of real-time speech translation.  I'm speaking English and you will hear my own voice begin Slovak within seconds.  The system listens through the microphone and detects when speech beans and ends.  First the speech is transcribed into text, then translated, then spoken again.  Very step runs locally on this computer, with no cloud and no waiting room.  A latency is the time between my words and the translated voice you hear.  Our goal is a delay of only a few seconds, short enough for natural conversation.  Voice cloning means the Slovak output sounds like me, not like a stranger.  To teach the system my voice, I recorded a few minutes of clean speech.  A quiet room matters more than an expensive microphone.  Please speak at a steady pace with short buzzes between sentences.  Numbers, names, and technical terms need extra care in both languages.  This subtitle line shows partial results while I'm still speaking.  You can pop the subtitles out into a floating window above any application.  The translated voice is routed into the meeting as a virtual microphone.  Other participants hear Slovak while I keep speaking English.  Questions from the audience will be translated in their opposite direction.  Thank you for listening, and I look forward to your questions.",
           "in_registry": true
         },
         {
-          "name": "Can you hear me_",
-          "file": "../../speaker_voices/Can you hear me_.wav",
-          "language": "en",
-          "transcript": "Hey laddy can you hear me well?",
-          "in_registry": true
-        },
-        {
-          "name": "My test speech_xtts_speaker_clean",
-          "file": "../../speaker_voices/My test speech_xtts_speaker_clean.wav",
-          "language": "en",
-          "transcript": "In this experiment, the system converts spoken English into text.  Translate it into Slava and then send the sizes it back into speech.  The process involves three stages, speech recognition, machine translation and text to speech.  Each model introduces a small delay, so we will measure the overall latency.  The main objective is to achieve natural communication despite language barriers.",
-          "in_registry": true
-        },
-        {
-          "name": "hello",
-          "file": "../../speaker_voices/hello.wav",
-          "language": "en",
-          "transcript": "Hello, this is a test of my voice for cloning purposes.",
-          "in_registry": true
-        },
-        {
-          "name": "voice_rec_1m",
-          "file": "../../speaker_voices/voice_rec_1m.m4a",
-          "language": "?",
-          "transcript": "",
-          "in_registry": false
-        },
-        {
-          "name": "voice_rec_1m",
-          "file": "../../speaker_voices/voice_rec_1m.wav",
-          "language": "en",
-          "transcript": "When the sunlight strikes raindrops in the air, they act as a prism and form a rainbow. The rainbow is a division of white light into many beautiful colors. These take the shape of a long round arch, with its path high above, and its two ends apparently beyond the horizon. There is, according to legend, a boiling pot of gold at one end. People look, but no one ever finds it. When a man looks for something beyond his reach, his friends say he is looking for the pot of gold at the end of the rainbow.",
+          "name": "sk_script_reading",
+          "file": "../../speaker_voices/sk_script_reading.m4a",
+          "language": "sk",
+          "transcript": "Добре рано, а витеця в тето ошиви окашки преклото речи в реалном часи.  Оварим по-анхлитски, а моих глаз будете почуть говорить по-словенски и то некълки в секунду.  Систем почувам микрофоном, а де декую, киде реч са чина, а кончи.  Найправи е реч, прописано до тексту, потом приложено, а потом опять проверено.  Каждый круг пеше локальни на темто почтачи, без облаку, а без чакарни.  Латенци е час мецимой мейсловами, а приложено микласам, коги почуваеш.  Нашим цилам е стержанилен пар секунт до скратки на природсини розховор.  Ласове клановани е знамена ше словенски висто пъсне, ако я не ако цюзинец.  А висом учил систем мойм гласом, зазнаменавам пар мину чистое речи.  На тихе местности залжив яц, ако на драго микрофоне.  Просим говорти с талем темпо с краткими представками мецеветвами.  Числа, назви, а техницки вирази, си вижедую меморядно, страстливе с в бог язика.  Линка титълков, укаживе частичне вислитки, затяло че съм е ще говорим.  Титълки можете присунет до половачих окна на т. ако колвек-апликациал.  Проложни глас е присмировани на сръжм с хромаждени аковартални микрофон.  Остатнию частници почувая словенщину, затяло че става говорим англитски.  Отаски публика буде проложна обачным смиром.  Дяка ма въм са випечите, а теж им се на ваше отаски.",
           "in_registry": true
         }
       ]

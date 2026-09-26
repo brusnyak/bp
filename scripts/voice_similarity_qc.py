@@ -32,12 +32,9 @@ sys.path.insert(0, REPO_ROOT)
 
 OUT_DEFAULT = os.path.join(REPO_ROOT, "processed", "voice_qc")
 
-EN_REFERENCE_WAV = os.path.join(REPO_ROOT, "speaker_voices", "voice_rec_1m.wav")
-# Optional: recorded SK reference once the owner records the SK session
-# (see documentation/voice_and_app_direction_2026-09.md §3). Absent → SK candidates
-# are scored against the EN reference with a cross-lingual flag (speaker embeddings
-# are text-independent, so this still measures identity, just noisier).
-SK_REFERENCE_WAV = os.path.join(REPO_ROOT, "speaker_voices", "sk_ref.wav")
+EN_REFERENCE_WAV = os.path.join(REPO_ROOT, "speaker_voices", "en_script_reading.m4a")
+# Recorded SK session (2026-09-27) — same-language reference for SK candidates.
+SK_REFERENCE_WAV = os.path.join(REPO_ROOT, "speaker_voices", "sk_script_reading.m4a")
 
 CANDIDATE_TEXTS = {
     "en": "This is a short test sentence synthesized for voice similarity quality control.",
