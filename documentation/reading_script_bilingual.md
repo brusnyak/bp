@@ -19,7 +19,7 @@ the recording teaches YOUR voice, the text must be worth saying.
 | 11 | Please speak at a steady pace, with short pauses between sentences. | Prosím hovorte stálym tempom, s krátkymi prestávkami medzi vetami. |
 | 12 | Numbers, names, and technical terms need extra care in both languages. | Čísla, názvy a technické výrazy si vyžadujú mimoriadnu starostlivosť v oboch jazykoch. |
 | 13 | The subtitle line shows partial results while I am still speaking. | Linka titulkov ukazuje čiastočné výsledky, zatiaľ čo ja som ešte hovoriť. |
-| 14 | You can pop the subtitles out into a floating window above any application. | Môžete pop titulky von do plávajúceho okna nad akúkoľvek aplikáciu. |
+| 14 | You can pop the subtitles out into a floating window above any application. | Titulky môžete presunúť do plávajúceho okna nad akoukoľvek aplikáciou.|
 | 15 | The translated voice is routed into the meeting as a virtual microphone. | Preložený hlas je presmerovaný na zhromaždenie ako virtuálny mikrofón. |
 | 16 | Other participants hear Slovak, while I keep speaking English. | Ostatní účastníci počúvajú slovenčinu, zatiaľ čo ja stále hovorím anglicky. |
 | 17 | Questions from the audience will be translated in the opposite direction. | Otázky publika budú preložené opačným smerom. |
