@@ -101,6 +101,7 @@ sacremoses
 SQLAlchemy==2.0.30
 alembic==1.13.1
 python-jose[cryptography]==3.3.0
+python-dotenv==1.2.3  # local .env (GOOGLE_CLIENT_ID etc.); .env stays untracked
 google-auth==2.35.0  # Google ID-token verification (/api/auth/google); inert unless GOOGLE_CLIENT_ID is set
 
 # === UI Testing ===
