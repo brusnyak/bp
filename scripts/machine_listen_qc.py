@@ -37,6 +37,11 @@ TARGETS = {
     "piper_generic_sk_test.wav": ("sk", SK_AB),
     "piper_personal_sk_ns09.wav": ("sk", SK_AB),
     "piper_personal_sk_ns11.wav": ("sk", SK_AB),
+    "piper_personal_sk_2500.wav": ("sk", SK_AB),
+    "sk2500_ns05.wav": ("sk", SK_AB),
+    "sk2500_ns08.wav": ("sk", SK_AB),
+    "enpers_ns03.wav": ("en", EN_TEXT),
+    "enpers_ns05.wav": ("en", EN_TEXT),
 }
 
 
@@ -116,6 +121,12 @@ def main():
                                 fmax=librosa.note_to_hz("C7"), sr=sr)
         f0v = f0[~np.isnan(f0)]
         f0std = round(float(np.std(f0v)), 1) if len(f0v) else 0.0
+        # tremor: mean frame-to-frame F0 jump relative to mean F0 (voiced only)
+        d = np.abs(np.diff(f0v))
+        jitter = round(float(np.mean(d) / (np.mean(f0v) + 1e-9)), 4) if len(f0v) > 1 else 0.0
+        # hiss: harmonic-to-noise energy ratio in dB (lower = noisier/shhh)
+        harm, perc = librosa.effects.hpss(wav)
+        hnr = round(10 * float(np.log10((np.mean(harm ** 2) + 1e-12) / (np.mean(perc ** 2) + 1e-12))), 1)
         tail_e = float(np.mean(wav[-int(0.2 * sr) :] ** 2)) / (rms ** 2 + 1e-9)
 
         rep[fname] = {
@@ -123,10 +134,11 @@ def main():
             "degrades": bool(wers[2] > wers[0] + 0.15),
             "peak": round(peak, 3), "clip_pct": clip_pct,
             "noise_floor": round(quiet, 4), "f0_std_hz": f0std,
+            "f0_jitter": jitter, "hnr_db": hnr,
             "tail_energy_ratio": round(tail_e, 2),
             "dur_s": round(n / sr, 1),
         }
-        print(f"{fname}: WER {full_wer} thirds {wers} f0std {f0std}Hz clip {clip_pct}%")
+        print(f"{fname}: WER {full_wer} thirds {wers} f0std {f0std}Hz jitter {jitter} HNR {hnr}dB")
 
     with open(OUT_JSON, "w") as f:
         json.dump(rep, f, indent=2)
