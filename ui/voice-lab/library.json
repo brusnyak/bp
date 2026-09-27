@@ -25,6 +25,24 @@
       "title": "QC candidates (engine outputs)",
       "items": [
         {
+          "name": "enpers_ns03",
+          "file": "../../processed/voice_qc/enpers_ns03.wav",
+          "engine": "?",
+          "language": "?",
+          "sample_rate": null,
+          "synthesis_latency_s": null,
+          "similarity": null
+        },
+        {
+          "name": "enpers_ns05",
+          "file": "../../processed/voice_qc/enpers_ns05.wav",
+          "engine": "?",
+          "language": "?",
+          "sample_rate": null,
+          "synthesis_latency_s": null,
+          "similarity": null
+        },
+        {
           "name": "hybrid_en",
           "file": "../../processed/voice_qc/hybrid_en.wav",
           "engine": "hybrid",
@@ -79,8 +97,8 @@
           "similarity": null
         },
         {
-          "name": "piper_personal_sk_ns09",
-          "file": "../../processed/voice_qc/piper_personal_sk_ns09.wav",
+          "name": "sk2500_ns05",
+          "file": "../../processed/voice_qc/sk2500_ns05.wav",
           "engine": "?",
           "language": "?",
           "sample_rate": null,
@@ -88,17 +106,8 @@
           "similarity": null
         },
         {
-          "name": "piper_personal_sk_ns11",
-          "file": "../../processed/voice_qc/piper_personal_sk_ns11.wav",
-          "engine": "?",
-          "language": "?",
-          "sample_rate": null,
-          "synthesis_latency_s": null,
-          "similarity": null
-        },
-        {
-          "name": "piper_personal_sk_test",
-          "file": "../../processed/voice_qc/piper_personal_sk_test.wav",
+          "name": "sk2500_ns08",
+          "file": "../../processed/voice_qc/sk2500_ns08.wav",
           "engine": "?",
           "language": "?",
           "sample_rate": null,
