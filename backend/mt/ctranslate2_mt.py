@@ -143,7 +143,13 @@ class CTranslate2MT:
         live pipeline translate per committed chunk instead of per paragraph.
         """
         parts = re.split(r"(?<=[.!?])\s+", text.strip())
-        return [p for p in parts if p]
+        parts = [p for p in parts if p]
+        if len(parts) <= 1:
+            # Unpunctuated STT output (e.g. Parakeet): fall back to ~20-word
+            # windows so batches stay short and partials keep flowing.
+            words = text.split()
+            parts = [" ".join(words[i : i + 20]) for i in range(0, len(words), 20)]
+        return parts
 
     def translate_segments(
         self, segments: List[str], src_lang: str, tgt_lang: str
