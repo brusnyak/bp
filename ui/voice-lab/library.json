@@ -8,14 +8,14 @@
           "name": "en_script_reading",
           "file": "../../speaker_voices/en_script_reading.m4a",
           "language": "en",
-          "transcript": "Good morning, and welcome to this live demonstration of real-time speech translation.  I'm speaking English and you will hear my own voice begin Slovak within seconds.  The system listens through the microphone and detects when speech beans and ends.  First the speech is transcribed into text, then translated, then spoken again.  Very step runs locally on this computer, with no cloud and no waiting room.  A latency is the time between my words and the translated voice you hear.  Our goal is a delay of only a few seconds, short enough for natural conversation.  Voice cloning means the Slovak output sounds like me, not like a stranger.  To teach the system my voice, I recorded a few minutes of clean speech.  A quiet room matters more than an expensive microphone.  Please speak at a steady pace with short buzzes between sentences.  Numbers, names, and technical terms need extra care in both languages.  This subtitle line shows partial results while I'm still speaking.  You can pop the subtitles out into a floating window above any application.  The translated voice is routed into the meeting as a virtual microphone.  Other participants hear Slovak while I keep speaking English.  Questions from the audience will be translated in their opposite direction.  Thank you for listening, and I look forward to your questions.",
+          "transcript": "Good morning, and welcome to this live demonstration of real time speech translation. I am speaking English, and you will hear my own voice speaking Slovak within seconds. The system listens through the microphone and detects when speech begins and ends. First the speech is transcribed into text, then translated, then spoken again. Every step runs locally on this computer, with no cloud and no waiting room. Latency is the time between my words and the translated voice you hear. Our goal is a delay of only a few seconds, short enough for natural conversation. Voice cloning means the Slovak output sounds like me, not like a stranger. To teach the system my voice, I record a few minutes of clean speech. A quiet room matters more than an expensive microphone. Please speak at a steady pace, with short pauses between sentences. Numbers, names, and technical terms need extra care in both languages. The subtitle line shows partial results while I am still speaking. You can pop the subtitles out into a floating window above any application. The translated voice is routed into the meeting as a virtual microphone. Other participants hear Slovak, while I keep speaking English. Questions from the audience will be translated in the opposite direction. Thank you for listening, and I look forward to your questions.",
           "in_registry": true
         },
         {
           "name": "sk_script_reading",
           "file": "../../speaker_voices/sk_script_reading.m4a",
           "language": "sk",
-          "transcript": "Добре рано, а витеця в тето ошиви окашки преклото речи в реалном часи.  Оварим по-анхлитски, а моих глаз будете почуть говорить по-словенски и то некълки в секунду.  Систем почувам микрофоном, а де декую, киде реч са чина, а кончи.  Найправи е реч, прописано до тексту, потом приложено, а потом опять проверено.  Каждый круг пеше локальни на темто почтачи, без облаку, а без чакарни.  Латенци е час мецимой мейсловами, а приложено микласам, коги почуваеш.  Нашим цилам е стержанилен пар секунт до скратки на природсини розховор.  Ласове клановани е знамена ше словенски висто пъсне, ако я не ако цюзинец.  А висом учил систем мойм гласом, зазнаменавам пар мину чистое речи.  На тихе местности залжив яц, ако на драго микрофоне.  Просим говорти с талем темпо с краткими представками мецеветвами.  Числа, назви, а техницки вирази, си вижедую меморядно, страстливе с в бог язика.  Линка титълков, укаживе частичне вислитки, затяло че съм е ще говорим.  Титълки можете присунет до половачих окна на т. ако колвек-апликациал.  Проложни глас е присмировани на сръжм с хромаждени аковартални микрофон.  Остатнию частници почувая словенщину, затяло че става говорим англитски.  Отаски публика буде проложна обачным смиром.  Дяка ма въм са випечите, а теж им се на ваше отаски.",
+          "transcript": "Dobré ráno a vitajte v tejto živej ukážke prekladu reči v reálnom čase. Hovorím po anglicky a môj hlas budete počuť hovoriť po slovensky do niekoľkých sekúnd. Systém počúva mikrofónom a detekuje, kedy reč začína a končí. Najprv je reč prepísaná do textu, potom preložená a potom opäť prevedená. Každý krok beží lokálne na tomto počítači, bez oblaku a bez čakárne. Latency je čas medzi mojimi slovami a preloženým hlasom, ktorý počuješ. Naším cieľom je zdržanie len pár sekúnd, dosť krátke na prirodzený rozhovor. Hlasové klonovanie znamená, že slovenský výstup znie ako ja, nie ako cudzinec. Aby som učil systém mojím hlasom, zaznamenávam pár minút čistej reči. Na tichej miestnosti záleží viac ako na drahom mikrofóne. Prosím hovorte stálym tempom, s krátkymi prestávkami medzi vetami. Čísla, názvy a technické výrazy si vyžadujú mimoriadnu starostlivosť v oboch jazykoch. Linka titulkov ukazuje čiastočné výsledky, zatiaľ čo ja som ešte hovoriť. Titulky môžete presunúť do plávajúceho okna nad akoukoľvek aplikáciou. Preložený hlas je presmerovaný na zhromaždenie ako virtuálny mikrofón. Ostatní účastníci počúvajú slovenčinu, zatiaľ čo ja stále hovorím anglicky. Otázky publika budú preložené opačným smerom. Ďakujem vám za vypočutie a teším sa na vaše otázky.",
           "in_registry": true
         }
       ]
@@ -30,7 +30,7 @@
           "engine": "hybrid",
           "language": "en",
           "sample_rate": 22050,
-          "synthesis_latency_s": 1.2692,
+          "synthesis_latency_s": 2.4157,
           "similarity": null
         },
         {
@@ -39,7 +39,7 @@
           "engine": "hybrid",
           "language": "sk",
           "sample_rate": 22050,
-          "synthesis_latency_s": 6.9575,
+          "synthesis_latency_s": 2.8492,
           "similarity": null
         },
         {
@@ -48,7 +48,7 @@
           "engine": "piper",
           "language": "sk",
           "sample_rate": 22050,
-          "synthesis_latency_s": 0.2665,
+          "synthesis_latency_s": 0.3334,
           "similarity": null
         },
         {
@@ -57,29 +57,8 @@
           "engine": "piper_personal",
           "language": "en",
           "sample_rate": 22050,
-          "synthesis_latency_s": 0.257,
+          "synthesis_latency_s": 0.2869,
           "similarity": null
-        }
-      ]
-    },
-    {
-      "id": "test",
-      "title": "Test clips (pipeline inputs)",
-      "items": [
-        {
-          "name": "Can you hear me_",
-          "file": "../../test/Can you hear me_.wav",
-          "transcript": ""
-        },
-        {
-          "name": "Hello",
-          "file": "../../test/Hello.wav",
-          "transcript": "Hello, this is a test of my voice for cloning purposes."
-        },
-        {
-          "name": "My test speech_xtts_speaker_clean",
-          "file": "../../test/My test speech_xtts_speaker_clean.wav",
-          "transcript": ""
         }
       ]
     }
