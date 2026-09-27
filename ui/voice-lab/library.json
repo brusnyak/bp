@@ -34,60 +34,6 @@
           "similarity": null
         },
         {
-          "name": "enpers_v2_ns03",
-          "file": "../../processed/voice_qc/enpers_v2_ns03.wav",
-          "engine": "?",
-          "language": "?",
-          "sample_rate": null,
-          "synthesis_latency_s": null,
-          "similarity": null
-        },
-        {
-          "name": "enpers_v2_ns05",
-          "file": "../../processed/voice_qc/enpers_v2_ns05.wav",
-          "engine": "?",
-          "language": "?",
-          "sample_rate": null,
-          "synthesis_latency_s": null,
-          "similarity": null
-        },
-        {
-          "name": "male_best1122_base",
-          "file": "../../processed/voice_qc/male_best1122_base.wav",
-          "engine": "?",
-          "language": "?",
-          "sample_rate": null,
-          "synthesis_latency_s": null,
-          "similarity": null
-        },
-        {
-          "name": "male_best1122_ns05",
-          "file": "../../processed/voice_qc/male_best1122_ns05.wav",
-          "engine": "?",
-          "language": "?",
-          "sample_rate": null,
-          "synthesis_latency_s": null,
-          "similarity": null
-        },
-        {
-          "name": "male_early330_base",
-          "file": "../../processed/voice_qc/male_early330_base.wav",
-          "engine": "?",
-          "language": "?",
-          "sample_rate": null,
-          "synthesis_latency_s": null,
-          "similarity": null
-        },
-        {
-          "name": "male_early330_ns05",
-          "file": "../../processed/voice_qc/male_early330_ns05.wav",
-          "engine": "?",
-          "language": "?",
-          "sample_rate": null,
-          "synthesis_latency_s": null,
-          "similarity": null
-        },
-        {
           "name": "male_last_base",
           "file": "../../processed/voice_qc/male_last_base.wav",
           "engine": "?",
@@ -117,15 +63,6 @@
         {
           "name": "piper_generic_sk_test",
           "file": "../../processed/voice_qc/piper_generic_sk_test.wav",
-          "engine": "?",
-          "language": "?",
-          "sample_rate": null,
-          "synthesis_latency_s": null,
-          "similarity": null
-        },
-        {
-          "name": "piper_male_sk_test",
-          "file": "../../processed/voice_qc/piper_male_sk_test.wav",
           "engine": "?",
           "language": "?",
           "sample_rate": null,

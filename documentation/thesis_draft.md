@@ -139,13 +139,13 @@ The decision to include both Piper and Coqui TTS is a strategic one:
 This dual approach allows the system to be flexible and cater to different user needs, while also showcasing advanced TTS capabilities within the project.
 
 **Rationale for XTTS v2:**
-XTTS v2 was selected for its state-of-the-art zero-shot voice cloning capabilities and cross-lingual support. Unlike standard TTS models that require extensive fine-tuning for new voices, XTTS v2 can clone a voice from a 6-second audio sample. Its architecture is specifically optimized for cross-lingual tasks, allowing it to preserve the speaker's vocal characteristics even when translating between languages (e.g., English speaker synthesized in Slovak).
+XTTS v2 was selected for its state-of-the-art zero-shot voice cloning capabilities and cross-lingual support. Unlike standard TTS models that require extensive fine-tuning for new voices, XTTS v2 can clone a voice from a 6-second audio sample. Its architecture is specifically optimized for cross-lingual tasks, allowing it to preserve the speaker's vocal characteristics even when translating between languages (e.g., English speaker synthesized in Czech).
 
 **Comparison with Alternatives:**
 While other frameworks like ESPnet or StyleTTS were considered, XTTS v2 offered the best balance of:
 
 - **Zero-shot performance:** Immediate cloning without retraining.
-- **Language Support:** Native support for 17 languages including English, Czech, and Slovak.
+- **Language Support:** Native support for 17 languages including English and Czech. **Not Slovak** — verified against XTTS v2's actual `config.languages` list (`en, es, fr, de, it, pt, pl, tr, ru, nl, cs, ar, zh-cn, hu, ko, ja, hi`); an earlier draft of this document incorrectly claimed Slovak support. Slovak voice cloning is not available via XTTS v2 in this project; Slovak output uses generic (non-cloned) Piper.
 - **Community Support:** Active development and pre-trained checkpoints suitable for fine-tuning.
 
 The combination of Piper (for speed) and XTTS v2 (for cloning) provides a comprehensive and optimized TTS solution for the real-time speech translation system.
@@ -1369,6 +1369,32 @@ Building upon the current foundation, several key areas for future work have bee
 - **Robust Error Handling:** Implement more granular error handling and logging across the entire pipeline, providing clearer diagnostics and recovery mechanisms.
 - **Scalability:** Design and implement strategies for horizontal scaling of the backend services to handle a larger number of concurrent users or higher processing loads, potentially involving shared model instances and request queuing as identified in the scalability analysis.
 - **Additional Models:** Integrate and evaluate alternative STT, MT, or TTS models to compare performance, explore different linguistic capabilities, or support specialized use cases.
+
+## Deklarácia k využitiu UI (povinná časť, DRAFT — vlastník doplní a overí pred odovzdaním)
+
+Vypracované podľa Pravidiel používania AI v ŠP B-IKT zo dňa 14.09.2026 (nadstavba nad
+Opatrením rektora STU č. 1/2024 – O). Každému bodu autor rozumie, vie ho vysvetliť a vie
+uviesť zdroj publikovanej informácie a jeho relevanciu.
+
+- **Teoretické kapitoly (STT/MT/TTS/VAD):** AI slúžilo ako vyhľadávací a sumarizačný
+  pomocník. Každé technické tvrdenie je overené voči citovanému zdroju (pozri kapitolu 7)
+  alebo voči vlastnému meraniu v kapitole 5. Autor zdroje preštudoval.
+- **Návrh a špecifikácie (`specs/`, `documentation/*.md`):** AI asistovalo pri formulácii;
+  všetky architektonické rozhodnutia sú autorove a podložené vlastnými meraniami na
+  referenčnom stroji (M1 Pro, 16 GB). Negatívne výsledky (SSBD, S2S/Hibiki, XTTS-caching
+  1,9 %) sú vlastné experimenty s uloženými artefaktmi.
+- **Kód:** agentný vývoj (scaffolding, refaktoring, testy) v tomto rozsahu: [DOPLNIŤ presný
+  zoznam súborov/funkcií]. Každá AI-generovaná časť je pokrytá testami: `test/hardware_test.py`
+  (7/7), `test_full_pipeline.py`, `soak_interrupt_cycles.py` (10 cyklov, 0 stratených,
+  RSS −257 MB) a živými smoke-testami s logami. Merania latencií a presností (WER, BLEU/METEOR,
+  RTF) sú výhradne vlastné behy na vlastnom hardvéri.
+- **Text práce:** písaný autorom v slovenskom jazyku; AI použité len na gramatickú
+  a štylistickú kontrolu.
+- **Pripravenosť na obhajobu:** zdrojové kódy sú k dispozícii komisii; autor vie
+  predviesť orientáciu v kóde a vysvetliť logiku kľúčových častí: `backend/main.py`
+  (pipeline, `model_call_lock`, barge-in), `backend/tts/base.py` (registry),
+  `backend/tts/hybrid_tts.py` (embedding cache), `backend/stt/streaming_captions.py`
+  (LocalAgreement+VAC), `backend/tts/text_chunking.py`, `backend/hardware.py`.
 
 ## 7. References
 
