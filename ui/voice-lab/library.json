@@ -70,6 +70,24 @@
           "similarity": null
         },
         {
+          "name": "piper_personal_sk_ns09",
+          "file": "../../processed/voice_qc/piper_personal_sk_ns09.wav",
+          "engine": "?",
+          "language": "?",
+          "sample_rate": null,
+          "synthesis_latency_s": null,
+          "similarity": null
+        },
+        {
+          "name": "piper_personal_sk_ns11",
+          "file": "../../processed/voice_qc/piper_personal_sk_ns11.wav",
+          "engine": "?",
+          "language": "?",
+          "sample_rate": null,
+          "synthesis_latency_s": null,
+          "similarity": null
+        },
+        {
           "name": "piper_personal_sk_test",
           "file": "../../processed/voice_qc/piper_personal_sk_test.wav",
           "engine": "?",
