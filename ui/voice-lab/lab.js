@@ -65,6 +65,10 @@
       card.appendChild(metaLine(["file: " + item.file]));
       if (item.transcript) card.appendChild(metaLine(["ground truth: " + item.transcript]));
     }
+    if (item.meta && Object.keys(item.meta).length) {
+      card.appendChild(metaLine(
+        Object.entries(item.meta).map(([k, v]) => k + ": " + v)));
+    }
     card.appendChild(audioEl(item.file));
     return card;
   }
