@@ -124,6 +124,56 @@
           "similarity": null
         }
       ]
+    },
+    {
+      "id": "conversation",
+      "title": "Conversation sim (live-pipeline sentence outputs)",
+      "items": [
+        {
+          "name": "en_sk_00",
+          "file": "../../processed/conversation/en_sk_00.wav",
+          "meta": {
+            "mt_sentence_s": 0.174,
+            "mt_word_total_s": 0.105,
+            "mt_word_first_s": 0.052,
+            "tts_s": 0.26,
+            "audio_s": 5.8
+          }
+        },
+        {
+          "name": "en_sk_01",
+          "file": "../../processed/conversation/en_sk_01.wav",
+          "meta": {
+            "mt_sentence_s": 0.139,
+            "mt_word_total_s": 0.098,
+            "mt_word_first_s": 0.033,
+            "tts_s": 0.24,
+            "audio_s": 6.4
+          }
+        },
+        {
+          "name": "sk_en_00",
+          "file": "../../processed/conversation/sk_en_00.wav",
+          "meta": {
+            "mt_sentence_s": 0.135,
+            "mt_word_total_s": 0.108,
+            "mt_word_first_s": 0.036,
+            "tts_s": 0.17,
+            "audio_s": 4.1
+          }
+        },
+        {
+          "name": "sk_en_01",
+          "file": "../../processed/conversation/sk_en_01.wav",
+          "meta": {
+            "mt_sentence_s": 0.16,
+            "mt_word_total_s": 0.117,
+            "mt_word_first_s": 0.039,
+            "tts_s": 0.14,
+            "audio_s": 3.6
+          }
+        }
+      ]
     }
   ]
 }

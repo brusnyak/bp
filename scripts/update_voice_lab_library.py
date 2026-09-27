@@ -16,6 +16,7 @@ only this file — no backend needed. Re-run after every new recording or QC run
 import argparse
 import json
 import os
+import re
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 AUDIO_EXTS = (".wav", ".m4a", ".mp3", ".ogg", ".flac")
@@ -111,6 +112,23 @@ def main():
         library["sections"].append(
             {"id": "test", "title": "Test clips (pipeline inputs)", "items": test_items}
         )
+
+    # 4. Conversation sim (end-to-end sentence outputs + per-stage latencies).
+    conv_dir = os.path.join(REPO_ROOT, "processed", "conversation")
+    sim = load_json(os.path.join(REPO_ROOT, "processed", "conversation_sim.json")) or {}
+    sim_by_key = {(s.get("dir"), s.get("n")): s for s in sim.get("sections", []) or sim.get("sentences", [])}
+    conv_items = []
+    for name in audio_files(conv_dir):
+        stem = os.path.splitext(name)[0]  # e.g. en_sk_00
+        m = re.match(r"(.+)_(\d+)$", stem)
+        meta = dict(sim_by_key.get((m.group(1), int(m.group(2))), {})) if m else {}
+        meta.pop("dir", None)
+        meta.pop("n", None)
+        conv_items.append({"name": stem, "file": "../../processed/conversation/" + name,
+                           "meta": meta})
+    library["sections"].append(
+        {"id": "conversation", "title": "Conversation sim (live-pipeline sentence outputs)", "items": conv_items}
+    )
 
     out = os.path.join(REPO_ROOT, "ui", "voice-lab", "library.json")
     with open(out, "w") as f:
