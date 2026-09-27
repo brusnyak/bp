@@ -76,13 +76,8 @@ def get_db_dependency():
 security = HTTPBearer()
 
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db_dependency)):
-    # For now, we'll just extract the email from the mock token
-    # In a real app, you'd decode the JWT and verify it
-    token = credentials.credentials
-    if not token.startswith("mock-jwt-token-for-"):
-        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
-    
-    email = token.replace("mock-jwt-token-for-", "")
+    from backend.utils.auth import decode_access_token
+    email = decode_access_token(credentials.credentials)
     user = db.query(User).filter(User.email == email).first()
     if user is None:
         raise HTTPException(status_code=401, detail="User not found")
@@ -349,6 +344,14 @@ async def _initialize_tts_models(session_data: Dict[str, Any], tts_model_choice:
         session_data["tts_engine_name"] = None
         return
 
+    # Measured default (2026-09-27): SK output speaks with the user's own
+    # fine-tuned voice instead of the Czech generic base. Explicit engine
+    # choices (hybrid, xtts, ...) pass through untouched.
+    target = (session_data.get("session_config") or {}).get("target_lang", "")
+    if tts_model_choice == "piper" and target.startswith("sk"):
+        tts_model_choice = "piper_sk_personal"
+        factory = TTS_ENGINES.get(tts_model_choice)
+
     if session_data.get("tts_engine") is not None and session_data.get("tts_engine_name") == tts_model_choice:
         logging.info(f"Backend: Session {session_data['client_info']}: TTS engine '{tts_model_choice}' already initialized.")
         return
@@ -407,6 +410,11 @@ async def initialize_all_models(client_info: str, source_lang: str, target_lang:
 
     logging.info(f"Backend: Session {client_info}: Initializing models at {time.strftime('%H:%M:%S', time.localtime(time.time()))}...")
 
+    # Per-language measured defaults (2026-09-27): SK source -> large-v3-turbo
+    # (WER 0.41 vs small 0.49); plain "base"/"small" requests upgrade silently.
+    if source_lang.startswith("sk") and stt_model_size in ("base", "small", DEFAULT_STT_MODEL_SIZE):
+        stt_model_size = "large-v3-turbo"
+        session_data["session_config"]["stt_model_size"] = stt_model_size
     await _initialize_stt_model(session_data, stt_model_size)
     await _initialize_mt_model(session_data, source_lang, target_lang, websocket)
     if source_lang != "en" and source_lang != target_lang: # Also initialize en-target for auto-detection fallback, but only if not already the target
@@ -440,10 +448,9 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     user = db.query(User).filter(User.email == form_data.username).first() # username field is used for email
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Incorrect email or password")
-    
-    # For now, we'll return a mock JWT token
-    mock_token = f"mock-jwt-token-for-{user.email}"
-    return {"access_token": mock_token, "token_type": "bearer"}
+
+    from backend.utils.auth import create_access_token
+    return {"access_token": create_access_token(user.email), "token_type": "bearer"}
 
 @router.post("/login", summary="Login endpoint for frontend")
 async def login(user_login: UserLogin, db: Session = Depends(get_db_dependency)):
@@ -454,12 +461,11 @@ async def login(user_login: UserLogin, db: Session = Depends(get_db_dependency))
     user = db.query(User).filter(User.email == user_login.email).first()
     if not user or not verify_password(user_login.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Incorrect email or password")
-    
-    # Return mock token with user info in the format frontend expects
-    mock_token = f"mock-jwt-token-for-{user.email}"
+
+    from backend.utils.auth import create_access_token
     return {
         "message": "Login successful",
-        "token": mock_token,
+        "token": create_access_token(user.email),
         "username": user.username,
         "email": user.email
     }
@@ -507,10 +513,10 @@ async def login_with_google(body: GoogleAuthRequest, db: Session = Depends(get_d
         else:
             user.google_sub = sub
             db.commit()
-    mock_token = f"mock-jwt-token-for-{user.email}"
+    from backend.utils.auth import create_access_token
     return {
         "message": "Login successful",
-        "token": mock_token,
+        "token": create_access_token(user.email),
         "username": user.username,
         "email": user.email
     }
@@ -734,10 +740,9 @@ async def get_voices(
     current_user = None
     if credentials:
         try:
-            token = credentials.credentials
-            if token.startswith("mock-jwt-token-for-"):
-                email = token.replace("mock-jwt-token-for-", "")
-                current_user = db.query(User).filter(User.email == email).first()
+            from backend.utils.auth import decode_access_token
+            email = decode_access_token(credentials.credentials)
+            current_user = db.query(User).filter(User.email == email).first()
         except Exception as e:
             logging.warning(f"Backend: Failed to authenticate user for voices endpoint: {e}")
     

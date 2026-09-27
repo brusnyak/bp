@@ -46,13 +46,15 @@ def _piper_personal_factory() -> PiperTTS:
 
 
 def _piper_personal_v2_factory() -> PiperTTS:
-    # Output of the new repeatable corpus pipeline (scripts/prepare_voice_corpus.py +
-    # scripts/finetune_personal_voice.py, documentation/voice_corpus_pipeline_2026-08-21.md).
-    # Real-audio-only (no GPT-SoVITS synthetic bootstrap this run, unlike en_US-personal-medium)
-    # - kept as a separate, distinctly-named entry rather than overwriting "piper_personal" so
-    # the better-quality GPT-SoVITS-augmented voice stays the default until this one is
-    # actually A/B'd against it.
+    # Second EN fine-tune (scripts/finetune_personal_voice.py, real-audio-only).
+    # Ear verdict 2026-09-27 pending between v1/v2 (v1: F0 100Hz HNR -3.9; v2: 111Hz -5.9).
     return PiperTTS(model_id="en_US-personal-v2", device=hardware.detect_backend("tts_baseline"))
+
+
+def _piper_sk_personal_factory() -> PiperTTS:
+    # User's SK voice: jirka-male warmstart, 2500 steps on 18 segmented clips
+    # (2026-09-27). Default SK output voice — replaces the Czech generic base.
+    return PiperTTS(model_id="sk_SK-personal-male-medium", device=hardware.detect_backend("tts_baseline"))
 
 
 def _xtts_factory() -> CoquiTTS:
@@ -71,6 +73,7 @@ TTS_ENGINES: Dict[str, Callable[[], object]] = {
     "piper": _piper_factory,
     "piper_personal": _piper_personal_factory,
     "piper_personal_v2": _piper_personal_v2_factory,
+    "piper_sk_personal": _piper_sk_personal_factory,
     "xtts": _xtts_factory,
     "hybrid": _hybrid_factory,
     "omnivoice": _omnivoice_factory,
