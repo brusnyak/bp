@@ -84,6 +84,15 @@
           "similarity": null
         },
         {
+          "name": "xtts_en_rainbowref",
+          "file": "../../processed/voice_qc/xtts_en_rainbowref.wav",
+          "engine": "?",
+          "language": "?",
+          "sample_rate": null,
+          "synthesis_latency_s": null,
+          "similarity": null
+        },
+        {
           "name": "xtts_en_zeroshot",
           "file": "../../processed/voice_qc/xtts_en_zeroshot.wav",
           "engine": "?",
