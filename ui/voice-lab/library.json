@@ -43,6 +43,15 @@
           "similarity": null
         },
         {
+          "name": "xtts_cs_sktext",
+          "file": "../../processed/voice_qc/xtts_cs_sktext.wav",
+          "engine": "?",
+          "language": "?",
+          "sample_rate": null,
+          "synthesis_latency_s": null,
+          "similarity": null
+        },
+        {
           "name": "xtts_en_zeroshot",
           "file": "../../processed/voice_qc/xtts_en_zeroshot.wav",
           "engine": "?",
