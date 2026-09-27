@@ -25,15 +25,6 @@
       "title": "QC candidates (engine outputs)",
       "items": [
         {
-          "name": "enpers_v1",
-          "file": "../../processed/voice_qc/enpers_v1.wav",
-          "engine": "?",
-          "language": "?",
-          "sample_rate": null,
-          "synthesis_latency_s": null,
-          "similarity": null
-        },
-        {
           "name": "enpers_v2",
           "file": "../../processed/voice_qc/enpers_v2.wav",
           "engine": "?",
