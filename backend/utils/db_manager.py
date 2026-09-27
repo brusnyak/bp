@@ -21,9 +21,13 @@ def get_db_session_and_engine(database_url: str):
     Configures and returns a database engine and a sessionmaker.
     This allows for easy switching between different databases (e.g., in-memory for tests).
     """
-    _engine = create_engine(
-        database_url, connect_args={"check_same_thread": False}
-    )
+    from sqlalchemy.pool import StaticPool
+    kwargs = {"connect_args": {"check_same_thread": False}}
+    if database_url == "sqlite:///:memory:":
+        # One shared connection: otherwise each pooled checkout gets its own
+        # EMPTY database and tests see ghost rows / missing tables.
+        kwargs["poolclass"] = StaticPool
+    _engine = create_engine(database_url, **kwargs)
     _SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=_engine)
     return _engine, _SessionLocal
 

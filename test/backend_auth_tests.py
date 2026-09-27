@@ -1,6 +1,7 @@
 import pytest
 import os
 import sys
+import uuid
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session # Import Session, create_engine, sessionmaker
 from fastapi.testclient import TestClient # Import TestClient
@@ -11,58 +12,68 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../b
 import backend.utils.db_manager # Import the db_manager module
 
 from backend.utils.db_manager import Base, User # Import Base and User from db_manager
-from backend.utils.auth import get_password_hash, verify_password # Import auth functions
+from backend.utils.auth import get_password_hash, verify_password, decode_access_token
 from app import app # Import app from app.py
 from backend.main import get_db # Import get_db from main.py
+
+API = "/api"  # router is mounted under /api (app.py) — bare paths 404
+
+def fresh(prefix: str) -> str:
+    """Unique per-test identity: kills cross-test and cross-run DB pollution."""
+    return f"{prefix}_{uuid.uuid4().hex[:8]}"
 
 def test_register_user_success(test_client: TestClient):
     """Test successful user registration."""
     client = test_client
-    response = client.post("/register", json={"username": "unique_testuser_reg_success", "email": "unique_testuser_reg_success@example.com", "password": "pass"})
+    response = client.post(f"{API}/register", json={"username": fresh("tu_reg"), "email": f"{fresh('tu_reg')}@x.com", "password": "pass"})
     assert response.status_code == 200
-    assert response.json() == {"status": "success", "message": "User registered successfully."}
+    assert response.json() == {"message": "User registered successfully"}
 
 def test_register_user_already_exists(test_client: TestClient):
     """Test registration of an already existing user."""
     client = test_client
+    uname, email = fresh("tu_dup"), f"{fresh('tu_dup')}@x.com"
     # Register user first
-    client.post("/register", json={"username": "unique_existinguser", "email": "unique_existinguser@example.com", "password": "pass"})
-    
+    client.post(f"{API}/register", json={"username": uname, "email": email, "password": "pass"})
+
     # Attempt to register again
-    response = client.post("/register", json={"username": "unique_existinguser", "email": "unique_existinguser@example.com", "password": "pass"})
+    response = client.post(f"{API}/register", json={"username": uname, "email": email, "password": "pass"})
     assert response.status_code == 400
-    assert response.json() == {"status": "error", "message": "Username already registered"} # Expect username error first
+    assert response.json() == {"detail": "Email already registered"} # email check runs first
 
 def test_login_user_success(test_client: TestClient):
     """Test successful user login."""
     client = test_client
+    uname, email = fresh("tu_login"), f"{fresh('tu_login')}@x.com"
     # Register user first
-    client.post("/register", json={"username": "unique_testuser_login_success", "email": "unique_testuser_login_success@example.com", "password": "pass"})
-    
-    response = client.post("/login", json={"email": "unique_testuser_login_success@example.com", "password": "pass"})
+    client.post(f"{API}/register", json={"username": uname, "email": email, "password": "pass"})
+
+    response = client.post(f"{API}/login", json={"email": email, "password": "pass"})
     assert response.status_code == 200
     response_json = response.json()
-    assert response_json["status"] == "success"
-    assert response_json["message"] == "Login successful."
+    assert response_json["message"] == "Login successful"
+    assert response_json["username"] == uname
     assert "token" in response_json
-    assert response_json["token"].startswith("mock-jwt-token-for-")
+    # Real HS256 session JWT (no mock strings): must decode back to the email.
+    assert decode_access_token(response_json["token"]) == email
 
 def test_login_user_incorrect_password(test_client: TestClient):
     """Test login with incorrect password."""
     client = test_client
+    uname, email = fresh("tu_bad"), f"{fresh('tu_bad')}@x.com"
     # Register user first
-    client.post("/register", json={"username": "unique_testuser_login_incorrect", "email": "unique_testuser_login_incorrect@example.com", "password": "pass"})
-    
-    response = client.post("/login", json={"email": "unique_testuser_login_incorrect@example.com", "password": "wrong"})
+    client.post(f"{API}/register", json={"username": uname, "email": email, "password": "pass"})
+
+    response = client.post(f"{API}/login", json={"email": email, "password": "wrong"})
     assert response.status_code == 401
-    assert response.json() == {"status": "error", "message": "Incorrect email or password"}
+    assert response.json() == {"detail": "Incorrect email or password"}
 
 def test_login_user_not_found(test_client: TestClient):
     """Test login with a non-existent user."""
     client = test_client
-    response = client.post("/login", json={"email": "unique_nonexistentuser@example.com", "password": "pass"})
+    response = client.post(f"{API}/login", json={"email": f"{fresh('tu_nobody')}@x.com", "password": "pass"})
     assert response.status_code == 401
-    assert response.json() == {"status": "error", "message": "Incorrect email or password"}
+    assert response.json() == {"detail": "Incorrect email or password"}
 
 # Test for the /initialize endpoint to ensure it starts without torio/ffmpeg errors
 def test_initialize_pipeline_success(test_client: TestClient):
