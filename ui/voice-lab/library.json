@@ -25,6 +25,24 @@
       "title": "QC candidates (engine outputs)",
       "items": [
         {
+          "name": "enpers_v1",
+          "file": "../../processed/voice_qc/enpers_v1.wav",
+          "engine": "?",
+          "language": "?",
+          "sample_rate": null,
+          "synthesis_latency_s": null,
+          "similarity": null
+        },
+        {
+          "name": "enpers_v2",
+          "file": "../../processed/voice_qc/enpers_v2.wav",
+          "engine": "?",
+          "language": "?",
+          "sample_rate": null,
+          "synthesis_latency_s": null,
+          "similarity": null
+        },
+        {
           "name": "male_best1122_base",
           "file": "../../processed/voice_qc/male_best1122_base.wav",
           "engine": "?",
@@ -99,15 +117,6 @@
         {
           "name": "piper_male_sk_test",
           "file": "../../processed/voice_qc/piper_male_sk_test.wav",
-          "engine": "?",
-          "language": "?",
-          "sample_rate": null,
-          "synthesis_latency_s": null,
-          "similarity": null
-        },
-        {
-          "name": "xtts_cs_sktext",
-          "file": "../../processed/voice_qc/xtts_cs_sktext.wav",
           "engine": "?",
           "language": "?",
           "sample_rate": null,
