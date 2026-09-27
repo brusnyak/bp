@@ -2,7 +2,8 @@ import ctranslate2
 from transformers import AutoTokenizer
 import torch  # Added for MPS check
 import os  # Added for path operations
-from typing import Tuple
+import re  # Sentence splitting for chunked streaming translation
+from typing import List, Tuple
 
 
 class CTranslate2MT:
@@ -132,6 +133,51 @@ class CTranslate2MT:
             f"Translated '{text}' ({src_lang}) to '{translated_text}' ({tgt_lang}) in {translation_time:.4f}s"
         )
         return translated_text, translation_time
+
+    @staticmethod
+    def split_chunks(text: str) -> List[str]:
+        """Split text into sentence-ish chunks for streaming/partial translation.
+
+        STT partials arrive as word fragments; sentence ends commit. Splitting
+        keeps each Marian batch short (no early-stop truncation) and lets the
+        live pipeline translate per committed chunk instead of per paragraph.
+        """
+        parts = re.split(r"(?<=[.!?])\s+", text.strip())
+        return [p for p in parts if p]
+
+    def translate_segments(
+        self, segments: List[str], src_lang: str, tgt_lang: str
+    ) -> Tuple[List[str], List[float]]:
+        """Translate many short segments in ONE CT2 batch call.
+
+        Returns (translated_segments, per_segment_times_s). One encoder pass
+        over the batch — this is the streaming path: each STT-committed
+        chunk (word group / clause / sentence) goes out without waiting
+        for the paragraph to finish.
+        """
+        import time
+
+        tokenized = [
+            self.tokenizer.convert_ids_to_tokens(
+                self.tokenizer.encode(s, add_special_tokens=True)
+            )
+            for s in segments
+        ]
+        start = time.time()
+        results = self.translator.translate_batch(
+            tokenized, max_batch_size=len(tokenized) or 1,
+            beam_size=4, num_hypotheses=1,
+        )
+        total = time.time() - start
+        out = [
+            self.tokenizer.decode(
+                self.tokenizer.convert_tokens_to_ids(r.hypotheses[0]),
+                skip_special_tokens=True,
+            )
+            for r in results
+        ]
+        per_seg = [total / max(len(segments), 1)] * len(segments)
+        return out, per_seg
 
 
 if __name__ == "__main__":
