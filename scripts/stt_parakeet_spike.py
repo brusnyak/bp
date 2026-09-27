@@ -39,6 +39,10 @@ def wer(hyp: str, ref: str) -> float:
 
 def main() -> None:
     clip = sys.argv[sys.argv.index("--clip") + 1] if "--clip" in sys.argv else "sk"
+    as_json = "--json" in sys.argv
+    max_windows = (
+        int(sys.argv[sys.argv.index("--max-windows") + 1]) if "--max-windows" in sys.argv else None
+    )
     meta = {m["language"]: m for m in json.load(open("speaker_voices/speaker_voices.json"))}
     m = meta[clip]
     wav, _ = librosa.load(m["path"], sr=16000, mono=True)
@@ -51,7 +55,10 @@ def main() -> None:
     print(f"model load: {load_t:.1f}s", flush=True)
 
     hyps, dec_t = [], 0.0
-    for i in range(0, len(wav), WIN_S * 16000):
+    windows = list(range(0, len(wav), WIN_S * 16000))
+    if max_windows is not None:
+        windows = windows[:max_windows]
+    for i in windows:
         seg = wav[i : i + WIN_S * 16000]
         inputs = proc(seg, sampling_rate=16000, return_tensors="pt")
         t1 = time.perf_counter()
@@ -62,7 +69,10 @@ def main() -> None:
         print(f"window {i // 16000}s done ({dec_t:.1f}s decode so far)", flush=True)
 
     hyp = plain(" ".join(hyps))
-    audio_s = len(wav) / 16000
+    audio_s = sum(len(wav[i : i + WIN_S * 16000]) for i in windows) / 16000
+    if as_json:
+        print(json.dumps({"text": hyp, "decode_s": round(dec_t, 2), "audio_s": round(audio_s, 1)}))
+        return
     print(f"windows: {len(hyps)}, audio {audio_s:.1f}s, decode {dec_t:.1f}s (RTF {dec_t / audio_s:.3f})")
     print(f"plain-WER: {wer(hyp, ref):.4f}")
     print("HYP:", hyp[:300])
