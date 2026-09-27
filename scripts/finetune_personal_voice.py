@@ -115,10 +115,11 @@ def run_training(
     # PyTorch 2.6+ defaults torch.load(weights_only=True), which rejects the pathlib.PosixPath
     # object embedded in rhasspy/piper-checkpoints .ckpt files. Fix via the officially-recommended
     # safe_globals allowlist (not the riskier weights_only=False) by shimming the CLI entry point.
-    # Also: the packaged val_mos ModelCheckpoint callback hard-crashes
-    # (MisconfigurationException) instead of soft-skipping when the MOS predictor
-    # doesn't log in time (observed even after downloading SpeechMOS and adding
-    # num_test_examples). Not essential -- val_mel + save_last still select checkpoints.
+    # Also: the packaged val_mel ModelCheckpoint never fires on tiny single-speaker
+    # datasets (empty val split -> 'val_mel' never logged -> zero files written,
+    # observed 2026-09-27: 100+ epochs, no checkpoints/ dir at all). Append a
+    # dedicated last-only checkpoint so a killable long run always leaves an
+    # exportable last.ckpt; top-k ranking stays disabled (save_top_k=0).
     # Strip it from the hardcoded callback list before main() builds the CLI/Trainer.
     shim = (
         "import pathlib, torch.serialization, sys; "
@@ -126,6 +127,11 @@ def run_training(
         "import piper.train.__main__ as m; "
         "m._DEFAULT_CALLBACKS = [c for c in m._DEFAULT_CALLBACKS "
         "if getattr(c, 'monitor', None) != 'val_mos']; "
+        "from lightning.pytorch.callbacks import ModelCheckpoint; "
+        "m._DEFAULT_CALLBACKS.append(ModelCheckpoint("
+        "dirpath=r'" + str(output_dir / "lightning_logs" / "version_0" / "checkpoints") + "', "
+        "save_top_k=0, save_last=True, every_n_train_steps=25, "
+        "save_on_train_epoch_end=True)); "
         "from piper.train.__main__ import main; sys.argv = ['piper.train'] + sys.argv[1:]; main()"
     )
     cmd = [

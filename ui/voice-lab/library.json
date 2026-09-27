@@ -30,7 +30,7 @@
           "engine": "hybrid",
           "language": "en",
           "sample_rate": 22050,
-          "synthesis_latency_s": 2.4157,
+          "synthesis_latency_s": 2.2442,
           "similarity": null
         },
         {
@@ -39,7 +39,7 @@
           "engine": "hybrid",
           "language": "sk",
           "sample_rate": 22050,
-          "synthesis_latency_s": 2.8492,
+          "synthesis_latency_s": 2.5367,
           "similarity": null
         },
         {
@@ -48,7 +48,7 @@
           "engine": "piper",
           "language": "sk",
           "sample_rate": 22050,
-          "synthesis_latency_s": 0.3334,
+          "synthesis_latency_s": 0.2632,
           "similarity": null
         },
         {
@@ -57,7 +57,7 @@
           "engine": "piper_personal",
           "language": "en",
           "sample_rate": 22050,
-          "synthesis_latency_s": 0.2869,
+          "synthesis_latency_s": 0.2422,
           "similarity": null
         }
       ]
