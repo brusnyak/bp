@@ -2,7 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 from backend.utils.db_manager import User
-from backend.utils.auth import get_password_hash
+from backend.utils.auth import get_password_hash, create_access_token
 import os
 import json
 import httpx
@@ -10,12 +10,11 @@ import asyncio
 import wave # For creating dummy WAV file
 import numpy as np # For creating dummy WAV file
 
-# Mock JWT token for testing purposes
-MOCK_JWT_TOKEN_PREFIX = "mock-jwt-token-for-"
+# Real HS256 session JWT for the default test user (created by app lifespan).
 TEST_USER_EMAIL = "test@example.com"
 TEST_USER_USERNAME = "testuser"
 TEST_USER_PASSWORD = "password"
-TEST_USER_TOKEN = f"{MOCK_JWT_TOKEN_PREFIX}{TEST_USER_EMAIL}"
+TEST_USER_TOKEN = create_access_token(TEST_USER_EMAIL)
 
 # Dummy audio file for testing uploads
 DUMMY_AUDIO_PATH = "test/dummy_audio.wav"
@@ -48,7 +47,7 @@ def authenticated_test_client(test_client: TestClient, app_with_test_db):
     """
     Provides a TestClient instance with an authenticated user.
     This fixture ensures a user exists in the database and provides a client
-    that sends a mock JWT token for that user.
+    that sends a real session JWT for that user.
     """
     # Ensure the default user exists (created by app's lifespan event)
     # We don't need to explicitly create it here, as app_with_test_db handles it.

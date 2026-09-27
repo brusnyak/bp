@@ -73,3 +73,22 @@ prinesie?
 - Leave 0.5s silence at start/end of each take for the silence splitter.
 - After recording: segment (`scripts/segment_sk_dataset.py` pattern), QC in lab,
   then fine-tune per `documentation/voice_build_runbook.md`.
+
+## CZ — Staroměstské odpoledne (optional third language, ~150 words ≈ 1.5 min)
+
+Why Czech: closest phonetic neighbor (mutually intelligible, shared pipeline),
+XTTS already speaks it (cross-checks), and it adds ř/ě/ů/ou the SK set lacks.
+Same male-speaker warmstart logic applies (jirka is literally this language).
+
+Včera odpoledne jsem šel na Staroměstské náměstí. Potkal jsem tam starého
+kamaráda, který prodával housky a koláče. „Tři rohlíky a čtyři koláče,
+prosím!" poprosil jsem. „Ahoj! Kde ses toulal celé měsíce?" zeptal se mě.
+Vypravoval jsem mu o své práci a o dlouhé cestě vlakem přes hory a údolí.
+
+Pak jsme si sedli na lavičku a dali si kávu. Okolo běhaly děti a házely si
+míčem. V pekárně voněla čerstvá mouka a pečivo. „Věřil bys, že tohle místo
+znám už čtyřicet let?" řekl a ukázal na věž. Musel jsem se smát.
+
+Když se setmělo, vydali jsme se domů přes Karlův most. Kousek od mostu stojí
+můj starý dům. Nad řekou kroužili racci a z hospody se ozývala hudba. Bylo to
+jedno z nejhezčích odpolední tohoto měsíce. Kdy se sem zase vrátím?
