@@ -13,6 +13,7 @@ only this file — no backend needed. Re-run after every new recording or QC run
     python3 scripts/update_voice_lab_library.py
 """
 
+import argparse
 import json
 import os
 
@@ -37,6 +38,10 @@ def load_json(path):
 
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--no-test", action="store_true",
+                    help="skip the legacy test/ clips section (test fixtures, not voice material)")
+    args = ap.parse_args()
     library = {"sections": []}
 
     # 1. Speaker voices (reference recordings + transcripts).
@@ -87,23 +92,25 @@ def main():
     )
 
     # 3. Test clips (pipeline inputs + ground-truth transcripts).
-    test_dir = os.path.join(REPO_ROOT, "test")
-    test_items = []
-    for name in audio_files(test_dir):
-        stem = os.path.splitext(name)[0]
-        transcript = ""
-        for cand in (stem + "_transcript.txt", stem + " transcript.txt"):
-            p = os.path.join(test_dir, cand)
-            if os.path.exists(p):
-                with open(p) as f:
-                    transcript = f.read().strip()
-                break
-        test_items.append(
-            {"name": stem, "file": "../../test/" + name, "transcript": transcript}
+    # Skipped with --no-test: test/*.wav are old unit-test fixtures, not voice material.
+    if not args.no_test:
+        test_dir = os.path.join(REPO_ROOT, "test")
+        test_items = []
+        for name in audio_files(test_dir):
+            stem = os.path.splitext(name)[0]
+            transcript = ""
+            for cand in (stem + "_transcript.txt", stem + " transcript.txt"):
+                p = os.path.join(test_dir, cand)
+                if os.path.exists(p):
+                    with open(p) as f:
+                        transcript = f.read().strip()
+                    break
+            test_items.append(
+                {"name": stem, "file": "../../test/" + name, "transcript": transcript}
+            )
+        library["sections"].append(
+            {"id": "test", "title": "Test clips (pipeline inputs)", "items": test_items}
         )
-    library["sections"].append(
-        {"id": "test", "title": "Test clips (pipeline inputs)", "items": test_items}
-    )
 
     out = os.path.join(REPO_ROOT, "ui", "voice-lab", "library.json")
     with open(out, "w") as f:
