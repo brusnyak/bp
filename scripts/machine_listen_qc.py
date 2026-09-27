@@ -38,6 +38,7 @@ TARGETS = {
     "piper_personal_sk_ns09.wav": ("sk", SK_AB),
     "piper_personal_sk_ns11.wav": ("sk", SK_AB),
     "piper_personal_sk_2500.wav": ("sk", SK_AB),
+    "piper_male_sk_test.wav": ("sk", SK_AB),
     "sk2500_ns05.wav": ("sk", SK_AB),
     "sk2500_ns08.wav": ("sk", SK_AB),
     "enpers_ns03.wav": ("en", EN_TEXT),
