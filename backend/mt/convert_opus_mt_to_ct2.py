@@ -36,6 +36,9 @@ def convert_model(model_name: str, output_dir: str, quantization: str = "int8"):
     # Convert and save the model, forcing overwrite if directory exists
     converter.convert(output_dir, quantization=quantization, force=True)
 
+    # Keep the tokenizer next to model.bin so runtime (ctranslate2_mt.py) never needs the network.
+    AutoTokenizer.from_pretrained(model_name).save_pretrained(output_dir)
+
     print(f"Model {model_name} successfully converted and saved to {output_dir}")
 
 import argparse

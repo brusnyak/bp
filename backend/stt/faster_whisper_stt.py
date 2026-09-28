@@ -1,6 +1,9 @@
+import os
 from faster_whisper import WhisperModel
 import numpy as np
 from typing import Optional, Tuple
+
+LOCAL_MODELS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "ct2_models")
 
 
 class FasterWhisperSTT:
@@ -16,7 +19,11 @@ class FasterWhisperSTT:
             compute_type (str): Type of computation to use (e.g., "int8", "float16", "float32").
         """
         self.model_size = model_size # Store model_size as an instance attribute
-        self.model = WhisperModel(model_size, device=device, compute_type=compute_type)
+        # Prefer a model fetched by scripts/setup.py into ct2_models/whisper-<size>: it needs no Hugging Face cache
+        # (whose symlinks fail on Windows without Developer Mode) and no network at runtime.
+        local = os.path.join(LOCAL_MODELS_DIR, f"whisper-{model_size}")
+        source = local if os.path.exists(os.path.join(local, "model.bin")) else model_size
+        self.model = WhisperModel(source, device=device, compute_type=compute_type)
         print(
             f"FasterWhisperSTT initialized with model_size={self.model_size}, device={device}, compute_type={compute_type}"
         )
@@ -60,13 +67,15 @@ class FasterWhisperSTT:
             transcribe_options["no_speech_threshold"] = None # Disable FasterWhisper's internal no-speech detection
 
         segments, info = self.model.transcribe(audio_data, **transcribe_options)
+        # transcribe() returns a lazy generator: the decoding happens while it is consumed, so the
+        # list() must be inside the timed region (it used to be outside, reporting ~0.02 s).
+        segments = list(segments)
 
         end_time = time.time()
         transcription_time = end_time - start_time
 
-        # Return the list of segments directly
         detected_language = info.language if info and hasattr(info, 'language') else None
-        return list(segments), transcription_time, detected_language
+        return segments, transcription_time, detected_language
 
 
 if __name__ == "__main__":

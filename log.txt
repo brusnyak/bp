@@ -1,8 +1,0 @@
-
-1. alright, now to clarify:
-activity log and that line below the chart could display all the log:
-the initialization, start of the session, change of the voice, change of the tts, language, end of the session, etc.
-
-2. shall we check xtts tts, right now even a single word takes like 2 seconds to synthesize, [06:01:56] Processed speech - STT: 0.44s, MT: 0.03s, TTS: 2.06s
-
-3. cannot open sidebar to see my recorded voices and user profile...

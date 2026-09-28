@@ -14,6 +14,9 @@ from fastapi.testclient import TestClient
 # Add the backend directory to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../backend')))
 
+os.environ.setdefault("BP_DEMO_USER", "1")  # some tests log in as the demo user (opt-in, see app.py)
+os.environ.setdefault("JWT_SECRET", "test-only-secret-not-used-outside-pytest")
+
 from app import create_app # Import the app-creating function
 from backend.main import get_db_dependency # Import get_db_dependency
 from backend.utils.db_manager import Base, get_db_session_and_engine, SQLALCHEMY_DATABASE_URL, User # Import User
