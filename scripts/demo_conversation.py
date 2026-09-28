@@ -102,7 +102,12 @@ def main():
     default_sk = os.environ.get("BP_SK_STT_MODEL") or (str(local_sk) if (local_sk / "model.bin").exists() else "large-v3-turbo")
     ap.add_argument("--sk-stt", default=default_sk, help="comma separated recognizer specs")
     ap.add_argument("--out", default="processed/demo")
+    ap.add_argument("--docs-dir", help="also write documentation assets here: audio-free HTML + standalone SVG charts")
+    ap.add_argument("--from-json", help="skip the run; render --docs-dir from a saved conversation_demo.json")
     a = ap.parse_args()
+    if a.from_json:
+        export_docs(json.loads(Path(a.from_json).read_text(encoding="utf-8")), Path(a.docs_dir or "documentation/demo"))
+        return
     modes = {"synthetic": ["synthetic"], "recordings": ["recordings"], "both": ["synthetic", "recordings"]}[
         a.inputs or ("recordings" if a.en_dir and a.sk_dir else "synthetic")]
     if "recordings" in modes and not (a.en_dir and a.sk_dir):
@@ -160,6 +165,26 @@ def main():
     (outdir / "conversation_demo.json").write_text(json.dumps(slim, indent=1, ensure_ascii=False), encoding="utf-8")
     (outdir / "conversation_demo.html").write_text(render(report), encoding="utf-8")
     print(f"wrote {outdir / 'conversation_demo.html'}")
+    if a.docs_dir:
+        export_docs(slim, Path(a.docs_dir))
+
+
+SVG_STYLE = ('<style>.lane{font:12px sans-serif;fill:#0f172a}.axis{stroke:#e2e8f0}.tick,.turn{font:10px sans-serif;fill:#64748b}'
+             '.lat{font:600 11px sans-serif;fill:#0f172a}.bar{font:11px sans-serif;fill:#fff}</style><rect width="100%" height="100%" fill="#fff"/>')
+
+
+def export_docs(report, docdir):
+    """Audio-free assets for the repository documentation (GitHub renders the SVGs inline)."""
+    docdir.mkdir(parents=True, exist_ok=True)
+    (docdir / "conversation_demo.json").write_text(json.dumps(report, indent=1, ensure_ascii=False), encoding="utf-8")
+    (docdir / "conversation_demo_noaudio.html").write_text(render(report), encoding="utf-8")
+    for run in report["runs"]:
+        slug = re.sub(r"[^a-z0-9]+", "-", f'{run["label"].split(" (")[0]}-{run["input"]}'.lower()).strip("-")
+        for name, fn in (("timeline", timeline_svg), ("breakdown", breakdown_svg)):
+            svg = fn(run)
+            head, rest = svg.split(">", 1)
+            (docdir / f"{name}_{slug}.svg").write_text(head + ">" + SVG_STYLE + rest, encoding="utf-8")
+    print(f"wrote documentation assets to {docdir}")
 
 
 # ---------------------------------------------------------------- report ----
@@ -230,7 +255,8 @@ def render(r):
             wer = f' <small>(WER {t["wer"]:.2f})</small>' if t.get("wer") is not None else ""
             rows.append(f'<tr><td>{i}</td><td>{d}</td><td>{html.escape(t["heard"])}{wer}</td><td>{html.escape(t["translation"])}</td>'
                         f'<td class="n">{t["stt_s"]:.2f}</td><td class="n">{t["mt_s"]:.2f}</td><td class="n">{t["tts_s"]:.2f}</td><td class="n"><b>{t["latency_s"]:.2f}</b></td>'
-                        f'<td><audio controls preload="none" src="data:audio/wav;base64,{t["audio_b64"]}"></audio></td></tr>')
+                        + (f'<td><audio controls preload="none" src="data:audio/wav;base64,{t["audio_b64"]}"></audio></td></tr>'
+                           if t.get("audio_b64") else '<td>–</td></tr>'))
         panels.append(f'<section class="panel" id="p{k}"><h3>Where the time goes (median per stage)</h3>{breakdown_svg(run)}'
                       f'<h3>Conversation timeline</h3>{timeline_svg(run)}<div class="legend">{legend}</div>'
                       f'<table><thead><tr><th>#</th><th>Dir.</th><th>Recognized</th><th>Translated</th><th>STT s</th><th>MT s</th><th>TTS s</th><th>Total s</th><th>Voice</th></tr></thead><tbody>{"".join(rows)}</tbody></table></section>')

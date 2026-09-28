@@ -61,11 +61,13 @@ The translation model is not the bottleneck; recognition errors are. An alternat
 
 Two complete runs (the second while the machine was also doing other work), each with synthetic speech and with real recordings; ranges are min-max of the medians over those four conversations:
 
-| Slovak recognizer | EN -> SK | SK -> EN | SK WER (synthetic dialogue) |
+| Slovak recognizer | EN -> SK | SK -> EN | SK WER (synthetic dialogue, 3 sentences) |
 | --- | --- | --- | --- |
-| `large-v3-turbo` (previous default) | 1.0-1.3 s | 8.9-10.8 s | 0.12 |
-| **Slovak-tuned `small` (new default)** | 1.0-1.4 s | **2.6-3.5 s** | **0.07** |
-| Parakeet v3 int8 | 0.9-1.3 s | 0.4-0.9 s | 0.18 |
+| `large-v3-turbo` (previous default) | 1.0-1.3 s | 8.9-10.8 s | 0.07-0.12 |
+| **Slovak-tuned `small` (new default)** | 1.0-1.4 s | **2.6-3.5 s** | 0.07-0.09 |
+| Parakeet v3 int8 | 0.9-1.3 s | 0.4-0.9 s | 0.12-0.18 |
+
+The WER column scores only three Slovak sentences per run and Piper's synthesis is not deterministic, so its values change between runs and the differences between recognizers there are noise; use section 1 for accuracy.
 
 English -> Slovak costs about 1 s (STT 0.7-0.9 s, MT 0.1 s, TTS 0.1-0.3 s). Piper's very first call used to cost ~2.7 s; the engine is now warmed up at load time. Timings on a laptop vary by 10-30% run to run, so treat single numbers as approximate.
 

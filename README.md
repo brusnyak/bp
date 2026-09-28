@@ -209,7 +209,7 @@ python scripts/demo_conversation.py --sk-stt "tuned=ct2_models/whisper-small-sk,
 # parakeet needs: pip install "onnx-asr[cpu,hub]"
 ```
 
-Plays a six-turn dialogue (Person A speaks English, Person B answers in Slovak) through the real speech-to-text, translation and text-to-speech backends and writes `processed/demo/conversation_demo.html`: a timeline chart per conversation, a "where the time goes" breakdown, a comparison of Slovak recognizers, and a table with the recognized text, the translation, every stage time and the translated audio. Add `--inputs both --en-dir ... --sk-dir ...` to also use your own recordings. Measured results are in [`documentation/model_evaluation_2026-09.md`](documentation/model_evaluation_2026-09.md).
+Plays a six-turn dialogue (Person A speaks English, Person B answers in Slovak) through the real speech-to-text, translation and text-to-speech backends and writes `processed/demo/conversation_demo.html`: a timeline chart per conversation, a "where the time goes" breakdown, a comparison of Slovak recognizers, and a table with the recognized text, the translation, every stage time and the translated audio. Add `--inputs both --en-dir ... --sk-dir ...` to also use your own recordings. Measured results, charts and the per-turn table are in [`documentation/demo_report_2026-09.md`](documentation/demo_report_2026-09.md); the model comparison is in [`documentation/model_evaluation_2026-09.md`](documentation/model_evaluation_2026-09.md).
 
 To evaluate on a fresh recording: `python scripts/build_recording_set.py`, then `python scripts/record_reading.py`, then `scripts/eval_stt.py` (see the evaluation document).
 
