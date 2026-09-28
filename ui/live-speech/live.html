@@ -422,11 +422,13 @@
               </select>
             </div>
             <div class="modal-section">
-              <p>Please read the following statement clearly:</p>
-              <p class="reading-text" id="readingText">
-                "Reading this statement, I agree to provide my voice for cloning purposes.
-                My voice will be used to synthesize translated speech within this application."
+              <p>Please read the following passage clearly (same script we train voices on):</p>
+              <p>
+                <button class="btn-small passage-tab" data-lang="en">English</button>
+                <button class="btn-small passage-tab" data-lang="sk">Slovenčina</button>
+                <button class="btn-small passage-tab" data-lang="cs">Čeština</button>
               </p>
+              <pre class="reading-text" id="readingText" style="white-space:pre-wrap;max-height:220px;overflow:auto;">loading…</pre>
               <div class="input-level-container modal-input-level" aria-live="polite" aria-atomic="true">
                 <span class="Mic Input Level"></span>
                 <label id="modalMicLevelLabel" class="visually-hidden">Mic Input Level:</label>
