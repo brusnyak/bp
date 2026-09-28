@@ -72,6 +72,13 @@ class PiperTTS:
             print(f"ERROR: Failed to load Piper model '{model_id}': {e}")
             raise RuntimeError(f"Failed to load Piper model '{model_id}': {e}") from e
 
+        # The first inference builds onnxruntime's execution plan (~2.7 s measured on a 6-core CPU vs
+        # 0.2-0.3 s afterwards). Pay it at init instead of on the user's first sentence.
+        try:
+            self.synthesize("Test.", language="en")
+        except Exception:
+            pass  # warm-up is best effort; a real failure will surface on the first real call
+
     def synthesize(
         self,
         text: str,

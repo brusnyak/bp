@@ -23,6 +23,7 @@ To add a new engine (e.g. if a faster/better model replaces one of these):
 
 Nothing in main.py changes when you do this.
 """
+import os
 from typing import Callable, Dict
 
 from backend import hardware
@@ -35,12 +36,29 @@ except ImportError:
     # omni_tts.py / hybrid_tts.py already use -- the "xtts" engine just stays
     # unregistered instead of breaking every import of this module.
     CoquiTTS = None
-from backend.tts.hybrid_tts import HybridTTS
-from backend.tts.omni_tts import OmniVoiceTTS
+# Lite install has no torch: both engines import it at module level, so guard like CoquiTTS.
+try:
+    from backend.tts.hybrid_tts import HybridTTS
+except ImportError:
+    HybridTTS = None
+try:
+    from backend.tts.omni_tts import OmniVoiceTTS
+except ImportError:
+    OmniVoiceTTS = None
 
 
 def _piper_factory() -> PiperTTS:
     return PiperTTS(model_id="cs_CZ-jirka-medium", device=hardware.detect_backend("tts_baseline"))
+
+
+_PIPER_DIR = os.path.join("backend", "tts", "piper_models")
+
+
+def _piper(preferred: str, fallback: str) -> PiperTTS:
+    """Personal fine-tuned voices are local-only (never committed); a fresh clone falls back to the
+    public Piper voice that scripts/setup.py downloads."""
+    have = os.path.exists(os.path.join(_PIPER_DIR, f"{preferred}.onnx"))
+    return PiperTTS(model_id=preferred if have else fallback, device=hardware.detect_backend("tts_baseline"))
 
 
 def _piper_personal_factory() -> PiperTTS:
@@ -49,19 +67,19 @@ def _piper_personal_factory() -> PiperTTS:
     # was trained on EN-only recordings, so this is not a generic-language voice like the other
     # Piper entries; no SUPPORTS_CLONING flag exists for "clones one specific pre-baked speaker",
     # it's just a different fixed voice.
-    return PiperTTS(model_id="en_US-personal-medium", device=hardware.detect_backend("tts_baseline"))
+    return _piper("en_US-personal-medium", "en_US-ryan-medium")
 
 
 def _piper_personal_v2_factory() -> PiperTTS:
     # Second EN fine-tune (scripts/finetune_personal_voice.py, real-audio-only).
     # Ear verdict 2026-09-27 pending between v1/v2 (v1: F0 100Hz HNR -3.9; v2: 111Hz -5.9).
-    return PiperTTS(model_id="en_US-personal-v2", device=hardware.detect_backend("tts_baseline"))
+    return _piper("en_US-personal-v2", "en_US-ryan-medium")
 
 
 def _piper_sk_personal_factory() -> PiperTTS:
     # User's SK voice: jirka-male warmstart, 2500 steps on 18 segmented clips
     # (2026-09-27). Default SK output voice — replaces the Czech generic base.
-    return PiperTTS(model_id="sk_SK-personal-male-medium", device=hardware.detect_backend("tts_baseline"))
+    return _piper("sk_SK-personal-male-medium", "sk_SK-lili-medium")
 
 
 def _xtts_factory():
@@ -83,9 +101,11 @@ TTS_ENGINES: Dict[str, Callable[[], object]] = {
     "piper_personal": _piper_personal_factory,
     "piper_personal_v2": _piper_personal_v2_factory,
     "piper_sk_personal": _piper_sk_personal_factory,
-    "hybrid": _hybrid_factory,
-    "omnivoice": _omnivoice_factory,
 }
 
+if HybridTTS is not None:
+    TTS_ENGINES["hybrid"] = _hybrid_factory
+if OmniVoiceTTS is not None:
+    TTS_ENGINES["omnivoice"] = _omnivoice_factory
 if CoquiTTS is not None:
     TTS_ENGINES["xtts"] = _xtts_factory

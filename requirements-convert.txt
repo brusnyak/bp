@@ -1,0 +1,11 @@
+# Used ONLY by scripts/convert_models.py inside a throwaway venv (.venv-convert, deleted afterwards).
+torch==2.6.0
+transformers==4.46.3
+tokenizers==0.20.3
+accelerate==0.33.0
+ctranslate2>=4.0.0
+sentencepiece==0.2.1
+sacremoses
+numpy==1.26.4
+huggingface-hub==0.36.0
+hf_xet

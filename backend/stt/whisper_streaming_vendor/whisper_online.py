@@ -111,6 +111,13 @@ class FasterWhisperASR(ASRBase):
             model_size_or_path = model_dir
         elif modelsize is not None:
             model_size_or_path = modelsize
+            # Project change: prefer the plain directory fetched by scripts/setup.py (no Hugging Face cache symlinks,
+            # which fail on Windows without Developer Mode, and no network at runtime); same rule as FasterWhisperSTT.
+            import os
+            local = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
+                                 "ct2_models", f"whisper-{modelsize}")
+            if os.path.exists(os.path.join(local, "model.bin")):
+                model_size_or_path = local
         else:
             raise ValueError("modelsize or model_dir parameter must be set")
 
