@@ -29,6 +29,8 @@ REQUIRED = [
     (".env", "secrets file: GOOGLE_CLIENT_ID + JWT_SECRET (see documentation/amd_fetch_checklist.md)"),
     ("backend/tts/piper_models/sk_SK-personal-male-medium.onnx",
      "shipped personal SK voice (the demo voice)"),
+    ("backend/tts/piper_models/sk_SK-personal-male-medium.onnx.json",
+     "Piper sidecar config for the demo voice (without it TTS init fails and the WS never acks — hit on Linux 2026-09-28)"),
     ("backend/tts/piper_models/cs_CZ-jirka-medium.onnx", "Piper base for SK text"),
     ("ct2_models/Helsinki-NLP--opus-mt-en-sk/model.bin", "Opus-MT EN->SK"),
     ("ct2_models/Helsinki-NLP--opus-mt-sk-en/model.bin", "Opus-MT SK->EN"),
