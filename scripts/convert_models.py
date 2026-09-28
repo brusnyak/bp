@@ -22,10 +22,15 @@ def run(cmd):
     subprocess.run([str(c) for c in cmd], cwd=ROOT, env=ENV, check=True)
 
 
+SK_STT = ("NaiveNeuron/whisper-small-sk", "ct2_models/whisper-small-sk")  # Slovak-fine-tuned Whisper small (MIT)
+
+
 def main():
+    skip_stt = "--skip-stt-model" in sys.argv
     todo = [p for p in PAIRS if not (ROOT / "ct2_models" / f"Helsinki-NLP--opus-mt-{p}" / "model.bin").exists()]
-    if not todo:
-        print("all MT models already converted")
+    need_stt = not skip_stt and not (ROOT / SK_STT[1] / "model.bin").exists()
+    if not todo and not need_stt:
+        print("all models already converted")
         return
     try:
         run([sys.executable, "-m", "venv", TMP])
@@ -38,6 +43,8 @@ def main():
             run([PY, "-c",
                  "import sys; sys.setrecursionlimit(2000); import backend.mt.convert_opus_mt_to_ct2 as c; "
                  f"c.convert_model('Helsinki-NLP/opus-mt-{p}', 'ct2_models/Helsinki-NLP--opus-mt-{p}', quantization='int8')"])
+        if need_stt:
+            run([PY, "scripts/convert_whisper.py", *SK_STT])
     finally:
         shutil.rmtree(TMP, ignore_errors=True)
 

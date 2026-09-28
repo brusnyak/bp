@@ -5,3 +5,4 @@ httpx==0.28.1
 jiwer==4.0.0
 sacrebleu==2.5.1
 nltk==3.10.3
+sounddevice

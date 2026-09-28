@@ -17,7 +17,6 @@ venv/
 
 # IDE/Editor specific
 .idea/
-.vscode/
 .continue/
 
 # Build artifacts
@@ -77,3 +76,6 @@ sql_app.db
 speaker_voices/synth_*.wav
 eval_data/
 .cache/
+
+# generated from NTREX-128 (not redistributed); rebuild with scripts/build_recording_set.py
+documentation/recording_script_sk_v2.md

@@ -13,7 +13,7 @@ from faster_whisper import WhisperModel
 
 model_name = sys.argv[1]; ctype = sys.argv[2] if len(sys.argv) > 2 else "int8"
 refs = [r[1] for r in cs.script_rows()]
-clips = sorted(glob.glob(os.path.join(B, "eval_data", "sk_clips", "sk_*.wav")))
+clips = sorted(glob.glob(os.path.join(os.environ.get("EVAL_CLIPS_DIR", os.path.join(B, "eval_data", "sk_clips")), "sk_*.wav")))
 assert len(clips) == len(refs) == 18, (len(clips), len(refs))
 
 norm = lambda s: re.sub(r"\s+", " ", re.sub(r"[^\w\s]", " ", s.lower())).strip()
@@ -31,5 +31,6 @@ out = {"model": model_name, "compute": ctype, "load_s": round(load_s, 1),
        "s_per_clip": round(sum(times) / len(times), 2), "rtf": round(sum(times) / audio_s, 2), "audio_s": round(audio_s, 1),
        "hyps": hyps}
 os.makedirs(os.path.join(B, "processed", "eval_out"), exist_ok=True)
-json.dump(out, open(os.path.join(B, "processed", "eval_out", f"stt_{model_name.replace('/', '_')}_{ctype}.json"), "w", encoding="utf-8"), indent=1, ensure_ascii=False)
+tag = os.path.basename(model_name.replace("\\", "/").rstrip("/"))  # model name or local model directory
+json.dump(out, open(os.path.join(B, "processed", "eval_out", f"stt_{tag}_{ctype}.json"), "w", encoding="utf-8"), indent=1, ensure_ascii=False)
 print({k: v for k, v in out.items() if k != "hyps"})
