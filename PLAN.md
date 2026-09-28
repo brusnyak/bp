@@ -1,6 +1,9 @@
 # BP Dev Plan — where we are, what's ahead
 
-Branch: `main` (local, unpushed). Docs: `documentation/voice_and_app_direction_2026-09.md`.
+Branch: `main` + `merge/windows-amd-cpu` (2026-09-28, verified: Windows CPU-setup work
+merged, `main` fast-forwards onto it). Two machines: Mac M1 Pro (reference) and the
+Windows 11 AMD CPU-only laptop. Docs: `documentation/voice_and_app_direction_2026-09.md`,
+`documentation/demo_runbook_2026-09-28.md`, `AGENTS.md`.
 Thesis rules: faculty guide + §4.1 AI rules → `Deklarácia k využitiu UI` skeleton lives in
 `documentation/thesis_draft.md` (one `[DOPLNIŤ]` marker left).
 
@@ -16,6 +19,34 @@ Thesis rules: faculty guide + §4.1 AI rules → `Deklarácia k využitiu UI` sk
 - [x] Session JSONL logging (`processed/sessions/`)
 - [x] Single `bp` CLI (`corpus/qc/stt/e2e/library/script`)
 - [x] PWA installable: manifest on all pages, maskable icons, shell v2, apple-touch-icon
+- [x] Windows/AMD CPU-only port merged (2026-09-28): guarded Coqui import, engine-name
+  write-back on the SK remap, `logging` instead of `print` on the MT hot path, UTF-8
+  session logs, ctranslate2/transformers dtype compat, stale-test cleanup,
+  `requirements-windows.txt` + `SETUP_WINDOWS.md` (16/16 green on stock Windows 11, e2e ~3.6s)
+- [x] Demo readiness (2026-09-28): `make demo-check` pre-flight, runbook, clean WS teardown,
+  fallback clip committed to git (was Mac-only)
+
+## Measured findings 2026-09-28 (merge + demo verification, M1 Pro)
+
+- Merged the Windows/AMD work into the main line: only `ui/voice-lab/library.json`
+  (generated) conflicted; resolved by re-running the generator, so the committed manifest
+  lists git-tracked assets only.
+- **The merge fixed a live SK-output bug on every machine**: the `piper` →
+  `piper_sk_personal` remap never wrote the effective engine name back into
+  `session_config`, so `tts_engine_name != session_config["tts_model_choice"]` and both
+  lookups returned `None` — translation text arrived, synthesis silently never ran.
+  `test/backend_api_tests.py::test_initialize_full_pipeline_live` now pins it.
+- Live WS rehearsal (`test/interrupt_smoke_test.py`): 2 utterances + barge-in →
+  9 translations, 5 partial captions, 228 TTS audio chunks, final metrics
+  **STT 0.51s / MT 0.10s / TTS 0.17s / total 0.78s**. Teardown: one INFO line, no ERROR.
+- Test suite green: hardware 7 + VAD 4 + auth 6 + API 3 = **20 passed**, plus
+  `test/piper_pipeline_test.py` (exit 0). Two defects fixed while verifying:
+  `"xtts" not in engines` was a Windows-only assertion (macOS has Coqui — now
+  conditional), and the API-test fixture used to wipe `speaker_voices.json` + `*.wav`
+  (must stay snapshot/restore).
+- Rehearsal artifact for the honest-gaps slide: MT reads literally on a misheard word
+  ("into Slovak" → "do pomalého wacku") — Opus-MT behaviour on a bad transcript, not a
+  new bug.
 
 ## Measured findings 2026-09-27 (evidence, not vibes)
 
@@ -37,17 +68,23 @@ Thesis rules: faculty guide + §4.1 AI rules → `Deklarácia k využitiu UI` sk
 
 ## Now (one at a time)
 
-- [ ] Overnight SK 2500-step run → export → lab A/B listen (timbre? F0 recovery?)
-- [ ] EN personal same treatment (August run likely undertrained too)
+- [ ] Merge `main` forward in the Mac checkout (`git merge --ff-only merge/windows-amd-cpu`
+      from `~/Documents/STU/BP`), re-run `make test` + `test/interrupt_smoke_test.py`, then
+      re-generate the Voice Lab manifest to pick up the untracked `*_v2b` takes
+- [ ] Ask before pushing: `main` is now demoable (20 tests + live rehearsal green); push
+      so the Windows laptop sees the same HEAD, then send the handler update + demo ask
+- [ ] EN personal voice same treatment as SK (August run likely undertrained too)
 - [ ] Per-language STT router in backend (Parakeet EN / whisper-small SK)
 - [ ] QC similarity scoring (resemblyzer) only after a proper clone exists
-- [ ] Push `main` when demoable; handler update message + demo ask
 
 ## Next
 
 - [ ] Thesis numbers corrected to measured + `[DOPLNIŤ]` marker filled
-- [ ] Stage-demo prep: script, pre-warmed models, soundcheck VAD, backup take
-- [ ] Env raw-test on clean checkout (this Mac + 2nd ARM laptop) — parked until complete
+- [ ] Stage-demo dry run on the real machine: runbook → `documentation/demo_runbook_2026-09-28.md`
+      (pre-flight, script, fallback ladder, timings); checklist → `documentation/monday_test_checklist.md`
+- [ ] Delete `test/full_pipeline_test.py` (dead F5 leftover, breaks `pytest test/` collection)
+- [ ] Env raw-test on clean checkout (this Mac + Windows laptop) — Windows half now done via
+      `SETUP_WINDOWS.md`; Mac half parked until the project is complete
 
 ## Run things
 
@@ -55,7 +92,9 @@ Thesis rules: faculty guide + §4.1 AI rules → `Deklarácia k využitiu UI` sk
 |---|---|
 | `make lab` | Voice Lab review page, static only (no login/upload — those need `make run`) |
 | `make run` | Full backend (https://localhost:8000) |
-| `make test` | Backend suite (existing files only) |
+| `make demo-check` | Demo pre-flight (assets + live server; `scripts/demo_preflight.py --server`) |
+| `make test` | Backend suite: piper pipeline + VAD + hardware + auth + API tests (20 pass, 2026-09-28) |
+| `venv/bin/python test/interrupt_smoke_test.py` | Live WS rehearsal over `/ws` (needs `make run`) |
 | `python3 scripts/update_voice_lab_library.py --no-test` | Refresh Voice Lab manifest |
 | `venv/bin/python scripts/voice_similarity_qc.py --synthesize-only` | Synthesize QC candidates |
 | `.venv-stt/bin/python scripts/stt_parakeet_spike.py --clip en\|sk` | Parakeet spike (separate venv) |

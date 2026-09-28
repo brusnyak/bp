@@ -24,15 +24,27 @@ client = TestClient(app)
 def setup_test_environment():
     # Ensure speaker_voices directory exists for tests
     os.makedirs(SPEAKER_VOICES_DIR, exist_ok=True)
+    # Snapshot the real registry + directory contents BEFORE the test writes its empty
+    # registry. The old teardown wrote [] and unlinked every *.wav in place, which on a
+    # machine with real recordings destroyed the user's speaker metadata for good
+    # (nothing in git to restore it from on Windows; on macOS only the committed copy
+    # saves you). Restore-instead-of-destroy, 2026-09-28.
+    meta_backup = None
+    if os.path.exists(SPEAKER_VOICES_METADATA_FILE):
+        with open(SPEAKER_VOICES_METADATA_FILE, encoding="utf-8") as f:
+            meta_backup = f.read()
+    files_before = set(os.listdir(SPEAKER_VOICES_DIR))
     # Clear metadata file before tests
     _write_speaker_voices_metadata([]) # Initialize as an empty list
     yield
-    # Clean up after tests
-    if os.path.exists(SPEAKER_VOICES_METADATA_FILE):
+    # Clean up after tests: restore the registry, remove only files the test created
+    if meta_backup is not None:
+        with open(SPEAKER_VOICES_METADATA_FILE, "w", encoding="utf-8") as f:
+            f.write(meta_backup)
+    elif os.path.exists(SPEAKER_VOICES_METADATA_FILE):
         os.remove(SPEAKER_VOICES_METADATA_FILE)
-    # Clean up any test WAV files
     for f in os.listdir(SPEAKER_VOICES_DIR):
-        if f.endswith(".wav") or f.startswith("temp_upload_"):
+        if f not in files_before and (f.endswith(".wav") or f.startswith("temp_upload_")):
             os.remove(os.path.join(SPEAKER_VOICES_DIR, f))
 
 # --- Mocking external dependencies ---
@@ -67,8 +79,12 @@ def test_voice_lab_status_no_auth():
     assert response.status_code == 200
     body = response.json()
     assert "piper" in body["engines"]
-    # Coqui has no Windows wheels -> guarded import -> xtts must NOT be advertised.
-    assert "xtts" not in body["engines"]
+    # Coqui has no Windows wheels -> guarded import (backend/tts/base.py, backend/main.py).
+    # So "xtts" is advertised exactly when Coqui actually imported: absent on stock
+    # Windows, present on macOS/Linux. Asserting it must be absent everywhere was a
+    # Windows-only expectation and failed on macOS (measured 2026-09-28).
+    from backend.main import CoquiTTS
+    assert ("xtts" in body["engines"]) is (CoquiTTS is not None)
     assert body["hardware_backends"]["stt"] == "cpu"
     assert body["hardware_backends"]["mt"] == "cpu"
 
