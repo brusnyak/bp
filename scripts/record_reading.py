@@ -36,6 +36,7 @@ def record(sd, device):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--set", default=str(ROOT / "eval_data" / "recording_set_v2"))
+    ap.add_argument("--lang", default="sk", choices=["sk", "en"], help="manifest field to read and file prefix (sk_00.wav / en_00.wav)")
     ap.add_argument("--device", type=int, default=None)
     ap.add_argument("--list-devices", action="store_true")
     ap.add_argument("--redo", type=int, default=None, help="re-record just this sentence id")
@@ -44,15 +45,17 @@ def main():
     if a.list_devices:
         print(sd.query_devices()); return
     d = Path(a.set)
+    lang = a.lang
+    other = "en" if lang == "sk" else "sk"
     items = json.loads((d / "manifest.json").read_text(encoding="utf-8"))
     for it in items:
-        path = d / f"sk_{it['id']:02d}.wav"
+        path = d / f"{lang}_{it['id']:02d}.wav"
         if a.redo is not None and it["id"] != a.redo:
             continue
         if path.exists() and a.redo is None:
             continue
         while True:
-            print(f"\n[{it['id'] + 1}/{len(items)}]  {it['sk']}\n(en: {it['en']})")
+            print(f"\n[{it['id'] + 1}/{len(items)}]  {it[lang]}\n({other}: {it[other]})")
             input("  Enter = start recording ")
             print("  ● recording... Enter = stop")
             audio = record(sd, a.device)
@@ -69,7 +72,7 @@ def main():
             if ans != "s":
                 sf.write(path, audio, SR, subtype="PCM_16")
             break
-    print("\nDone. Files:", len(list(d.glob('sk_*.wav'))), "in", d)
+    print(f"\nDone. Files:", len(list(d.glob(f'{lang}_*'))), "in", d)
 
 
 if __name__ == "__main__":
