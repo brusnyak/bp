@@ -21,19 +21,28 @@ from typing import Callable, Dict, List, Tuple
 Stage = str  # "stt" | "mt" | "tts_baseline" | "tts_clone"
 
 
+def _torch():
+    # torch is optional (lite install): no torch => no CUDA/ROCm/MPS => CPU chain.
+    try:
+        import torch
+        return torch
+    except ImportError:
+        return None
+
+
 def _cuda() -> bool:
-    import torch
-    return torch.cuda.is_available()
+    torch = _torch()
+    return torch is not None and torch.cuda.is_available()
 
 
 def _rocm() -> bool:
-    import torch
-    return platform.system() == "Linux" and getattr(torch.version, "hip", None) is not None
+    torch = _torch()
+    return torch is not None and platform.system() == "Linux" and getattr(torch.version, "hip", None) is not None
 
 
 def _mps() -> bool:
-    import torch
-    return platform.system() == "Darwin" and torch.backends.mps.is_available()
+    torch = _torch()
+    return torch is not None and platform.system() == "Darwin" and torch.backends.mps.is_available()
 
 
 def _onnx_provider(name: str) -> bool:

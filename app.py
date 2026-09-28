@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()  # local .env (GOOGLE_CLIENT_ID etc.) — untracked, never committed
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -11,6 +11,14 @@ import asyncio
 import json
 import os
 import sys # Import sys
+
+# Slovak/Czech text in log lines raises UnicodeEncodeError on consoles that default to cp1252 (stock Windows),
+# which used to kill the pipeline task. Make the streams UTF-8 so no PYTHONIOENCODING is needed.
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 import time # Import time for timing logs
 from typing import Optional, List # Ensure List is imported
 import threading
@@ -26,25 +34,31 @@ from sqlalchemy.orm import Session # Import Session
 from backend.utils.db_manager import get_db_session_and_engine, SQLALCHEMY_DATABASE_URL, get_db, init_db # Import init_db
 from fastapi import UploadFile, File, Depends # Import Depends
 
+class _AudioOnlyStatic(StaticFiles):
+    """Serve voice clips but never speaker_voices.json (it lists every user's uploads and file paths)."""
+
+    async def get_response(self, path, scope):
+        if not path.lower().endswith((".wav", ".m4a", ".mp3", ".webm", ".ogg")):
+            raise HTTPException(status_code=404)
+        return await super().get_response(path, scope)
+
+
 # Define module-level engine and SessionLocal for non-test runs
 _default_engine, _default_SessionLocal = get_db_session_and_engine(SQLALCHEMY_DATABASE_URL)
 
 # Function to create a default user if no users exist, now accepts SessionLocal
 async def create_default_user_if_empty(db_session_local):
+    # A well-known account (test@example.com / password) is a backdoor on any reachable server,
+    # so it exists only when explicitly requested for local development / tests.
+    if os.environ.get("BP_DEMO_USER") != "1":
+        return
     with db_session_local() as db:
         if db.query(User).count() == 0:
-            print("APP: No users found in the database. Creating a default user.")
             default_email = "test@example.com"
-            default_password = "password"
-            hashed_password = get_password_hash(default_password)
-            print(f"APP: Hashed password for default user: {hashed_password[:10]}...") # Log first 10 chars
-            default_user = User(username="testuser", email=default_email, hashed_password=hashed_password)
-            db.add(default_user)
+            hashed_password = get_password_hash("password")
+            db.add(User(username="testuser", email=default_email, hashed_password=hashed_password))
             db.commit()
-            db.refresh(default_user)
-            print(f"APP: Default user '{default_email}' created successfully.")
-        else:
-            print("APP: Users already exist in the database. Skipping default user creation.")
+            print(f"APP: BP_DEMO_USER=1 -> demo user '{default_email}' created (development only).")
 
 from contextlib import asynccontextmanager
 
@@ -116,7 +130,7 @@ def create_app(db_session_local_override=None) -> FastAPI:
     os.makedirs("processed/voice_qc", exist_ok=True)
     _app.mount("/ui", StaticFiles(directory="ui"), name="ui")
     _app.mount("/ui/images", StaticFiles(directory="ui/images"), name="images") # Explicitly mount images
-    _app.mount("/speaker_voices", StaticFiles(directory="speaker_voices"), name="speaker_voices")
+    _app.mount("/speaker_voices", _AudioOnlyStatic(directory="speaker_voices"), name="speaker_voices")
     # Voice-lab eval page (ui/voice-lab/): serves QC candidate audio + manifests.
     # Read-only static mount, same pattern as /speaker_voices above.
     _app.mount("/voice_qc", StaticFiles(directory="processed/voice_qc"), name="voice_qc")
@@ -127,7 +141,7 @@ def create_app(db_session_local_override=None) -> FastAPI:
 
     @_app.get("/", response_class=HTMLResponse)
     async def read_root(request: Request):
-        return templates.TemplateResponse("home/home.html", {"request": request})
+        return templates.TemplateResponse(request, "home/home.html")  # (request, name) signature: starlette >= 0.29
 
 
 
@@ -338,10 +352,15 @@ if __name__ == "__main__":
     os.makedirs("backend/tts/piper_models", exist_ok=True)
     os.makedirs("speaker_voices", exist_ok=True)
     os.makedirs("processed/voice_qc", exist_ok=True)
+    # Loopback by default: the API has open registration and an unauthenticated /ws.
+    # For a conference/LAN demo opt in explicitly: BP_HOST=0.0.0.0
+    host = os.environ.get("BP_HOST", "127.0.0.1")
+    if host not in ("127.0.0.1", "localhost", "::1"):
+        print(f"APP: WARNING - listening on {host}; anyone on the network can register and use /ws.")
     uvicorn.run(
         "app:app", # Changed to reference the app object directly
-        host="0.0.0.0",
-        port=8000,
+        host=host,
+        port=int(os.environ.get("BP_PORT", "8000")),
         ssl_keyfile="./certs/key.pem",
         ssl_certfile="./certs/cert.pem",
         log_level="info", # Set log level to info for cleaner output
