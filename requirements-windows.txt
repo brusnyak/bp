@@ -1,3 +1,18 @@
+# === requirements-windows.txt: the TESTED Windows/CPU install set (2026-09-28) ===
+# Verified end-to-end on stock Windows 11, Python 3.11.16, CPU-only (AMD iGPU, no
+# NVIDIA): venv builds, full pipeline (VAD->STT->MT->Piper) runs, 11/11 hardware+VAD
+# tests green. Resolved with `uv pip` (strict resolver).
+#
+# Deltas vs requirements.txt (each marked SANDBOX-NOTE inline):
+#   1. omnivoice==0.1.4 OUT -- requires transformers>=5.3.0, file pins 4.46.3.
+#      Optional at runtime (guarded import); reinstall manually with --no-deps if needed.
+#   2. OpenVoice transitive block OUT (whisper_timestamped..resampy) -- dtw-python==1.7.5
+#      requires numpy>=2.0, file pins numpy==1.26.4. Nothing imports them at module level.
+#   3. TTS==0.22.0 (Coqui/XTTS) OUT -- Linux-only wheels; sdist needs MSVC 14+.
+#      Code imports it guarded (backend/tts/base.py, backend/main.py); "xtts" engine
+#      simply reports unavailable. Re-enable on Linux or after MSVC Build Tools.
+# Everything else installs from wheels, no compiler needed.
+#
 # === CORE FRAMEWORK ===
 # Backend (cuda/mps/rocm/cpu) is a runtime decision made by backend/hardware.py, not an
 # install-time pin — this requirements.txt installs the standard PyPI torch build, which

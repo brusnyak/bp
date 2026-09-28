@@ -1,0 +1,89 @@
+{
+  "sentences": [
+    {
+      "dir": "en_sk",
+      "n": 0,
+      "src": "In this experiment, the system converts spoken English into text.",
+      "tgt": "V tomto experimente systém premieňa hovorenú angličtinu na text.",
+      "stt_s": 0.1,
+      "mt_sentence_s": 0.099,
+      "tts_s": 0.32,
+      "audio_s": 4.8
+    },
+    {
+      "dir": "en_sk",
+      "n": 1,
+      "src": "Translate it into Slavak and then synthesizes it back into speech.  The process involves three stages, speech recognition, machine translation and text to speech.",
+      "tgt": "Prelož ho do Slavaku a potom ho syntetizuje späť do reči. Proces zahŕňa tri etapy, rozpoznávanie reči, strojový preklad a text do reči.",
+      "stt_s": 0.05,
+      "mt_sentence_s": 0.205,
+      "tts_s": 0.5,
+      "audio_s": 10.5
+    },
+    {
+      "dir": "en_sk",
+      "n": 2,
+      "src": "Each model introduces a small delay, so we will measure the overall latency.",
+      "tgt": "Každý model predstavuje malé oneskorenie, takže zmeriame celkovú latenciu.",
+      "stt_s": 0.03,
+      "mt_sentence_s": 0.1,
+      "tts_s": 0.28,
+      "audio_s": 5.8
+    },
+    {
+      "dir": "en_sk",
+      "n": 3,
+      "src": "The main objective is to achieve natural communication despite language barriers.",
+      "tgt": "Hlavným cieľom je dosiahnuť prirodzenú komunikáciu napriek jazykovým bariéram.",
+      "stt_s": 0.03,
+      "mt_sentence_s": 0.083,
+      "tts_s": 0.3,
+      "audio_s": 6.5
+    },
+    {
+      "dir": "sk_en",
+      "n": 0,
+      "src": "Dobrý den, týtam vás na dnešné povede o preklade reči.",
+      "tgt": "Hello, I'm asking you to tell us today about the translation of the speech.",
+      "stt_s": 0.02,
+      "mt_sentence_s": 0.115,
+      "tts_s": 0.2,
+      "audio_s": 3.5,
+      "note": "source audio synthesized by Piper (stand-in meeting clip)"
+    },
+    {
+      "dir": "sk_en",
+      "n": 1,
+      "src": "System funkuje okolne, ani potrekuje internetové pripojmy.",
+      "tgt": "The system functions outside or punishes internet connections.",
+      "stt_s": 0.02,
+      "mt_sentence_s": 0.071,
+      "tts_s": 0.19,
+      "audio_s": 3.8,
+      "note": "source audio synthesized by Piper (stand-in meeting clip)"
+    },
+    {
+      "dir": "sk_en",
+      "n": 2,
+      "src": "Ďakujem vám sa poslednosti, težim sa na vaši odtasky.",
+      "tgt": "Thank you for the last time, I look forward to your tastings.",
+      "stt_s": 0.02,
+      "mt_sentence_s": 0.116,
+      "tts_s": 0.15,
+      "audio_s": 2.6,
+      "note": "source audio synthesized by Piper (stand-in meeting clip)"
+    }
+  ],
+  "agg": {
+    "en_sk": {
+      "stt": 0.05,
+      "mt": 0.1,
+      "tts": 0.32
+    },
+    "sk_en": {
+      "stt": 0.02,
+      "mt": 0.12,
+      "tts": 0.19
+    }
+  }
+}

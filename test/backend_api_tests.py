@@ -36,30 +36,12 @@ def setup_test_environment():
             os.remove(os.path.join(SPEAKER_VOICES_DIR, f))
 
 # --- Mocking external dependencies ---
-@pytest.fixture(autouse=True)
-def mock_models():
-    """Mocks STT, MT, and TTS models for tests."""
-    with patch('backend.main.FasterWhisperSTT') as MockSTT, \
-         patch('backend.main.CTranslate2MT') as MockMT, \
-         patch('backend.main.F5_TTS') as MockF5TTS, \
-         patch('backend.main.PiperTTS') as MockPiperTTS, \
-         patch('backend.main.webrtcvad.Vad') as MockVAD:
-        
-        # Configure STT mock
-        mock_stt_instance = MockSTT.return_value
-        mock_stt_instance.transcribe_audio.return_value = ([AsyncMock(text="mocked transcription")], 0.1, "en")
-        
-        # Configure MT mock
-        mock_mt_instance = MockMT.return_value
-        mock_mt_instance.translate.return_value = ("mocked translation", 0.1)
-
-        # Configure TTS mocks
-        mock_f5_tts_instance = MockF5TTS.return_value
-        mock_f5_tts_instance.synthesize.return_value = (np.zeros(16000), 16000, 0.1)
-        mock_piper_tts_instance = MockPiperTTS.return_value
-        mock_piper_tts_instance.synthesize.return_value = (np.zeros(16000), 16000, 0.1)
-
-        yield MockSTT, MockMT, MockF5TTS, MockPiperTTS, MockVAD
+# SANDBOX-NOTE (2026-09-28): the old mock_models fixture patched backend.main.F5_TTS,
+# an engine that no longer exists, and the translate_phrase tests below targeted a
+# /api/translate_phrase route that no longer exists either (404 for all six tests).
+# This file now smoke-tests the routes that DO exist. The deleted machinery is
+# documented here so a future F5/translate_phrase revival knows what was here.
+# (No autouse mocks: the live-simulation tests below intentionally use real models.)
 
 @pytest.fixture(scope="module")
 def mock_user():
@@ -78,85 +60,41 @@ def override_get_current_user_dependency(mock_user):
     yield
     app.dependency_overrides.clear()
 
-# --- Tests for /translate_phrase endpoint ---
+# --- Live API smoke tests (real routes, real models where cheap) ---
+def test_voice_lab_status_no_auth():
+    """Capabilities endpoint: no auth, lists engines + per-stage CPU backends."""
+    response = client.get("/api/voice-lab/status")
+    assert response.status_code == 200
+    body = response.json()
+    assert "piper" in body["engines"]
+    # Coqui has no Windows wheels -> guarded import -> xtts must NOT be advertised.
+    assert "xtts" not in body["engines"]
+    assert body["hardware_backends"]["stt"] == "cpu"
+    assert body["hardware_backends"]["mt"] == "cpu"
+
+
+def test_root_serves_home():
+    response = client.get("/")
+    assert response.status_code == 200
+    assert "text/html" in response.headers["content-type"]
+
+
 @pytest.mark.asyncio
-async def test_translate_phrase_success(mock_models):
-    # Initialize models first, as translate_phrase depends on STT and MT
-    await initialize_all_models(client_info="test_client", source_lang="en", target_lang="sk", tts_model_choice="piper")
-    
+async def test_initialize_full_pipeline_live():
+    """POST /initialize with real STT/MT/Piper: proves the endpoint, the model
+    stack, and the piper->piper_sk_personal remap write-back (engine must be
+    reachable under its stored name, otherwise TTS silently never runs)."""
     response = client.post(
-        "/api/translate_phrase", # Updated endpoint path
-        json={"phrase": "Hello world", "target_lang": "sk"}
+        "/initialize",  # app-level route (not under /api -- see app.py)
+        params={"source_lang": "en", "target_lang": "sk",
+                "tts_model_choice": "piper", "stt_model_size": "base",
+                "vad_enabled_param": True},
     )
-    
     assert response.status_code == 200
     assert response.json()["status"] == "success"
-    assert response.json()["translated_text"] == "mocked translation"
-    
-    # Verify MT model was called
-    mock_models[1].return_value.translate.assert_called_once_with("Hello world", "en", "sk")
-
-@pytest.mark.asyncio
-async def test_translate_phrase_same_language(mock_models):
-    # Initialize models
-    await initialize_all_models(client_info="test_client", source_lang="en", target_lang="en", tts_model_choice="piper")
-
-    response = client.post(
-        "/api/translate_phrase", # Updated endpoint path
-        json={"phrase": "Hello world", "target_lang": "en"}
-    )
-    
-    assert response.status_code == 200
-    assert response.json()["status"] == "success"
-    assert response.json()["translated_text"] == "Hello world" # Should return original phrase
-    
-    # Verify MT model was NOT called
-    mock_models[1].return_value.translate.assert_not_called()
-
-@pytest.mark.asyncio
-async def test_translate_phrase_stt_not_initialized():
-    # Initialize models with a dummy client_info, then patch STT model
-    await initialize_all_models(client_info="test_client", source_lang="en", target_lang="sk", tts_model_choice="piper")
-    with patch('backend.main.active_sessions.get("test_client")["stt_model"]', None):
-        response = client.post(
-            "/api/translate_phrase", # Updated endpoint path
-            json={"phrase": "Hello world", "target_lang": "sk"}
-        )
-        assert response.status_code == 500
-        assert "STT model not initialized" in response.json()["detail"]
-
-@pytest.mark.asyncio
-async def test_translate_phrase_mt_not_initialized(mock_models):
-    # Initialize STT but not MT for the specific language pair
-    await initialize_all_models(client_info="test_client", source_lang="en", target_lang="en", tts_model_choice="piper") # Init with same lang to avoid MT init
-    
-    # Manually clear the specific MT model for the test client
     from backend.main import active_sessions
-    if "test_client" in active_sessions and "en-sk" in active_sessions["test_client"]["mt_models"]:
-        del active_sessions["test_client"]["mt_models"]["en-sk"]
-
-    response = client.post(
-        "/api/translate_phrase", # Updated endpoint path
-        json={"phrase": "Hello world", "target_lang": "sk"}
-    )
-    assert response.status_code == 200 # Expect 200 because dynamic initialization is now handled
-    assert response.json()["status"] == "success"
-    assert response.json()["translated_text"] == "mocked translation"
-
-@pytest.mark.asyncio
-async def test_translate_phrase_missing_phrase():
-    response = client.post(
-        "/api/translate_phrase", # Updated endpoint path
-        json={"target_lang": "sk"}
-    )
-    assert response.status_code == 422 # FastAPI validation error
-    assert "Field required" in response.json()["detail"][0]["msg"]
-
-@pytest.mark.asyncio
-async def test_translate_phrase_missing_target_lang():
-    response = client.post(
-        "/api/translate_phrase", # Updated endpoint path
-        json={"phrase": "Hello world"}
-    )
-    assert response.status_code == 422 # FastAPI validation error
-    assert "Field required" in response.json()["detail"][0]["msg"]
+    session = active_sessions.get("http_init_client")
+    assert session is not None
+    assert session["stt_model"] is not None
+    assert session["tts_engine"] is not None
+    assert session["tts_engine_name"] == session["session_config"]["tts_model_choice"] == "piper_sk_personal"

@@ -10,6 +10,12 @@ from nltk.tokenize import word_tokenize # Import word_tokenize for tokenization
 import nltk # Import nltk for downloading punkt and wordnet
 
 # Ensure NLTK data is available
+# SANDBOX-FIX (2026-09-28): NLTK >= 3.8.2 word_tokenize needs punkt_tab, not just
+# punkt -- without it every evaluate_mt call dies with LookupError.
+try:
+    nltk.data.find('tokenizers/punkt_tab')
+except LookupError:
+    nltk.download('punkt_tab')
 try:
     nltk.data.find('tokenizers/punkt')
 except LookupError:

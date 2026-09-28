@@ -168,8 +168,13 @@ def create_app(db_session_local_override=None) -> FastAPI:
         # This ensures that any client that connects after initialization, or is already connected,
         # receives the correct status.
         
-        # Create a dummy session_config for get_initialized_models
-        dummy_session_config = {
+        # Status check must use the STORED session_config, not the request params:
+        # initialize_all_models may remap choices to measured defaults (e.g. STT
+        # size upgrade, piper->piper_sk_personal) and writes them back into the
+        # session. Checking against the raw request would report "not loaded"
+        # for a correctly initialized engine. SANDBOX-FIX (2026-09-28).
+        stored_session = backend_main.active_sessions.get(dummy_client_info, {})
+        dummy_session_config = dict(stored_session.get("session_config") or {
             "source_lang": source_lang,
             "target_lang": target_lang,
             "tts_model_choice": tts_model_choice,
@@ -178,7 +183,7 @@ def create_app(db_session_local_override=None) -> FastAPI:
             "speaker_text": speaker_text,
             "speaker_lang": speaker_lang,
             "vad_enabled": vad_enabled_param,
-        }
+        })
         (
             current_stt_model,
             current_main_mt_model,

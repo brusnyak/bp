@@ -27,7 +27,14 @@ from typing import Callable, Dict
 
 from backend import hardware
 from backend.tts.piper_tts import PiperTTS
-from backend.tts.coqui_tts import CoquiTTS
+try:
+    from backend.tts.coqui_tts import CoquiTTS
+except ImportError:
+    # SANDBOX-NOTE (2026-09-28): Coqui TTS ships Linux-only wheels; on stock Windows
+    # the package is uninstallable without an MSVC toolchain. Same guarded pattern
+    # omni_tts.py / hybrid_tts.py already use -- the "xtts" engine just stays
+    # unregistered instead of breaking every import of this module.
+    CoquiTTS = None
 from backend.tts.hybrid_tts import HybridTTS
 from backend.tts.omni_tts import OmniVoiceTTS
 
@@ -57,7 +64,9 @@ def _piper_sk_personal_factory() -> PiperTTS:
     return PiperTTS(model_id="sk_SK-personal-male-medium", device=hardware.detect_backend("tts_baseline"))
 
 
-def _xtts_factory() -> CoquiTTS:
+def _xtts_factory():
+    if CoquiTTS is None:
+        raise RuntimeError("CoquiTTS (XTTS) is not installed on this machine.")
     return CoquiTTS(device=hardware.detect_backend("tts_clone"))
 
 
@@ -74,7 +83,9 @@ TTS_ENGINES: Dict[str, Callable[[], object]] = {
     "piper_personal": _piper_personal_factory,
     "piper_personal_v2": _piper_personal_v2_factory,
     "piper_sk_personal": _piper_sk_personal_factory,
-    "xtts": _xtts_factory,
     "hybrid": _hybrid_factory,
     "omnivoice": _omnivoice_factory,
 }
+
+if CoquiTTS is not None:
+    TTS_ENGINES["xtts"] = _xtts_factory
