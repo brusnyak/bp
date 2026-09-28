@@ -1328,6 +1328,19 @@ document.addEventListener('DOMContentLoaded', () => {
         updateButtonStates(agreeToRecordCheckbox.checked);
     }
 
+    // Recording-passage tabs: same per-language scripts the voices train on.
+    // (Old 2-sentence consent text retired 2026-09: too short to clone from.)
+    fetch('passages.json', { cache: 'no-store' }).then((r) => r.json()).then((passages) => {
+        const box = document.getElementById('readingText');
+        const tabs = Array.from(document.querySelectorAll('.passage-tab'));
+        const show = (lang) => { if (box && passages[lang]) box.textContent = passages[lang]; };
+        tabs.forEach((b) => b.addEventListener('click', () => show(b.dataset.lang)));
+        show('en');
+    }).catch(() => {
+        const box = document.getElementById('readingText');
+        if (box) box.textContent = 'Could not load passages.json.';
+    });
+
     // Recording functionality
     if (startRecordingModalBtn) {
         startRecordingModalBtn.addEventListener('click', () => {
