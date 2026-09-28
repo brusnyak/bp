@@ -60,8 +60,8 @@
       "title": "QC candidates (engine outputs)",
       "items": [
         {
-          "name": "enpers_v2",
-          "file": "../../processed/voice_qc/enpers_v2.wav",
+          "name": "sandbox_cs_CZ-jirka-medium_cs",
+          "file": "../../processed/voice_qc/sandbox_cs_CZ-jirka-medium_cs.wav",
           "engine": "?",
           "language": "?",
           "sample_rate": null,
@@ -69,8 +69,8 @@
           "similarity": null
         },
         {
-          "name": "jirka_sk_fallback",
-          "file": "../../processed/voice_qc/jirka_sk_fallback.wav",
+          "name": "sandbox_en_US-personal-medium_en",
+          "file": "../../processed/voice_qc/sandbox_en_US-personal-medium_en.wav",
           "engine": "?",
           "language": "?",
           "sample_rate": null,
@@ -78,8 +78,8 @@
           "similarity": null
         },
         {
-          "name": "jirka_sk_text",
-          "file": "../../processed/voice_qc/jirka_sk_text.wav",
+          "name": "sandbox_en_US-personal-v2_en",
+          "file": "../../processed/voice_qc/sandbox_en_US-personal-v2_en.wav",
           "engine": "?",
           "language": "?",
           "sample_rate": null,
@@ -87,8 +87,8 @@
           "similarity": null
         },
         {
-          "name": "male_last_base",
-          "file": "../../processed/voice_qc/male_last_base.wav",
+          "name": "sandbox_en_US-ryan-medium_en",
+          "file": "../../processed/voice_qc/sandbox_en_US-ryan-medium_en.wav",
           "engine": "?",
           "language": "?",
           "sample_rate": null,
@@ -96,8 +96,8 @@
           "similarity": null
         },
         {
-          "name": "male_last_ns05",
-          "file": "../../processed/voice_qc/male_last_ns05.wav",
+          "name": "sandbox_sk_SK-lili-medium_sk",
+          "file": "../../processed/voice_qc/sandbox_sk_SK-lili-medium_sk.wav",
           "engine": "?",
           "language": "?",
           "sample_rate": null,
@@ -105,49 +105,34 @@
           "similarity": null
         },
         {
-          "name": "piper_generic_sk",
-          "file": "../../processed/voice_qc/piper_generic_sk.wav",
-          "engine": "piper",
-          "language": "sk",
-          "sample_rate": 22050,
-          "synthesis_latency_s": 0.2632,
-          "similarity": null
-        },
-        {
-          "name": "piper_generic_sk_test",
-          "file": "../../processed/voice_qc/piper_generic_sk_test.wav",
+          "name": "sandbox_sk_SK-personal-male-medium_sk",
+          "file": "../../processed/voice_qc/sandbox_sk_SK-personal-male-medium_sk.wav",
           "engine": "?",
           "language": "?",
           "sample_rate": null,
           "synthesis_latency_s": null,
           "similarity": null
+        }
+      ]
+    },
+    {
+      "id": "test",
+      "title": "Test clips (pipeline inputs)",
+      "items": [
+        {
+          "name": "Can you hear me_",
+          "file": "../../test/Can you hear me_.wav",
+          "transcript": ""
         },
         {
-          "name": "xtts_cs_sameref",
-          "file": "../../processed/voice_qc/xtts_cs_sameref.wav",
-          "engine": "?",
-          "language": "?",
-          "sample_rate": null,
-          "synthesis_latency_s": null,
-          "similarity": null
+          "name": "Hello",
+          "file": "../../test/Hello.wav",
+          "transcript": "Hello, this is a test of my voice for cloning purposes."
         },
         {
-          "name": "xtts_en_ref2",
-          "file": "../../processed/voice_qc/xtts_en_ref2.wav",
-          "engine": "?",
-          "language": "?",
-          "sample_rate": null,
-          "synthesis_latency_s": null,
-          "similarity": null
-        },
-        {
-          "name": "xtts_en_zeroshot",
-          "file": "../../processed/voice_qc/xtts_en_zeroshot.wav",
-          "engine": "?",
-          "language": "?",
-          "sample_rate": null,
-          "synthesis_latency_s": null,
-          "similarity": null
+          "name": "My test speech_xtts_speaker_clean",
+          "file": "../../test/My test speech_xtts_speaker_clean.wav",
+          "transcript": ""
         }
       ]
     },
@@ -158,46 +143,37 @@
         {
           "name": "en_sk_00",
           "file": "../../processed/conversation/en_sk_00.wav",
-          "meta": {
-            "mt_sentence_s": 0.174,
-            "mt_word_total_s": 0.105,
-            "mt_word_first_s": 0.052,
-            "tts_s": 0.26,
-            "audio_s": 5.8
-          }
+          "meta": {}
         },
         {
           "name": "en_sk_01",
           "file": "../../processed/conversation/en_sk_01.wav",
-          "meta": {
-            "mt_sentence_s": 0.139,
-            "mt_word_total_s": 0.098,
-            "mt_word_first_s": 0.033,
-            "tts_s": 0.24,
-            "audio_s": 6.4
-          }
+          "meta": {}
+        },
+        {
+          "name": "en_sk_02",
+          "file": "../../processed/conversation/en_sk_02.wav",
+          "meta": {}
+        },
+        {
+          "name": "en_sk_03",
+          "file": "../../processed/conversation/en_sk_03.wav",
+          "meta": {}
         },
         {
           "name": "sk_en_00",
           "file": "../../processed/conversation/sk_en_00.wav",
-          "meta": {
-            "mt_sentence_s": 0.135,
-            "mt_word_total_s": 0.108,
-            "mt_word_first_s": 0.036,
-            "tts_s": 0.17,
-            "audio_s": 4.1
-          }
+          "meta": {}
         },
         {
           "name": "sk_en_01",
           "file": "../../processed/conversation/sk_en_01.wav",
-          "meta": {
-            "mt_sentence_s": 0.16,
-            "mt_word_total_s": 0.117,
-            "mt_word_first_s": 0.039,
-            "tts_s": 0.14,
-            "audio_s": 3.6
-          }
+          "meta": {}
+        },
+        {
+          "name": "sk_en_02",
+          "file": "../../processed/conversation/sk_en_02.wav",
+          "meta": {}
         }
       ]
     }

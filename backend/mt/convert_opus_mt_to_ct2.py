@@ -1,6 +1,20 @@
 import os
 import ctranslate2
+from ctranslate2.converters import TransformersConverter
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+
+
+class CompatTransformersConverter(TransformersConverter):
+    """SANDBOX-NOTE (2026-09-28): ctranslate2>=4.6 passes dtype= to from_pretrained,
+    but this project pins transformers==4.46.3, which only understands torch_dtype
+    (the rename happened in transformers 4.47). The unknown kwarg falls through into
+    MarianMTModel.__init__ -> TypeError. Translate it back; conversion output is
+    identical, runtime pins untouched."""
+
+    def load_model(self, model_class, model_name_or_path, **kwargs):
+        if "dtype" in kwargs:
+            kwargs["torch_dtype"] = kwargs.pop("dtype")
+        return super().load_model(model_class, model_name_or_path, **kwargs)
 
 def convert_model(model_name: str, output_dir: str, quantization: str = "int8"):
     """
@@ -17,7 +31,7 @@ def convert_model(model_name: str, output_dir: str, quantization: str = "int8"):
     os.makedirs(output_dir, exist_ok=True)
 
     # Create a converter, letting it load the model and tokenizer internally
-    converter = ctranslate2.converters.TransformersConverter(model_name)
+    converter = CompatTransformersConverter(model_name)
 
     # Convert and save the model, forcing overwrite if directory exists
     converter.convert(output_dir, quantization=quantization, force=True)
