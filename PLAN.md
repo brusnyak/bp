@@ -79,6 +79,12 @@ Thesis rules: faculty guide + §4.1 AI rules → `Deklarácia k využitiu UI` sk
 
 ## Next
 
+- [ ] Land the Windows branch when it arrives (`win/*` → gates → ff `main`; protocol in
+      `AGENTS.md`), then execute the footprint diet — ranked cut list with measured savings
+      in `documentation/footprint_audit_2026-09-28.md` (biggest: core/extras requirements
+      split ≈ −1.5 GB venv −1.6 GB browsers; `ct2_models/` out of git −225 MB)
+- [ ] Linux pass on a third machine → fill `documentation/linux_setup_and_test.md` (setup,
+      6-gate ladder, record sheet, unknowns)
 - [ ] Thesis numbers corrected to measured + `[DOPLNIŤ]` marker filled
 - [ ] Stage-demo dry run on the real machine: runbook → `documentation/demo_runbook_2026-09-28.md`
       (pre-flight, script, fallback ladder, timings); checklist → `documentation/monday_test_checklist.md`
