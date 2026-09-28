@@ -18,62 +18,65 @@ Backend FastAPI + WebSocket, UI plain HTML/CSS/JS. Owner: Yegor Brusnyak.
 
 | Machine | Path | Role |
 |---|---|---|
-| Mac, M1 Pro 16GB | `~/Documents/STU/BP` (main checkout, `main`) | reference box: all measurements in `PLAN.md` are from here; has `venv`, `.venv-stt` (Parakeet), `.venv-train` (Piper fine-tune), `models/` (OpenVoice), `.env`, HF cache |
-| Windows 11, AMD, CPU-only, no admin | clone of `https://github.com/brusnyak/bp` (GitHub user `I-BRUS`) | portability proof: `requirements-windows.txt`, `SETUP_WINDOWS.md`, `setup_windows.ps1`; no XTTS/Coqui (no Windows wheels), Piper-only |
+| Mac, M1 Pro 16GB | `~/Documents/STU/BP` (main checkout, `main`) | reference box: all measurements in `PLAN.md` are from here; has `.venv` (post-`lite`; legacy `venv` still on disk), `.venv-stt` (Parakeet), `.venv-train` (Piper fine-tune), `models/` (OpenVoice), `.env`, HF cache |
+| Windows 11, AMD, CPU-only, no admin | fork `I-BRUS/bp`, branch `lite` (GitHub user `I-BRUS`) | portability proof: one-command `scripts/setup.py`, torch-free runtime, Piper-only (no XTTS/Coqui wheels) |
 
-Branch state and history (verified 2026-09-28):
-- `merge/windows-amd-cpu` + `cline/f9e7b` both point at the integration tip: the 6 local
-  commits ending at the shipped SK voice, the merge of the Windows CPU-setup work
-  (`e55461c` ← Windows `79a8476`), and the demo-readiness commit. Check
+Branch state and history (verified 2026-09-28, after the `lite` landing):
+- Integration tip = `merge/windows-amd-cpu` = `cline/63e9f` = `main`: the 6 local commits
+  ending at the shipped SK voice, PR #1 merge (`e55461c`), demo readiness + footprint audit,
+  then the `lite` merge (`001b4c3`) and the POSIX voice-path fix (`a68b1db`). Check
   `git log --oneline -3` for the current hash.
-- The Mac checkout's `main` is still at `da37df0` and fast-forwards onto that tip:
-  `git -C ~/Documents/STU/BP merge --ff-only merge/windows-amd-cpu`.
-- `origin/main` had diverged (Windows laptop pushed PR #1 from `I-BRUS`); that side is
-  also bookmarked locally as `windows/amd-cpu-setup`. Nothing is pushed since — pushing
+- `lite` (I-BRUS fork, 6 commits over `origin/main`) landed 2026-09-28: torch-free runtime,
+  one-command setup, Slovak-tuned `whisper-small` STT default (SK→EN ~3 s vs 9–11 s),
+  measured demo report, 75-sentence recording kit, and the weight (piper onnx, ct2 models,
+  recordings, certs) moved out of git into local-only/ignored files.
+- `origin/main` is still at `f6904a5` (PR #1 only) — our line is **not pushed**; pushing
   needs the owner's go-ahead.
 - `voice-lab`, `worktree-agent-a342c9d7f70fec900` are fully merged ancestors — dead ends,
   do not branch from them.
-- Windows deltas stay in `requirements-windows.txt`; `requirements.txt` keeps macOS/Linux
-  installs (Coqui/omnivoice/OpenVoice live there) — do not "unify" them.
 
-## Landing the Windows laptop's branch (protocol)
+## Landing branches (protocol — still in force)
 
-Windows work lands as a **branch on the remote**, never as a direct rewrite of `main`:
+New work lands as a **branch on the remote**, never as a direct rewrite of `main`:
 
-1. Windows: commit on a `win/*` branch, push, open a PR (that is how `79a8476` arrived).
-2. Mac: `git fetch`, merge that branch into `merge/windows-amd-cpu`, resolve conflicts,
-   then run the three gates — `make test` (20 expected), `venv/bin/python
+1. Contributor: commit on a `win/*` (or similar) branch, push, open a PR (that is how
+   `79a8476` and the `lite` branch arrived).
+2. Mac: `git fetch`, merge that branch into the integration line, resolve conflicts,
+   then run the three gates — `make test` (33 expected), `.venv/bin/python
    test/interrupt_smoke_test.py` (needs `make run`), `make demo-check`.
-3. Only after the gates pass: `git -C ~/Documents/STU/BP merge --ff-only merge/windows-amd-cpu`.
+3. Only after the gates pass: ff `main` at `~/Documents/STU/BP` onto the tip.
 
-While a Windows branch is in flight, **do not touch on the Mac**: `requirements*.txt`,
-`setup_windows.ps1`, `SETUP_WINDOWS.md`, and the install sections of `README.md` — those are
-the files that side is rewriting (footprint diet in flight). Work that does not conflict:
-`documentation/`, `specs/`, tests, `ui/`, backend code the Windows side is not editing.
-
-Plan behind that freeze: `documentation/footprint_audit_2026-09-28.md` (ranked cut list with
-measured savings) and `documentation/linux_setup_and_test.md` (third-OS test sheet).
+Setup model after `lite` (2026-09-28): **one** cross-platform `requirements.txt`
+(+ `requirements-dev.txt` for tests, `requirements-convert.txt` for the one-time model
+conversion) and one setup path — `python3.11 scripts/setup.py --dev` (the Mac's default
+`python3` is 3.14, which the script rejects by design; `PYTHON=python3.11 make install`
+works too). ~92 s on a warm Mac, ~850 s cold on the Windows laptop. The old
+`setup_windows.ps1` / `SETUP_WINDOWS.md` / `requirements-windows.txt` were deleted by
+`lite` — do not resurrect them. Plans behind that split: `documentation/footprint_audit_2026-09-28.md`
+(ranked cut list) and `documentation/linux_setup_and_test.md` (third-OS test sheet).
 
 ## Run it
 
 | Command | What |
 |---|---|
+| `python3.11 scripts/setup.py --dev` (= `make install`) | one-command setup: `.venv` + deps + `.env` + certs + voices + MT/STT model conversion |
 | `make run` | backend, `https://localhost:8000` (self-signed cert in `certs/`) |
 | `make demo-check` | demo pre-flight: assets + live server (`scripts/demo_preflight.py --server`) |
 | `make lab` | Voice Lab static page, `http://localhost:8080/ui/voice-lab/lab.html`, no backend |
-| `make test` | piper pipeline + VAD + hardware + auth + API tests |
+| `make test` | 33 tests: hardware, VAD, MT, API, auth, security, config |
 | `python3 scripts/update_voice_lab_library.py --no-test` | regenerate `ui/voice-lab/library.json` (never hand-edit) |
-| `venv/bin/python test/interrupt_smoke_test.py` | live WS rehearsal, needs `make run` |
-| `venv/bin/python scripts/e2e_ensk_new_voice.py` | full EN→SK offline run, writes `processed/e2e_ensk.json` |
+| `.venv/bin/python test/interrupt_smoke_test.py` | live WS rehearsal, needs `make run` |
+| `.venv/bin/python scripts/e2e_ensk_new_voice.py` | full EN→SK offline run, writes `processed/e2e_ensk.json` |
 
 Demo: `documentation/demo_runbook_2026-09-28.md` (+ `monday_test_checklist.md`,
 `handler_update_2026-09.md`). Thesis: `documentation/thesis_draft.md`.
 
 ## Test reality (measured 2026-09-28, M1 Pro)
 
-- `pytest` collects only `test/*_test.py` style files: `hardware_test.py` (7),
-  `vad_tests.py` (4), `backend_auth_tests.py` (6), `backend_api_tests.py` (3).
-  `make test` = 20 tests + the piper pipeline script, all green.
+- `make test` = explicit pytest over `hardware_test` (7), `vad_tests` (4),
+  `backend_auth_tests` (6), `backend_api_tests` (3) — the original 20 — plus
+  `mt_model_tests`, `security_tests`, `config_tests` from `lite`: **33 tests, green on
+  macOS 2026-09-28 (merge gate) and on the Windows laptop (33/33)**.
 - `test/full_pipeline_test.py` is a **broken leftover**: it imports
   `backend.tts.f5_tts`, removed in August, so it breaks `pytest test/` collection.
   Exclude it or delete it; do not silently "fix" it into a test.
@@ -87,8 +90,13 @@ Demo: `documentation/demo_runbook_2026-09-28.md` (+ `monday_test_checklist.md`,
 
 - `.env` never enters git (Google client id + `JWT_SECRET`). `.env` may be symlinked
   from another checkout for a local run; never from a shared/cloud path.
-- Personal voice models are committed binaries on purpose (`backend/tts/piper_models/*.onnx`);
-  never retrain or overwrite them as part of unrelated work.
+- Personal voice models and voice recordings are **local-only, never committed**
+  (`backend/tts/piper_models/*.onnx`, `speaker_voices/` — both gitignored after `lite`).
+  A fresh clone falls back to the generic Piper voice (`backend/tts/base.py` `_piper`).
+  The shipped SK voice (`sk_SK-personal-male-medium.onnx`, latest copy 2026-09-28 07:04)
+  **cannot be re-downloaded** — back it up outside git before any `make clean`.
+- One cross-platform `requirements.txt` (+ `-dev` / `-convert`); the Windows-specific
+  files are gone for good. Never re-add `setup_windows.ps1` / `requirements-windows.txt`.
 - No cloud TTS/translation in the pipeline (constitution III + thesis local-first rule);
   cloud services may only appear as QC references.
 - SK output default is the owner's own fine-tuned voice (`piper` → remaps to
@@ -98,12 +106,22 @@ Demo: `documentation/demo_runbook_2026-09-28.md` (+ `monday_test_checklist.md`,
   decision with evidence behind it is not re-litigated (constitution II).
 - Ask before pushing to the remote or anything shared/visible (constitution, Operating Mode).
 
-## Next steps
+## Next steps (owner-approved order, 2026-09-28)
 
-1. Merge/ff `main` into the Mac checkout and re-run `make test` + the rehearsal there
-   (`merge/windows-amd-cpu` → `main` is a fast-forward).
-2. Re-run `scripts/update_voice_lab_library.py --no-test` on the Mac after that merge to
-   pick up the locally-untracked `*_v2b` takes.
-3. Demo prep per the runbook; then the handler update message.
-4. Open engineering items: per-language STT routing (Parakeet EN / whisper-small SK) in
-   the backend, `test/full_pipeline_test.py` deletion, SK STT accuracy rung (turbo/small).
+1. Push pending owner approval: `main` is ahead of `origin/main` by the `lite` landing
+   (fork housekeeping: delete stale `lite-base`, merge `lite`→`main` on the fork).
+2. SK→EN deep check on the Mac: reproduce the Windows numbers with the small-sk default
+   (`scripts/live_direction_probe.py`, `scripts/demo_conversation.py`), then accuracy work
+   (segment merging/context, prompt, `BP_SK_STT_MODEL` rungs, MT input guards).
+3. Voice cloning speed + quality: record the 75-sentence set
+   (`scripts/build_recording_set.py` → `scripts/record_reading.py`), longer Piper fine-tune,
+   QC in the Voice Lab (WER thirds / F0 / HNR / Praat panel).
+4. Updated recording transcript for the owner (SK + CZ — include the ElevenLabs
+   instant-voice-cloning reference texts, which double as colloquial STT/MT test material).
+5. Linux: execute `documentation/linux_setup_and_test.md` and wire
+   `documentation/ci.yml.example` into `.github/workflows/ci.yml`.
+6. Voice Lab analytics → demo-ready: E2E + S2S charts from `scripts/demo_conversation.py`
+   and the latency/STT JSONs, speed + quality panels, and the showcase page
+   (done / worked-on / future work).
+7. Housekeeping: delete `test/full_pipeline_test.py`; re-run
+   `python3 scripts/update_voice_lab_library.py --no-test` for the `*_v2b` takes.
