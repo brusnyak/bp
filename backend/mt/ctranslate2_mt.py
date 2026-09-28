@@ -1,6 +1,9 @@
 import ctranslate2
 from transformers import AutoTokenizer
-import torch  # Added for MPS check
+try:
+    import torch  # optional: only used for the MPS hint below
+except ImportError:
+    torch = None
 import os  # Added for path operations
 import re  # Sentence splitting for chunked streaming translation
 import logging  # SANDBOX-FIX (2026-09-28): hot-path text logging must not print()
@@ -23,7 +26,7 @@ class CTranslate2MT:
         """
         if device == "auto":
             # CTranslate2 does not directly support "mps" device. Fallback to "cpu" on Apple Silicon.
-            if torch.backends.mps.is_available():
+            if torch is not None and torch.backends.mps.is_available():
                 self.device = "cpu" # Explicitly use CPU for CTranslate2 on MPS
                 print("CTranslate2MT: MPS device detected, but CTranslate2 will use CPU.")
             else:
@@ -58,9 +61,12 @@ class CTranslate2MT:
             )
 
         self.translator = ctranslate2.Translator(self.ctranslate2_model_dir, device=self.device, compute_type="int8")
+        # convert_opus_mt_to_ct2 saves the tokenizer next to model.bin, so runtime works offline;
+        # fall back to the Hugging Face ID for models converted before that change.
+        local_tok = os.path.exists(os.path.join(self.ctranslate2_model_dir, "tokenizer_config.json"))
         self.tokenizer = AutoTokenizer.from_pretrained(
-            self.hf_model_id
-        )  # Use original HF ID for tokenizer
+            self.ctranslate2_model_dir if local_tok else self.hf_model_id
+        )
         print(
             f"CTranslate2MT initialized with model_path={self.ctranslate2_model_dir}, device={self.device}"
         )

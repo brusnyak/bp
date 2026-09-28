@@ -1,90 +1,25 @@
-.PHONY: install install-deps run lab test certs clean help
+.PHONY: install run test clean help
 
-# Detect operating system
+# Same commands on every OS; the real work lives in scripts/setup.py.
 ifeq ($(OS),Windows_NT)
-    UNAME_S := Windows
+    VENV_PY = .venv\Scripts\python.exe
+    PYTHON ?= python
 else
-    UNAME_S := $(shell uname -s 2>/dev/null || echo Unknown)
+    VENV_PY = .venv/bin/python
+    PYTHON ?= python3
 endif
 
-# Python version
-PYTHON_VERSION = 3.11
+install: ## Venv + deps + .env + certs + Piper voices + MT models (add DEV=1 for test deps).
+	$(PYTHON) scripts/setup.py $(if $(DEV),--dev,)
 
-# Platform-specific variables
-ifeq ($(UNAME_S),Darwin)  # macOS
-    VENV_NAME = venv
-    PYTHON_EXEC = $(VENV_NAME)/bin/python$(PYTHON_VERSION)
-    PIP_EXEC = $(VENV_NAME)/bin/pip
-    DYLD_ENV = DYLD_LIBRARY_PATH="/opt/homebrew/lib"
-    FFMPEG_INSTALL = brew install ffmpeg || true
-    OPENSSL_CMD = openssl
-else ifeq ($(UNAME_S),Linux)
-    VENV_NAME = venv
-    PYTHON_EXEC = $(VENV_NAME)/bin/python$(PYTHON_VERSION)
-    PIP_EXEC = $(VENV_NAME)/bin/pip
-    DYLD_ENV = 
-    FFMPEG_INSTALL = @echo "Please install FFmpeg: sudo apt-get install ffmpeg (Debian/Ubuntu) or sudo yum install ffmpeg (RHEL/CentOS)"
-    OPENSSL_CMD = openssl
-else  # Windows
-    VENV_NAME = venv
-    PYTHON_EXEC = $(VENV_NAME)\Scripts\python.exe
-    PIP_EXEC = $(VENV_NAME)\Scripts\pip.exe
-    DYLD_ENV = 
-    FFMPEG_INSTALL = @echo "FFmpeg should be installed via winget or setup_windows.ps1"
-    OPENSSL_CMD = "C:\Program Files\Git\usr\bin\openssl.exe"
-endif
+run: ## Run the server on https://localhost:8000 (loopback only; BP_HOST=0.0.0.0 for LAN).
+	$(VENV_PY) app.py
 
-install: ## Install all Python and Node.js dependencies, including models.
-	@echo "--- Creating Python virtual environment '$(VENV_NAME)' with Python $(PYTHON_VERSION) ---"
-	python$(PYTHON_VERSION) -m venv $(VENV_NAME)
-	@echo "--- Installing all Python project dependencies from requirements.txt ---"
-	$(PIP_EXEC) install -r requirements.txt
-	@echo "--- Installing FFmpeg (platform-specific) ---"
-	$(FFMPEG_INSTALL)
-	@echo "--- Installing Coqui TTS ---"
-	$(PIP_EXEC) install TTS
-	@echo "--- Downloading MT models (CTranslate2) ---"
-	$(PYTHON_EXEC) -c "import sys; sys.setrecursionlimit(2000); import backend.mt.convert_opus_mt_to_ct2 as converter; converter.convert_model('Helsinki-NLP/opus-mt-en-sk', 'ct2_models/Helsinki-NLP--opus-mt-en-sk', quantization='int8')"
-	$(PYTHON_EXEC) -c "import sys; sys.setrecursionlimit(2000); import backend.mt.convert_opus_mt_to_ct2 as converter; converter.convert_model('Helsinki-NLP/opus-mt-sk-en', 'ct2_models/Helsinki-NLP--opus-mt-sk-en', quantization='int8')"
-	$(PYTHON_EXEC) -c "import sys; sys.setrecursionlimit(2000); import backend.mt.convert_opus_mt_to_ct2 as converter; converter.convert_model('Helsinki-NLP/opus-mt-en-cs', 'ct2_models/Helsinki-NLP--opus-mt-en-cs', quantization='int8')"
-	@echo "--- Downloading Piper TTS models ---"
-	$(PYTHON_EXEC) backend/tts/download_piper_models.py en_US-ryan-medium
-	$(PYTHON_EXEC) backend/tts/download_piper_models.py sk_SK-lili-medium
-	$(PYTHON_EXEC) backend/tts/download_piper_models.py cs_CZ-jirka-medium
-	@echo "--- Installing frontend dependencies ---"
-	npm install
-	@echo "--- Installation complete. ---"
+test: ## Run the backend test suite.
+	$(VENV_PY) -m pytest test/hardware_test.py test/vad_tests.py test/mt_model_tests.py test/backend_api_tests.py test/backend_auth_tests.py test/security_tests.py -q
 
-run: ## Run the FastAPI backend server.
-	$(DYLD_ENV) TORCH_USE_LIBAV=0 TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1 PYTHONHASHSEED=random $(PYTHON_EXEC) app.py
+clean: ## Remove generated models, certs, venv and caches (never touches speaker_voices/).
+	$(PYTHON) -c "import shutil,pathlib;[shutil.rmtree(p,ignore_errors=True) for p in ('.venv','.venv-convert','ct2_models','certs','node_modules','.pytest_cache')];[shutil.rmtree(p,ignore_errors=True) for p in pathlib.Path('.').rglob('__pycache__')]"
 
-test: ## Run the comprehensive backend test suite.
-	$(DYLD_ENV) TORCH_USE_LIBAV=0 TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1 PYTHONHASHSEED=random $(PYTHON_EXEC) test/piper_pipeline_test.py
-	$(DYLD_ENV) TORCH_USE_LIBAV=0 TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1 PYTHONHASHSEED=random $(PYTHON_EXEC) -m pytest test/vad_tests.py | cat
-	$(DYLD_ENV) TORCH_USE_LIBAV=0 TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1 PYTHONHASHSEED=random $(PYTHON_EXEC) -m pytest test/hardware_test.py | cat
-
-certs: ## Generate SSL certificates for HTTPS/WSS.
-	@mkdir -p certs
-	$(OPENSSL_CMD) req -x509 -newkey rsa:4096 -nodes -out certs/cert.pem -keyout certs/key.pem -days 365 -subj "/CN=localhost"
-
-clean: ## Clean up generated files and caches (never touches speaker_voices/).
-	find . -name "__pycache__" -type d -exec rm -rf {} +
-	find . -name "*.pyc" -type f -delete
-	rm -f output_*.wav
-	rm -rf ct2_models/*
-	@echo "Cleaned up build artifacts and generated files."
-
-distclean: clean ## Clean up all generated files, caches, and downloaded models.
-	@echo "--- Performing a deep clean (removing all downloaded models) ---"
-	rm -rf backend/tts/piper_models/*.onnx
-	rm -rf backend/tts/piper_models/*.json
-	rm -rf $(VENV_NAME)
-	@echo "Deep clean complete. You may need to run 'make install' again."
-
-lab: ## Serve the Voice Lab review page (static only: no /api, no Google login, no real upload — use `make run` + https://localhost:8000/ui/voice-lab/lab.html for backend features).
-	@echo "--- Voice Lab (STATIC, no backend) at http://localhost:8080/ui/voice-lab/lab.html ---"
-	@echo "--- Need Google login or real upload? Use: make run → https://localhost:8000/ui/voice-lab/lab.html ---"
-	python3 -m http.server 8080
-
-help: ## Display this help message.
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+help: ## Show this help.
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "%-12s %s\n", $$1, $$2}'

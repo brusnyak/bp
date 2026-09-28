@@ -16,7 +16,6 @@ from pydantic import BaseModel, Field # Import Field
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, OAuth2PasswordRequestForm # Import security components
-from jose import jwt, JWTError # Import JWT components (even if using mock for now)
 import uuid
 
 # Configure logging
@@ -33,10 +32,12 @@ except ImportError:
     # on machines without it (no Windows wheels). Capabilities endpoint below is
     # None-safe via getattr; TTS_ENGINES simply lacks "xtts".
     CoquiTTS = None
-from backend.tts.hybrid_tts import HybridTTS
-from backend.tts.omni_tts import OmniVoiceTTS
-from backend.tts.base import TTS_ENGINES
-from backend.mt.nllb_mt import NLLBMT
+# Lite install has no torch: these engines import it at module level, so guard like CoquiTTS.
+from backend.tts.base import TTS_ENGINES, HybridTTS, OmniVoiceTTS
+try:
+    from backend.mt.nllb_mt import NLLBMT
+except ImportError:
+    NLLBMT = None
 
 # Get engine and SessionLocal
 engine, SessionLocal = get_db_session_and_engine(SQLALCHEMY_DATABASE_URL)
@@ -113,7 +114,10 @@ from fastapi import (
     Depends # Import Depends for dependency injection
 )
 from starlette.responses import JSONResponse
-import torch
+try:
+    import torch  # optional: only for Tensor->numpy conversion of TTS output
+except ImportError:
+    torch = None
 import webrtcvad # Re-enabled
 from collections import deque
 import websockets.exceptions # Explicitly import websockets.exceptions
@@ -154,6 +158,40 @@ PRE_VAD_BUFFER_DURATION = 0.5 # seconds, how much audio to buffer before checkin
 SPEAKER_VOICES_DIR = "speaker_voices"
 SPEAKER_VOICES_METADATA_FILE = os.path.join(SPEAKER_VOICES_DIR, "speaker_voices.json")
 os.makedirs(SPEAKER_VOICES_DIR, exist_ok=True)
+
+
+def _safe_voice_name(name: str) -> str:
+    """Same character policy as /voices/upload; rejects names that are empty or only dots."""
+    cleaned = "".join(c for c in name if c.isalnum() or c in (" ", ".", "_")).strip()
+    if not cleaned or not cleaned.strip("."):
+        raise HTTPException(status_code=400, detail="Invalid voice name.")
+    return cleaned
+
+
+def _voice_path(filename: str) -> str:
+    """Resolve `filename` inside SPEAKER_VOICES_DIR or raise 400 (blocks ../ and absolute paths)."""
+    base = os.path.realpath(SPEAKER_VOICES_DIR)
+    path = os.path.realpath(os.path.join(base, filename))
+    if os.path.commonpath([base, path]) != base:
+        raise HTTPException(status_code=400, detail="Invalid voice path.")
+    return path
+
+
+def _safe_speaker_wav(path: Optional[str]) -> Optional[str]:
+    """speaker_wav_path comes from the unauthenticated /initialize endpoint and the WebSocket.
+    Only files inside SPEAKER_VOICES_DIR are allowed; anything else is dropped (no cloning, no file read)."""
+    if not path:
+        return path
+    base = os.path.realpath(SPEAKER_VOICES_DIR)
+    resolved = os.path.realpath(path)
+    try:
+        inside = os.path.commonpath([base, resolved]) == base
+    except ValueError:  # different drives on Windows
+        inside = False
+    if not inside:
+        logging.warning("Backend: Ignoring speaker_wav_path outside the speaker voices directory.")
+        return None
+    return path
 
 # Dictionary to store active sessions and their models
 # Key: client_info (str), Value: Dict[str, Any] containing session_config and model instances
@@ -394,7 +432,8 @@ async def _initialize_vad_instance(session_data: Dict[str, Any]):
 
 async def initialize_all_models(client_info: str, source_lang: str, target_lang: str, tts_model_choice: str, stt_model_size: str = DEFAULT_STT_MODEL_SIZE, speaker_wav_path: Optional[str] = None, speaker_text: Optional[str] = None, speaker_lang: Optional[str] = None, vad_enabled_param: bool = True, websocket: Optional[WebSocket] = None):
     """Initializes all necessary models (STT, MT, TTS, VAD) for a given session."""
-    
+    speaker_wav_path = _safe_speaker_wav(speaker_wav_path)  # shared choke point: HTTP /initialize and WebSocket
+
     session_data = active_sessions.setdefault(client_info, {
         "client_info": client_info,
         "stt_model": None,
@@ -506,6 +545,9 @@ async def login_with_google(body: GoogleAuthRequest, db: Session = Depends(get_d
     email = claims.get("email")
     if not sub or not email:
         raise HTTPException(status_code=401, detail="Google token missing sub/email")
+    # Linking by email below would let an unverified address take over an existing account.
+    if claims.get("email_verified") is not True:
+        raise HTTPException(status_code=401, detail="Google email is not verified")
     user = db.query(User).filter(User.google_sub == sub).first()
     if user is None:
         user = db.query(User).filter(User.email == email).first()
@@ -593,7 +635,7 @@ async def upload_voice(
             ]
 
             # If the input is webm, specify the input format and codec
-            if 'webm' in file.content_type:
+            if 'webm' in (file.content_type or ""):
                 command.insert(1, "webm")
                 command.insert(1, "-f")
                 command.insert(3, "opus")
@@ -672,20 +714,21 @@ async def rename_voice(
 
     if user_voice:
         # User owns the voice, proceed with rename
-        # Check if new name already exists for this user
-        if any(v.get("user_id") == current_user.id and v.get("name") == request.new_name for v in metadata):
-            raise HTTPException(status_code=409, detail=f"Voice with name '{request.new_name}' already exists for this user.")
+        # new_name becomes part of a file path: apply the same policy as /voices/upload (no separators, no ..).
+        new_name = _safe_voice_name(request.new_name)
+        if any(v.get("user_id") == current_user.id and v.get("name") == new_name for v in metadata):
+            raise HTTPException(status_code=409, detail=f"Voice with name '{new_name}' already exists for this user.")
 
         old_filename = user_voice["filename"]
         file_extension = os.path.splitext(old_filename)[1]
-        new_filename = f"{current_user.id}_{request.new_name}{file_extension}"
-        
-        old_file_path = os.path.join(SPEAKER_VOICES_DIR, old_filename)
-        new_file_path = os.path.join(SPEAKER_VOICES_DIR, new_filename)
+        new_filename = f"{current_user.id}_{new_name}{file_extension}"
+
+        old_file_path = _voice_path(old_filename)
+        new_file_path = _voice_path(new_filename)
 
         try:
             os.rename(old_file_path, new_file_path)
-            user_voice["name"] = request.new_name
+            user_voice["name"] = new_name
             user_voice["filename"] = new_filename
             user_voice["path"] = new_file_path
             _write_speaker_voices_metadata(metadata)
@@ -714,7 +757,7 @@ async def delete_voice(
     voice_deleted = False
     for voice in metadata:
         if voice.get("user_id") == current_user.id and voice.get("filename") == request.filename:
-            file_path = os.path.join(SPEAKER_VOICES_DIR, request.filename)
+            file_path = _voice_path(request.filename)
             try:
                 os.remove(file_path)
                 logging.info(f"Backend: Deleted voice file {file_path}")
@@ -1087,7 +1130,7 @@ async def _process_speech_segment_pipeline(
 
     if audio_wav is not None and sample_rate is not None:
         # Ensure audio_wav is a numpy array
-        if isinstance(audio_wav, torch.Tensor):
+        if torch is not None and isinstance(audio_wav, torch.Tensor):
             audio_wav = audio_wav.cpu().numpy()
         
         _save_audio_segment_for_debug(audio_wav, "tts_output", is_final)
@@ -1250,7 +1293,7 @@ async def handle_audio_stream(websocket: WebSocket):
                             new_source_lang = data.get("source_lang", session_config["source_lang"])
                             new_target_lang = data.get("target_lang", session_config["target_lang"])
                             new_tts_model_choice = data.get("tts_model_choice", session_config["tts_model_choice"])
-                            new_speaker_wav_path = data.get("speaker_wav_path", session_config["speaker_wav_path"])
+                            new_speaker_wav_path = _safe_speaker_wav(data.get("speaker_wav_path", session_config["speaker_wav_path"]))
                             new_speaker_text = data.get("speaker_text", session_config["speaker_text"])
                             new_speaker_lang = data.get("speaker_lang", session_config["speaker_lang"])
                             new_vad_enabled = data.get("vad_enabled", session_config["vad_enabled"]) # Get new VAD enabled state
