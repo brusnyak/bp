@@ -108,11 +108,13 @@ Demo: `documentation/demo_runbook_2026-09-28.md` (+ `monday_test_checklist.md`,
 
 ## Next steps (owner-approved order, 2026-09-28)
 
-1. Push pending owner approval: `main` is ahead of `origin/main` by the `lite` landing
-   (fork housekeeping: delete stale `lite-base`, merge `lite`→`main` on the fork).
-2. SK→EN deep check on the Mac: reproduce the Windows numbers with the small-sk default
-   (`scripts/live_direction_probe.py`, `scripts/demo_conversation.py`), then accuracy work
-   (segment merging/context, prompt, `BP_SK_STT_MODEL` rungs, MT input guards).
+1. [x] **Pushed `main` to `origin/main`** (tip: 920fd24 including Windows/AMD CPU setup, lite, and SK->EN evaluation matrix).
+2. **Accelerate SK→EN turnaround latency**:
+   - Target: close the ~2x latency gap (SK→EN ~1.4s vs EN→SK ~0.7s).
+   - Analysis: MT and TTS are already sub-150ms. The gap is 100% in Slovak STT (`whisper-small-sk` at ~1.3s vs EN `base` at ~0.55s).
+   - Test `beam_size=1` (greedy) vs `beam_size=2` / `5` in `faster-whisper` on Slovak speech with `scripts/eval_sk_direction.py` to check speedup vs accuracy trade-off.
+   - Benchmark `initial_prompt` with common Slovak diacritics / orthography.
+   - Profile `cpu_threads` and chunking thresholds.
 3. Voice cloning speed + quality: record the 75-sentence set
    (`scripts/build_recording_set.py` → `scripts/record_reading.py`), longer Piper fine-tune,
    QC in the Voice Lab (WER thirds / F0 / HNR / Praat panel).
