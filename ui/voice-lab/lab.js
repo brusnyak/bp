@@ -23,6 +23,47 @@
     return el("span", "pill " + kind, text);
   }
 
+  function getRatings() {
+    try { return JSON.parse(localStorage.getItem("hlas-ratings") || "{}"); }
+    catch (e) { return {}; }
+  }
+  function saveRating(name, patch) {
+    const all = getRatings();
+    all[name] = Object.assign(all[name] || {}, patch);
+    localStorage.setItem("hlas-ratings", JSON.stringify(all));
+  }
+
+  function ratingRow(item) {
+    const wrap = el("div", "lab-rate");
+    const saved = getRatings()[item.name] || {};
+    wrap.appendChild(document.createTextNode("sounds like me: "));
+    const slider = document.createElement("input");
+    slider.type = "range"; slider.min = "0"; slider.max = "100";
+    slider.value = saved.sim !== undefined ? saved.sim : "50";
+    slider.setAttribute("aria-label", "Similarity to my voice for " + item.name);
+    const val = el("strong", null, String(slider.value));
+    slider.addEventListener("input", () => {
+      val.textContent = slider.value;
+      saveRating(item.name, { sim: Number(slider.value) });
+    });
+    wrap.appendChild(slider); wrap.appendChild(document.createTextNode(" "));
+    wrap.appendChild(val);
+    [["steadiness", "tremor"], ["hiss", "hiss"], ["muffled", "phone-fog"]].forEach(([key, label]) => {
+      wrap.appendChild(document.createTextNode(" " + label + " "));
+      const sel = document.createElement("select");
+      sel.setAttribute("aria-label", label + " for " + item.name);
+      ["?", "1-none", "2-slight", "3-clear", "4-strong"].forEach((o, i) => {
+        const opt = document.createElement("option");
+        opt.value = String(i); opt.textContent = o;
+        sel.appendChild(opt);
+      });
+      sel.value = String(saved[key] !== undefined ? saved[key] : 0);
+      sel.addEventListener("change", () => saveRating(item.name, { [key]: Number(sel.value) }));
+      wrap.appendChild(sel);
+    });
+    return wrap;
+  }
+
   function metaLine(parts) {
     return el("p", "lab-meta", parts.filter(Boolean).join(" · "));
   }
@@ -70,6 +111,7 @@
         Object.entries(item.meta).map(([k, v]) => k + ": " + v)));
     }
     card.appendChild(audioEl(item.file));
+    if (sectionId === "qc") card.appendChild(ratingRow(item));
     return card;
   }
 
@@ -251,6 +293,17 @@
     setupPlanToggle();
     loadPlan();
     probeBackend();
+    const dl = el("button", "btn-small", "Download my ratings (JSON)");
+    dl.addEventListener("click", () => {
+      const blob = new Blob([localStorage.getItem("hlas-ratings") || "{}"],
+        { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "voice-ratings.json";
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    });
+    document.getElementById("statStrip").appendChild(dl);
     try {
       const r = await fetch("library.json", { cache: "no-store" });
       if (!r.ok) throw new Error("HTTP " + r.status);
