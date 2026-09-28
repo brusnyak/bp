@@ -36,6 +36,24 @@ Branch state and history (verified 2026-09-28):
 - Windows deltas stay in `requirements-windows.txt`; `requirements.txt` keeps macOS/Linux
   installs (Coqui/omnivoice/OpenVoice live there) — do not "unify" them.
 
+## Landing the Windows laptop's branch (protocol)
+
+Windows work lands as a **branch on the remote**, never as a direct rewrite of `main`:
+
+1. Windows: commit on a `win/*` branch, push, open a PR (that is how `79a8476` arrived).
+2. Mac: `git fetch`, merge that branch into `merge/windows-amd-cpu`, resolve conflicts,
+   then run the three gates — `make test` (20 expected), `venv/bin/python
+   test/interrupt_smoke_test.py` (needs `make run`), `make demo-check`.
+3. Only after the gates pass: `git -C ~/Documents/STU/BP merge --ff-only merge/windows-amd-cpu`.
+
+While a Windows branch is in flight, **do not touch on the Mac**: `requirements*.txt`,
+`setup_windows.ps1`, `SETUP_WINDOWS.md`, and the install sections of `README.md` — those are
+the files that side is rewriting (footprint diet in flight). Work that does not conflict:
+`documentation/`, `specs/`, tests, `ui/`, backend code the Windows side is not editing.
+
+Plan behind that freeze: `documentation/footprint_audit_2026-09-28.md` (ranked cut list with
+measured savings) and `documentation/linux_setup_and_test.md` (third-OS test sheet).
+
 ## Run it
 
 | Command | What |
