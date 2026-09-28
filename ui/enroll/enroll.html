@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+    <title>Voice enrollment — read, record, clone</title>
+    <link rel="manifest" href="/ui/manifest.webmanifest" />
+    <meta name="theme-color" content="#0A1C4F" />
+    <link rel="apple-touch-icon" href="/ui/images/icon-192.png" />
+    <link rel="stylesheet" href="/ui/global-styles.css" />
+    <link rel="stylesheet" href="enroll-style.css" />
+  </head>
+  <body>
+    <header class="lab-hero">
+      <div class="lab-hero-inner">
+        <div>
+          <h1>Voice enrollment</h1>
+          <p class="lab-sub">Read each sentence aloud, right here. No files, no uploads by hand —
+            the system segments, registers, and queues your voice for training approval.</p>
+          <div class="lab-stats" id="statStrip"></div>
+        </div>
+        <nav class="lab-nav">
+          <a href="/ui/live-speech/live.html">Live translation →</a>
+        </nav>
+      </div>
+    </header>
+    <main class="lab-container">
+      <section id="gateSection">
+        <p class="lab-hint" id="gateMsg">Checking login…</p>
+      </section>
+      <section id="setupSection" class="hidden">
+        <h2>1. Language + session</h2>
+        <p class="lab-hint">
+          <select id="langSelect" aria-label="Script language">
+            <option value="en">English (18 sentences)</option>
+            <option value="sk">Slovenčina (18 viet)</option>
+            <option value="cs">Čeština (16 vět)</option>
+          </select>
+          <input id="sessionInput" placeholder="session name, e.g. living-room" />
+          <button id="startBtn" class="btn-small">Start session</button>
+        </p>
+        <p class="lab-hint">Quiet room, steady pace, 0.5s silence at start/end of each take.
+          Recording stays on this device until you submit.</p>
+      </section>
+      <section id="recordSection" class="hidden">
+        <h2>2. Read + record <span id="progPill" class="pill idle">0 / 0</span></h2>
+        <div id="sentList"></div>
+        <p><button id="submitBtn" class="btn-small" disabled>Submit all for processing</button>
+          <span class="lab-hint" id="submitMsg"></span></p>
+      </section>
+      <section id="doneSection" class="hidden">
+        <h2>3. Processed</h2>
+        <pre id="donePre" class="lab-plan"></pre>
+      </section>
+    </main>
+    <script src="/ui/theme-toggle.js"></script>
+    <script src="enroll.js"></script>
+  </body>
+</html>

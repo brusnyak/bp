@@ -641,6 +641,54 @@ async def upload_voice(
         logging.error(f"Backend: Error uploading voice '{voice_name}': {e}")
         raise HTTPException(status_code=500, detail=f"Failed to upload voice: {e}")
 
+class ProcessSessionRequest(BaseModel):
+    session: str
+    speaker_lang: str
+    items: List[Dict[str, str]]  # [{idx: "01", text: "..."}] in recording order
+
+
+@router.post("/voices/process", summary="Segment an enrollment session into a training corpus")
+async def process_session(
+    body: ProcessSessionRequest,
+    current_user: User = Depends(get_current_user),
+):
+    """Collects one enrollment session's clips, resamples to 22050 Hz mono,
+    writes processed/enroll/<user>/<session>/ + speaker_voices.json, and
+    reports READY FOR TRAINING APPROVAL. Nothing trains by itself (approved-first)."""
+    import librosa
+
+    metadata = _read_speaker_voices_metadata()
+    session = "".join(c for c in body.session if c.isalnum() or c in ("-", "_")) or "take1"
+    found, total_s = [], 0.0
+    for it in body.items:
+        idx = str(it.get("idx", "")).zfill(2)
+        name = f"{session}_{idx}"
+        entry = next((v for v in metadata
+                      if v.get("user_id") == current_user.id and v.get("name") == name), None)
+        if entry is None:
+            raise HTTPException(status_code=404, detail=f"Clip not found: {name}")
+        found.append((entry, it.get("text", "")))
+    out_dir = os.path.join("processed", "enroll", str(current_user.id), session)
+    os.makedirs(out_dir, exist_ok=True)
+    entries = []
+    for entry, text in found:
+        wav, _ = librosa.load(entry["path"], sr=22050, mono=True)
+        total_s += len(wav) / 22050
+        base = os.path.basename(entry["path"])
+        root, _ = os.path.splitext(base)
+        out_wav = os.path.join(out_dir, root + "_22k.wav")
+        import soundfile as sf
+        sf.write(out_wav, wav, 22050)
+        entries.append({"id": entry["name"], "language": body.speaker_lang,
+                        "name": entry["name"], "path": os.path.basename(out_wav),
+                        "transcript_source": "in-browser enrollment",
+                        "transcribed_text": text})
+    with open(os.path.join(out_dir, "speaker_voices.json"), "w") as f:
+        json.dump(entries, f, indent=2, ensure_ascii=False)
+    return {"status": "ready_for_approval", "clips": len(entries),
+            "seconds": round(total_s, 1), "corpus_dir": out_dir}
+
+
 @router.put("/voices/rename", summary="Rename an existing speaker voice", response_model=Dict[str, str])
 async def rename_voice(
     request: RenameVoiceRequest,
