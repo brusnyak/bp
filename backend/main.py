@@ -1267,6 +1267,16 @@ async def handle_audio_stream(websocket: WebSocket):
     try:
         while True:
             message = await websocket.receive()
+            if message["type"] == "websocket.disconnect":
+                # Starlette emits exactly one of these when the peer goes away and raises
+                # RuntimeError if receive() is called again after it. This loop only checked
+                # for "websocket.receive", so the disconnect message fell through, receive()
+                # was called a second time, and the RuntimeError surfaced as two ERROR lines
+                # on every client teardown (reproduced 2026-09-28 in the live WS rehearsal).
+                # Clients flush with an explicit 'stop', so exiting here keeps the old
+                # behaviour: cleanup in the finally block, no extra pipeline work.
+                logging.info(f"Client {client_info} disconnected (code {message.get('code')}).")
+                break
             if message["type"] == "websocket.receive": # Check for the correct message type
                 if "text" in message:
                     data = json.loads(message["text"])
