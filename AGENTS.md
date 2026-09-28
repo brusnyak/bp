@@ -22,10 +22,15 @@ Backend FastAPI + WebSocket, UI plain HTML/CSS/JS. Owner: Yegor Brusnyak.
 | Windows 11, AMD, CPU-only, no admin | clone of `https://github.com/brusnyak/bp` (GitHub user `I-BRUS`) | portability proof: `requirements-windows.txt`, `SETUP_WINDOWS.md`, `setup_windows.ps1`; no XTTS/Coqui (no Windows wheels), Piper-only |
 
 Branch state and history (verified 2026-09-28):
-- `main` = the 6 local commits ending at the shipped SK voice + the merge of the
-  Windows CPU-setup work (`e55461c`, merged `79a8476`).
+- `merge/windows-amd-cpu` + `cline/f9e7b` both point at the integration tip: the 6 local
+  commits ending at the shipped SK voice, the merge of the Windows CPU-setup work
+  (`e55461c` ← Windows `79a8476`), and the demo-readiness commit. Check
+  `git log --oneline -3` for the current hash.
+- The Mac checkout's `main` is still at `da37df0` and fast-forwards onto that tip:
+  `git -C ~/Documents/STU/BP merge --ff-only merge/windows-amd-cpu`.
 - `origin/main` had diverged (Windows laptop pushed PR #1 from `I-BRUS`); that side is
-  bookmarked locally as `windows/amd-cpu-setup` and merged on `merge/windows-amd-cpu`.
+  also bookmarked locally as `windows/amd-cpu-setup`. Nothing is pushed since — pushing
+  needs the owner's go-ahead.
 - `voice-lab`, `worktree-agent-a342c9d7f70fec900` are fully merged ancestors — dead ends,
   do not branch from them.
 - Windows deltas stay in `requirements-windows.txt`; `requirements.txt` keeps macOS/Linux
