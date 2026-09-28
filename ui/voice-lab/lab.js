@@ -105,6 +105,42 @@
     } else if (sectionId === "test") {
       card.appendChild(metaLine(["file: " + item.file]));
       if (item.transcript) card.appendChild(metaLine(["ground truth: " + item.transcript]));
+    } else if (sectionId === "sk_direction") {
+      card.appendChild(metaLine([
+        "audio: " + (item.audio_s ? item.audio_s + "s" : "?"),
+        "SK ref chars: " + (item.ref_chars || "?"),
+        "EN ref chars: " + (item.en_ref_chars || "?"),
+        "file: " + item.file,
+      ]));
+      if (item.rungs && Object.keys(item.rungs).length) {
+        const tbl = el("table", "matrix-table");
+        const thead = el("thead");
+        const trh = el("tr");
+        ["Rung", "WER", "CER", "MT chrF", "STT Latency", "RTF", "MT Latency"].forEach(h => {
+          trh.appendChild(el("th", null, h));
+        });
+        thead.appendChild(trh);
+        tbl.appendChild(thead);
+        const tbody = el("tbody");
+        for (const [rungName, r] of Object.entries(item.rungs)) {
+          const tr = el("tr");
+          tr.appendChild(el("td", null, rungName));
+          const werTd = el("td", null, (r.wer * 100).toFixed(1) + "%");
+          if (r.wer < 0.3) werTd.className = "pass";
+          else if (r.wer > 0.5) werTd.className = "fail";
+          tr.appendChild(werTd);
+          tr.appendChild(el("td", null, (r.cer * 100).toFixed(1) + "%"));
+          const chrfTd = el("td", null, String(r.chrf));
+          if (r.chrf >= 60) chrfTd.className = "pass";
+          tr.appendChild(chrfTd);
+          tr.appendChild(el("td", null, r.stt_s + "s"));
+          tr.appendChild(el("td", null, String(r.rtf)));
+          tr.appendChild(el("td", null, r.mt_s + "s"));
+          tbody.appendChild(tr);
+        }
+        tbl.appendChild(tbody);
+        card.appendChild(tbl);
+      }
     }
     if (item.meta && Object.keys(item.meta).length) {
       card.appendChild(metaLine(
@@ -124,6 +160,7 @@
     [
       ["Voices", counts.voices || 0],
       ["QC candidates", counts.qc || 0],
+      ["SK matrix", counts.sk_direction || 0],
       ["Scored", scored],
       ["Test clips", counts.test || 0],
     ].forEach(([label, n]) => {

@@ -130,6 +130,27 @@ def main():
         {"id": "conversation", "title": "Conversation sim (live-pipeline sentence outputs)", "items": conv_items}
     )
 
+    # 5. SK->EN Direction Matrix (STT WER/CER + MT chrF + latencies).
+    sk_matrix_file = os.path.join(REPO_ROOT, "processed", "sk_direction", "sk_direction_matrix.json")
+    sk_matrix = load_json(sk_matrix_file)
+    if sk_matrix and "clips" in sk_matrix:
+        matrix_items = []
+        for clip_id, cdata in sk_matrix["clips"].items():
+            audio_path = os.path.join("..", "..", "speaker_voices", f"{clip_id}.m4a")
+            matrix_items.append({
+                "name": clip_id,
+                "file": audio_path,
+                "audio_s": cdata.get("audio_s"),
+                "ref_chars": cdata.get("ref_chars"),
+                "en_ref_chars": cdata.get("en_ref_chars"),
+                "rungs": cdata.get("rungs", {}),
+            })
+        library["sections"].append({
+            "id": "sk_direction",
+            "title": "SK→EN Pipeline Matrix (STT Rungs & MT chrF)",
+            "items": matrix_items,
+        })
+
     out = os.path.join(REPO_ROOT, "ui", "voice-lab", "library.json")
     with open(out, "w") as f:
         json.dump(library, f, indent=2, ensure_ascii=False)
