@@ -152,7 +152,33 @@ section > h2 {
   overflow-y: auto;
 }
 
+/* Matrix Table */
+.matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.8rem;
+  font-size: 0.88rem;
+}
+.matrix-table th, .matrix-table td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+.matrix-table th {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--secondary-color);
+  background: var(--soft-gray);
+}
+[data-theme="dark"] .matrix-table th {
+  background: rgba(255, 255, 255, 0.05);
+}
+.matrix-table td strong {
+  font-weight: 700;
+}
+
 @media (max-width: 700px) {
   .lab-hero-inner { flex-direction: column; }
   .lab-hero h1 { font-size: 2rem; }
+  .matrix-table { display: block; overflow-x: auto; }
 }
