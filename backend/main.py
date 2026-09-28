@@ -190,10 +190,16 @@ def _safe_voice_name(name: str) -> str:
 
 
 def _voice_path(filename: str) -> str:
-    """Resolve `filename` inside SPEAKER_VOICES_DIR or raise 400 (blocks ../ and absolute paths)."""
+    """Resolve `filename` inside SPEAKER_VOICES_DIR or raise 400 (blocks ../, backslash traversal and absolute paths)."""
+    if "\\" in filename:  # not a separator on POSIX, but never produced by _safe_voice_name and is one on Windows
+        raise HTTPException(status_code=400, detail="Invalid voice path.")
     base = os.path.realpath(SPEAKER_VOICES_DIR)
     path = os.path.realpath(os.path.join(base, filename))
-    if os.path.commonpath([base, path]) != base:
+    try:
+        inside = os.path.commonpath([base, path]) == base
+    except ValueError:  # different drives on Windows
+        inside = False
+    if not inside:
         raise HTTPException(status_code=400, detail="Invalid voice path.")
     return path
 
