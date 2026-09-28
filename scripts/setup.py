@@ -77,6 +77,10 @@ def main():
     for v in PIPER_VOICES:
         run([PY, "backend/tts/download_piper_models.py", v])
 
+    step("Whisper base (English recognition) as a plain directory: no cache symlinks, works offline")
+    if not (ROOT / "ct2_models" / "whisper-base" / "model.bin").exists():
+        run([PY, "scripts/fetch_whisper.py", "Systran/faster-whisper-base", "ct2_models/whisper-base"])
+
     if not a.skip_models:
         step("MT + Slovak speech models (one-time CTranslate2 conversion, isolated env; skips what exists)")
         run([sys.executable, "scripts/convert_models.py"])

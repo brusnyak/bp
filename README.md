@@ -256,6 +256,7 @@ bp/
 | Symptom | Fix |
 | --- | --- |
 | Setup fails with "Python 3.10-3.12 required" | Install a supported Python; 3.13+ has no wheels for the pinned numpy/numba. |
+| `OSError ... WinError 1314` while downloading a model | Windows blocks symlinks in the Hugging Face cache (no Developer Mode). `scripts/setup.py` fetches the models it needs into plain `ct2_models/` folders; for other Whisper sizes enable Developer Mode. |
 | Model downloads look stuck | Hugging Face downloads use `hf_xet`, which writes in the background: the progress bar and cache size can sit still until each file completes. |
 | `Address already in use` | Set `BP_PORT` to a free port. |
 | Voice upload returns 500 | FFmpeg is missing from `PATH`. |

@@ -22,3 +22,14 @@ def test_other_languages_and_explicit_models_are_untouched(monkeypatch):
     monkeypatch.delenv("BP_SK_STT_MODEL", raising=False)
     assert bm._pick_stt_model("en", "base") == "base"
     assert bm._pick_stt_model("sk", "medium") == "medium"
+
+
+def test_whisper_prefers_local_model_directory(monkeypatch, tmp_path):
+    import backend.stt.faster_whisper_stt as fw
+    seen = []
+    monkeypatch.setattr(fw, "WhisperModel", lambda source, **kw: seen.append(source))
+    monkeypatch.setattr(fw, "LOCAL_MODELS_DIR", str(tmp_path))
+    fw.FasterWhisperSTT(model_size="base")
+    (tmp_path / "whisper-base").mkdir(); (tmp_path / "whisper-base" / "model.bin").write_bytes(b"x")
+    fw.FasterWhisperSTT(model_size="base")
+    assert seen == ["base", str(tmp_path / "whisper-base")]  # cache name when absent, plain directory when fetched
