@@ -3,7 +3,10 @@ from transformers import AutoTokenizer
 import torch  # Added for MPS check
 import os  # Added for path operations
 import re  # Sentence splitting for chunked streaming translation
+import logging  # SANDBOX-FIX (2026-09-28): hot-path text logging must not print()
 from typing import List, Tuple
+
+logger = logging.getLogger(__name__)
 
 
 class CTranslate2MT:
@@ -129,7 +132,10 @@ class CTranslate2MT:
         end_time = time.time()
         translation_time = end_time - start_time
 
-        print(
+        # SANDBOX-FIX (2026-09-28): logging, not print -- translated text carries
+        # Slovak diacritics and print() to a stock Windows console (cp1252) raised
+        # UnicodeEncodeError, killing the whole pipeline task after a good translation.
+        logger.info(
             f"Translated '{text}' ({src_lang}) to '{translated_text}' ({tgt_lang}) in {translation_time:.4f}s"
         )
         return translated_text, translation_time
