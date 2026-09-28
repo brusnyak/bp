@@ -1319,6 +1319,34 @@ Based on stress testing results:
 
 **Impact:** Correct pronunciation of Czech text with all special characters.
 
+### 5.2.5 Measurement update (September 2026) — replaces target figures above
+
+All figures below are measured on Apple Silicon (CPU/MPS), local-only, no cloud.
+Full matrices: `processed/stt_matrix.json`, `processed/e2e_ensk.json`,
+`processed/conversation_sim.json`, `processed/machine_listen.json`.
+
+- **STT (WER, own 115–134s recordings with script ground truth):**
+  EN faster-whisper base 0.077 / small 0.096 / **Parakeet-TDT-v3 0.023**;
+  SK small 0.49 plain / **large-v3-turbo 0.41** (adopted default for SK source);
+  base+auto-detect on SK catastrophic (1.0); Czech-prompt proxy worse than SK prompt.
+  Parakeet-v3 via transformers rejected for SK (0.89, no lang conditioning).
+  Per-language routing stands: Parakeet EN / turbo SK.
+- **MT (Opus-MT CTranslate2 int8, CPU):** 18 sentences in 0.50s chunked batch
+  (3.5x faster than single-shot, also fixes long-input truncation); word-window
+  first-chunk p50 0.035–0.05s vs sentence 0.13–0.15s → streaming wins 3x to first audio.
+- **E2E EN→SK:** STT 0.5s + MT 1.8s + hybrid TTS 7.1s (53s audio, RTF 0.13),
+  wall 18.7s incl. model loads. Audible proof: `processed/e2e_ensk_sk.wav`.
+- **TTS voices (F0 / jitter / HNR panel):** stock lili F0 198Hz vs speaker
+  101Hz — female base could not reach a male speaker (2500 steps, still robotic).
+  Male-Czech warmstart (`jirka`) fixed pitch (111Hz) and prosody range
+  (22.3Hz ≈ generic 22.1Hz); tremor (jitter ~0.043 vs 0.0225) and hiss remain
+  as training-data-scale residue. Czech Piper reading Slovak directly: F0 157Hz,
+  flat prosody — intelligible fallback, wrong timbre, Czech accent. No local
+  Slovak voice base appeared in 2026; XTTS/CosyVoice/F5 all lack Slovak;
+  Gemini 3.8 replica is EEA-geo-blocked; all cloud options violate local-first.
+- **Shipped defaults (measured, wired):** SK source → large-v3-turbo;
+  SK target → own fine-tuned male voice (RTF 0.05, 0.28s per 6s audio).
+
 ### 5.3 Discussion of Results
 
 The experimental evaluation demonstrates that the real-time speech translation system successfully meets its primary objectives of low-latency, high-quality translation, particularly on Apple Silicon hardware. The dual-engine TTS architecture effectively balances speed (Piper TTS) with personalized voice cloning (Coqui TTS XTTS v2), offering flexibility for different use cases.
