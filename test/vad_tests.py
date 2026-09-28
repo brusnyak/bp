@@ -111,8 +111,10 @@ async def test_vad_speech_detection_and_processing():
     if np.max(np.abs(audio_np)) > 0:
         audio_np = audio_np / np.max(np.abs(audio_np)) * 0.9
 
-    # Create a short speech segment (e.g., 1 second)
-    speech_segment = audio_np[:AUDIO_SAMPLE_RATE] # 1 second of speech
+    # SANDBOX-FIX (2026-09-28): the fixture starts with ~1s of near-silence, so
+    # [:RATE] fed pure silence and no correct VAD can transcribe it. Take 1.0-2.0s,
+    # where the speech actually is (verified per-100ms energy profile).
+    speech_segment = audio_np[AUDIO_SAMPLE_RATE:2 * AUDIO_SAMPLE_RATE] # 1 second of speech
     
     # Add some silence after the speech
     silence_duration_seconds = SILENCE_TIMEOUT * 2 # Enough silence to trigger end of speech
@@ -203,9 +205,12 @@ async def test_vad_silence_handling(): # Removed setup_models fixture
 @pytest.mark.asyncio
 async def test_vad_aggressiveness_and_short_speech(): # Removed setup_models fixture
     """
-    Test VAD with a very short speech burst to see if it's detected.
-    Given VAD_AGGRESSIVENESS=2 and MIN_SPEECH_DURATION=0.2s,
-    a very short burst should be detected and processed.
+    Test VAD with a short speech burst to see if it's detected and processed.
+    SANDBOX-FIX (2026-09-28): was 0.2s, which can never transcribe -- the pre-VAD
+    buffer alone holds 0.5s and faster-whisper emits nothing useful under ~0.5-1s.
+    1.0s is the realistic "short" minimum for this pipeline (still 4x shorter
+    than test 1's segment + trailing silence). Old docstring also cited
+    VAD_AGGRESSIVENESS=2 / MIN_SPEECH_DURATION, both long removed (now 3 / gone).
     """
     # Initialize models directly within the test
     await initialize_all_models(
@@ -231,8 +236,9 @@ async def test_vad_aggressiveness_and_short_speech(): # Removed setup_models fix
         audio_np = resample_audio(audio_np, original_sr=sr, target_sr=AUDIO_SAMPLE_RATE)
         sr = AUDIO_SAMPLE_RATE
 
-    # Create a very short speech segment (e.g., 0.2 seconds, less than MIN_SPEECH_DURATION)
-    short_speech_segment = audio_np[:int(AUDIO_SAMPLE_RATE * 0.2)]
+    # SANDBOX-FIX (2026-09-28): same leading-silence reason as above -- 1.0s taken
+    # from 1.0s, where the speech actually is (first second is near-silence).
+    short_speech_segment = audio_np[AUDIO_SAMPLE_RATE:2 * AUDIO_SAMPLE_RATE]
     silence_segment = np.zeros(int(AUDIO_SAMPLE_RATE * SILENCE_TIMEOUT * 2), dtype=np.float32)
     full_audio = np.concatenate([short_speech_segment, silence_segment])
     full_audio = np.nan_to_num(full_audio).astype(np.float32)
@@ -301,6 +307,7 @@ async def test_vad_long_speech_streaming(): # Removed setup_models fixture
 
     streaming_transcriptions = 0
     final_transcription_found = False
+    final_translation_found = False
     for msg in websocket.received_messages:
         if msg.get("type") == "transcription_result":
             if msg.get("is_final") == False and msg.get("transcribed"):
@@ -309,7 +316,15 @@ async def test_vad_long_speech_streaming(): # Removed setup_models fixture
             elif msg.get("is_final") == True and msg.get("transcribed"):
                 final_transcription_found = True
                 print(f"Final Transcription: {msg['transcribed']}")
-    
-    assert streaming_transcriptions >= 1, "Expected at least one streaming transcription."
+        if msg.get("type") == "translation_result" and msg.get("translated"):
+            final_translation_found = True
+            print(f"Final Translation: {msg['translated']}")
+
+    # SANDBOX-FIX (2026-09-28): VAD-enabled streaming partials are DISABLED upstream
+    # (backend/main.py:1478-1492 -- "causes Whisper hallucinations... Only process
+    # after silence timeout"). Expecting is_final==False can never pass by design,
+    # so assert the full long-form path instead: final transcription + translation.
+    # streaming_transcriptions is informational only (see note above).
     assert final_transcription_found, "Expected a final transcription."
+    assert final_translation_found, "Expected a final translation."
     print("Test completed: Long speech streaming checked.")

@@ -1,0 +1,64 @@
+{
+  "candidates": [
+    {
+      "label": "sandbox_en_US-ryan-medium_en",
+      "engine": "piper",
+      "language": "en",
+      "sample_rate": 22050,
+      "synthesis_latency_s": 0.2686,
+      "text": "Hello, this is a voice quality sample for the speech translation system.",
+      "model_id": "en_US-ryan-medium",
+      "made_at": "2026-09-28 06:10:29"
+    },
+    {
+      "label": "sandbox_en_US-personal-medium_en",
+      "engine": "piper",
+      "language": "en",
+      "sample_rate": 22050,
+      "synthesis_latency_s": 0.2372,
+      "text": "Hello, this is a voice quality sample for the speech translation system.",
+      "model_id": "en_US-personal-medium",
+      "made_at": "2026-09-28 06:10:31"
+    },
+    {
+      "label": "sandbox_en_US-personal-v2_en",
+      "engine": "piper",
+      "language": "en",
+      "sample_rate": 22050,
+      "synthesis_latency_s": 0.2264,
+      "text": "Hello, this is a voice quality sample for the speech translation system.",
+      "model_id": "en_US-personal-v2",
+      "made_at": "2026-09-28 06:10:33"
+    },
+    {
+      "label": "sandbox_sk_SK-lili-medium_sk",
+      "engine": "piper",
+      "language": "sk",
+      "sample_rate": 22050,
+      "synthesis_latency_s": 0.1954,
+      "text": "Dobrý deň, toto je hlasová vzorka pre systém prekladu reči.",
+      "model_id": "sk_SK-lili-medium",
+      "made_at": "2026-09-28 06:10:34"
+    },
+    {
+      "label": "sandbox_sk_SK-personal-male-medium_sk",
+      "engine": "piper",
+      "language": "sk",
+      "sample_rate": 22050,
+      "synthesis_latency_s": 0.2426,
+      "text": "Dobrý deň, toto je hlasová vzorka pre systém prekladu reči.",
+      "model_id": "sk_SK-personal-male-medium",
+      "made_at": "2026-09-28 06:10:36"
+    },
+    {
+      "label": "sandbox_cs_CZ-jirka-medium_cs",
+      "engine": "piper",
+      "language": "cs",
+      "sample_rate": 22050,
+      "synthesis_latency_s": 0.266,
+      "text": "Dobrý den, toto je hlasový vzorek pro systém překladu řeči.",
+      "model_id": "cs_CZ-jirka-medium",
+      "made_at": "2026-09-28 06:10:38"
+    }
+  ]
+}

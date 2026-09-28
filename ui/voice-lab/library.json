@@ -19,13 +19,6 @@
           "in_registry": true
         },
         {
-          "name": "en_rainbow_v2b",
-          "file": "../../speaker_voices/en_rainbow_v2b.m4a",
-          "language": "en",
-          "transcript": "When the sunlight strikes raindrops in the air, they act as a prism and form a rainbow. The rainbow is a division of white light into many beautiful colors. These take the shape of a long round arch, with its path high above, and its two ends apparently beyond the horizon. There is, according to legend, a boiling pot of gold at one end. People look, but no one ever finds it. When a man looks for something beyond his reach, his friends say he is looking for the pot of gold at the end of the rainbow. Throughout the centuries people have explained the rainbow in various ways. Some have accepted it as a miracle without physical explanation. To the Hebrews it was a token that there would be no more universal floods. The Greeks used to imagine that it was a sign from the gods to foretell war or heavy rain. The Norsemen considered the rainbow as a bridge over which the gods passed from earth to their home in the sky. Others have tried to explain the phenomenon physically. Aristotle thought that the rainbow was caused by reflection of the sun's rays by the rain. Since then physicists have found that it is not reflection, but refraction by the raindrops which causes the rainbow. Many complicated ideas about the rainbow have been formed. The difference in the rainbow depends considerably upon the size of the drops, and the width of the rainbow increases as the size of the drops increases. The actual primary rainbow observed is said to be the effect of superposition of a number of bows. If the red of the second bow falls upon the green of the first, the result is to give a bow with an abnormally wide yellow band, since red and green light when mixed form yellow.",
-          "in_registry": true
-        },
-        {
           "name": "en_script_reading",
           "file": "../../speaker_voices/en_script_reading.m4a",
           "language": "en",
@@ -45,13 +38,6 @@
           "language": "sk",
           "transcript": "Včera ráno som išiel na trh kúpiť čerstvý chlieb a mlieko. Stretol som tam starého priateľa Ľuba, ktorý predával med a syry. „Ahoj! Kde si sa túľal celé mesiace?\" spýtal sa ma s úsmevom. Porozprával som mu o svojej práci a o dlhej ceste vlakom cez hory a doliny, až ma bolel každý kĺb. Po chvíli sme si sadli na lavičku pod veľkú vŕbu a dali sme si kávu. „Môžem prísť aj zajtra?\" spýtal som sa. Okolo nás pobehovali deti a hádzali si farebnú loptu. Jedno dievčatko nieslo džbán plný malín a smialo sa na celé kolo. Vôňa čerstvého pečiva sa niesla vzduchom a ja som si spomenul na detstvo u starých rodičov. V diaľke vŕzgali brzdy električky. Ľubo mi potom ukázal fotografie zo svojej záhrady. Medzi riadkami cibule a cesnaku rástli ľalie, pivonky a neskutočne veľké tekvice. „Pozri, táto váži vyše deväť kíl!\" pochválil sa. Neveril som vlastným očiam. „Musím už ísť, ale v piatok prídem zas,\" povedal som a pobrali sme sa domov. Ešte dnes cítim chuť toho chleba s maslom a medom. Bolo to jedno z najkrajších rán tohto jesenného mesiaca. Koľko takýchto dní nám ešte život prinesie?",
           "in_registry": true
-        },
-        {
-          "name": "sk_trhove_rano_v2b",
-          "file": "../../speaker_voices/sk_trhove_rano_v2b.m4a",
-          "language": "sk",
-          "transcript": "Včera ráno som išiel na trh kúpiť čerstvý chlieb a mlieko. Stretol som tam starého priateľa Ľuba, ktorý predával med a syry. „Ahoj! Kde si sa túľal celé mesiace?\" spýtal sa ma s úsmevom. Porozprával som mu o svojej práci a o dlhej ceste vlakom cez hory a doliny, až ma bolel každý kĺb. Po chvíli sme si sadli na lavičku pod veľkú vŕbu a dali sme si kávu. „Môžem prísť aj zajtra?\" spýtal som sa. Okolo nás pobehovali deti a hádzali si farebnú loptu. Jedno dievčatko nieslo džbán plný malín a smialo sa na celé kolo. Vôňa čerstvého pečiva sa niesla vzduchom a ja som si spomenul na detstvo u starých rodičov. V diaľke vŕzgali brzdy električky. Ľubo mi potom ukázal fotografie zo svojej záhrady. Medzi riadkami cibule a cesnaku rástli ľalie, pivonky a neskutočne veľké tekvice. „Pozri, táto váži vyše deväť kíl!\" pochválil sa. Neveril som vlastným očiam. „Musím už ísť, ale v piatok prídem zas,\" povedal som a pobrali sme sa domov. Ešte dnes cítim chuť toho chleba s maslom a medom. Bolo to jedno z najkrajších rán tohto jesenného mesiaca. Koľko takýchto dní nám ešte život prinesie?",
-          "in_registry": true
         }
       ]
     },
@@ -60,39 +46,57 @@
       "title": "QC candidates (engine outputs)",
       "items": [
         {
-          "name": "enpers_v2",
-          "file": "../../processed/voice_qc/enpers_v2.wav",
-          "engine": "?",
-          "language": "?",
-          "sample_rate": null,
-          "synthesis_latency_s": null,
+          "name": "sandbox_cs_CZ-jirka-medium_cs",
+          "file": "../../processed/voice_qc/sandbox_cs_CZ-jirka-medium_cs.wav",
+          "engine": "piper",
+          "language": "cs",
+          "sample_rate": 22050,
+          "synthesis_latency_s": 0.266,
           "similarity": null
         },
         {
-          "name": "male_last_base",
-          "file": "../../processed/voice_qc/male_last_base.wav",
-          "engine": "?",
-          "language": "?",
-          "sample_rate": null,
-          "synthesis_latency_s": null,
+          "name": "sandbox_en_US-personal-medium_en",
+          "file": "../../processed/voice_qc/sandbox_en_US-personal-medium_en.wav",
+          "engine": "piper",
+          "language": "en",
+          "sample_rate": 22050,
+          "synthesis_latency_s": 0.2372,
           "similarity": null
         },
         {
-          "name": "male_last_ns05",
-          "file": "../../processed/voice_qc/male_last_ns05.wav",
-          "engine": "?",
-          "language": "?",
-          "sample_rate": null,
-          "synthesis_latency_s": null,
+          "name": "sandbox_en_US-personal-v2_en",
+          "file": "../../processed/voice_qc/sandbox_en_US-personal-v2_en.wav",
+          "engine": "piper",
+          "language": "en",
+          "sample_rate": 22050,
+          "synthesis_latency_s": 0.2264,
           "similarity": null
         },
         {
-          "name": "piper_male_sk_alldata",
-          "file": "../../processed/voice_qc/piper_male_sk_alldata.wav",
-          "engine": "?",
-          "language": "?",
-          "sample_rate": null,
-          "synthesis_latency_s": null,
+          "name": "sandbox_en_US-ryan-medium_en",
+          "file": "../../processed/voice_qc/sandbox_en_US-ryan-medium_en.wav",
+          "engine": "piper",
+          "language": "en",
+          "sample_rate": 22050,
+          "synthesis_latency_s": 0.2686,
+          "similarity": null
+        },
+        {
+          "name": "sandbox_sk_SK-lili-medium_sk",
+          "file": "../../processed/voice_qc/sandbox_sk_SK-lili-medium_sk.wav",
+          "engine": "piper",
+          "language": "sk",
+          "sample_rate": 22050,
+          "synthesis_latency_s": 0.1954,
+          "similarity": null
+        },
+        {
+          "name": "sandbox_sk_SK-personal-male-medium_sk",
+          "file": "../../processed/voice_qc/sandbox_sk_SK-personal-male-medium_sk.wav",
+          "engine": "piper",
+          "language": "sk",
+          "sample_rate": 22050,
+          "synthesis_latency_s": 0.2426,
           "similarity": null
         }
       ]
@@ -105,44 +109,87 @@
           "name": "en_sk_00",
           "file": "../../processed/conversation/en_sk_00.wav",
           "meta": {
-            "mt_sentence_s": 0.174,
-            "mt_word_total_s": 0.105,
-            "mt_word_first_s": 0.052,
-            "tts_s": 0.26,
-            "audio_s": 5.8
+            "src": "In this experiment, the system converts spoken English into text.",
+            "tgt": "V tomto experimente systém premieňa hovorenú angličtinu na text.",
+            "stt_s": 0.1,
+            "mt_sentence_s": 0.099,
+            "tts_s": 0.32,
+            "audio_s": 4.8
           }
         },
         {
           "name": "en_sk_01",
           "file": "../../processed/conversation/en_sk_01.wav",
           "meta": {
-            "mt_sentence_s": 0.139,
-            "mt_word_total_s": 0.098,
-            "mt_word_first_s": 0.033,
-            "tts_s": 0.24,
-            "audio_s": 6.4
+            "src": "Translate it into Slavak and then synthesizes it back into speech.  The process involves three stages, speech recognition, machine translation and text to speech.",
+            "tgt": "Prelož ho do Slavaku a potom ho syntetizuje späť do reči. Proces zahŕňa tri etapy, rozpoznávanie reči, strojový preklad a text do reči.",
+            "stt_s": 0.05,
+            "mt_sentence_s": 0.205,
+            "tts_s": 0.5,
+            "audio_s": 10.5
+          }
+        },
+        {
+          "name": "en_sk_02",
+          "file": "../../processed/conversation/en_sk_02.wav",
+          "meta": {
+            "src": "Each model introduces a small delay, so we will measure the overall latency.",
+            "tgt": "Každý model predstavuje malé oneskorenie, takže zmeriame celkovú latenciu.",
+            "stt_s": 0.03,
+            "mt_sentence_s": 0.1,
+            "tts_s": 0.28,
+            "audio_s": 5.8
+          }
+        },
+        {
+          "name": "en_sk_03",
+          "file": "../../processed/conversation/en_sk_03.wav",
+          "meta": {
+            "src": "The main objective is to achieve natural communication despite language barriers.",
+            "tgt": "Hlavným cieľom je dosiahnuť prirodzenú komunikáciu napriek jazykovým bariéram.",
+            "stt_s": 0.03,
+            "mt_sentence_s": 0.083,
+            "tts_s": 0.3,
+            "audio_s": 6.5
           }
         },
         {
           "name": "sk_en_00",
           "file": "../../processed/conversation/sk_en_00.wav",
           "meta": {
-            "mt_sentence_s": 0.135,
-            "mt_word_total_s": 0.108,
-            "mt_word_first_s": 0.036,
-            "tts_s": 0.17,
-            "audio_s": 4.1
+            "src": "Dobrý den, týtam vás na dnešné povede o preklade reči.",
+            "tgt": "Hello, I'm asking you to tell us today about the translation of the speech.",
+            "stt_s": 0.02,
+            "mt_sentence_s": 0.115,
+            "tts_s": 0.2,
+            "audio_s": 3.5,
+            "note": "source audio synthesized by Piper (stand-in meeting clip)"
           }
         },
         {
           "name": "sk_en_01",
           "file": "../../processed/conversation/sk_en_01.wav",
           "meta": {
-            "mt_sentence_s": 0.16,
-            "mt_word_total_s": 0.117,
-            "mt_word_first_s": 0.039,
-            "tts_s": 0.14,
-            "audio_s": 3.6
+            "src": "System funkuje okolne, ani potrekuje internetové pripojmy.",
+            "tgt": "The system functions outside or punishes internet connections.",
+            "stt_s": 0.02,
+            "mt_sentence_s": 0.071,
+            "tts_s": 0.19,
+            "audio_s": 3.8,
+            "note": "source audio synthesized by Piper (stand-in meeting clip)"
+          }
+        },
+        {
+          "name": "sk_en_02",
+          "file": "../../processed/conversation/sk_en_02.wav",
+          "meta": {
+            "src": "Ďakujem vám sa poslednosti, težim sa na vaši odtasky.",
+            "tgt": "Thank you for the last time, I look forward to your tastings.",
+            "stt_s": 0.02,
+            "mt_sentence_s": 0.116,
+            "tts_s": 0.15,
+            "audio_s": 2.6,
+            "note": "source audio synthesized by Piper (stand-in meeting clip)"
           }
         }
       ]
