@@ -69,6 +69,24 @@
           "similarity": null
         },
         {
+          "name": "jirka_sk_fallback",
+          "file": "../../processed/voice_qc/jirka_sk_fallback.wav",
+          "engine": "?",
+          "language": "?",
+          "sample_rate": null,
+          "synthesis_latency_s": null,
+          "similarity": null
+        },
+        {
+          "name": "jirka_sk_text",
+          "file": "../../processed/voice_qc/jirka_sk_text.wav",
+          "engine": "?",
+          "language": "?",
+          "sample_rate": null,
+          "synthesis_latency_s": null,
+          "similarity": null
+        },
+        {
           "name": "male_last_base",
           "file": "../../processed/voice_qc/male_last_base.wav",
           "engine": "?",
