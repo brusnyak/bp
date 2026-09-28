@@ -19,6 +19,13 @@
           "in_registry": true
         },
         {
+          "name": "en_rainbow_v2b",
+          "file": "../../speaker_voices/en_rainbow_v2b.m4a",
+          "language": "en",
+          "transcript": "When the sunlight strikes raindrops in the air, they act as a prism and form a rainbow. The rainbow is a division of white light into many beautiful colors. These take the shape of a long round arch, with its path high above, and its two ends apparently beyond the horizon. There is, according to legend, a boiling pot of gold at one end. People look, but no one ever finds it. When a man looks for something beyond his reach, his friends say he is looking for the pot of gold at the end of the rainbow. Throughout the centuries people have explained the rainbow in various ways. Some have accepted it as a miracle without physical explanation. To the Hebrews it was a token that there would be no more universal floods. The Greeks used to imagine that it was a sign from the gods to foretell war or heavy rain. The Norsemen considered the rainbow as a bridge over which the gods passed from earth to their home in the sky. Others have tried to explain the phenomenon physically. Aristotle thought that the rainbow was caused by reflection of the sun's rays by the rain. Since then physicists have found that it is not reflection, but refraction by the raindrops which causes the rainbow. Many complicated ideas about the rainbow have been formed. The difference in the rainbow depends considerably upon the size of the drops, and the width of the rainbow increases as the size of the drops increases. The actual primary rainbow observed is said to be the effect of superposition of a number of bows. If the red of the second bow falls upon the green of the first, the result is to give a bow with an abnormally wide yellow band, since red and green light when mixed form yellow.",
+          "in_registry": true
+        },
+        {
           "name": "en_script_reading",
           "file": "../../speaker_voices/en_script_reading.m4a",
           "language": "en",
@@ -38,6 +45,13 @@
           "language": "sk",
           "transcript": "Včera ráno som išiel na trh kúpiť čerstvý chlieb a mlieko. Stretol som tam starého priateľa Ľuba, ktorý predával med a syry. „Ahoj! Kde si sa túľal celé mesiace?\" spýtal sa ma s úsmevom. Porozprával som mu o svojej práci a o dlhej ceste vlakom cez hory a doliny, až ma bolel každý kĺb. Po chvíli sme si sadli na lavičku pod veľkú vŕbu a dali sme si kávu. „Môžem prísť aj zajtra?\" spýtal som sa. Okolo nás pobehovali deti a hádzali si farebnú loptu. Jedno dievčatko nieslo džbán plný malín a smialo sa na celé kolo. Vôňa čerstvého pečiva sa niesla vzduchom a ja som si spomenul na detstvo u starých rodičov. V diaľke vŕzgali brzdy električky. Ľubo mi potom ukázal fotografie zo svojej záhrady. Medzi riadkami cibule a cesnaku rástli ľalie, pivonky a neskutočne veľké tekvice. „Pozri, táto váži vyše deväť kíl!\" pochválil sa. Neveril som vlastným očiam. „Musím už ísť, ale v piatok prídem zas,\" povedal som a pobrali sme sa domov. Ešte dnes cítim chuť toho chleba s maslom a medom. Bolo to jedno z najkrajších rán tohto jesenného mesiaca. Koľko takýchto dní nám ešte život prinesie?",
           "in_registry": true
+        },
+        {
+          "name": "sk_trhove_rano_v2b",
+          "file": "../../speaker_voices/sk_trhove_rano_v2b.m4a",
+          "language": "sk",
+          "transcript": "Včera ráno som išiel na trh kúpiť čerstvý chlieb a mlieko. Stretol som tam starého priateľa Ľuba, ktorý predával med a syry. „Ahoj! Kde si sa túľal celé mesiace?\" spýtal sa ma s úsmevom. Porozprával som mu o svojej práci a o dlhej ceste vlakom cez hory a doliny, až ma bolel každý kĺb. Po chvíli sme si sadli na lavičku pod veľkú vŕbu a dali sme si kávu. „Môžem prísť aj zajtra?\" spýtal som sa. Okolo nás pobehovali deti a hádzali si farebnú loptu. Jedno dievčatko nieslo džbán plný malín a smialo sa na celé kolo. Vôňa čerstvého pečiva sa niesla vzduchom a ja som si spomenul na detstvo u starých rodičov. V diaľke vŕzgali brzdy električky. Ľubo mi potom ukázal fotografie zo svojej záhrady. Medzi riadkami cibule a cesnaku rástli ľalie, pivonky a neskutočne veľké tekvice. „Pozri, táto váži vyše deväť kíl!\" pochválil sa. Neveril som vlastným očiam. „Musím už ísť, ale v piatok prídem zas,\" povedal som a pobrali sme sa domov. Ešte dnes cítim chuť toho chleba s maslom a medom. Bolo to jedno z najkrajších rán tohto jesenného mesiaca. Koľko takýchto dní nám ešte život prinesie?",
+          "in_registry": true
         }
       ]
     },
@@ -45,6 +59,51 @@
       "id": "qc",
       "title": "QC candidates (engine outputs)",
       "items": [
+        {
+          "name": "enpers_v2",
+          "file": "../../processed/voice_qc/enpers_v2.wav",
+          "engine": "?",
+          "language": "?",
+          "sample_rate": null,
+          "synthesis_latency_s": null,
+          "similarity": null
+        },
+        {
+          "name": "male_alldata_denoised",
+          "file": "../../processed/voice_qc/male_alldata_denoised.wav",
+          "engine": "?",
+          "language": "?",
+          "sample_rate": null,
+          "synthesis_latency_s": null,
+          "similarity": null
+        },
+        {
+          "name": "male_last_base",
+          "file": "../../processed/voice_qc/male_last_base.wav",
+          "engine": "?",
+          "language": "?",
+          "sample_rate": null,
+          "synthesis_latency_s": null,
+          "similarity": null
+        },
+        {
+          "name": "male_last_ns05",
+          "file": "../../processed/voice_qc/male_last_ns05.wav",
+          "engine": "?",
+          "language": "?",
+          "sample_rate": null,
+          "synthesis_latency_s": null,
+          "similarity": null
+        },
+        {
+          "name": "piper_male_sk_alldata",
+          "file": "../../processed/voice_qc/piper_male_sk_alldata.wav",
+          "engine": "?",
+          "language": "?",
+          "sample_rate": null,
+          "synthesis_latency_s": null,
+          "similarity": null
+        },
         {
           "name": "sandbox_cs_CZ-jirka-medium_cs",
           "file": "../../processed/voice_qc/sandbox_cs_CZ-jirka-medium_cs.wav",
@@ -190,6 +249,93 @@
             "tts_s": 0.15,
             "audio_s": 2.6,
             "note": "source audio synthesized by Piper (stand-in meeting clip)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "sk_direction",
+      "title": "SK→EN Pipeline Matrix (STT Rungs & MT chrF)",
+      "items": [
+        {
+          "name": "sk_script_reading",
+          "file": "../../speaker_voices/sk_script_reading.m4a",
+          "audio_s": 134.3,
+          "ref_chars": 1263,
+          "en_ref_chars": 1320,
+          "rungs": {
+            "small-sk": {
+              "wer": 0.2344,
+              "cer": 0.103,
+              "chrf": 65.4,
+              "stt_s": 19.78,
+              "mt_s": 2.08,
+              "rtf": 0.147,
+              "lang": "sk"
+            },
+            "base": {
+              "wer": 0.7135,
+              "cer": 0.2295,
+              "chrf": 52.2,
+              "stt_s": 8.68,
+              "mt_s": 2.71,
+              "rtf": 0.065,
+              "lang": "sk"
+            }
+          }
+        },
+        {
+          "name": "sk_trhove_rano_v2",
+          "file": "../../speaker_voices/sk_trhove_rano_v2.m4a",
+          "audio_s": 103.6,
+          "ref_chars": 1080,
+          "en_ref_chars": 1126,
+          "rungs": {
+            "small-sk": {
+              "wer": 0.3508,
+              "cer": 0.1523,
+              "chrf": 52.0,
+              "stt_s": 17.37,
+              "mt_s": 2.13,
+              "rtf": 0.168,
+              "lang": "sk"
+            },
+            "base": {
+              "wer": 0.6597,
+              "cer": 0.2433,
+              "chrf": 42.6,
+              "stt_s": 7.16,
+              "mt_s": 2.66,
+              "rtf": 0.069,
+              "lang": "sk"
+            }
+          }
+        },
+        {
+          "name": "sk_trhove_rano_v2b",
+          "file": "../../speaker_voices/sk_trhove_rano_v2b.m4a",
+          "audio_s": 109.0,
+          "ref_chars": 1080,
+          "en_ref_chars": 1126,
+          "rungs": {
+            "small-sk": {
+              "wer": 0.3037,
+              "cer": 0.1159,
+              "chrf": 63.1,
+              "stt_s": 17.66,
+              "mt_s": 2.23,
+              "rtf": 0.162,
+              "lang": "sk"
+            },
+            "base": {
+              "wer": 0.6702,
+              "cer": 0.2519,
+              "chrf": 43.6,
+              "stt_s": 6.98,
+              "mt_s": 2.38,
+              "rtf": 0.064,
+              "lang": "sk"
+            }
           }
         }
       ]
