@@ -66,16 +66,24 @@ Thesis rules: faculty guide + §4.1 AI rules → `Deklarácia k využitiu UI` sk
   XTTS/CosyVoice/F5 all SK-less or CUDA-bound; Piper TRAINING.md wants ~1000
   epochs for fine-tune (we ran ~200 — undertraining explains robotic).
 
-## Now (one at a time)
+## Now: Accelerating SK→EN Turnaround Latency (Target: close the 2x asymmetry)
 
-- [ ] Merge `main` forward in the Mac checkout (`git merge --ff-only merge/windows-amd-cpu`
-      from `~/Documents/STU/BP`), re-run `make test` + `test/interrupt_smoke_test.py`, then
-      re-generate the Voice Lab manifest to pick up the untracked `*_v2b` takes
-- [ ] Ask before pushing: `main` is now demoable (20 tests + live rehearsal green); push
-      so the Windows laptop sees the same HEAD, then send the handler update + demo ask
-- [ ] EN personal voice same treatment as SK (August run likely undertrained too)
-- [ ] Per-language STT router in backend (Parakeet EN / whisper-small SK)
-- [ ] QC similarity scoring (resemblyzer) only after a proper clone exists
+Current measured baseline from 2-speaker simulation (`scripts/demo_conversation.py`):
+- **EN→SK turn latency**: ~0.67s – 0.87s (STT ~0.55s, MT ~0.08s, TTS ~0.15s)
+- **SK→EN turn latency**: ~1.27s – 1.64s (STT ~1.13s – 1.43s, MT ~0.08s – 0.11s, TTS ~0.07s – 0.14s)
+- **Bottleneck**: MT and TTS are virtually identical in speed (~0.2s combined). The entire asymmetry is inside **Slovak STT** (`whisper-small-sk` at ~1.3s vs English `base` at ~0.55s).
+
+Next action items to explore and benchmark:
+1. **Beam size tuning on FasterWhisper for Slovak**:
+   - `beam_size=5` (default) vs `beam_size=1` (greedy) or `beam_size=2` / `best_of=1`.
+   - On CTranslate2 / Whisper, greedy decoding (`beam_size=1`) can cut inference time by 30–50% while often retaining >95% accuracy on domain/colloquial speech.
+   - Run offline test with `scripts/eval_sk_direction.py` comparing `beam_size=1,2,5` on `small-sk` to verify WER impact vs latency gain.
+2. **Compute type & thread parallelism**:
+   - Verify `compute_type="int8"` vs `int8_float16` / `float32` and `cpu_threads` settings on Apple Silicon / CPU runtime.
+3. **Conditioning / Prompting (`initial_prompt`)**:
+   - Supplying a short prompt with Slovak diacritics / context helps greedy decoding converge accurately without needing wide beam search.
+4. **VAD chunking optimization**:
+   - Tighter silence thresholds for Slovak turn completion to reduce trailing audio padded into STT.
 
 ## Next
 
