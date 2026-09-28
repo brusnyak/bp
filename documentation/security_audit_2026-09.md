@@ -22,6 +22,7 @@ Scope: `app.py`, `backend/`, dependency set, repository contents, setup tooling.
 
 - `transformers` 4.57.6 has advisories fixed only in 5.x. The lite install uses it only for `AutoTokenizer` (no model or pickle loading), so the advisories' code paths are not reachable. Revisit when moving to transformers 5.
 - `nltk` (dev-only, used by the evaluation framework) has one open advisory.
+- With the full PyTorch install (not the default), `backend/stt/whisper_streaming_vendor/silero_vad_iterator.py` calls `torch.hub.load("snakers4/silero-vad")`, which downloads and executes code from a GitHub repository at runtime (unpinned). It is unreachable in the default install (no torch). Pin a commit or vendor the model before enabling it.
 - The WebSocket `/ws` has no authentication. Mitigated by the loopback default; add token auth before exposing it on a network.
 - No rate limiting on `/login` and `/register`; registration is open. Same mitigation.
 - The whole uploaded body is read into memory before the 50 MB check.
