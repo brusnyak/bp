@@ -16,7 +16,7 @@ run: ## Run the server on https://localhost:8000 (loopback only; BP_HOST=0.0.0.0
 	$(VENV_PY) app.py
 
 test: ## Run the backend test suite.
-	$(VENV_PY) -m pytest test/hardware_test.py test/vad_tests.py test/mt_model_tests.py test/backend_api_tests.py test/backend_auth_tests.py test/security_tests.py -q
+	$(VENV_PY) -m pytest test/hardware_test.py test/vad_tests.py test/mt_model_tests.py test/backend_api_tests.py test/backend_auth_tests.py test/security_tests.py test/config_tests.py -q
 
 clean: ## Remove generated models, certs, venv and caches (never touches speaker_voices/).
 	$(PYTHON) -c "import shutil,pathlib;[shutil.rmtree(p,ignore_errors=True) for p in ('.venv','.venv-convert','ct2_models','certs','node_modules','.pytest_cache')];[shutil.rmtree(p,ignore_errors=True) for p in pathlib.Path('.').rglob('__pycache__')]"

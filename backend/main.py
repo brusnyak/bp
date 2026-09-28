@@ -139,6 +139,27 @@ DEFAULT_TTS_MODEL = "piper"
 AUDIO_SAMPLE_RATE = 16000 # Standard sample rate for VAD and STT (Reverted to 16000 Hz for VAD/STT compatibility)
 MAX_VOICE_UPLOAD_BYTES = 50 * 1024 * 1024 # /voices/upload had no size cap - unbounded file.read() into memory
 
+
+# Slovak-fine-tuned Whisper small (NaiveNeuron/whisper-small-sk, MIT) converted by scripts/convert_models.py.
+SK_STT_LOCAL_MODEL = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "ct2_models", "whisper-small-sk")
+
+
+def _pick_stt_model(source_lang: str, requested: str) -> str:
+    """Slovak input silently upgrades a plain base/small request to the best Slovak recognizer available.
+
+    Order: BP_SK_STT_MODEL (model name or CT2 directory) > the local Slovak-fine-tuned small model > large-v3-turbo.
+    Measured on a 6-core CPU (documentation/model_evaluation_2026-09.md): tuned small WER 0.26 at RTF 0.33,
+    large-v3-turbo 0.44 at RTF ~1, plain small 0.62 at RTF 0.30.
+    """
+    if source_lang.startswith("sk") and requested in ("base", "small", DEFAULT_STT_MODEL_SIZE):
+        env = os.environ.get("BP_SK_STT_MODEL")
+        if env:
+            return env
+        if os.path.exists(os.path.join(SK_STT_LOCAL_MODEL, "model.bin")):
+            return SK_STT_LOCAL_MODEL
+        return "large-v3-turbo"
+    return requested
+
 # VAD Configuration (matching BP xtts)
 VAD_FRAME_DURATION = 20 # ms - BP xtts uses 20ms frames
 VAD_AGGRESSIVENESS = 3 # Mode 3 (Most Aggressive) - Increased from 1 for noisy environments
@@ -459,10 +480,9 @@ async def initialize_all_models(client_info: str, source_lang: str, target_lang:
 
     logging.info(f"Backend: Session {client_info}: Initializing models at {time.strftime('%H:%M:%S', time.localtime(time.time()))}...")
 
-    # Per-language measured defaults (2026-09-27): SK source -> large-v3-turbo
-    # (WER 0.41 vs small 0.49); plain "base"/"small" requests upgrade silently.
-    if source_lang.startswith("sk") and stt_model_size in ("base", "small", DEFAULT_STT_MODEL_SIZE):
-        stt_model_size = "large-v3-turbo"
+    upgraded = _pick_stt_model(source_lang, stt_model_size)
+    if upgraded != stt_model_size:
+        stt_model_size = upgraded
         session_data["session_config"]["stt_model_size"] = stt_model_size
     await _initialize_stt_model(session_data, stt_model_size)
     await _initialize_mt_model(session_data, source_lang, target_lang, websocket)

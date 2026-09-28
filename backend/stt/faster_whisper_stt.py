@@ -60,13 +60,15 @@ class FasterWhisperSTT:
             transcribe_options["no_speech_threshold"] = None # Disable FasterWhisper's internal no-speech detection
 
         segments, info = self.model.transcribe(audio_data, **transcribe_options)
+        # transcribe() returns a lazy generator: the decoding happens while it is consumed, so the
+        # list() must be inside the timed region (it used to be outside, reporting ~0.02 s).
+        segments = list(segments)
 
         end_time = time.time()
         transcription_time = end_time - start_time
 
-        # Return the list of segments directly
         detected_language = info.language if info and hasattr(info, 'language') else None
-        return list(segments), transcription_time, detected_language
+        return segments, transcription_time, detected_language
 
 
 if __name__ == "__main__":

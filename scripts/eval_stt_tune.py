@@ -11,7 +11,7 @@ from faster_whisper import WhisperModel
 model, threads, beam, prompt = sys.argv[1], int(sys.argv[2]), int(sys.argv[3]), sys.argv[4] == "1"
 PROMPT = "Dobrý deň, vitajte na konferencii. Hovorím po slovensky a prosím o pozornosť."  # generic; no script vocabulary
 refs = [r[1] for r in cs.script_rows()]
-clips = sorted(glob.glob(os.path.join(B, "eval_data", "sk_clips", "sk_*.wav")))
+clips = sorted(glob.glob(os.path.join(os.environ.get("EVAL_CLIPS_DIR", os.path.join(B, "eval_data", "sk_clips")), "sk_*.wav")))
 norm = lambda s: re.sub(r"\s+", " ", re.sub(r"[^\w\s]", " ", s.lower())).strip()
 m = WhisperModel(model, device="cpu", compute_type="int8", cpu_threads=threads)
 w = librosa.load(clips[0], sr=16000)[0]; list(m.transcribe(w[:16000], language="sk")[0])

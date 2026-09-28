@@ -78,11 +78,8 @@ def main():
         run([PY, "backend/tts/download_piper_models.py", v])
 
     if not a.skip_models:
-        step("MT models (one-time CTranslate2 conversion, isolated env)")
-        if all((ROOT / "ct2_models" / f"Helsinki-NLP--opus-mt-{p}" / "model.bin").exists() for p in MT_PAIRS):
-            print("ct2_models already present")
-        else:
-            run([sys.executable, "scripts/convert_models.py"])
+        step("MT + Slovak speech models (one-time CTranslate2 conversion, isolated env; skips what exists)")
+        run([sys.executable, "scripts/convert_models.py"])
 
     if not a.no_npm and shutil.which("npm") and (ROOT / "package.json").exists():
         step("UI assets (npm)")
