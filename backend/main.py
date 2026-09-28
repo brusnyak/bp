@@ -26,7 +26,13 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 from backend.utils.db_manager import SQLALCHEMY_DATABASE_URL, get_db_session_and_engine, init_db, User # Import init_db and User
 from backend.utils.auth import get_password_hash, verify_password # Import auth functions
 from backend.tts.piper_tts import PiperTTS
-from backend.tts.coqui_tts import CoquiTTS
+try:
+    from backend.tts.coqui_tts import CoquiTTS
+except ImportError:
+    # SANDBOX-NOTE (2026-09-28): see backend/tts/base.py -- Coqui TTS is optional
+    # on machines without it (no Windows wheels). Capabilities endpoint below is
+    # None-safe via getattr; TTS_ENGINES simply lacks "xtts".
+    CoquiTTS = None
 from backend.tts.hybrid_tts import HybridTTS
 from backend.tts.omni_tts import OmniVoiceTTS
 from backend.tts.base import TTS_ENGINES
@@ -118,7 +124,6 @@ from backend.stt.faster_whisper_stt import FasterWhisperSTT
 from backend.stt.streaming_captions import SessionCaptioner, STREAMING_CAPTIONS_AVAILABLE  # T044
 from backend.mt.ctranslate2_mt import CTranslate2MT
 from backend.tts.piper_tts import PiperTTS
-from backend.tts.coqui_tts import CoquiTTS # Import CoquiTTS
 from backend.utils.audio_utils import load_audio, save_audio
 
 # Router for FastAPI
@@ -351,6 +356,11 @@ async def _initialize_tts_models(session_data: Dict[str, Any], tts_model_choice:
     if tts_model_choice == "piper" and target.startswith("sk"):
         tts_model_choice = "piper_sk_personal"
         factory = TTS_ENGINES.get(tts_model_choice)
+        # SANDBOX-FIX (2026-09-28): write the effective choice back, same pattern as
+        # the STT size upgrade in initialize_all_models. Without this, tts_engine_name
+        # ('piper_sk_personal') never equals session_config['tts_model_choice'] ('piper'),
+        # so every lookup reports "TTS not initialized" and no synthesis ever runs.
+        session_data["session_config"]["tts_model_choice"] = tts_model_choice
 
     if session_data.get("tts_engine") is not None and session_data.get("tts_engine_name") == tts_model_choice:
         logging.info(f"Backend: Session {session_data['client_info']}: TTS engine '{tts_model_choice}' already initialized.")
@@ -777,10 +787,13 @@ async def voice_lab_status():
         "piper": PiperTTS,
         "piper_personal": PiperTTS,
         "piper_personal_v2": PiperTTS,
-        "xtts": CoquiTTS,
+        "xtts": CoquiTTS,  # None when Coqui is uninstallable (no Windows wheels)
         "hybrid": HybridTTS,
         "omnivoice": OmniVoiceTTS,
     }
+    # SANDBOX-FIX (2026-09-28): don't advertise engines whose class is None --
+    # otherwise the UI offers XTTS on machines where selecting it can only fail.
+    engine_classes = {k: v for k, v in engine_classes.items() if v is not None}
     engines = {
         key: {
             "cloning": bool(getattr(cls, "SUPPORTS_CLONING", False)),
@@ -853,7 +866,7 @@ def _log_session_event(client_info: str, event: Dict[str, Any]):
             safe = "".join(c if c.isalnum() else "_" for c in (client_info or "unknown"))
             os.makedirs(os.path.join("processed", "sessions"), exist_ok=True)
             stamp = time.strftime("%Y%m%d-%H%M%S")
-            f = open(os.path.join("processed", "sessions", f"{stamp}_{safe}.jsonl"), "a")
+            f = open(os.path.join("processed", "sessions", f"{stamp}_{safe}.jsonl"), "a", encoding="utf-8")  # SANDBOX-FIX (2026-09-28): explicit UTF-8 -- stock Windows consoles default to cp1252 and any Slovak diacritic (č/š/ž) killed the write
             _session_log_files[client_info] = f
         f.write(json.dumps({"ts": time.time(), **event}, ensure_ascii=False) + "\n")
         f.flush()
@@ -1296,7 +1309,12 @@ async def handle_audio_stream(websocket: WebSocket):
                                 
                                 session_config["source_lang"] = new_source_lang
                                 session_config["target_lang"] = new_target_lang
-                                session_config["tts_model_choice"] = new_tts_model_choice
+                                # SANDBOX-FIX (2026-09-28): do NOT write back the requested
+                                # tts_model_choice here. initialize_all_models may have remapped
+                                # it to a measured default (piper->piper_sk_personal) and stored
+                                # the effective name; restoring 'piper' orphans the initialized
+                                # engine so every later lookup reports "TTS not initialized"
+                                # and no synthesis ever runs (seen live over WS).
                                 session_config["speaker_wav_path"] = new_speaker_wav_path
                                 session_config["speaker_text"] = new_speaker_text
                                 session_config["speaker_lang"] = new_speaker_lang

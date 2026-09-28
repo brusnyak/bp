@@ -1,150 +1,137 @@
-# Windows Setup Script for BP Project
+# Windows Setup Script for BP Project (sandbox-fixed copy, 2026-09-28)
+#
+# Fixes vs the committed version:
+#   1. No machine-scope installs: nothing here needs admin or UAC.
+#      Python 3.11 / FFmpeg / Node.js are CHECKED, not installed system-wide.
+#      Missing pieces print a user-scope install hint and the script stops.
+#   2. `npm install` runs at the repo ROOT (package.json lives here) --
+#      the old script did `Push-Location frontend`, a directory that
+#      does not exist, so step 6 always failed.
+#   3. OpenSSL fallback covers Git Bash (`C:\Program Files\Git\usr\bin\openssl.exe`),
+#      same as the Makefile's Windows branch -- plain `openssl` is rarely on PATH.
+#   4. No Invoke-Expression string-eval; the call operator (&) is used throughout.
+#   5. Fails fast ($ErrorActionPreference = "Stop") instead of limping on
+#      with the wrong interpreter.
+#
+# Run from the repo root (non-interactive):
+#   powershell -NoProfile -ExecutionPolicy Bypass -File setup_windows.ps1
+# To skip the slow model downloads (CT2 conversion takes a while):
+#   powershell -NoProfile -ExecutionPolicy Bypass -File setup_windows.ps1 -SkipModels
 
-Write-Host "--- Starting Windows Setup for BP Project ---" -ForegroundColor Cyan
+param(
+    [switch]$SkipModels
+)
 
-# Function to check if a command exists
-function Test-Command ($command) {
+$ErrorActionPreference = "Stop"
+
+Write-Host "--- Starting Windows Setup for BP Project (isolated, no admin) ---" -ForegroundColor Cyan
+
+function Test-CommandExists ($command) {
     return $null -ne (Get-Command $command -ErrorAction SilentlyContinue)
 }
 
-# 1. Check/Install Python 3.11
-Write-Host "`n[1/7] Checking Python 3.11..." -ForegroundColor Yellow
-if (-not (Test-Command "python")) {
-    Write-Host "Python not found. Installing Python 3.11..."
-    winget install -e --id Python.Python.3.11 --scope machine
-    # Refresh env
-    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
-}
-else {
-    $pyVer = python --version
-    if ($pyVer -match "3.11") {
-        Write-Host "Python 3.11 is already installed." -ForegroundColor Green
-    }
-    else {
-        Write-Host "Current Python version is $pyVer. Installing Python 3.11 side-by-side..."
-        winget install -e --id Python.Python.3.11 --scope machine
-        # We will need to find the specific python 3.11 executable
-    }
-}
-
-# Find Python 3.11 executable
-$py311 = Get-Command "py" -ErrorAction SilentlyContinue
-if ($py311) {
-    $pythonExec = "py -3.11"
-}
-else {
-    # Fallback to just python if it is 3.11, otherwise warn
-    if ((python --version) -match "3.11") {
-        $pythonExec = "python"
-    }
-    else {
-        Write-Host "Could not find 'py' launcher. Please ensure Python 3.11 is installed and in PATH." -ForegroundColor Red
-        # Try to guess path
-        $potentialPath = "$env:LOCALAPPDATA\Programs\Python\Python311\python.exe"
-        if (Test-Path $potentialPath) {
-            $pythonExec = $potentialPath
+# 1. Python 3.11 via the py launcher (user-scope install, never machine-scope)
+Write-Host "`n[1/6] Checking Python 3.11..." -ForegroundColor Yellow
+$pythonExec = $null
+if (Test-CommandExists "py") {
+    try {
+        $py311ver = & py -3.11 --version 2>&1
+        if ($py311ver -match "3\.11") {
+            $pythonExec = @("py", "-3.11")
+            Write-Host "Found $py311ver via py launcher." -ForegroundColor Green
         }
-        else {
-            $potentialPathSystem = "C:\Program Files\Python311\python.exe"
-            if (Test-Path $potentialPathSystem) {
-                $pythonExec = $potentialPathSystem
-            }
-            else {
-                Write-Host "Using default 'python' ($pyVer) - this might fail if not compatible." -ForegroundColor Magenta
-                $pythonExec = "python"
-            }
-        }
-    }
+    } catch { }
 }
-
-Write-Host "Using Python executable: $pythonExec" -ForegroundColor Cyan
-
-# 2. Check/Install FFmpeg
-Write-Host "`n[2/7] Checking FFmpeg..." -ForegroundColor Yellow
-if (-not (Test-Command "ffmpeg")) {
-    Write-Host "FFmpeg not found. Installing via winget..."
-    winget install -e --id Gyan.FFmpeg
-    # Refresh env
-    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
-}
-else {
-    Write-Host "FFmpeg is already installed." -ForegroundColor Green
-}
-
-# 3. Check Node.js
-Write-Host "`n[3/7] Checking Node.js..." -ForegroundColor Yellow
-if (-not (Test-Command "npm")) {
-    Write-Host "Node.js not found. Installing..."
-    winget install -e --id OpenJS.NodeJS
-    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
-}
-else {
-    Write-Host "Node.js is already installed." -ForegroundColor Green
-}
-
-# 4. Create Virtual Environment
-Write-Host "`n[4/7] Creating Virtual Environment..." -ForegroundColor Yellow
-if (-not (Test-Path "venv")) {
-    Invoke-Expression "$pythonExec -m venv venv"
-    Write-Host "Virtual environment created." -ForegroundColor Green
-}
-else {
-    Write-Host "Virtual environment 'venv' already exists." -ForegroundColor Green
-}
-
-# 5. Install Python Dependencies
-Write-Host "`n[5/7] Installing Python Dependencies..." -ForegroundColor Yellow
-# Activate venv for the script execution
-$venvPython = ".\venv\Scripts\python.exe"
-$venvPip = ".\venv\Scripts\pip.exe"
-
-if (-not (Test-Path $venvPython)) {
-    Write-Host "Error: Virtual environment python not found at $venvPython" -ForegroundColor Red
+if (-not $pythonExec) {
+    Write-Host "Python 3.11 not found (only $(python --version 2>$null))." -ForegroundColor Red
+    Write-Host "Install it WITHOUT admin rights, then re-run this script:" -ForegroundColor Yellow
+    Write-Host '  winget install -e --id Python.Python.3.11 --scope user' -ForegroundColor White
+    Write-Host "requirements.txt pins (numpy 1.26.4 / pandas 1.5.3 / numba 0.60.0) target 3.11;" -ForegroundColor Yellow
+    Write-Host "3.12 is not supported by this project." -ForegroundColor Yellow
     exit 1
 }
 
-Invoke-Expression "& '$venvPip' install -r requirements.txt"
+# 2. FFmpeg (check only -- already present on most dev machines)
+Write-Host "`n[2/6] Checking FFmpeg..." -ForegroundColor Yellow
+if (-not (Test-CommandExists "ffmpeg")) {
+    Write-Host "FFmpeg not found. Install without admin:" -ForegroundColor Red
+    Write-Host '  winget install -e --id Gyan.FFmpeg --scope user' -ForegroundColor White
+    exit 1
+}
+Write-Host "FFmpeg is already installed." -ForegroundColor Green
 
-# 6. Install Frontend Dependencies
-Write-Host "`n[6/7] Installing Frontend Dependencies..." -ForegroundColor Yellow
-Push-Location frontend
-npm install
-Pop-Location
+# 3. Node.js (check only -- needed solely for chart.js UI deps at repo root)
+Write-Host "`n[3/6] Checking Node.js..." -ForegroundColor Yellow
+if (-not (Test-CommandExists "npm")) {
+    Write-Host "Node.js not found -- UI chart deps will be skipped." -ForegroundColor Magenta
+    Write-Host '  Optional (no admin): winget install -e --id OpenJS.NodeJS --scope user' -ForegroundColor White
+    $skipNpm = $true
+} else {
+    Write-Host "Node.js is already installed." -ForegroundColor Green
+    $skipNpm = $false
+}
 
-# 7. Download Models & Setup
-Write-Host "`n[7/7] Downloading Models and Setting up..." -ForegroundColor Yellow
+# 4. Virtual environment (inside the project dir -- nothing touches global Python)
+Write-Host "`n[4/6] Creating Virtual Environment..." -ForegroundColor Yellow
+if (-not (Test-Path "venv")) {
+    & $pythonExec -m venv venv
+    Write-Host "Virtual environment created." -ForegroundColor Green
+} else {
+    Write-Host "Virtual environment 'venv' already exists." -ForegroundColor Green
+}
 
-# Create certs directory
+$venvPython = ".\venv\Scripts\python.exe"
+$venvPip = ".\venv\Scripts\pip.exe"
+if (-not (Test-Path $venvPython)) {
+    Write-Host "Error: virtual environment python not found at $venvPython" -ForegroundColor Red
+    exit 1
+}
+
+# 5. Python + frontend dependencies
+Write-Host "`n[5/6] Installing Python Dependencies (this takes a while: torch + Coqui TTS)..." -ForegroundColor Yellow
+& $venvPip install -r requirements.txt
+
+if (-not $skipNpm) {
+    Write-Host "Installing UI dependencies at repo root (package.json)..." -ForegroundColor Yellow
+    & npm install
+} else {
+    Write-Host "Skipping npm install (Node.js missing)." -ForegroundColor Magenta
+}
+
+# 6. Certificates + models
+Write-Host "`n[6/6] Certificates and models..." -ForegroundColor Yellow
 New-Item -ItemType Directory -Force -Path "certs" | Out-Null
-# Generate dummy certs if openssl exists, else warn
-if (Test-Command "openssl") {
-    openssl req -x509 -newkey rsa:4096 -nodes -out certs/cert.pem -keyout certs/key.pem -days 365 -subj "/CN=localhost"
+$gitOpenssl = "C:\Program Files\Git\usr\bin\openssl.exe"
+if (Test-CommandExists "openssl") {
+    & openssl req -x509 -newkey rsa:4096 -nodes -out certs/cert.pem -keyout certs/key.pem -days 365 -subj "/CN=localhost"
+} elseif (Test-Path $gitOpenssl) {
+    & $gitOpenssl req -x509 -newkey rsa:4096 -nodes -out certs/cert.pem -keyout certs/key.pem -days 365 -subj "/CN=localhost"
+} else {
+    Write-Host "OpenSSL not found (checked PATH and Git Bash). Generate manually:" -ForegroundColor Magenta
+    Write-Host '  & "C:\Program Files\Git\usr\bin\openssl.exe" req -x509 -newkey rsa:4096 -nodes -out certs/cert.pem -keyout certs/key.pem -days 365 -subj "/CN=localhost"' -ForegroundColor White
 }
-else {
-    Write-Host "OpenSSL not found. Skipping certificate generation. You may need to generate 'certs/cert.pem' and 'certs/key.pem' manually or install Git Bash which includes OpenSSL." -ForegroundColor Magenta
+
+if ($SkipModels) {
+    Write-Host "Skipping model downloads (-SkipModels)." -ForegroundColor Yellow
+} else {
+    New-Item -ItemType Directory -Force -Path "ct2_models" | Out-Null
+    Write-Host "Downloading Piper TTS models..." -ForegroundColor Yellow
+    & $venvPython backend/tts/download_piper_models.py en_US-ryan-medium
+    & $venvPython backend/tts/download_piper_models.py sk_SK-lili-medium
+    & $venvPython backend/tts/download_piper_models.py cs_CZ-jirka-medium
+
+    Write-Host "Converting MT models (slow, needs internet)..." -ForegroundColor Yellow
+    # sys.setrecursionlimit(2000) required by the converter -- see Makefile
+    & $venvPython -c "import sys; sys.setrecursionlimit(2000); import backend.mt.convert_opus_mt_to_ct2 as converter; converter.convert_model('Helsinki-NLP/opus-mt-en-sk', 'ct2_models/Helsinki-NLP--opus-mt-en-sk', quantization='int8')"
+    & $venvPython -c "import sys; sys.setrecursionlimit(2000); import backend.mt.convert_opus_mt_to_ct2 as converter; converter.convert_model('Helsinki-NLP/opus-mt-sk-en', 'ct2_models/Helsinki-NLP--opus-mt-sk-en', quantization='int8')"
+    & $venvPython -c "import sys; sys.setrecursionlimit(2000); import backend.mt.convert_opus_mt_to_ct2 as converter; converter.convert_model('Helsinki-NLP/opus-mt-en-cs', 'ct2_models/Helsinki-NLP--opus-mt-en-cs', quantization='int8')"
 }
-
-# Download Piper Models
-Write-Host "Downloading Piper TTS models..."
-Invoke-Expression "& '$venvPython' backend/tts/download_piper_models.py en_US-ryan-medium"
-Invoke-Expression "& '$venvPython' backend/tts/download_piper_models.py sk_SK-lili-medium"
-Invoke-Expression "& '$venvPython' backend/tts/download_piper_models.py cs_CZ-jirka-medium"
-
-# Convert MT Models (This might take a while and requires internet)
-Write-Host "Converting MT models (this may take time)..."
-# We need to set recursion limit as per Makefile
-$convertScript = "import sys; sys.setrecursionlimit(2000); import backend.mt.convert_opus_mt_to_ct2 as converter; converter.convert_model('Helsinki-NLP/opus-mt-en-sk', 'ct2_models/Helsinki-NLP--opus-mt-en-sk', quantization='int8')"
-Invoke-Expression "& '$venvPython' -c `"$convertScript`""
-
-$convertScript2 = "import sys; sys.setrecursionlimit(2000); import backend.mt.convert_opus_mt_to_ct2 as converter; converter.convert_model('Helsinki-NLP/opus-mt-sk-en', 'ct2_models/Helsinki-NLP--opus-mt-sk-en', quantization='int8')"
-Invoke-Expression "& '$venvPython' -c `"$convertScript2`""
-
-$convertScript3 = "import sys; sys.setrecursionlimit(2000); import backend.mt.convert_opus_mt_to_ct2 as converter; converter.convert_model('Helsinki-NLP/opus-mt-en-cs', 'ct2_models/Helsinki-NLP--opus-mt-en-cs', quantization='int8')"
-Invoke-Expression "& '$venvPython' -c `"$convertScript3`""
-
 
 Write-Host "`n--- Setup Complete! ---" -ForegroundColor Cyan
-Write-Host "To run the app:"
-Write-Host "1. .\venv\Scripts\activate"
-Write-Host "2. python app.py"
-Write-Host "`nNote: VB-CABLE was not installed automatically. Please install it manually if needed."
+Write-Host "CPU note: this machine has no NVIDIA GPU; backend/hardware.py" -ForegroundColor White
+Write-Host "falls back to CPU per stage (verified). Expect Piper to feel" -ForegroundColor White
+Write-Host "fast, XTTS voice-cloning noticeably slower (~seconds per clip)." -ForegroundColor White
+Write-Host "To run the app:" -ForegroundColor Cyan
+Write-Host "1. .\venv\Scripts\activate" -ForegroundColor White
+Write-Host "2. python app.py" -ForegroundColor White
+Write-Host "3. Open https://localhost:8000 (accept the self-signed cert)" -ForegroundColor White
