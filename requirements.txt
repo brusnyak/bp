@@ -1,124 +1,43 @@
-# === CORE FRAMEWORK ===
-# Backend (cuda/mps/rocm/cpu) is a runtime decision made by backend/hardware.py, not an
-# install-time pin — this requirements.txt installs the standard PyPI torch build, which
-# already ships CUDA/MPS/CPU support; ROCm needs its own index and isn't covered here.
-torch==2.6.0
-torchaudio==2.6.0 # Re-added as FFmpeg issues are resolved
-torchcodec
+# Runtime dependencies (CPU; Windows / macOS / Linux, Python 3.10-3.12). No torch.
+# Install: python scripts/setup.py   (or: pip install -r requirements.txt)
+# Dev/test extras: requirements-dev.txt.  One-time model conversion (needs torch): requirements-convert.txt.
 
-# === TTS MODELS ===
-piper-tts==1.3.0
-# TTS==0.22.0  # SANDBOX-NOTE (2026-09-28): Coqui TTS commented out -- it ships Linux-only
-# wheels (cp39/cp310/cp311 manylinux, no Windows wheel) and the sdist needs MSVC 14+
-# to compile Cython extensions, i.e. a machine-global compiler toolchain. backend/tts/base.py
-# and backend/main.py now import CoquiTTS guarded (same pattern omni/hybrid already used),
-# so the app starts without it; the "xtts" engine simply reports unavailable.
-# Re-enable on Linux/macOS or after installing MSVC Build Tools.
-# omnivoice==0.1.4  # SANDBOX-NOTE (2026-09-28): upstream pin is uninstallable as-is --
-# omnivoice 0.1.4 requires transformers>=5.3.0 but this file pins transformers==4.46.3,
-# so any strict resolver fails. backend/tts/omni_tts.py guards the import in try/except,
-# so the app starts without it; install separately AFTER everything else with:
-#   uv pip install --no-deps omnivoice==0.1.4 --python venv\Scripts\python.exe
-# (same --no-deps pattern the file already documents for OpenVoice).
-
-# openvoice (HybridTTS: fast Piper output + OpenVoice V2 tone-color conversion — the
-# fast+cloned+cross-lingual path). No PyPI release; pinned deps in its own setup.py are
-# 2022-era and hard-conflict with this project's stack (numpy==1.22.0 doesn't build on
-# Python 3.11; installing it normally drags in numpy 2.x and breaks numba/accelerate/gruut).
-# NOT a plain `pip install -r requirements.txt` line — it needs --no-build-isolation and
-# --no-deps or it'll try to pull its own conflicting pins. Run manually, after everything
-# else above is installed (verified working against those exact pinned versions, 2026-08-21):
-#   pip install --no-build-isolation --no-deps git+https://github.com/myshell-ai/OpenVoice.git
-# Then its transitive deps below (small, low-risk, nothing else in the project needs them):
-# SANDBOX-NOTE (2026-09-28): OpenVoice transitive deps commented out -- dtw-python==1.7.5
-# requires numpy>=2.0 which contradicts the pinned numpy==1.26.4, so strict resolution
-# fails. Nothing in backend/ imports these at module level (openvoice import is guarded
-# in hybrid_tts.py; whisper_timestamped is lazy inside a vendored spike script), so the
-# main pipeline (Piper/XTTS/STT/MT) does not need them. Revisit only for the manual
-# OpenVoice step documented above.
-# whisper_timestamped==1.15.9
-# openai-whisper==20250625
-# tiktoken==0.14.0
-# dtw-python==1.7.5
-# eng_to_ipa==0.0.2
-# cn2an==0.5.24
-# langid==1.1.6
-# proces==0.1.7
-# wavmark==0.0.3
-# resampy==0.4.3
-# OpenVoice V2 checkpoints also required at models/openvoice_v2/checkpoints_v2/converter/
-# (config.json + checkpoint.pth), downloaded from HF hub myshell-ai/OpenVoiceV2 — not pip-installable.
-
-
-# === STT: Faster-Whisper (PyTorch + CTranslate2 + MPS) ===
+# STT / MT / TTS
 faster-whisper==1.2.0
 ctranslate2>=4.0.0
-
-# === MT: SeamlessM4T v2 or NLLB (Hugging Face Transformers) ===
-transformers==4.46.3
+transformers==4.57.6      # AutoTokenizer only; runs without torch. Remaining CVEs are fixed only in 5.x (model-loading paths we do not use)
+tokenizers==0.22.2
 sentencepiece==0.2.1
-accelerate==0.33.0
+sacremoses
+huggingface-hub==0.36.2
+hf_xet                    # much faster model downloads from the Hub
+piper-tts==1.3.0
+onnxruntime==1.19.2
 
-# === AUDIO & UTILS ===
-librosa==0.11.0
-soundfile==0.13.1
+# Audio
 numpy==1.26.4
 scipy==1.13.1
+soundfile==0.13.1
+librosa==0.11.0           # imported at module level by the whisper_online vendor code
 numba==0.60.0
 av==15.1.0
 pydub==0.25.1
-ffmpeg-python==0.2.0 # Added for FFmpeg integration
-jiwer==4.0.0
-sacrebleu==2.5.1
-pandas==1.5.3 # Adjusted for compatibility with TTS==0.22.0
-scikit-learn==1.7.2
-nltk==3.9.2
-
-# === COMMON DEPENDENCIES ===
-tokenizers==0.20.3
-tqdm==4.67.1
-huggingface-hub==0.36.0
-safetensors==0.5.3
-pyyaml==6.0.3
-regex==2025.10.23
-requests==2.32.5
-packaging==25.0
-jinja2==3.1.6
-markupsafe==3.0.3
-typing-extensions==4.15.0
-filelock==3.19.1
-fsspec==2025.10.0
-
-# === WEB / API ===
-fastapi==0.120.3
-uvicorn[standard]==0.38.0
-websockets==12.0
-httpx==0.28.1 # Added for backend testing
-python-multipart # Required for form data handling in FastAPI
-
-# === ONNX Runtime (for Piper) ===
-onnxruntime==1.19.2
-
-# === VOICE ACTIVITY DETECTION (VAD) ===
+ffmpeg-python==0.2.0
 webrtcvad-wheels==2.0.14
 
-# === Plotting and Analysis ===
-matplotlib>=3.9.1
-seaborn==0.13.2
-
-# === Optional: Pre-commit, etc. ===
-pre-commit==4.3.0
-argon2-cffi==23.1.0
-pytest
-pytest-asyncio
-sacremoses
-
-# === DATABASE ===
+# Web / API / auth / db
+fastapi==0.141.1
+uvicorn[standard]==0.38.0
+websockets==12.0
+python-multipart
+starlette==1.7.0             # CVE fixes (pip-audit)
+jinja2==3.1.6             # starlette Jinja2Templates
+markupsafe==3.0.3
+requests==2.34.2
+pyyaml==6.0.3
 SQLAlchemy==2.0.30
-alembic==1.13.1
-python-jose[cryptography]==3.3.0
-python-dotenv==1.2.3  # local .env (GOOGLE_CLIENT_ID etc.); .env stays untracked
-google-auth==2.35.0  # Google ID-token verification (/api/auth/google); inert unless GOOGLE_CLIENT_ID is set
-
-# === UI Testing ===
-playwright==1.45.0
+argon2-cffi==23.1.0
+pyjwt==2.13.0
+cryptography              # scripts/gen_cert.py
+python-dotenv==1.2.3
+google-auth==2.35.0       # inert unless GOOGLE_CLIENT_ID is set

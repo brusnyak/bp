@@ -1,6 +1,6 @@
 # Real-Time Speech Translation System
 
-[![Python](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.10--3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-WebSocket-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![Whisper](https://img.shields.io/badge/STT-Faster--Whisper-7C3AED)](https://github.com/SYSTRAN/faster-whisper)
 [![CTranslate2](https://img.shields.io/badge/MT-CTranslate2-0F766E)](https://opennmt.net/CTranslate2/)
@@ -101,9 +101,9 @@ flowchart TB
 | TTS | Piper TTS, XTTS, OmniVoice, MLX-Audio/Qwen3-TTS | Fast synthesis and voice cloning experiments. |
 | VAD | WebRTC VAD | Speech segment detection. |
 | Audio processing | soundfile, librosa, pydub, FFmpeg | Audio loading, conversion, and processing utilities. |
-| Metrics | Chart.js, matplotlib, seaborn | Latency visualization and analysis. |
-| Database/auth | SQLAlchemy, Alembic, python-jose, argon2 | Local metadata, user handling, and auth experiments. |
-| Testing | pytest, pytest-asyncio, Playwright | Backend and UI test support. |
+| Metrics | Chart.js | Latency visualization in the browser. |
+| Database/auth | SQLAlchemy (SQLite), argon2, PyJWT | Local metadata, user handling, session tokens. |
+| Testing | pytest, pytest-asyncio, httpx | Backend, VAD, MT and security regression tests. |
 
 ## Model backends
 
@@ -131,104 +131,50 @@ The project targets low-latency local execution:
 
 ## Quick start
 
-### Prerequisites
+Works the same on Windows, macOS and Linux (CPU only, no admin rights, nothing installed globally).
 
-- Python 3.9+
-- Git
-- FFmpeg
-- BlackHole 2ch or a similar virtual audio device on macOS for audio routing tests
-
-On macOS:
-
-```bash
-brew install ffmpeg blackhole-2ch
-```
-
-### Windows setup
-
-Run the provided PowerShell setup script:
-
-```powershell
-.\setup_windows.ps1
-```
-
-The script installs Python, FFmpeg, Node.js, creates a virtual environment, and installs dependencies.
-
-### macOS / Linux setup
-
-Clone the repository:
+**You need:** Python 3.10-3.12, Git, and FFmpeg (only for voice upload/recording; `brew install ffmpeg` / `apt install ffmpeg` / `winget install Gyan.FFmpeg`). Node.js is optional (UI chart assets).
 
 ```bash
 git clone https://github.com/brusnyak/bp.git
 cd bp
+python scripts/setup.py        # add --dev for the test dependencies
 ```
 
-Create and activate a virtual environment:
+`scripts/setup.py` is idempotent and does everything: virtual environment (`.venv`), dependencies (uses `uv` if installed, `pip` otherwise), a random `JWT_SECRET` in `.env`, a self-signed localhost certificate, the three Piper voices, and the one-time Opus-MT to CTranslate2 conversion (done in a throwaway venv, so the running app never needs PyTorch). Use `--skip-models` to skip the conversion.
+
+Start it:
 
 ```bash
-python3 -m venv venv
-source venv/bin/activate
+.venv/bin/python app.py          # Windows: .venv\Scripts\python.exe app.py
 ```
 
-Install dependencies:
+Open `https://localhost:8000` (accept the self-signed certificate).
 
-```bash
-pip install -r requirements.txt
-```
+The server listens on `127.0.0.1` only. For a conference/LAN demo opt in explicitly with `BP_HOST=0.0.0.0` (anyone on the network can then register and use the WebSocket, so only do this on a trusted network).
 
-Generate local HTTPS certificates:
+### Configuration
 
-```bash
-openssl req -x509 -newkey rsa:4096 -nodes \
-  -out certs/cert.pem \
-  -keyout certs/key.pem \
-  -days 365 \
-  -subj "/CN=localhost"
-```
-
-Run the application:
-
-```bash
-python app.py
-```
-
-Open:
-
-```text
-https://localhost:8000
-```
-
-Your browser may ask you to accept the self-signed certificate.
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `BP_HOST` / `BP_PORT` | `127.0.0.1` / `8000` | Bind address and port. |
+| `JWT_SECRET` | random per process | Signs session tokens. `scripts/setup.py` writes one to `.env`. |
+| `GOOGLE_CLIENT_ID` | unset | Enables Google login. |
+| `BP_DEMO_USER` | unset | Set to `1` to create a `test@example.com` demo account (development only). |
+| `HF_HOME` | `~/.cache/huggingface` | Where Whisper models are cached. |
 
 ## Model setup
 
-### Piper TTS
-
-Piper models can be downloaded manually:
+`scripts/setup.py` handles all of this; the manual equivalents are:
 
 ```bash
-python backend/tts/download_piper_models.py en_US-ryan-medium
+python backend/tts/download_piper_models.py en_US-ryan-medium     # Piper voices
 python backend/tts/download_piper_models.py sk_SK-lili-medium
 python backend/tts/download_piper_models.py cs_CZ-jirka-medium
+python scripts/convert_models.py                                  # Opus-MT -> CTranslate2 int8, tokenizers saved alongside
 ```
 
-### CTranslate2 translation models
-
-Convert Opus-MT models to CTranslate2 format:
-
-```bash
-python backend/mt/convert_opus_mt_to_ct2.py --model_name Helsinki-NLP/opus-mt-en-sk
-python backend/mt/convert_opus_mt_to_ct2.py --model_name Helsinki-NLP/opus-mt-sk-en
-python backend/mt/convert_opus_mt_to_ct2.py --model_name Helsinki-NLP/opus-mt-en-cs
-```
-
-### Faster-Whisper
-
-The Faster-Whisper model is downloaded automatically on first use.
-
-### Voice cloning models
-
-XTTS, OmniVoice, and MLX-Audio models are downloaded automatically when selected, depending on backend support and local hardware.
+Faster-Whisper models download on first use (`hf_xet` makes this fast). Personal/fine-tuned Piper voices are local-only: drop `<name>.onnx` + `<name>.onnx.json` into `backend/tts/piper_models/` and the `piper_personal*` engines pick them up; without them the public voices above are used. XTTS, OmniVoice and OpenVoice need PyTorch and are not part of the default install (the `xtts`, `hybrid` and `omnivoice` engines are simply not advertised).
 
 ## Usage
 
@@ -242,21 +188,12 @@ XTTS, OmniVoice, and MLX-Audio models are downloaded automatically when selected
 
 ## Testing
 
-Run the streaming pipeline tests:
-
 ```bash
-python test/streaming_pipeline_tests.py
+python scripts/setup.py --dev
+.venv/bin/python -m pytest test/hardware_test.py test/vad_tests.py test/mt_model_tests.py test/backend_api_tests.py test/backend_auth_tests.py test/security_tests.py -q
 ```
 
-For full evaluation, add test audio files to the `test/` directory:
-
-| File | Purpose |
-| --- | --- |
-| `test/My test speech_xtts_speaker_clean.wav` | English speech test input. |
-| `test/slovak_test_speech.wav` | Slovak speech test input. |
-| `test/Voice-Training.wav` | Speaker reference audio for voice cloning. |
-
-Matching transcript and translation reference files should be added for metric-based evaluation.
+`documentation/ci.yml.example` is a ready GitHub Actions workflow that runs setup + these tests from a clean checkout on Ubuntu, macOS and Windows; copy it to `.github/workflows/ci.yml` (pushing workflow files needs a token with the `workflow` scope). The first VAD test loads Faster-Whisper `base`, so the first run downloads about 140 MB.
 
 ## Project structure
 
@@ -270,11 +207,11 @@ bp/
 │   ├── tts/             # Piper, XTTS, OmniVoice, and hybrid TTS modules
 │   └── utils/           # Audio, auth, and database utilities
 ├── ui/                  # Browser interface
-├── test/                # Streaming and pipeline tests
-├── speaker_voices/      # Local speaker reference audio and metadata
-├── documentation/       # Thesis notes and supporting research
-├── requirements.txt
-└── package.json
+├── scripts/             # setup.py (one-command install), convert_models.py, gen_cert.py, evaluation scripts
+├── test/                # hardware, VAD, MT, API, auth and security tests
+├── documentation/       # Thesis notes, security audit, model evaluation
+├── requirements.txt     # runtime deps (no torch); -dev and -convert variants alongside
+└── package.json         # UI chart assets
 ```
 
 ## Current development status
@@ -297,13 +234,3 @@ bp/
 - Expand evaluation with consistent Slovak/English test audio.
 - Package the system for simpler installation.
 - Refine thesis documentation around methodology, measurements, and limitations.
-
-## README style direction
-
-This repository follows the shared portfolio README structure:
-
-- Short project description at the top.
-- Technology labels for fast scanning.
-- Coloured system design diagram when architecture is useful.
-- Structured features, model backends, testing, and roadmap tables.
-- Practical setup instructions separated from research/development notes.
