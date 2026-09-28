@@ -1,4 +1,4 @@
-.PHONY: install install-deps run lab test certs clean help
+.PHONY: install install-deps run lab test demo-check certs clean help
 
 # Detect operating system
 ifeq ($(OS),Windows_NT)
@@ -62,6 +62,10 @@ test: ## Run the comprehensive backend test suite.
 	$(DYLD_ENV) TORCH_USE_LIBAV=0 TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1 PYTHONHASHSEED=random $(PYTHON_EXEC) test/piper_pipeline_test.py
 	$(DYLD_ENV) TORCH_USE_LIBAV=0 TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1 PYTHONHASHSEED=random $(PYTHON_EXEC) -m pytest test/vad_tests.py | cat
 	$(DYLD_ENV) TORCH_USE_LIBAV=0 TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1 PYTHONHASHSEED=random $(PYTHON_EXEC) -m pytest test/hardware_test.py | cat
+	$(DYLD_ENV) TORCH_USE_LIBAV=0 TORCH_FORCE_NO_WEIGHTS_ONLY_LOAD=1 PYTHONHASHSEED=random $(PYTHON_EXEC) -m pytest test/backend_auth_tests.py test/backend_api_tests.py | cat
+
+demo-check: ## Pre-flight the live demo (assets + the server running on https://localhost:8000).
+	python3 scripts/demo_preflight.py --server
 
 certs: ## Generate SSL certificates for HTTPS/WSS.
 	@mkdir -p certs
