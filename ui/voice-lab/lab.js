@@ -419,8 +419,34 @@
     host.appendChild(section);
   }
 
+  function audioCard(item) {
+    const card = el("div", "lab-card");
+    card.appendChild(el("h4", null, item.name));
+    const meta = item.meta || {};
+    const lines = Object.entries(meta).filter(([, v]) => v !== undefined && v !== null && v !== "");
+    if (lines.length) {
+      card.appendChild(metaLine(lines.map(([k, v]) => k + ": " + v)));
+    }
+    card.appendChild(audioEl(item.file));
+    return card;
+  }
+
   function renderAudioList(items, host, title, lead, id) {    if (!items.length) return;
     const section = evidenceSection(title, lead, id);
+    if (id === "training-corpus" && items.length > 8) {
+      const head = items.slice(0, 5);
+      const rest = items.slice(5);
+      const det = document.createElement("details");
+      det.className = "lab-more";
+      det.appendChild(el("summary", null, "All corpus clips (" + items.length + ")"));
+      const list = el("div", "lab-card-list");
+      rest.forEach((item) => list.appendChild(audioCard(item)));
+      det.appendChild(list);
+      head.forEach((item) => section.appendChild(audioCard(item)));
+      section.appendChild(det);
+      host.appendChild(section);
+      return;
+    }
     if (id === "model-spikes") {
       const card = el("div", "lab-card");
       card.appendChild(el("h4", null, "Engine comparison"));
@@ -450,16 +476,9 @@
       card.appendChild(tbl);
       section.appendChild(card);
     }
-    items.forEach((item) => {
-      const card = el("div", "lab-card");
-      card.appendChild(el("h4", null, item.name));
-      const meta = item.meta || {};
-      const lines = Object.entries(meta).filter(([, v]) => v !== undefined && v !== null && v !== "");
-      if (lines.length) {
-        card.appendChild(metaLine(lines.map(([k, v]) => k + ": " + v)));
-      }
-      card.appendChild(audioEl(item.file));
-      section.appendChild(card);
+    const rest2 = id === "training-corpus" ? [] : items;
+    rest2.forEach((item) => {
+      section.appendChild(audioCard(item));
     });
     host.appendChild(section);
   }
