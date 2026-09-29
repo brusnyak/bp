@@ -113,6 +113,7 @@ from fastapi import (
     Body,
     Depends # Import Depends for dependency injection
 )
+from fastapi.responses import FileResponse
 from starlette.responses import JSONResponse
 try:
     import torch  # optional: only for Tensor->numpy conversion of TTS output
@@ -436,6 +437,13 @@ async def _initialize_tts_models(session_data: Dict[str, Any], tts_model_choice:
     try:
         session_data["tts_engine"] = factory()
         session_data["tts_engine_name"] = tts_model_choice
+        # Write back the EFFECTIVE choice (remapped or not) so the label always
+        # names the initialized engine. The 2026-09-28 fix only wrote back on the
+        # remap branch; without a target-sk remap the label kept a stale engine name
+        # while a different engine was initialized, and the pipeline lookup
+        # (engine_name == session_config choice) silently produced no synthesis
+        # (measured live 2026-09-29: sk->en turns got zero TTS bytes).
+        session_data["session_config"]["tts_model_choice"] = tts_model_choice
         init_end = time.time()
         logging.info(f"Backend: Session {session_data['client_info']}: TTS engine '{tts_model_choice}' initialized at {time.strftime('%H:%M:%S', time.localtime(init_end))}. Duration: {init_end - init_start:.2f}s.")
     except Exception as e:
@@ -877,19 +885,49 @@ async def get_voices(
     if current_user:
         # Authenticated: return default voices + user's voices
         user_voices = [
-            {"id": v.get("id", str(uuid.uuid4())), "name": v["name"], "filename": v.get("filename", "unknown_filename.wav"), "path": v.get("path", "unknown_path"), "language": v.get("language", "unknown"), "upload_time": v.get("upload_time", 0)}
+            {"id": v.get("id", str(uuid.uuid4())), "name": v["name"], "filename": v.get("filename") or os.path.basename(v.get("path", "")) or "unknown_filename.wav", "path": v.get("path", "unknown_path"), "language": v.get("language", "unknown"), "upload_time": v.get("upload_time", 0)}
             for v in metadata if v.get("user_id") is None or v.get("user_id") == current_user.id
         ]
         logging.info(f"Backend: Retrieved {len(user_voices)} voices for authenticated user {current_user.id}")
     else:
         # Unauthenticated: return only default voices
         user_voices = [
-            {"id": v.get("id", str(uuid.uuid4())), "name": v["name"], "filename": v.get("filename", "unknown_filename.wav"), "path": v.get("path", "unknown_path"), "language": v.get("language", "unknown"), "upload_time": v.get("upload_time", 0)}
+            {"id": v.get("id", str(uuid.uuid4())), "name": v["name"], "filename": v.get("filename") or os.path.basename(v.get("path", "")) or "unknown_filename.wav", "path": v.get("path", "unknown_path"), "language": v.get("language", "unknown"), "upload_time": v.get("upload_time", 0)}
             for v in metadata if v.get("user_id") is None
         ]
         logging.info(f"Backend: Retrieved {len(user_voices)} default voices for unauthenticated user")
     
     return user_voices
+
+@router.get("/voices/file", summary="Download a speaker voice file (preview/listen)")
+async def get_voice_file(
+    filename: str,
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(HTTPBearer(auto_error=False)),
+    db: Session = Depends(get_db_dependency)
+):
+    """Serve one voice file for in-browser preview. Same visibility as GET /voices
+    (default voices + the caller's own); path traversal blocked by _voice_path."""
+    metadata = _read_speaker_voices_metadata()
+    current_user = None
+    if credentials:
+        try:
+            from backend.utils.auth import decode_access_token
+            email = decode_access_token(credentials.credentials)
+            current_user = db.query(User).filter(User.email == email).first()
+        except Exception:
+            current_user = None
+    entry = next((v for v in metadata if v.get("filename") == filename), None)
+    if entry is None:
+        raise HTTPException(status_code=404, detail="Voice not found.")
+    if entry.get("user_id") is not None and (current_user is None or entry.get("user_id") != current_user.id):
+        raise HTTPException(status_code=403, detail="Not your voice.")
+    path = _voice_path(filename)
+    if not os.path.isfile(path):
+        raise HTTPException(status_code=404, detail="Voice file missing.")
+    ext = os.path.splitext(filename)[1].lower()
+    media = {"wav": "audio/wav", "mp3": "audio/mpeg", "m4a": "audio/mp4",
+             "ogg": "audio/ogg", "flac": "audio/flac"}.get(ext.lstrip("."), "audio/wav")
+    return FileResponse(path, media_type=media, filename=filename)
 
 @router.get("/voice-lab/status", summary="Voice-lab system status (no auth, local eval page)")
 async def voice_lab_status():
@@ -1395,8 +1433,14 @@ async def handle_audio_stream(websocket: WebSocket):
 
                             if config_changed:
                                 logging.info(f"Backend: Configuration changed. Re-initializing models with: Source={new_source_lang}, Target={new_target_lang}, TTS={new_tts_model_choice}, SpeakerWav={new_speaker_wav_path}, VAD_Enabled={new_vad_enabled}")
-                                await initialize_all_models(
-                                    client_info,
+                                # Direction must land in session_config BEFORE init: the
+                                # piper->piper_sk_personal remap reads target_lang from here,
+                                # and with a stale "sk" an EN target keeps the Slovak voice
+                                # (measured live 2026-09-29: English read by piper_sk_personal).
+                                old_source_lang = session_config["source_lang"]
+                                session_config["source_lang"] = new_source_lang
+                                session_config["target_lang"] = new_target_lang
+                                await initialize_all_models(                                    client_info,
                                     new_source_lang, new_target_lang, new_tts_model_choice,
                                     stt_model_size=session_config["stt_model_size"], # STT model size is not updated via config_update, keep current
                                     speaker_wav_path=new_speaker_wav_path, speaker_text=new_speaker_text,
@@ -1404,7 +1448,7 @@ async def handle_audio_stream(websocket: WebSocket):
                                 )
                                 
                                 # Check if source language changed and send a translated notification
-                                if new_source_lang != session_config["source_lang"]:
+                                if new_source_lang != old_source_lang:
                                     notification_phrase = f"Input language changed to {new_source_lang}."
                                     translated_notification = notification_phrase
                                     

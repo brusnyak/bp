@@ -61,10 +61,15 @@ is ~0.8s of compute instead of ~20s of model loading.
 | Claim | Value | Source |
 |---|---|---|
 | EN STT WER | 0.077 (`base`); 0.023 Parakeet-TDT-v3 (adopt path) | `PLAN.md`, `processed/stt_baseline.json` |
-| SK STT WER | 0.41 turbo (adopted), 0.49 small | `documentation/tts_landscape_2026-09.md` |
+| SK STT, clean generic input | 0.16 small-sk (0.59 base) | `processed/stt_input_test/clean_synth_matrix.json` |
+| SK STT, personal-voice input | 0.54–0.57 small-sk — the voice, not the model | `processed/engine_ab/matrix.json` |
+| OmniVoice clone as STT input | **0.054** small-sk (same text as 0.540 personal) | `processed/engine_ab/matrix.json` |
+| STT input length effect | 7s→24s: base 0.82→0.55, small-sk 0.36→0.28 | `processed/synth_lengths/stt_by_length.json` |
 | MT throughput | 18 sentences in 0.50s (chunked) | `PLAN.md` |
-| TTS | personal SK voice, 0.28s per 6s of audio | `documentation/handler_update_2026-09.md` |
-| Live sentence (rehearsal) | STT 0.51s / MT 0.10s / TTS 0.17s, total **0.78s** | `/tmp` rehearsal log, 2026-09-28 |
+| TTS | personal SK voice, RTF ~0.04 flat at 7→32s output | `processed/synth_lengths/synth_lengths.json` |
+| OmniVoice bulk corpus | 15 clips, ~6 min, mean QC WER 0.05 (round 2 in progress) | `processed/bulk_hq/manifest.json` |
+| Live turn, EN→SK (measured /ws) | first TTS audio ~2.5–5s into 6s turn (streaming) | `processed/meeting/live_dump_*_en-sk.json` |
+| Live turn, SK→EN (measured /ws) | first TTS audio ~2.5–7s (correct `piper_personal_v2` voice) | `processed/meeting/live_dump_*_sk-en.json` |
 | Windows 11, CPU-only | e2e ≈ 3.6s (no XTTS: Coqui has no Windows wheels) | `79a8476`, `SETUP_WINDOWS.md` |
 
 ## 5. Fallback ladder — if audio dies on stage

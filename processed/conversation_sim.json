@@ -3,87 +3,343 @@
     {
       "dir": "en_sk",
       "n": 0,
-      "src": "In this experiment, the system converts spoken English into text.",
-      "tgt": "V tomto experimente systém premieňa hovorenú angličtinu na text.",
-      "stt_s": 0.1,
-      "mt_sentence_s": 0.099,
-      "tts_s": 0.32,
-      "audio_s": 4.8
+      "mt_sentence_s": 0.154,
+      "mt_word_total_s": 0.105,
+      "mt_word_first_s": 0.052,
+      "tts_s": 0.23,
+      "audio_s": 5.9
     },
     {
       "dir": "en_sk",
       "n": 1,
-      "src": "Translate it into Slavak and then synthesizes it back into speech.  The process involves three stages, speech recognition, machine translation and text to speech.",
-      "tgt": "Prelož ho do Slavaku a potom ho syntetizuje späť do reči. Proces zahŕňa tri etapy, rozpoznávanie reči, strojový preklad a text do reči.",
-      "stt_s": 0.05,
-      "mt_sentence_s": 0.205,
-      "tts_s": 0.5,
-      "audio_s": 10.5
+      "mt_sentence_s": 0.131,
+      "mt_word_total_s": 0.093,
+      "mt_word_first_s": 0.031,
+      "tts_s": 0.23,
+      "audio_s": 6.0
     },
     {
       "dir": "en_sk",
       "n": 2,
-      "src": "Each model introduces a small delay, so we will measure the overall latency.",
-      "tgt": "Každý model predstavuje malé oneskorenie, takže zmeriame celkovú latenciu.",
-      "stt_s": 0.03,
-      "mt_sentence_s": 0.1,
-      "tts_s": 0.28,
-      "audio_s": 5.8
+      "mt_sentence_s": 0.119,
+      "mt_word_total_s": 0.084,
+      "mt_word_first_s": 0.028,
+      "tts_s": 0.17,
+      "audio_s": 4.5
     },
     {
       "dir": "en_sk",
       "n": 3,
-      "src": "The main objective is to achieve natural communication despite language barriers.",
-      "tgt": "Hlavným cieľom je dosiahnuť prirodzenú komunikáciu napriek jazykovým bariéram.",
-      "stt_s": 0.03,
-      "mt_sentence_s": 0.083,
-      "tts_s": 0.3,
-      "audio_s": 6.5
+      "mt_sentence_s": 0.143,
+      "mt_word_total_s": 0.086,
+      "mt_word_first_s": 0.043,
+      "tts_s": 0.22,
+      "audio_s": 5.7
+    },
+    {
+      "dir": "en_sk",
+      "n": 4,
+      "mt_sentence_s": 0.125,
+      "mt_word_total_s": 0.074,
+      "mt_word_first_s": 0.025,
+      "tts_s": 0.22,
+      "audio_s": 5.7
+    },
+    {
+      "dir": "en_sk",
+      "n": 5,
+      "mt_sentence_s": 0.143,
+      "mt_word_total_s": 0.086,
+      "mt_word_first_s": 0.029,
+      "tts_s": 0.24,
+      "audio_s": 6.2
+    },
+    {
+      "dir": "en_sk",
+      "n": 6,
+      "mt_sentence_s": 0.115,
+      "mt_word_total_s": 0.068,
+      "mt_word_first_s": 0.023,
+      "tts_s": 0.25,
+      "audio_s": 6.6
+    },
+    {
+      "dir": "en_sk",
+      "n": 7,
+      "mt_sentence_s": 0.148,
+      "mt_word_total_s": 0.098,
+      "mt_word_first_s": 0.033,
+      "tts_s": 0.26,
+      "audio_s": 6.8
+    },
+    {
+      "dir": "en_sk",
+      "n": 8,
+      "mt_sentence_s": 0.123,
+      "mt_word_total_s": 0.072,
+      "mt_word_first_s": 0.024,
+      "tts_s": 0.22,
+      "audio_s": 5.7
+    },
+    {
+      "dir": "en_sk",
+      "n": 9,
+      "mt_sentence_s": 0.102,
+      "mt_word_total_s": 0.074,
+      "mt_word_first_s": 0.037,
+      "tts_s": 0.16,
+      "audio_s": 4.1
+    },
+    {
+      "dir": "en_sk",
+      "n": 10,
+      "mt_sentence_s": 0.146,
+      "mt_word_total_s": 0.089,
+      "mt_word_first_s": 0.044,
+      "tts_s": 0.18,
+      "audio_s": 4.7
+    },
+    {
+      "dir": "en_sk",
+      "n": 11,
+      "mt_sentence_s": 0.121,
+      "mt_word_total_s": 0.077,
+      "mt_word_first_s": 0.039,
+      "tts_s": 0.26,
+      "audio_s": 6.8
+    },
+    {
+      "dir": "en_sk",
+      "n": 12,
+      "mt_sentence_s": 0.105,
+      "mt_word_total_s": 0.063,
+      "mt_word_first_s": 0.031,
+      "tts_s": 0.18,
+      "audio_s": 4.7
+    },
+    {
+      "dir": "en_sk",
+      "n": 13,
+      "mt_sentence_s": 0.118,
+      "mt_word_total_s": 0.07,
+      "mt_word_first_s": 0.023,
+      "tts_s": 0.24,
+      "audio_s": 6.4
+    },
+    {
+      "dir": "en_sk",
+      "n": 14,
+      "mt_sentence_s": 0.1,
+      "mt_word_total_s": 0.066,
+      "mt_word_first_s": 0.033,
+      "tts_s": 0.22,
+      "audio_s": 5.9
+    },
+    {
+      "dir": "en_sk",
+      "n": 15,
+      "mt_sentence_s": 0.117,
+      "mt_word_total_s": 0.082,
+      "mt_word_first_s": 0.041,
+      "tts_s": 0.22,
+      "audio_s": 5.9
+    },
+    {
+      "dir": "en_sk",
+      "n": 16,
+      "mt_sentence_s": 0.086,
+      "mt_word_total_s": 0.054,
+      "mt_word_first_s": 0.027,
+      "tts_s": 0.15,
+      "audio_s": 4.1
+    },
+    {
+      "dir": "en_sk",
+      "n": 17,
+      "mt_sentence_s": 0.106,
+      "mt_word_total_s": 0.083,
+      "mt_word_first_s": 0.042,
+      "tts_s": 0.16,
+      "audio_s": 4.0
     },
     {
       "dir": "sk_en",
       "n": 0,
-      "src": "Dobrý den, týtam vás na dnešné povede o preklade reči.",
-      "tgt": "Hello, I'm asking you to tell us today about the translation of the speech.",
-      "stt_s": 0.02,
-      "mt_sentence_s": 0.115,
-      "tts_s": 0.2,
-      "audio_s": 3.5,
-      "note": "source audio synthesized by Piper (stand-in meeting clip)"
+      "mt_sentence_s": 0.13,
+      "mt_word_total_s": 0.101,
+      "mt_word_first_s": 0.034,
+      "tts_s": 0.18,
+      "audio_s": 4.3
     },
     {
       "dir": "sk_en",
       "n": 1,
-      "src": "System funkuje okolne, ani potrekuje internetové pripojmy.",
-      "tgt": "The system functions outside or punishes internet connections.",
-      "stt_s": 0.02,
-      "mt_sentence_s": 0.071,
-      "tts_s": 0.19,
-      "audio_s": 3.8,
-      "note": "source audio synthesized by Piper (stand-in meeting clip)"
+      "mt_sentence_s": 0.162,
+      "mt_word_total_s": 0.112,
+      "mt_word_first_s": 0.037,
+      "tts_s": 0.17,
+      "audio_s": 4.3
     },
     {
       "dir": "sk_en",
       "n": 2,
-      "src": "Ďakujem vám sa poslednosti, težim sa na vaši odtasky.",
-      "tgt": "Thank you for the last time, I look forward to your tastings.",
-      "stt_s": 0.02,
-      "mt_sentence_s": 0.116,
+      "mt_sentence_s": 0.17,
+      "mt_word_total_s": 0.118,
+      "mt_word_first_s": 0.059,
+      "tts_s": 0.19,
+      "audio_s": 5.0
+    },
+    {
+      "dir": "sk_en",
+      "n": 3,
+      "mt_sentence_s": 0.13,
+      "mt_word_total_s": 0.092,
+      "mt_word_first_s": 0.046,
+      "tts_s": 0.17,
+      "audio_s": 4.3
+    },
+    {
+      "dir": "sk_en",
+      "n": 4,
+      "mt_sentence_s": 0.16,
+      "mt_word_total_s": 0.126,
+      "mt_word_first_s": 0.063,
+      "tts_s": 0.19,
+      "audio_s": 4.6
+    },
+    {
+      "dir": "sk_en",
+      "n": 5,
+      "mt_sentence_s": 0.131,
+      "mt_word_total_s": 0.076,
+      "mt_word_first_s": 0.038,
+      "tts_s": 0.18,
+      "audio_s": 4.4
+    },
+    {
+      "dir": "sk_en",
+      "n": 6,
+      "mt_sentence_s": 0.12,
+      "mt_word_total_s": 0.081,
+      "mt_word_first_s": 0.041,
+      "tts_s": 0.18,
+      "audio_s": 4.6
+    },
+    {
+      "dir": "sk_en",
+      "n": 7,
+      "mt_sentence_s": 0.182,
+      "mt_word_total_s": 0.092,
+      "mt_word_first_s": 0.031,
+      "tts_s": 0.18,
+      "audio_s": 4.6
+    },
+    {
+      "dir": "sk_en",
+      "n": 8,
+      "mt_sentence_s": 0.122,
+      "mt_word_total_s": 0.118,
+      "mt_word_first_s": 0.039,
+      "tts_s": 0.13,
+      "audio_s": 3.3
+    },
+    {
+      "dir": "sk_en",
+      "n": 9,
+      "mt_sentence_s": 0.111,
+      "mt_word_total_s": 0.075,
+      "mt_word_first_s": 0.038,
+      "tts_s": 0.14,
+      "audio_s": 3.5
+    },
+    {
+      "dir": "sk_en",
+      "n": 10,
+      "mt_sentence_s": 0.13,
+      "mt_word_total_s": 0.088,
+      "mt_word_first_s": 0.044,
+      "tts_s": 0.17,
+      "audio_s": 4.0
+    },
+    {
+      "dir": "sk_en",
+      "n": 11,
+      "mt_sentence_s": 0.171,
+      "mt_word_total_s": 0.115,
+      "mt_word_first_s": 0.057,
+      "tts_s": 0.2,
+      "audio_s": 5.2
+    },
+    {
+      "dir": "sk_en",
+      "n": 12,
+      "mt_sentence_s": 0.112,
+      "mt_word_total_s": 0.089,
+      "mt_word_first_s": 0.045,
+      "tts_s": 0.14,
+      "audio_s": 3.4
+    },
+    {
+      "dir": "sk_en",
+      "n": 13,
+      "mt_sentence_s": 0.129,
+      "mt_word_total_s": 0.115,
+      "mt_word_first_s": 0.058,
       "tts_s": 0.15,
-      "audio_s": 2.6,
-      "note": "source audio synthesized by Piper (stand-in meeting clip)"
+      "audio_s": 3.7
+    },
+    {
+      "dir": "sk_en",
+      "n": 14,
+      "mt_sentence_s": 0.158,
+      "mt_word_total_s": 0.111,
+      "mt_word_first_s": 0.055,
+      "tts_s": 0.16,
+      "audio_s": 4.0
+    },
+    {
+      "dir": "sk_en",
+      "n": 15,
+      "mt_sentence_s": 0.137,
+      "mt_word_total_s": 0.119,
+      "mt_word_first_s": 0.06,
+      "tts_s": 0.17,
+      "audio_s": 4.5
+    },
+    {
+      "dir": "sk_en",
+      "n": 16,
+      "mt_sentence_s": 0.115,
+      "mt_word_total_s": 0.117,
+      "mt_word_first_s": 0.059,
+      "tts_s": 0.14,
+      "audio_s": 3.6
+    },
+    {
+      "dir": "sk_en",
+      "n": 17,
+      "mt_sentence_s": 0.141,
+      "mt_word_total_s": 0.108,
+      "mt_word_first_s": 0.054,
+      "tts_s": 0.15,
+      "audio_s": 3.7
     }
   ],
   "agg": {
     "en_sk": {
-      "stt": 0.05,
-      "mt": 0.1,
-      "tts": 0.32
+      "mt_sentence_p50_s": 0.121,
+      "mt_word_first_p50_s": 0.033,
+      "tts_p50_s": 0.22
     },
     "sk_en": {
-      "stt": 0.02,
-      "mt": 0.12,
-      "tts": 0.19
+      "mt_sentence_p50_s": 0.131,
+      "mt_word_first_p50_s": 0.046,
+      "tts_p50_s": 0.17
+    },
+    "stt": {
+      "en_parakeet_total_s": 78.6,
+      "sk_whisper_total_s": 26.7,
+      "note": "EN incl one model load; SK warm"
     }
   }
 }

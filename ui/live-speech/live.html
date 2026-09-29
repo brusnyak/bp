@@ -154,15 +154,15 @@
             </select>
           </div>
 
-          <div class="control-group hidden" id="audio-output-group">
-            <label for="audioOutputSelect" class="visually-hidden">Audio Output</label>
+          <div class="control-group" id="audio-output-group">
+            <label for="audioOutputSelect">Translation playback</label>
             <select
               id="audioOutputSelect"
-              class="control-select"
+              class="control-select model-select"
               title="Select audio output device"
               aria-label="Select audio output device for translation"
             >
-              <option value="">Default</option>
+              <option value="">Speakers / headphones (default)</option>
               <!-- Audio output devices will be dynamically loaded here -->
             </select>
           </div>
@@ -203,7 +203,7 @@
             <span id="statusLabel">Ready</span>
           </div>
           <p class="hint hint-text virtual-mic-hint-centered" id="virtualMicHint">
-            ✓ Virtual device detected: BlackHole 2ch (Virtual)
+            Playback uses speakers or headphones until you choose a virtual cable.
           </p>
         </div>
       </div>
@@ -402,23 +402,8 @@
                 aria-label="Select voice language for recording"
               >
                 <option value="en" selected>English (English)</option>
-                <option value="es">Spanish (Español)</option>
-                <option value="fr">French (Français)</option>
-                <option value="de">German (Deutsch)</option>
-                <option value="it">Italian (Italiano)</option>
-                <option value="pt">Portuguese (Português)</option>
-                <option value="pl">Polish (Polski)</option>
-                <option value="tr">Turkish (Türkçe)</option>
-                <option value="ru">Russian (Русский)</option>
-                <option value="nl">Dutch (Nederlands)</option>
-                <option value="cs">Czech (Čeština)</option>
-                <option value="ar">Arabic (العربية)</option>
-                <option value="zh-cn">Chinese (中文)</option>
-                <option value="ja">Japanese (日本語)</option>
-                <option value="hu">Hungarian (Magyar)</hi>
-                <option value="ko">Korean (한국어)</ko>
-                <option value="hi">Hindi (हिन्दी)</hi>
                 <option value="sk">Slovak (Slovenčina)</option>
+                <option value="cs">Czech (Čeština)</option>
               </select>
             </div>
             <div class="modal-section">
@@ -505,6 +490,6 @@
     <!-- Custom Notification Bar -->
     <div id="notificationBar" class="notification-bar" role="alert" aria-live="assertive"></div>
 
-    <script src="/ui/live-speech/live-script.js"></script>
+    <script src="/ui/live-speech/live-script.js?v=20260929d"></script>
   </body>
 </html>

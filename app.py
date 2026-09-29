@@ -354,7 +354,7 @@ if __name__ == "__main__":
     os.makedirs("processed/voice_qc", exist_ok=True)
     # Loopback by default: the API has open registration and an unauthenticated /ws.
     # For a conference/LAN demo opt in explicitly: BP_HOST=0.0.0.0
-    host = os.environ.get("BP_HOST", "127.0.0.1")
+    host = os.environ.get("BP_HOST", "localhost")  # Google OAuth needs localhost:8000, not 127.0.0.1
     if host not in ("127.0.0.1", "localhost", "::1"):
         print(f"APP: WARNING - listening on {host}; anyone on the network can register and use /ws.")
     uvicorn.run(

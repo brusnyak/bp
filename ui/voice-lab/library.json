@@ -9,49 +9,56 @@
           "file": "../../speaker_voices/cs_staromestske_v2.m4a",
           "language": "cs",
           "transcript": "Včera odpoledne jsem šel na Staroměstské náměstí. Potkal jsem tam starého kamaráda, který prodával housky a koláče. „Tři rohlíky a čtyři koláče, prosím!\" poprosil jsem. „Ahoj! Kde ses toulal celé měsíce?\" zeptal se mě. Vypravoval jsem mu o své práci a o dlouhé cestě vlakem přes hory a údolí. Pak jsme si sedli na lavičku a dali si kávu. Okolo běhaly děti a házely si míčem. V pekárně voněla čerstvá mouka a pečivo. „Věřil bys, že tohle místo znám už čtyřicet let?\" řekl a ukázal na věž. Musel jsem se smát. Když se setmělo, vydali jsme se domů přes Karlův most. Kousek od mostu stojí můj starý dům. Nad řekou kroužili racci a z hospody se ozývala hudba. Bylo to jedno z nejhezčích odpolední tohoto měsíce. Kdy se sem zase vrátím?",
-          "in_registry": true
+          "in_registry": true,
+          "featured": true
         },
         {
           "name": "en_rainbow_v2",
           "file": "../../speaker_voices/en_rainbow_v2.m4a",
           "language": "en",
           "transcript": "When the sunlight strikes raindrops in the air, they act as a prism and form a rainbow. The rainbow is a division of white light into many beautiful colors. These take the shape of a long round arch, with its path high above, and its two ends apparently beyond the horizon. There is, according to legend, a boiling pot of gold at one end. People look, but no one ever finds it. When a man looks for something beyond his reach, his friends say he is looking for the pot of gold at the end of the rainbow. Throughout the centuries people have explained the rainbow in various ways. Some have accepted it as a miracle without physical explanation. To the Hebrews it was a token that there would be no more universal floods. The Greeks used to imagine that it was a sign from the gods to foretell war or heavy rain. The Norsemen considered the rainbow as a bridge over which the gods passed from earth to their home in the sky. Others have tried to explain the phenomenon physically. Aristotle thought that the rainbow was caused by reflection of the sun's rays by the rain. Since then physicists have found that it is not reflection, but refraction by the raindrops which causes the rainbow. Many complicated ideas about the rainbow have been formed. The difference in the rainbow depends considerably upon the size of the drops, and the width of the rainbow increases as the size of the drops increases. The actual primary rainbow observed is said to be the effect of superposition of a number of bows. If the red of the second bow falls upon the green of the first, the result is to give a bow with an abnormally wide yellow band, since red and green light when mixed form yellow.",
-          "in_registry": true
+          "in_registry": true,
+          "featured": false
         },
         {
           "name": "en_rainbow_v2b",
           "file": "../../speaker_voices/en_rainbow_v2b.m4a",
           "language": "en",
           "transcript": "When the sunlight strikes raindrops in the air, they act as a prism and form a rainbow. The rainbow is a division of white light into many beautiful colors. These take the shape of a long round arch, with its path high above, and its two ends apparently beyond the horizon. There is, according to legend, a boiling pot of gold at one end. People look, but no one ever finds it. When a man looks for something beyond his reach, his friends say he is looking for the pot of gold at the end of the rainbow. Throughout the centuries people have explained the rainbow in various ways. Some have accepted it as a miracle without physical explanation. To the Hebrews it was a token that there would be no more universal floods. The Greeks used to imagine that it was a sign from the gods to foretell war or heavy rain. The Norsemen considered the rainbow as a bridge over which the gods passed from earth to their home in the sky. Others have tried to explain the phenomenon physically. Aristotle thought that the rainbow was caused by reflection of the sun's rays by the rain. Since then physicists have found that it is not reflection, but refraction by the raindrops which causes the rainbow. Many complicated ideas about the rainbow have been formed. The difference in the rainbow depends considerably upon the size of the drops, and the width of the rainbow increases as the size of the drops increases. The actual primary rainbow observed is said to be the effect of superposition of a number of bows. If the red of the second bow falls upon the green of the first, the result is to give a bow with an abnormally wide yellow band, since red and green light when mixed form yellow.",
-          "in_registry": true
+          "in_registry": true,
+          "featured": true
         },
         {
           "name": "en_script_reading",
           "file": "../../speaker_voices/en_script_reading.m4a",
           "language": "en",
           "transcript": "Good morning, and welcome to this live demonstration of real time speech translation. I am speaking English, and you will hear my own voice speaking Slovak within seconds. The system listens through the microphone and detects when speech begins and ends. First the speech is transcribed into text, then translated, then spoken again. Every step runs locally on this computer, with no cloud and no waiting room. Latency is the time between my words and the translated voice you hear. Our goal is a delay of only a few seconds, short enough for natural conversation. Voice cloning means the Slovak output sounds like me, not like a stranger. To teach the system my voice, I record a few minutes of clean speech. A quiet room matters more than an expensive microphone. Please speak at a steady pace, with short pauses between sentences. Numbers, names, and technical terms need extra care in both languages. The subtitle line shows partial results while I am still speaking. You can pop the subtitles out into a floating window above any application. The translated voice is routed into the meeting as a virtual microphone. Other participants hear Slovak, while I keep speaking English. Questions from the audience will be translated in the opposite direction. Thank you for listening, and I look forward to your questions.",
-          "in_registry": true
+          "in_registry": true,
+          "featured": false
         },
         {
           "name": "sk_script_reading",
           "file": "../../speaker_voices/sk_script_reading.m4a",
           "language": "sk",
           "transcript": "Dobré ráno a vitajte v tejto živej ukážke prekladu reči v reálnom čase. Hovorím po anglicky a môj hlas budete počuť hovoriť po slovensky do niekoľkých sekúnd. Systém počúva mikrofónom a detekuje, kedy reč začína a končí. Najprv je reč prepísaná do textu, potom preložená a potom opäť prevedená. Každý krok beží lokálne na tomto počítači, bez oblaku a bez čakárne. Latency je čas medzi mojimi slovami a preloženým hlasom, ktorý počuješ. Naším cieľom je zdržanie len pár sekúnd, dosť krátke na prirodzený rozhovor. Hlasové klonovanie znamená, že slovenský výstup znie ako ja, nie ako cudzinec. Aby som učil systém mojím hlasom, zaznamenávam pár minút čistej reči. Na tichej miestnosti záleží viac ako na drahom mikrofóne. Prosím hovorte stálym tempom, s krátkymi prestávkami medzi vetami. Čísla, názvy a technické výrazy si vyžadujú mimoriadnu starostlivosť v oboch jazykoch. Linka titulkov ukazuje čiastočné výsledky, zatiaľ čo ja som ešte hovoriť. Titulky môžete presunúť do plávajúceho okna nad akoukoľvek aplikáciou. Preložený hlas je presmerovaný na zhromaždenie ako virtuálny mikrofón. Ostatní účastníci počúvajú slovenčinu, zatiaľ čo ja stále hovorím anglicky. Otázky publika budú preložené opačným smerom. Ďakujem vám za vypočutie a teším sa na vaše otázky.",
-          "in_registry": true
+          "in_registry": true,
+          "featured": false
         },
         {
           "name": "sk_trhove_rano_v2",
           "file": "../../speaker_voices/sk_trhove_rano_v2.m4a",
           "language": "sk",
           "transcript": "Včera ráno som išiel na trh kúpiť čerstvý chlieb a mlieko. Stretol som tam starého priateľa Ľuba, ktorý predával med a syry. „Ahoj! Kde si sa túľal celé mesiace?\" spýtal sa ma s úsmevom. Porozprával som mu o svojej práci a o dlhej ceste vlakom cez hory a doliny, až ma bolel každý kĺb. Po chvíli sme si sadli na lavičku pod veľkú vŕbu a dali sme si kávu. „Môžem prísť aj zajtra?\" spýtal som sa. Okolo nás pobehovali deti a hádzali si farebnú loptu. Jedno dievčatko nieslo džbán plný malín a smialo sa na celé kolo. Vôňa čerstvého pečiva sa niesla vzduchom a ja som si spomenul na detstvo u starých rodičov. V diaľke vŕzgali brzdy električky. Ľubo mi potom ukázal fotografie zo svojej záhrady. Medzi riadkami cibule a cesnaku rástli ľalie, pivonky a neskutočne veľké tekvice. „Pozri, táto váži vyše deväť kíl!\" pochválil sa. Neveril som vlastným očiam. „Musím už ísť, ale v piatok prídem zas,\" povedal som a pobrali sme sa domov. Ešte dnes cítim chuť toho chleba s maslom a medom. Bolo to jedno z najkrajších rán tohto jesenného mesiaca. Koľko takýchto dní nám ešte život prinesie?",
-          "in_registry": true
+          "in_registry": true,
+          "featured": false
         },
         {
           "name": "sk_trhove_rano_v2b",
           "file": "../../speaker_voices/sk_trhove_rano_v2b.m4a",
           "language": "sk",
           "transcript": "Včera ráno som išiel na trh kúpiť čerstvý chlieb a mlieko. Stretol som tam starého priateľa Ľuba, ktorý predával med a syry. „Ahoj! Kde si sa túľal celé mesiace?\" spýtal sa ma s úsmevom. Porozprával som mu o svojej práci a o dlhej ceste vlakom cez hory a doliny, až ma bolel každý kĺb. Po chvíli sme si sadli na lavičku pod veľkú vŕbu a dali sme si kávu. „Môžem prísť aj zajtra?\" spýtal som sa. Okolo nás pobehovali deti a hádzali si farebnú loptu. Jedno dievčatko nieslo džbán plný malín a smialo sa na celé kolo. Vôňa čerstvého pečiva sa niesla vzduchom a ja som si spomenul na detstvo u starých rodičov. V diaľke vŕzgali brzdy električky. Ľubo mi potom ukázal fotografie zo svojej záhrady. Medzi riadkami cibule a cesnaku rástli ľalie, pivonky a neskutočne veľké tekvice. „Pozri, táto váži vyše deväť kíl!\" pochválil sa. Neveril som vlastným očiam. „Musím už ísť, ale v piatok prídem zas,\" povedal som a pobrali sme sa domov. Ešte dnes cítim chuť toho chleba s maslom a medom. Bolo to jedno z najkrajších rán tohto jesenného mesiaca. Koľko takýchto dní nám ešte život prinesie?",
-          "in_registry": true
+          "in_registry": true,
+          "featured": true
         }
       ]
     },
@@ -75,69 +82,6 @@
           "language": "?",
           "sample_rate": null,
           "synthesis_latency_s": null,
-          "similarity": null
-        },
-        {
-          "name": "male_last_base",
-          "file": "../../processed/voice_qc/male_last_base.wav",
-          "engine": "?",
-          "language": "?",
-          "sample_rate": null,
-          "synthesis_latency_s": null,
-          "similarity": null
-        },
-        {
-          "name": "male_last_ns05",
-          "file": "../../processed/voice_qc/male_last_ns05.wav",
-          "engine": "?",
-          "language": "?",
-          "sample_rate": null,
-          "synthesis_latency_s": null,
-          "similarity": null
-        },
-        {
-          "name": "piper_male_sk_alldata",
-          "file": "../../processed/voice_qc/piper_male_sk_alldata.wav",
-          "engine": "?",
-          "language": "?",
-          "sample_rate": null,
-          "synthesis_latency_s": null,
-          "similarity": null
-        },
-        {
-          "name": "sandbox_cs_CZ-jirka-medium_cs",
-          "file": "../../processed/voice_qc/sandbox_cs_CZ-jirka-medium_cs.wav",
-          "engine": "piper",
-          "language": "cs",
-          "sample_rate": 22050,
-          "synthesis_latency_s": 0.266,
-          "similarity": null
-        },
-        {
-          "name": "sandbox_en_US-personal-medium_en",
-          "file": "../../processed/voice_qc/sandbox_en_US-personal-medium_en.wav",
-          "engine": "piper",
-          "language": "en",
-          "sample_rate": 22050,
-          "synthesis_latency_s": 0.2372,
-          "similarity": null
-        },
-        {
-          "name": "sandbox_en_US-personal-v2_en",
-          "file": "../../processed/voice_qc/sandbox_en_US-personal-v2_en.wav",
-          "engine": "piper",
-          "language": "en",
-          "sample_rate": 22050,
-          "synthesis_latency_s": 0.2264,
-          "similarity": null
-        },
-        {
-          "name": "sandbox_en_US-ryan-medium_en",
-          "file": "../../processed/voice_qc/sandbox_en_US-ryan-medium_en.wav",
-          "engine": "piper",
-          "language": "en",
-          "sample_rate": 22050,
-          "synthesis_latency_s": 0.2686,
           "similarity": null
         },
         {
@@ -168,87 +112,44 @@
           "name": "en_sk_00",
           "file": "../../processed/conversation/en_sk_00.wav",
           "meta": {
-            "src": "In this experiment, the system converts spoken English into text.",
-            "tgt": "V tomto experimente systém premieňa hovorenú angličtinu na text.",
-            "stt_s": 0.1,
-            "mt_sentence_s": 0.099,
-            "tts_s": 0.32,
-            "audio_s": 4.8
+            "mt_sentence_s": 0.154,
+            "mt_word_total_s": 0.105,
+            "mt_word_first_s": 0.052,
+            "tts_s": 0.23,
+            "audio_s": 5.9
           }
         },
         {
           "name": "en_sk_01",
           "file": "../../processed/conversation/en_sk_01.wav",
           "meta": {
-            "src": "Translate it into Slavak and then synthesizes it back into speech.  The process involves three stages, speech recognition, machine translation and text to speech.",
-            "tgt": "Prelož ho do Slavaku a potom ho syntetizuje späť do reči. Proces zahŕňa tri etapy, rozpoznávanie reči, strojový preklad a text do reči.",
-            "stt_s": 0.05,
-            "mt_sentence_s": 0.205,
-            "tts_s": 0.5,
-            "audio_s": 10.5
-          }
-        },
-        {
-          "name": "en_sk_02",
-          "file": "../../processed/conversation/en_sk_02.wav",
-          "meta": {
-            "src": "Each model introduces a small delay, so we will measure the overall latency.",
-            "tgt": "Každý model predstavuje malé oneskorenie, takže zmeriame celkovú latenciu.",
-            "stt_s": 0.03,
-            "mt_sentence_s": 0.1,
-            "tts_s": 0.28,
-            "audio_s": 5.8
-          }
-        },
-        {
-          "name": "en_sk_03",
-          "file": "../../processed/conversation/en_sk_03.wav",
-          "meta": {
-            "src": "The main objective is to achieve natural communication despite language barriers.",
-            "tgt": "Hlavným cieľom je dosiahnuť prirodzenú komunikáciu napriek jazykovým bariéram.",
-            "stt_s": 0.03,
-            "mt_sentence_s": 0.083,
-            "tts_s": 0.3,
-            "audio_s": 6.5
+            "mt_sentence_s": 0.131,
+            "mt_word_total_s": 0.093,
+            "mt_word_first_s": 0.031,
+            "tts_s": 0.23,
+            "audio_s": 6.0
           }
         },
         {
           "name": "sk_en_00",
           "file": "../../processed/conversation/sk_en_00.wav",
           "meta": {
-            "src": "Dobrý den, týtam vás na dnešné povede o preklade reči.",
-            "tgt": "Hello, I'm asking you to tell us today about the translation of the speech.",
-            "stt_s": 0.02,
-            "mt_sentence_s": 0.115,
-            "tts_s": 0.2,
-            "audio_s": 3.5,
-            "note": "source audio synthesized by Piper (stand-in meeting clip)"
+            "mt_sentence_s": 0.13,
+            "mt_word_total_s": 0.101,
+            "mt_word_first_s": 0.034,
+            "tts_s": 0.18,
+            "audio_s": 4.3
           }
         },
         {
           "name": "sk_en_01",
           "file": "../../processed/conversation/sk_en_01.wav",
           "meta": {
-            "src": "System funkuje okolne, ani potrekuje internetové pripojmy.",
-            "tgt": "The system functions outside or punishes internet connections.",
-            "stt_s": 0.02,
-            "mt_sentence_s": 0.071,
-            "tts_s": 0.19,
-            "audio_s": 3.8,
-            "note": "source audio synthesized by Piper (stand-in meeting clip)"
-          }
-        },
-        {
-          "name": "sk_en_02",
-          "file": "../../processed/conversation/sk_en_02.wav",
-          "meta": {
-            "src": "Ďakujem vám sa poslednosti, težim sa na vaši odtasky.",
-            "tgt": "Thank you for the last time, I look forward to your tastings.",
-            "stt_s": 0.02,
-            "mt_sentence_s": 0.116,
-            "tts_s": 0.15,
-            "audio_s": 2.6,
-            "note": "source audio synthesized by Piper (stand-in meeting clip)"
+            "mt_sentence_s": 0.162,
+            "mt_word_total_s": 0.112,
+            "mt_word_first_s": 0.037,
+            "tts_s": 0.17,
+            "audio_s": 4.3
           }
         }
       ]
@@ -336,6 +237,576 @@
               "rtf": 0.064,
               "lang": "sk"
             }
+          }
+        }
+      ]
+    },
+    {
+      "id": "charts",
+      "title": "Demo charts (measured, read from JSON)",
+      "items": [
+        {
+          "name": "gantt_meeting",
+          "file": "charts/gantt_meeting.png",
+          "caption": "Two speaker lanes over meeting time: speech, STT/MT/TTS, translated playback (processed/meeting/meeting_timeline.json)"
+        },
+        {
+          "name": "latency_by_direction",
+          "file": "charts/latency_by_direction.png",
+          "caption": "Mean STT/MT/TTS seconds per turn, EN→SK vs SK→EN (processed/conversation_sim.json)"
+        },
+        {
+          "name": "synth_by_length",
+          "file": "charts/synth_by_length.png",
+          "caption": "Piper synth seconds + RTF at ~7/15/30s output, generic vs personal (processed/synth_lengths)"
+        },
+        {
+          "name": "timeline_meeting",
+          "file": "charts/timeline_meeting.png",
+          "caption": "Every simulated conference turn in order, per-stage stack (processed/conversation_sim.json)"
+        },
+        {
+          "name": "wer_synth_vs_mic",
+          "file": "charts/wer_synth_vs_mic.png",
+          "caption": "SK WER: clean Piper synth input vs real microphone, base vs small-sk (processed/stt_input_test + sk_direction)"
+        }
+      ]
+    },
+    {
+      "id": "stt_input",
+      "title": "STT input control (clean synth vs mic)",
+      "items": [
+        {
+          "name": "clean_sk_generic",
+          "file": "../../processed/stt_input_test/clean_sk_generic.wav"
+        },
+        {
+          "name": "clean_sk_personal",
+          "file": "../../processed/stt_input_test/clean_sk_personal.wav"
+        },
+        {
+          "name": "_matrix",
+          "file": "",
+          "matrix": {
+            "generic/base": {
+              "wer": 0.5946,
+              "cer": 0.2245,
+              "stt_s": 1.61,
+              "audio_s": 11.5
+            },
+            "generic/small-sk": {
+              "wer": 0.1622,
+              "cer": 0.0714,
+              "stt_s": 3.11,
+              "audio_s": 11.5
+            },
+            "personal/base": {
+              "wer": 0.7838,
+              "cer": 0.449,
+              "stt_s": 1.49,
+              "audio_s": 17.3
+            },
+            "personal/small-sk": {
+              "wer": 0.5676,
+              "cer": 0.3878,
+              "stt_s": 2.88,
+              "audio_s": 17.3
+            }
+          },
+          "ref_chars": 200
+        }
+      ]
+    },
+    {
+      "id": "zeroshot",
+      "title": "Zero-shot voice clones (OmniVoice, isolated eval)",
+      "items": [
+        {
+          "name": "v2b_head_enref_sk_sk",
+          "file": "../../processed/omnivoice/v2b_head_enref_sk_sk.wav",
+          "meta": {
+            "reference": "ref_en_rainbow_head.wav",
+            "target_text": "Dobrý deň. Toto je ukážka klonovania hlasu v reálnom čase, vytvorená lokálne bez cloudu.",
+            "synthesis_s": 19.979,
+            "rtf": 2.779
+          }
+        },
+        {
+          "name": "v2b_head_sk_sk",
+          "file": "../../processed/omnivoice/v2b_head_sk_sk.wav",
+          "meta": {
+            "reference": "ref_sk_trhove_head.wav",
+            "target_text": "Dobrý deň. Toto je ukážka klonovania hlasu v reálnom čase, vytvorená lokálne bez cloudu.",
+            "synthesis_s": 22.085,
+            "rtf": 2.895
+          }
+        }
+      ]
+    },
+    {
+      "id": "demo_audio",
+      "title": "Demo turns (offline pipeline, playable fallback)",
+      "items": [
+        {
+          "name": "en_script_reading_en-sk_personal",
+          "file": "../../processed/demo_audio/en_script_reading_en-sk_personal.wav",
+          "meta": {
+            "direction": "en->sk",
+            "transcript": "Good morning and welcome to this live demonstration of real-time speech translation.",
+            "translation": "Dobré ráno a vitajte na tejto živej demonštrácii prekladu rečí v reálnom čase.",
+            "stt_s": 0.3677,
+            "mt_s": 0.1629,
+            "tts_s": 0.2364
+          }
+        },
+        {
+          "name": "sk_script_reading_sk-en_personal",
+          "file": "../../processed/demo_audio/sk_script_reading_sk-en_personal.wav",
+          "meta": {
+            "direction": "sk->en",
+            "transcript": "Dobré ráno a viete, čo v tejto šivej okažke a prekvod to rečujú v riadnom čase.",
+            "translation": "Good morning, and you know what they're saying at the proper time in this creepy eyeball.",
+            "stt_s": 1.1992,
+            "mt_s": 0.1748,
+            "tts_s": 0.1516
+          }
+        }
+      ]
+    },
+    {
+      "id": "meeting",
+      "title": "Simulated meeting (scripted turns + timeline)",
+      "items": [
+        {
+          "name": "_mix",
+          "file": "../../processed/meeting/meeting_mix.wav",
+          "meta": {
+            "total_s": 115.044,
+            "timing_model": "live-ws-measured",
+            "chapters": [
+              {
+                "turn": 0,
+                "speaker": "A",
+                "direction": "en->sk",
+                "speech_at": 0.0,
+                "playback_at": 25.16
+              },
+              {
+                "turn": 1,
+                "speaker": "B",
+                "direction": "sk->en",
+                "speech_at": 32.7,
+                "playback_at": 37.45
+              },
+              {
+                "turn": 2,
+                "speaker": "A",
+                "direction": "en->sk",
+                "speech_at": 59.3,
+                "playback_at": 65.33
+              },
+              {
+                "turn": 3,
+                "speaker": "B",
+                "direction": "sk->en",
+                "speech_at": 85.84,
+                "playback_at": 93.34
+              }
+            ]
+          }
+        },
+        {
+          "name": "turn_00_en-sk",
+          "file": "../../processed/meeting/live_turn_00_en-sk.wav",
+          "meta": {
+            "speaker": "A",
+            "direction": "en->sk",
+            "script": "Good morning everyone. Today's demo runs entirely on this laptop, with no cloud in the loop.",
+            "heard": "Good morning everyone, today's demo runs entirely on this laptop with no cloud in the loop.",
+            "translation": "Dobré ráno všetkým, dnešné demo beží úplne na tomto notebooku bez oblaku v slučke.",
+            "starts_at": 0.0,
+            "speech_s": 5.642,
+            "stt_s": null,
+            "mt_s": null,
+            "tts_s": null,
+            "playback_s": 6.745,
+            "first_word_s": 0.1733,
+            "first_audio_s": 0.0814,
+            "playback_starts": 25.16,
+            "streaming": false,
+            "live": true
+          }
+        },
+        {
+          "name": "turn_01_sk-en",
+          "file": "../../processed/meeting/live_turn_01_sk-en.wav",
+          "meta": {
+            "speaker": "B",
+            "direction": "sk->en",
+            "script": "Dobré ráno. Počujete ma dobre? Tento hovor prekladáme lokálne, bez cloudu.",
+            "heard": "Dobré reálneho kocvitrem je dobré... / trhovopiekodemne lokálne? / sob.",
+            "translation": "Good real kocvitrem is good... / The local market for the seventh time? / reindeer.",
+            "starts_at": 32.705,
+            "speech_s": 6.455,
+            "stt_s": null,
+            "mt_s": null,
+            "tts_s": null,
+            "playback_s": 4.748,
+            "first_word_s": 0.0729,
+            "first_audio_s": 0.0894,
+            "playback_starts": 37.448,
+            "streaming": false,
+            "live": true
+          }
+        },
+        {
+          "name": "turn_02_en-sk",
+          "file": "../../processed/meeting/live_turn_02_en-sk.wav",
+          "meta": {
+            "speaker": "A",
+            "direction": "en->sk",
+            "script": "If I pause mid-sentence, the system waits for the voice detector before translating. Short chunks keep the delay low.",
+            "heard": "If I pause mid sentence, the system waits for the voice detector before translating. / Short chunks, keep the delay low.",
+            "translation": "Ak zastavím strednú vetu, systém čaká na detektor hlasu pred prekladom. / Krátke kúsky, držte zdržanie nízko.",
+            "starts_at": 59.305,
+            "speech_s": 6.409,
+            "stt_s": null,
+            "mt_s": null,
+            "tts_s": null,
+            "playback_s": 9.694,
+            "first_word_s": 0.1216,
+            "first_audio_s": 0.0979,
+            "playback_starts": 65.325,
+            "streaming": false,
+            "live": true
+          }
+        },
+        {
+          "name": "turn_03_sk-en",
+          "file": "../../processed/meeting/live_turn_03_sk-en.wav",
+          "meta": {
+            "speaker": "B",
+            "direction": "sk->en",
+            "script": "Skúsim hovoriť pomaly a zreteľne, aby preklad stíhal držať krok. Krátke úseky držia oneskorenie nízko.",
+            "heard": "skúsim hovoriť spo malé azretine a vyplývať z jeho držších hrôb. / krát tie úseky držia o neskorenie nízpov.",
+            "translation": "I'm gonna try to talk to the little Azrezin and follow his own actions. / times the stretches are holding for the latency of the lows.",
+            "starts_at": 85.838,
+            "speech_s": 8.208,
+            "stt_s": null,
+            "mt_s": null,
+            "tts_s": null,
+            "playback_s": 7.593,
+            "first_word_s": 0.133,
+            "first_audio_s": 0.1607,
+            "playback_starts": 93.342,
+            "streaming": false,
+            "live": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "corpus",
+      "title": "Piper training corpus (OmniVoice bulk HQ)",
+      "items": [
+        {
+          "name": "hq_00",
+          "file": "../../processed/bulk_hq/hq_00.wav",
+          "meta": {
+            "audio_s": 30.21,
+            "rtf": 1.523,
+            "qc_wer": 0.058,
+            "qc_rms": 0.1164
+          }
+        },
+        {
+          "name": "hq_01",
+          "file": "../../processed/bulk_hq/hq_01.wav",
+          "meta": {
+            "audio_s": 28.91,
+            "rtf": 1.064,
+            "qc_wer": 0.0351,
+            "qc_rms": 0.1184
+          }
+        },
+        {
+          "name": "hq_02",
+          "file": "../../processed/bulk_hq/hq_02.wav",
+          "meta": {
+            "audio_s": 29.08,
+            "rtf": 1.069,
+            "qc_wer": 0.0345,
+            "qc_rms": 0.1158
+          }
+        },
+        {
+          "name": "hq_03",
+          "file": "../../processed/bulk_hq/hq_03.wav",
+          "meta": {
+            "audio_s": 35.53,
+            "rtf": 1.187,
+            "qc_wer": 0.0,
+            "qc_rms": 0.1071
+          }
+        },
+        {
+          "name": "hq_04",
+          "file": "../../processed/bulk_hq/hq_04.wav",
+          "meta": {
+            "audio_s": 32.16,
+            "rtf": 1.141,
+            "qc_wer": 0.0411,
+            "qc_rms": 0.1092
+          }
+        },
+        {
+          "name": "hq_05",
+          "file": "../../processed/bulk_hq/hq_05.wav",
+          "meta": {
+            "audio_s": 21.45,
+            "rtf": 0.975,
+            "qc_wer": 0.0444,
+            "qc_rms": 0.102
+          }
+        },
+        {
+          "name": "hq_06",
+          "file": "../../processed/bulk_hq/hq_06.wav",
+          "meta": {
+            "audio_s": 15.98,
+            "rtf": 1.049,
+            "qc_wer": 0.1471,
+            "qc_rms": 0.1076
+          }
+        },
+        {
+          "name": "hq_07",
+          "file": "../../processed/bulk_hq/hq_07.wav",
+          "meta": {
+            "audio_s": 19.24,
+            "rtf": 1.014,
+            "qc_wer": 0.1163,
+            "qc_rms": 0.1165
+          }
+        },
+        {
+          "name": "hq_08",
+          "file": "../../processed/bulk_hq/hq_08.wav",
+          "meta": {
+            "audio_s": 18.79,
+            "rtf": 1.045,
+            "qc_wer": 0.0426,
+            "qc_rms": 0.1137
+          }
+        },
+        {
+          "name": "hq_09",
+          "file": "../../processed/bulk_hq/hq_09.wav",
+          "meta": {
+            "audio_s": 21.83,
+            "rtf": 0.988,
+            "qc_wer": 0.0566,
+            "qc_rms": 0.1129
+          }
+        },
+        {
+          "name": "hq_10",
+          "file": "../../processed/bulk_hq/hq_10.wav",
+          "meta": {
+            "audio_s": 22.36,
+            "rtf": 0.981,
+            "qc_wer": 0.0,
+            "qc_rms": 0.124
+          }
+        },
+        {
+          "name": "hq_11",
+          "file": "../../processed/bulk_hq/hq_11.wav",
+          "meta": {
+            "audio_s": 19.08,
+            "rtf": 1.007,
+            "qc_wer": 0.0465,
+            "qc_rms": 0.1197
+          }
+        },
+        {
+          "name": "hq_12",
+          "file": "../../processed/bulk_hq/hq_12.wav",
+          "meta": {
+            "audio_s": 21.71,
+            "rtf": 0.999,
+            "qc_wer": 0.0,
+            "qc_rms": 0.1124
+          }
+        },
+        {
+          "name": "hq_13",
+          "file": "../../processed/bulk_hq/hq_13.wav",
+          "meta": {
+            "audio_s": 21.7,
+            "rtf": 1.012,
+            "qc_wer": 0.0476,
+            "qc_rms": 0.1168
+          }
+        },
+        {
+          "name": "hq_14",
+          "file": "../../processed/bulk_hq/hq_14.wav",
+          "meta": {
+            "audio_s": 20.84,
+            "rtf": 1.014,
+            "qc_wer": 0.0732,
+            "qc_rms": 0.1158
+          }
+        },
+        {
+          "name": "hq_15",
+          "file": "../../processed/bulk_hq/hq_15.wav",
+          "meta": {
+            "audio_s": 33.11,
+            "rtf": 1.339,
+            "qc_wer": 0.0645,
+            "qc_rms": 0.115
+          }
+        },
+        {
+          "name": "hq_16",
+          "file": "../../processed/bulk_hq/hq_16.wav",
+          "meta": {
+            "audio_s": 31.34,
+            "rtf": 1.52,
+            "qc_wer": 0.0625,
+            "qc_rms": 0.106
+          }
+        },
+        {
+          "name": "hq_17",
+          "file": "../../processed/bulk_hq/hq_17.wav",
+          "meta": {
+            "audio_s": 28.63,
+            "rtf": 1.1,
+            "qc_wer": 0.0923,
+            "qc_rms": 0.1118
+          }
+        },
+        {
+          "name": "hq_18",
+          "file": "../../processed/bulk_hq/hq_18.wav",
+          "meta": {
+            "audio_s": 35.51,
+            "rtf": 1.21,
+            "qc_wer": 0.029,
+            "qc_rms": 0.1157
+          }
+        },
+        {
+          "name": "hq_19",
+          "file": "../../processed/bulk_hq/hq_19.wav",
+          "meta": {
+            "audio_s": 32.25,
+            "rtf": 1.204,
+            "qc_wer": 0.0411,
+            "qc_rms": 0.1181
+          }
+        },
+        {
+          "name": "hq_20",
+          "file": "../../processed/bulk_hq/hq_20.wav",
+          "meta": {
+            "audio_s": 20.72,
+            "rtf": 1.043,
+            "qc_wer": 0.0,
+            "qc_rms": 0.1092
+          }
+        },
+        {
+          "name": "hq_21",
+          "file": "../../processed/bulk_hq/hq_21.wav",
+          "meta": {
+            "audio_s": 20.7,
+            "rtf": 1.002,
+            "qc_wer": 0.0952,
+            "qc_rms": 0.1175
+          }
+        },
+        {
+          "name": "hq_22",
+          "file": "../../processed/bulk_hq/hq_22.wav",
+          "meta": {
+            "audio_s": 21.38,
+            "rtf": 0.965,
+            "qc_wer": 0.122,
+            "qc_rms": 0.1151
+          }
+        },
+        {
+          "name": "hq_23",
+          "file": "../../processed/bulk_hq/hq_23.wav",
+          "meta": {
+            "audio_s": 21.84,
+            "rtf": 1.005,
+            "qc_wer": 0.0488,
+            "qc_rms": 0.1243
+          }
+        },
+        {
+          "name": "hq_24",
+          "file": "../../processed/bulk_hq/hq_24.wav",
+          "meta": {
+            "audio_s": 18.52,
+            "rtf": 1.022,
+            "qc_wer": 0.0909,
+            "qc_rms": 0.1114
+          }
+        },
+        {
+          "name": "hq_25",
+          "file": "../../processed/bulk_hq/hq_25.wav",
+          "meta": {
+            "audio_s": 18.33,
+            "rtf": 0.989,
+            "qc_wer": 0.0625,
+            "qc_rms": 0.1176
+          }
+        },
+        {
+          "name": "hq_26",
+          "file": "../../processed/bulk_hq/hq_26.wav",
+          "meta": {
+            "audio_s": 20.21,
+            "rtf": 1.004,
+            "qc_wer": 0.0256,
+            "qc_rms": 0.1174
+          }
+        },
+        {
+          "name": "hq_27",
+          "file": "../../processed/bulk_hq/hq_27.wav",
+          "meta": {
+            "audio_s": 16.68,
+            "rtf": 1.042,
+            "qc_wer": 0.0,
+            "qc_rms": 0.1114
+          }
+        },
+        {
+          "name": "hq_28",
+          "file": "../../processed/bulk_hq/hq_28.wav",
+          "meta": {
+            "audio_s": 18.05,
+            "rtf": 0.991,
+            "qc_wer": 0.0526,
+            "qc_rms": 0.1019
+          }
+        },
+        {
+          "name": "hq_29",
+          "file": "../../processed/bulk_hq/hq_29.wav",
+          "meta": {
+            "audio_s": 19.28,
+            "rtf": 1.001,
+            "qc_wer": 0.0244,
+            "qc_rms": 0.1085
           }
         }
       ]
