@@ -843,6 +843,18 @@
       "title": "New-model spikes (isolated eval)",
       "items": [
         {
+          "name": "chatterbox-cs-plproxy_trhove-passage-200ch",
+          "file": "../../processed/new_models/chatterbox_cs_sk.wav",
+          "meta": {
+            "rtf": 6.7,
+            "infer_s": 100.5,
+            "audio_s": 15.0,
+            "mt_chrf": null,
+            "wer": 0.054,
+            "hyp": "Včera ráno som išiel na trh kúpiť čerstvý chlieb a mlieko. Stretol som tam starého priateľa, žuba, ktorý predával med a sedy. Porozprával som mu o svojej práci a o dlhej ceste vlakom cez Hory a Doliny."
+          }
+        },
+        {
           "name": "seamless-chunked30_sk_trhove_rano_v2b",
           "file": "../../processed/new_models/seamless_sk_trhove_rano_v2b_en.wav",
           "meta": {
