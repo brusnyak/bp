@@ -315,8 +315,7 @@ def main():
                 "file": "../../" + wav if wav else "",
                 "meta": {"rtf": r.get("rtf"), "infer_s": r.get("infer_s"),
                          "audio_s": r.get("audio_s"),
-                         "mt_chrf": r.get("mt_chrf_vs_opusref"), "wer": (r.get("stt") or {}).get("wer")
-                         if isinstance(r.get("stt"), dict) else r.get("wer"),
+                         "mt_chrf": r.get("mt_chrf_vs_opusref"), "wer": r.get("wer", r.get("wer_smallsk")),
                          "hyp": (r.get("hyp_text") or "")[:220]},
             })
     if spike_items:
