@@ -174,6 +174,11 @@ Next action items to explore and benchmark:
 - **Bulk HQ complete (2026-09-29)**: 30 clips, ~12 min, mean QC WER 0.052 — meets the 10–20 min
   fine-tune minimum. Corpus section holds all 30. Training run itself (1–5h) deferred per demo rule;
   base-voice choice (fresh lili vs male SK base vs from-scratch) parked for post-demo research.
+- **SeamlessM4T spike, complete (2026-09-29)**: isolated `.venv-eval` (torch 2.2.2 + torchaudio
+  paired after an ABI spiral; fairseq2 worked on Mac). Full clips chunked at 30s (109s in one shot
+  OOMs 16GB into 14GB swap — playbook rule: never full-clip transformers here). trhove: RTF 0.99,
+  chrF 49.7; script_reading: RTF 0.77, chrF 39.5. Fluent, one "willow→fur coat" slip. Verdict: quality
+  reference + offline-voice potential, NOT a live path (3× cascade compute). Next: STT rungs.
 
 ## Next
 

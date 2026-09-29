@@ -483,6 +483,11 @@
       "Piper training corpus",
       "Bulk OmniVoice clones of the v2b voice (~6 min, mean QC WER 0.05) — the material a fresh Piper voice will train on. Not live voices, corpus only.",
       "training-corpus");
+    const spikes = library.sections.find((section) => section.id === "spikes");
+    if (spikes) renderAudioList(spikes.items, host,
+      "New-model spikes",
+      "Isolated-eval results on fixed clips: RTF, chrF/WER, hypothesis text, output audio. Kill reasons recorded in PLAN.md.",
+      "model-spikes");
   }
 
   // Backend-aware upload: if the FastAPI backend answers, staged files can be
