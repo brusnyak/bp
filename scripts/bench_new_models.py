@@ -64,10 +64,52 @@ def score_wer(ref: str, hyp: str) -> dict:
 
 
 def run_seamless(clips: list[str]) -> list[dict]:
-    raise NotImplementedError(
-        "TODO spike 1: pip install seamless_communication (fairseq2); load "
-        "SeamlessM4T v2 (~2GB first download); S2ST sk->en on clips; record per-clip "
-        "transcript/translation/audio + RTF. Kill fast if MPS/CPU RTF disappoints.")
+    import time as _time
+
+    import numpy as np
+    import soundfile as sf
+    import torch
+    from seamless_communication.inference import Translator
+
+    t0 = _time.perf_counter()
+    translator = Translator("seamlessM4T_v2_large", "vocoder_36langs",
+                            torch.device("cpu"), dtype=torch.float32)
+    load_s = _time.perf_counter() - t0
+    print(f"seamless model loaded in {load_s:.1f}s (cpu/float32)", flush=True)
+    rows = []
+    for clip_id in clips:
+        wav = load_audio(CLIPS[clip_id])
+        ref = load_sk_reference(clip_id)
+        audio_s = len(wav) / 16000
+        t0 = _time.perf_counter()
+        # s2st: speech in -> translated SPEECH out (+ text alongside).
+        # predict() needs a torch tensor, not numpy.
+        text_out, speech_out = translator.predict(torch.from_numpy(wav), "s2st", "eng", "slk")
+        infer_s = _time.perf_counter() - t0
+        hyp_text = str(text_out[0]) if text_out else ""
+        out_path = os.path.join(OUT_DIR, f"seamless_{clip_id}_en.wav")
+        out_audio_s = None
+        if speech_out is not None and getattr(speech_out, "audio_wavs", None):
+            out_wav = np.asarray(speech_out.audio_wavs[0].detach().cpu()).flatten()
+            out_sr = getattr(speech_out, "sample_rate", 16000)
+            sf.write(out_path, out_wav, out_sr)
+            out_audio_s = len(out_wav) / out_sr
+        mt_score = None
+        try:
+            refs = json.load(open(os.path.join(OUT_DIR, "en_refs.json"), encoding="utf-8"))
+            from sacrebleu import sentence_chrf
+            mt_score = round(sentence_chrf(hyp_text, [refs[clip_id]["en"]]).score, 1)
+        except Exception as e:
+            print(f"chrF skipped: {e}", flush=True)
+        rows.append({"clip": clip_id, "audio_s": round(audio_s, 1),
+                     "infer_s": round(infer_s, 2),
+                     "rtf": round(infer_s / audio_s, 3) if audio_s else None,
+                     "mt_chrf_vs_opusref": mt_score,
+                     "hyp_text": hyp_text[:300], "output_wav": out_path if out_audio_s else None,
+                     "load_s": round(load_s, 1)})
+        print(f"{clip_id}: RTF {infer_s / audio_s:.2f} "
+              f"chrF {mt_score} hyp: {hyp_text[:100]}", flush=True)
+    return rows
 
 
 def run_zipformer(clips: list[str]) -> list[dict]:

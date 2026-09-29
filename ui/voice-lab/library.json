@@ -810,6 +810,36 @@
           }
         }
       ]
+    },
+    {
+      "id": "spikes",
+      "title": "New-model spikes (isolated eval)",
+      "items": [
+        {
+          "name": "seamless-chunked30_sk_trhove_rano_v2b",
+          "file": "../../processed/new_models/seamless_sk_trhove_rano_v2b_en.wav",
+          "meta": {
+            "rtf": 0.986,
+            "infer_s": 107.6,
+            "audio_s": 109.0,
+            "mt_chrf": 49.7,
+            "wer": null,
+            "hyp": "Yesterday morning I went to the market to buy fresh bread and milk I met there an old friend of mine who sold honey and cheese hello where have you been for a whole month he asked me with a smile I told him about my work"
+          }
+        },
+        {
+          "name": "seamless-chunked30_sk_script_reading",
+          "file": "../../processed/new_models/seamless_sk_script_reading_en.wav",
+          "meta": {
+            "rtf": 0.771,
+            "infer_s": 103.6,
+            "audio_s": 134.3,
+            "mt_chrf": 39.5,
+            "wer": null,
+            "hyp": "I'm speaking in English, and you'll hear my voice speak in Slovenian for a few seconds. The system listens to the microphone and detects when the speech starts and ends. On this computer, without a cloud and without a wa"
+          }
+        }
+      ]
     }
   ]
 }

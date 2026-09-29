@@ -301,6 +301,29 @@ def main():
             {"id": "corpus", "title": "Piper training corpus (OmniVoice bulk HQ)", "items": bulk_items}
         )
 
+    # 12. New-model spikes (isolated .venv-eval benches: seamless, STT rungs, TTS proxies).
+    spikes_dir = os.path.join(REPO_ROOT, "processed", "new_models")
+    spike_items = []
+    for name in sorted(os.listdir(spikes_dir)) if os.path.isdir(spikes_dir) else []:
+        if not name.endswith("_matrix.json") or name == "en_refs.json":
+            continue
+        m = load_json(os.path.join(spikes_dir, name)) or {}
+        for r in m.get("results", [m] if "clip" in m else []):
+            wav = r.get("output_wav", "")
+            spike_items.append({
+                "name": f"{m.get('engine', '?')}_{r.get('clip', '?')}",
+                "file": "../../" + wav if wav else "",
+                "meta": {"rtf": r.get("rtf"), "infer_s": r.get("infer_s"),
+                         "audio_s": r.get("audio_s"),
+                         "mt_chrf": r.get("mt_chrf_vs_opusref"), "wer": (r.get("stt") or {}).get("wer")
+                         if isinstance(r.get("stt"), dict) else r.get("wer"),
+                         "hyp": (r.get("hyp_text") or "")[:220]},
+            })
+    if spike_items:
+        library["sections"].append(
+            {"id": "spikes", "title": "New-model spikes (isolated eval)", "items": spike_items}
+        )
+
     out = os.path.join(REPO_ROOT, "ui", "voice-lab", "library.json")
     with open(out, "w") as f:
         json.dump(library, f, indent=2, ensure_ascii=False)
