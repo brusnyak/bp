@@ -49,9 +49,9 @@ def main():
     sv_dir = os.path.join(REPO_ROOT, "speaker_voices")
     meta = load_json(os.path.join(sv_dir, "speaker_voices.json")) or []
     meta_by_file = {os.path.basename(m.get("path", "")): m for m in meta if m.get("path")}
-    # Featured first: the three new v2b takes (owner review 2026-09-29); the rest
+    # Featured first: the three new _b takes (owner review 2026-09-29); the rest
     # stay available under a collapsed toggle in the page.
-    FEATURED_VOICES = {"cs_staromestske_v2.m4a", "en_rainbow_v2b.m4a", "sk_trhove_rano_v2b.m4a"}
+    FEATURED_VOICES = {"me_cs_staromestske.m4a", "me_en_rainbow_b.m4a", "me_sk_trhove_b.m4a"}
     voices = []
     for name in audio_files(sv_dir):
         m = meta_by_file.get(name, {})
@@ -283,23 +283,25 @@ def main():
             {"id": "meeting", "title": "Simulated meeting (scripted turns + timeline)", "items": meet_items}
         )
 
-    # 11. Bulk HQ corpus (OmniVoice clones for the future Piper voice).
-    bulk_dir = os.path.join(REPO_ROOT, "processed", "bulk_hq")
-    bulk = load_json(os.path.join(bulk_dir, "manifest.json")) or {}
-    bulk_items = []
-    for c in bulk.get("clips", []):
-        wav = os.path.basename(c.get("wav", ""))
-        if wav.endswith(".wav") and os.path.isfile(os.path.join(bulk_dir, wav)):
-            bulk_items.append({
-                "name": os.path.splitext(wav)[0],
-                "file": "../../processed/bulk_hq/" + wav,
-                "meta": {"audio_s": c.get("audio_s"), "rtf": c.get("rtf"),
-                         "qc_wer": c.get("qc_wer_smallsk"), "qc_rms": c.get("qc_rms")},
-            })
-    if bulk_items:
-        library["sections"].append(
-            {"id": "corpus", "title": "Piper training corpus (OmniVoice bulk HQ)", "items": bulk_items}
-        )
+    # 11. HQ corpora (OmniVoice clones for the future Piper voices).
+    # Naming: omni_hq_<lang>/ dirs hold omni_hq_<lang>_NN.wav clips.
+    for _lang in ("sk", "en"):
+        bulk_dir = os.path.join(REPO_ROOT, "processed", f"omni_hq_{_lang}")
+        bulk = load_json(os.path.join(bulk_dir, "manifest.json")) or {}
+        bulk_items = []
+        for c in bulk.get("clips", []):
+            wav = os.path.basename(c.get("wav", ""))
+            if wav.endswith(".wav") and os.path.isfile(os.path.join(bulk_dir, wav)):
+                bulk_items.append({
+                    "name": os.path.splitext(wav)[0],
+                    "file": f"../../processed/omni_hq_{_lang}/" + wav,
+                    "meta": {"audio_s": c.get("audio_s"), "rtf": c.get("rtf"),
+                             "qc_wer": c.get("qc_wer_smallsk"), "qc_rms": c.get("qc_rms")},
+                })
+        if bulk_items:
+            library["sections"].append(
+                {"id": f"corpus_{_lang}", "title": f"Piper training corpus (OmniVoice HQ {_lang.upper()})", "items": bulk_items}
+            )
 
     # 12. New-model spikes (isolated .venv-eval benches: seamless, STT rungs, TTS proxies).
     spikes_dir = os.path.join(REPO_ROOT, "processed", "new_models")
@@ -321,6 +323,27 @@ def main():
     if spike_items:
         library["sections"].append(
             {"id": "spikes", "title": "New-model spikes (isolated eval)", "items": spike_items}
+        )
+
+    # 13. Streaming audits (live /ws stage-timing: VAD-close -> text -> translation -> audio).
+    stream_dir = os.path.join(REPO_ROOT, "processed", "stream_audit")
+    stream_items = []
+    for name in sorted(os.listdir(stream_dir)) if os.path.isdir(stream_dir) else []:
+        if not name.endswith("_audit.json"):
+            continue
+        a = load_json(os.path.join(stream_dir, name)) or {}
+        stream_items.append({
+            "name": os.path.splitext(name)[0].replace("audit_", ""),
+            "file": "",
+            "meta": {"direction": a.get("direction", ""), "audio_s": a.get("audio_s"),
+                     "utterances": a.get("utterances"),
+                     "vad_to_text_s": a.get("vad_to_text_s"),
+                     "text_to_translation_s": a.get("text_to_translation_s"),
+                     "translation_to_audio_s": a.get("translation_to_audio_s")},
+        })
+    if stream_items:
+        library["sections"].append(
+            {"id": "stream_audit", "title": "Streaming pipeline audit (live stage timing)", "items": stream_items}
         )
 
     out = os.path.join(REPO_ROOT, "ui", "voice-lab", "library.json")
