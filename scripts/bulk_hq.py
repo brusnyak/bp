@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Bulk HQ generation: OmniVoice zero-shot clones of the owner's v2b SK voice.
+"""OmniVoice HQ corpus generation: zero-shot clones of the owner's me_* voices.
 
-15 varied ~30s Slovak passages (meeting-style + transcript continuations) for the
-future Piper training corpus. Slow one-time job: run ALONE in the background
+15 varied ~30s passages (meeting-style + transcript continuations) per language
+for the future Piper training corpus. Slow one-time job: run ALONE in the background
 (.venv-omni, MPS) — never alongside STT tests (16GB RAM box).
 
-Out: processed/bulk_hq/hq_XX.wav + manifest.json
-Run: .venv-omni/bin/python scripts/bulk_hq.py [--count N]
+Out: processed/omni_hq_<lang>/omni_hq_<lang>_NN.wav + manifest.json
+Run: .venv-omni/bin/python scripts/bulk_hq.py [--lang sk|en] [--count N]
 """
 from __future__ import annotations
 
@@ -20,16 +20,18 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def get_refs(lang: str):
+    # Naming: me_<lang> = owner recordings; omni_hq_<lang> = OmniVoice HQ
+    # corpus dirs; me_omni_piper_<lang> = Piper voices trained on omni HQ.
     if lang == "en":
         ref = os.path.join(REPO_ROOT, "processed", "omnivoice", "ref_en_rainbow_head.wav")
         ref_text = ("When the sunlight strikes raindrops in the air, they act as a prism "
                     "and form a rainbow.")
-        out_sub = "bulk_hq_en"
+        out_sub = "omni_hq_en"
     else:
         ref = os.path.join(REPO_ROOT, "processed", "omnivoice", "ref_sk_trhove_head.wav")
         ref_text = ("Včera ráno som išiel na trh kúpiť čerstvý chlieb a mlieko. "
                     "Stretol som tam starého priateľa Ľuba, ktorý predával med a syry.")
-        out_sub = "bulk_hq"
+        out_sub = "omni_hq_sk"
     return ref, ref_text, out_sub
 
 # Meeting-style SK continuations (owner's register, new sentences for corpus variety).
@@ -86,7 +88,7 @@ def main() -> None:
     ap.add_argument("--skip-sents", type=int, default=0,
                     help="rotate transcript sentences for fresh passage windows")
     ap.add_argument("--lang", default="sk", choices=["sk", "en"],
-                    help="generation language + voice reference (bulk_hq vs bulk_hq_en)")
+                    help="generation language + voice reference (omni_hq_sk vs omni_hq_en)")
     args = ap.parse_args()
     REF, REF_TEXT, OUT_SUB = get_refs(args.lang)
     OUT_DIR = os.path.join(REPO_ROOT, "processed", OUT_SUB)
@@ -98,7 +100,7 @@ def main() -> None:
 
     meta = json.load(open(os.path.join(REPO_ROOT, "speaker_voices", "speaker_voices.json"),
                           encoding="utf-8"))
-    key = "en_rainbow_v2b" if args.lang == "en" else "sk_trhove_rano_v2b"
+    key = "me_en_rainbow_b" if args.lang == "en" else "me_sk_trhove_b"
     sv_text = next(e["transcribed_text"] for e in meta if key in e.get("path", ""))
     passages = build_passages(sv_text, args.count, args.skip_sents)
     print(f"{len(passages)} passages ({args.lang}), chars: {[len(p) for p in passages]}", flush=True)
@@ -117,7 +119,7 @@ def main() -> None:
     except (OSError, ValueError):
         manifest = []
     manifest = [c for c in manifest if c.get("n", -1) < args.start]
-    prefix = "en" if args.lang == "en" else "hq"
+    prefix = f"omni_hq_{args.lang}"
     for j, text in enumerate(passages):
         n = args.start + j
         t0 = time.perf_counter()
