@@ -259,8 +259,21 @@ def main():
     )
     if not version_dirs:
         sys.exit(f"No trained checkpoint found under {lightning_logs}")
-    ckpt = version_dirs[-1] / "checkpoints" / "last.ckpt"
-    print(f"Using {ckpt} (latest of {len(version_dirs)} version dir(s) found)")
+
+    # BUG FIXED 2026-09-30: do NOT trust the filename "last.ckpt". piper's own default
+    # callbacks include a val_mel ModelCheckpoint alongside the last-keeping one this
+    # script injects; when both write into the same dir, Lightning's rotation can leave
+    # the NEWEST state in "last-v1.ckpt" and an older one in "last.ckpt". Observed on the
+    # 2500-step me_omni_piper_sk run: last.ckpt = global_step 2090, last-v1.ckpt = 2500.
+    # Exporting the filename blindly ships a checkpoint that is hundreds of steps short.
+    # Write order is the only reliable signal, so take the most recently written *.ckpt.
+    ckpt_dir = version_dirs[-1] / "checkpoints"
+    candidates = [p for p in ckpt_dir.glob("*.ckpt") if p.is_file()]
+    if not candidates:
+        sys.exit(f"No .ckpt files under {ckpt_dir}")
+    ckpt = max(candidates, key=lambda p: p.stat().st_mtime)
+    print(f"Using {ckpt.name} (newest of {len(candidates)} checkpoint(s) in {ckpt_dir.name}; "
+          f"latest of {len(version_dirs)} version dir(s) found)")
     output_dir.mkdir(parents=True, exist_ok=True)
     onnx_out = output_dir / f"{args.voice_name}.onnx"
     export_onnx(ckpt, onnx_out, args.train_python)
