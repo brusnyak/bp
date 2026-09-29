@@ -1,0 +1,16 @@
+# Isolated eval env for new-model spikes (.venv-eval). NOT installed by setup.py.
+# Install only on charger: .venv-eval/bin/pip install -r requirements-eval.txt
+# Order per 2026-09-29 plan: seamless spike first, then STT rungs, then TTS proxies.
+#
+# NOTE: fairseq2 (seamless) is Linux-leaning; if the Mac build fails, log it and move on.
+
+# --- spike 1: end-to-end S2ST (SK native, voice-preserving) ---
+seamless_communication  # pulls fairseq2; ~2GB weights download at first run (SeamlessM4T v2)
+
+# --- spike 2: STT rungs (SK/CZ-proxy WER + RTF on our v2b clips) ---
+sherpa-onnx  # Zipformer streaming + Whisper offline runtimes, CPU-light
+# cohere-transcribe (ONNX) — check packaging at spike time; fallback: skip with note
+
+# --- spike 3: TTS zero-shot proxies (CZ/SK, 6-10s ref) ---
+chatterbox-tts  # MIT; needs G2P check for SK
+kokoro  # expect SK fail; 30-min test, keep the negative result
