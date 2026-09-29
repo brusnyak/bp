@@ -192,6 +192,7 @@ section > h2 {
   border-collapse: collapse;
   margin-top: 0.8rem;
   font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
 }
 .matrix-table th, .matrix-table td {
   padding: 0.5rem 0.75rem;
@@ -203,12 +204,36 @@ section > h2 {
   font-weight: 600;
   color: var(--secondary-color);
   background: var(--soft-gray);
+  white-space: nowrap;
 }
 [data-theme="dark"] .matrix-table th {
   background: rgba(255, 255, 255, 0.05);
 }
+.matrix-table tbody tr:nth-child(even) {
+  background: rgba(0, 0, 0, 0.025);
+}
+[data-theme="dark"] .matrix-table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.03);
+}
+.matrix-table tbody tr:hover {
+  background: rgba(196, 30, 58, 0.06);
+}
 .matrix-table td strong {
   font-weight: 700;
+}
+.matrix-table td.pass, .matrix-table td.fail {
+  font-weight: 700;
+  white-space: nowrap;
+}
+.matrix-table td.pass {
+  color: var(--log-success-color);
+}
+.matrix-table td.fail {
+  color: var(--danger-color);
+}
+.lab-chart {
+  background: #fff;
+  padding: 0.5rem;
 }
 
 @media (max-width: 700px) {

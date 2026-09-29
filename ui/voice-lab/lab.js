@@ -421,6 +421,35 @@
 
   function renderAudioList(items, host, title, lead, id) {    if (!items.length) return;
     const section = evidenceSection(title, lead, id);
+    if (id === "model-spikes") {
+      const card = el("div", "lab-card");
+      card.appendChild(el("h4", null, "Engine comparison"));
+      const tbl = el("table", "matrix-table");
+      const thead = el("thead");
+      const trh = el("tr");
+      ["Engine × clip", "RTF", "chrF / WER", "Audio"].forEach((h) => {
+        trh.appendChild(el("th", null, h));
+      });
+      thead.appendChild(trh);
+      tbl.appendChild(thead);
+      const tbody = el("tbody");
+      items.forEach((item) => {
+        const meta = item.meta || {};
+        const tr = el("tr");
+        tr.appendChild(el("td", null, item.name));
+        const rtfTd = el("td", null, meta.rtf !== undefined && meta.rtf !== null ? String(meta.rtf) : "—");
+        if (meta.rtf !== undefined && meta.rtf !== null && meta.rtf < 1) rtfTd.className = "pass";
+        tr.appendChild(rtfTd);
+        const q = meta.mt_chrf !== undefined && meta.mt_chrf !== null ? "chrF " + meta.mt_chrf
+          : (meta.qc_wer !== undefined && meta.qc_wer !== null ? "WER " + (meta.qc_wer * 100).toFixed(1) + "%" : "—");
+        tr.appendChild(el("td", null, q));
+        tr.appendChild(el("td", null, meta.audio_s !== undefined && meta.audio_s !== null ? meta.audio_s + "s" : "—"));
+        tbody.appendChild(tr);
+      });
+      tbl.appendChild(tbody);
+      card.appendChild(tbl);
+      section.appendChild(card);
+    }
     items.forEach((item) => {
       const card = el("div", "lab-card");
       card.appendChild(el("h4", null, item.name));
