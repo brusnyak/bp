@@ -164,6 +164,13 @@ def _pick_stt_model(source_lang: str, requested: str) -> str:
 # VAD Configuration (matching BP xtts)
 VAD_FRAME_DURATION = 20 # ms - BP xtts uses 20ms frames
 VAD_AGGRESSIVENESS = 3 # Mode 3 (Most Aggressive) - Increased from 1 for noisy environments
+# Max open-segment bound (measured 2026-09-29): dense pause-free speech never trips
+# SILENCE_TIMEOUT, so transcripts waited for teardown (~24s). Force-close every
+# MAX_SEGMENT_S of continuous speech; next voiced frame opens a chained segment.
+# This bounds the worst case, it is not the streaming mechanism (pauses + interim
+# path give the real-time feel). 6s keeps typical sentences whole (MT quality)
+# while capping dense-speech wait at ~7s incl. STT.
+MAX_SEGMENT_S = 6.0
 # MIN_SPEECH_DURATION removed - BP xtts doesn't filter by duration
 SILENCE_TIMEOUT = 0.3 # seconds (reduced from 1.0s for better responsiveness)
 STREAMING_CHUNK_LENGTH = 0.5 # seconds
@@ -1385,6 +1392,9 @@ async def handle_audio_stream(websocket: WebSocket):
                 logging.info(f"Client {client_info} disconnected (code {message.get('code')}).")
                 break
             if message["type"] == "websocket.receive": # Check for the correct message type
+                # TEMP-DIAG3 2026-09-29: message arrival trace (removed after root-cause).
+                if "bytes" in message:
+                    logging.warning(f"DIAG3 bytes msg len={len(message['bytes'])} q={len(audio_queue)} in_seg={in_speech_segment}")
                 if "text" in message:
                     data = json.loads(message["text"])
                     if data["type"] == "start":
@@ -1516,10 +1526,15 @@ async def handle_audio_stream(websocket: WebSocket):
                         logging.debug(f"Backend: audio_np min: {np.min(audio_np)}, max: {np.max(audio_np)}")
                         logging.debug(f"Backend: audio_np contains NaN: {np.isnan(audio_np).any()}, Inf: {np.isinf(audio_np).any()}")
                     logging.debug(f"Backend: audio_np shape: {audio_np.shape}, dtype: {audio_np.dtype}")
-                    # Skip all-zero audio chunks entirely to prevent false VAD triggers
-                    if not audio_np.any():
-                        logging.warning("Backend: Received an all-zero audio chunk. Skipping processing.")
-                        continue
+                    # All-zero chunks are digital silence (mic muted / tail gap), NOT speech.
+                    # They must still flow into the VAD frame loop below so the
+                    # SILENCE_TIMEOUT close branch sees the gap. Skipping them here
+                    # with `continue` starves close-eval: trailing silence never
+                    # closes (only teardown flushes). WebRTC VAD scores pure zeros
+                    # as non-speech, so there is no false-trigger risk.
+                    _is_digital_silence = not audio_np.any()
+                    if _is_digital_silence:
+                        logging.debug("Backend: all-zero audio chunk — feeding as silence for close-eval.")
 
                     # T044: feed the streaming captioner, fire-and-forget. Never awaited inline —
                     # a slow feed() call must not reintroduce the capture-blocking bug T043 just
@@ -1638,10 +1653,12 @@ async def handle_audio_stream(websocket: WebSocket):
                                         prev_task.cancel()
                                 last_speech_time = time.perf_counter()
 
-                                # Safety Valve: Force process if speech segment is too long (e.g., stuck due to noise)
+                                # Safety Valve (MAX_SEGMENT_S bound): force-close long open segments
+                                # even without silence — dense speech otherwise waits for teardown.
+                                # Next voiced frame opens a chained segment; nothing is dropped.
                                 current_speech_duration = len(speech_frames) * (VAD_FRAME_DURATION / 1000.0)
-                                if current_speech_duration > 15.0: # 15 seconds max
-                                    logging.warning(f"Backend: Speech segment exceeded 15s ({current_speech_duration:.2f}s). Forcing processing.")
+                                if current_speech_duration > MAX_SEGMENT_S:
+                                    logging.warning(f"Backend: Speech segment exceeded {MAX_SEGMENT_S:.0f}s ({current_speech_duration:.2f}s). Forcing processing.")
                                     final_speech_segment_np = np.concatenate(speech_frames)
                                     task = asyncio.create_task(_run_pipeline_task(websocket, final_speech_segment_np, last_speech_time, True, session_config, client_info))
                                     session_data["active_pipeline_task"] = task
@@ -1672,7 +1689,7 @@ async def handle_audio_stream(websocket: WebSocket):
 
                             elif in_speech_segment:
                                 # Silence detected after speech, or speech ended
-                                if (time.perf_counter() - last_speech_time) > SILENCE_TIMEOUT:
+                                if time.perf_counter() - last_speech_time > SILENCE_TIMEOUT:
                                     if speech_frames:
                                         final_speech_segment_np = np.concatenate(speech_frames)
                                         # Sanitize final_speech_segment_np before pipeline
