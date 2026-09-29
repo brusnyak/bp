@@ -179,6 +179,11 @@ Next action items to explore and benchmark:
   OOMs 16GB into 14GB swap — playbook rule: never full-clip transformers here). trhove: RTF 0.99,
   chrF 49.7; script_reading: RTF 0.77, chrF 39.5. Fluent, one "willow→fur coat" slip. Verdict: quality
   reference + offline-voice potential, NOT a live path (3× cascade compute). Next: STT rungs.
+- **Chatterbox-Czech spike (2026-09-29, pushed)**: gated `t3_cs` weights (owner HF login) + pl-proxy
+  language tag + v2b voice prompt → small-sk WER **0.054** / CER 0.015, base 0.432 — a quality TIE with
+  omni-zeroshot (errors only on Ľuba/syry edges). RTF 6.7 vs omni 1.2. Verdict: MIT + openly
+  trainable = strategically interesting, but bulk generation stays OmniVoice (5× faster, equal
+  quality). Zipformer killed (no SK/CZ in 60-model zoo); Cohere deprioritized (no SK/CZ coverage).
 - **Turbo rung, definitive negative (2026-09-29, pushed)**: large-v3-turbo on all 3 SK clips —
   WER 0.41–0.52 vs small-sk 0.23–0.35, 27–30s vs 18–22s. Distillation cost it low-resource
   capacity. No adoption; matrix keeps the rung as the documented ceiling check.
@@ -211,4 +216,16 @@ Next action items to explore and benchmark:
 | `venv/bin/python scripts/voice_similarity_qc.py --synthesize-only` | Synthesize QC candidates |
 | `.venv-stt/bin/python scripts/stt_parakeet_spike.py --clip en\|sk` | Parakeet spike (separate venv) |
 | `venv/bin/python scripts/pipeline_latency_probe.py` | First-output latency probe |
+| `.venv/bin/python scripts/vad_close_probe.py` | Trailing-silence VAD probe (needs `make run`) |
+| `.venv/bin/python scripts/assemble_train_corpus.py --lang sk\|en` | `omni_hq_<lang>` manifest → Piper train corpus dir |
+
+## Handler deliverable (deadline ~2026-10-13, draft due 2026-10-05)
+
+- `documentation/compute_capacity_report_2026-09.md` — Mac vs NVIDIA laptop vs
+  university server, every figure labelled `MEASURED` / `PROJECTED`.
+- `documentation/handler_update_2026-09.md` — the covering note; its
+  "Hardware ask" section quotes only the measured rows.
+- To add before sending: the completed 2500-step result, the ear-QC verdict for
+  `me_omni_piper_sk`, and a sweep of new STT/MT/TTS releases.
+
 | `venv/bin/python scripts/machine_listen_qc.py` | Machine listening panel (WER thirds + acoustic health) |
