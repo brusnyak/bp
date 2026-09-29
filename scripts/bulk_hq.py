@@ -17,10 +17,20 @@ import sys
 import time
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT_DIR = os.path.join(REPO_ROOT, "processed", "bulk_hq")
-SK_REF = os.path.join(REPO_ROOT, "processed", "omnivoice", "ref_sk_trhove_head.wav")
-SK_REF_TEXT = ("Včera ráno som išiel na trh kúpiť čerstvý chlieb a mlieko. "
-               "Stretol som tam starého priateľa Ľuba, ktorý predával med a syry.")
+
+
+def get_refs(lang: str):
+    if lang == "en":
+        ref = os.path.join(REPO_ROOT, "processed", "omnivoice", "ref_en_rainbow_head.wav")
+        ref_text = ("When the sunlight strikes raindrops in the air, they act as a prism "
+                    "and form a rainbow.")
+        out_sub = "bulk_hq_en"
+    else:
+        ref = os.path.join(REPO_ROOT, "processed", "omnivoice", "ref_sk_trhove_head.wav")
+        ref_text = ("Včera ráno som išiel na trh kúpiť čerstvý chlieb a mlieko. "
+                    "Stretol som tam starého priateľa Ľuba, ktorý predával med a syry.")
+        out_sub = "bulk_hq"
+    return ref, ref_text, out_sub
 
 # Meeting-style SK continuations (owner's register, new sentences for corpus variety).
 NEW = [
@@ -75,7 +85,11 @@ def main() -> None:
                     help="first clip index (round 2 continues numbering, never overwrites)")
     ap.add_argument("--skip-sents", type=int, default=0,
                     help="rotate transcript sentences for fresh passage windows")
+    ap.add_argument("--lang", default="sk", choices=["sk", "en"],
+                    help="generation language + voice reference (bulk_hq vs bulk_hq_en)")
     args = ap.parse_args()
+    REF, REF_TEXT, OUT_SUB = get_refs(args.lang)
+    OUT_DIR = os.path.join(REPO_ROOT, "processed", OUT_SUB)
     os.makedirs(OUT_DIR, exist_ok=True)
 
     import torch
@@ -84,15 +98,16 @@ def main() -> None:
 
     meta = json.load(open(os.path.join(REPO_ROOT, "speaker_voices", "speaker_voices.json"),
                           encoding="utf-8"))
-    sv_text = next(e["transcribed_text"] for e in meta if "sk_trhove_rano_v2b" in e.get("path", ""))
+    key = "en_rainbow_v2b" if args.lang == "en" else "sk_trhove_rano_v2b"
+    sv_text = next(e["transcribed_text"] for e in meta if key in e.get("path", ""))
     passages = build_passages(sv_text, args.count, args.skip_sents)
-    print(f"{len(passages)} passages, chars: {[len(p) for p in passages]}", flush=True)
+    print(f"{len(passages)} passages ({args.lang}), chars: {[len(p) for p in passages]}", flush=True)
 
     t0 = time.perf_counter()
     model = OmniVoice.from_pretrained("k2-fsa/OmniVoice", device_map="mps", dtype=torch.float32)
     print(f"load {time.perf_counter() - t0:.1f}s", flush=True)
     t0 = time.perf_counter()
-    prompt = model.create_voice_clone_prompt(SK_REF, SK_REF_TEXT)
+    prompt = model.create_voice_clone_prompt(REF, REF_TEXT)
     print(f"prompt {time.perf_counter() - t0:.1f}s (reused for all clips)", flush=True)
 
     manifest_path = os.path.join(OUT_DIR, "manifest.json")
@@ -102,21 +117,22 @@ def main() -> None:
     except (OSError, ValueError):
         manifest = []
     manifest = [c for c in manifest if c.get("n", -1) < args.start]
+    prefix = "en" if args.lang == "en" else "hq"
     for j, text in enumerate(passages):
         n = args.start + j
         t0 = time.perf_counter()
-        audio = model.generate(text=text, language="sk", voice_clone_prompt=prompt, num_step=16)[0]
+        audio = model.generate(text=text, language=args.lang, voice_clone_prompt=prompt, num_step=16)[0]
         syn_s = time.perf_counter() - t0
         audio_s = len(audio) / model.sampling_rate
-        path = os.path.join(OUT_DIR, f"hq_{n:02d}.wav")
+        path = os.path.join(OUT_DIR, f"{prefix}_{n:02d}.wav")
         sf.write(path, audio, model.sampling_rate)
         manifest.append({"n": n, "chars": len(text), "text": text,
                          "syn_s": round(syn_s, 2), "audio_s": round(audio_s, 2),
                          "rtf": round(syn_s / audio_s, 3), "wav": path})
-        print(f"hq_{n:02d}: {audio_s:.1f}s audio in {syn_s:.1f}s (rtf {syn_s / audio_s:.2f})", flush=True)
+        print(f"{prefix}_{n:02d}: {audio_s:.1f}s audio in {syn_s:.1f}s (rtf {syn_s / audio_s:.2f})", flush=True)
 
     with open(os.path.join(OUT_DIR, "manifest.json"), "w", encoding="utf-8") as f:
-        json.dump({"reference": SK_REF, "reference_text": SK_REF_TEXT,
+        json.dump({"reference": REF, "reference_text": REF_TEXT,
                    "device": "mps", "num_step": 16, "clips": manifest},
                   f, indent=2, ensure_ascii=False)
     print(f"wrote {os.path.relpath(OUT_DIR, REPO_ROOT)}/manifest.json")
