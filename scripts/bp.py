@@ -29,6 +29,7 @@ WRAPPED = {
     "e2e": "e2e_ensk_new_voice.py",
     "library": "update_voice_lab_library.py",
     "script": "make_reading_script.py",
+    "demo-audio": "demo_audio.py",
 }
 
 

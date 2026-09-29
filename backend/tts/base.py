@@ -82,6 +82,17 @@ def _piper_sk_personal_factory() -> PiperTTS:
     return _piper("sk_SK-personal-male-medium", "sk_SK-lili-medium")
 
 
+def _piper_generic_sk_factory() -> PiperTTS:
+    # Generic SK base voice (lili), no fine-tune. Reference point for
+    # generic-vs-cloned comparisons (added 2026-09-29 for the live meeting A/B).
+    return PiperTTS(model_id="sk_SK-lili-medium", device=hardware.detect_backend("tts_baseline"))
+
+
+def _piper_generic_en_factory() -> PiperTTS:
+    # Generic EN base voice (ryan), no fine-tune. Same purpose as above.
+    return PiperTTS(model_id="en_US-ryan-medium", device=hardware.detect_backend("tts_baseline"))
+
+
 def _xtts_factory():
     if CoquiTTS is None:
         raise RuntimeError("CoquiTTS (XTTS) is not installed on this machine.")
@@ -101,6 +112,8 @@ TTS_ENGINES: Dict[str, Callable[[], object]] = {
     "piper_personal": _piper_personal_factory,
     "piper_personal_v2": _piper_personal_v2_factory,
     "piper_sk_personal": _piper_sk_personal_factory,
+    "piper_generic_sk": _piper_generic_sk_factory,
+    "piper_generic_en": _piper_generic_en_factory,
 }
 
 if HybridTTS is not None:

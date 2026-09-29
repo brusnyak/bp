@@ -73,10 +73,13 @@ async def run(args):
 
     chunks, audio_s = load_chunks(args.clip)
     transcripts, translations = [], []
+    partials = []
+    tts_chunks = []  # (t_recv, bytes) per binary message
     tts_bytes = 0
+    first_tts_at = None
 
     async def recv_loop(ws):
-        nonlocal tts_bytes
+        nonlocal tts_bytes, first_tts_at
         while True:
             try:
                 msg = await asyncio.wait_for(ws.recv(), timeout=0.1)
@@ -85,16 +88,23 @@ async def run(args):
             except Exception:
                 break
             if isinstance(msg, bytes):
+                now = time.perf_counter()
+                if first_tts_at is None:
+                    first_tts_at = now
+                tts_chunks.append((now, msg))
                 tts_bytes += len(msg)
                 continue
             try:
                 d = json.loads(msg)
             except ValueError:
                 continue
+            now = time.perf_counter()
             if d.get("type") == "transcription_result":
-                transcripts.append((time.perf_counter(), (d.get("transcribed") or "").strip()))
+                transcripts.append((now, (d.get("transcribed") or "").strip()))
             elif d.get("type") == "translation_result":
-                translations.append((time.perf_counter(), (d.get("translated") or "").strip()))
+                translations.append((now, (d.get("translated") or "").strip()))
+            elif d.get("type") == "caption_partial":
+                partials.append((now, (d.get("text") or "").strip()))
 
     async with websockets.connect(WS_URL, ssl=ctx, max_size=None) as ws:
         await ws.send(json.dumps({"type": "config_update", "source_lang": args.source,
@@ -108,7 +118,7 @@ async def run(args):
             await ws.send(c.tobytes())
             await asyncio.sleep(CHUNK_SEC)
         silence = np.zeros(int(SR * CHUNK_SEC), dtype=np.float32)
-        for _ in range(30):
+        for _ in range(int(args.trail / CHUNK_SEC)):
             await ws.send(silence.tobytes())
             await asyncio.sleep(CHUNK_SEC)
         await asyncio.sleep(args.settle)
@@ -135,10 +145,19 @@ async def run(args):
     if args.dump:
         with open(args.dump, "w", encoding="utf-8") as f:
             json.dump({"source": args.source, "target": args.target, "clip": args.clip,
-                       "transcripts": [t for _, t in transcripts],
-                       "translations": [t for _, t in translations],
-                       "tts_bytes": tts_bytes}, f, ensure_ascii=False, indent=2)
+                       "t_start": t_start, "audio_s": audio_s,
+                       "transcripts": [{"at": t - t_start, "text": x} for t, x in transcripts],
+                       "translations": [{"at": t - t_start, "text": x} for t, x in translations],
+                       "partials": [{"at": t - t_start, "text": x} for t, x in partials],
+                       "first_tts_at": (first_tts_at - t_start) if first_tts_at else None,
+                       "tts_bytes": tts_bytes, "tts_chunks": len(tts_chunks)},
+                      f, ensure_ascii=False, indent=2)
         print(f"wrote {args.dump}")
+    if args.tts_out and tts_chunks:
+        with open(args.tts_out, "wb") as f:
+            for _, b in tts_chunks:
+                f.write(b)
+        print(f"wrote {args.tts_out} ({tts_bytes} bytes in {len(tts_chunks)} chunks)")
 
 
 def main():
@@ -150,7 +169,11 @@ def main():
     ap.add_argument("--reference-md", default=None)
     ap.add_argument("--reference-col", type=int, default=3)
     ap.add_argument("--settle", type=float, default=8.0)
+    ap.add_argument("--trail", type=float, default=0.6,
+                    help="seconds of trailing silence to let VAD finalize the utterance")
     ap.add_argument("--dump", default=None)
+    ap.add_argument("--tts-out", default=None,
+                    help="save raw TTS audio bytes to this file for mix rebuilding")
     asyncio.run(run(ap.parse_args()))
 
 

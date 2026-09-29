@@ -8,7 +8,7 @@ LOCAL_MODELS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
 
 class FasterWhisperSTT:
     def __init__(
-        self, model_size: str = "base", device: str = "auto", compute_type: str = "int8"
+        self, model_size: str = "base", device: str = "auto", compute_type: str = "int8", beam_size: int = 5
     ):
         """
         Initializes the FasterWhisperSTT model.
@@ -19,6 +19,7 @@ class FasterWhisperSTT:
             compute_type (str): Type of computation to use (e.g., "int8", "float16", "float32").
         """
         self.model_size = model_size # Store model_size as an instance attribute
+        self.beam_size = beam_size
         # Prefer a model fetched by scripts/setup.py into ct2_models/whisper-<size>: it needs no Hugging Face cache
         # (whose symlinks fail on Windows without Developer Mode) and no network at runtime.
         local = os.path.join(LOCAL_MODELS_DIR, f"whisper-{model_size}")
@@ -60,7 +61,7 @@ class FasterWhisperSTT:
         # Adjust Faster-Whisper's internal thresholds when an external VAD is used
         transcribe_options = {
             "language": language,
-            "beam_size": 5,
+            "beam_size": self.beam_size,
             "vad_filter": vad_filter,
         }
         if not vad_filter: # If external VAD is enabled (and FasterWhisper's is disabled)

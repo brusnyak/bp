@@ -139,7 +139,7 @@ def main():
     mt_en_sk = CTranslate2MT("Helsinki-NLP/opus-mt-en-sk")
     mt_sk_en = CTranslate2MT("Helsinki-NLP/opus-mt-sk-en")
     tts_sk = PiperTTS(model_id="sk_SK-personal-male-medium")
-    tts_en = PiperTTS(model_id="en_US-ryan-medium")
+    tts_en = PiperTTS(model_id="en_US-personal-v2")
 
     rep = {"sentences": [], "agg": {}}
     for mode, clips, texts, mt, tts, src, tgt in [

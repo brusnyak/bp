@@ -1,4 +1,4 @@
-.PHONY: install run test demo-check lab clean help
+.PHONY: install run test demo-check demo-audio lab clean help
 
 # Same commands on every OS; the real work lives in scripts/setup.py.
 ifeq ($(OS),Windows_NT)
@@ -23,6 +23,12 @@ clean: ## Remove generated models, certs, venv and caches (never touches speaker
 
 demo-check: ## Pre-flight the live demo (assets + the server running on https://localhost:8000).
 	python3 scripts/demo_preflight.py --server
+
+demo-audio: ## Process FILE through local pipeline; set SRC/TGT, optional SECONDS=12 VOICE=generic|personal.
+	@test -n "$(FILE)" || (echo "Usage: make demo-audio FILE=speaker_voices/clip.m4a SRC=en TGT=sk [SECONDS=12] [VOICE=generic]"; exit 2)
+	@test -n "$(SRC)" || (echo "Set SRC=en or SRC=sk"; exit 2)
+	@test -n "$(TGT)" || (echo "Set TGT=en or TGT=sk"; exit 2)
+	$(VENV_PY) scripts/bp.py demo-audio $(FILE) --source $(SRC) --target $(TGT) $(if $(SECONDS),--max-seconds $(SECONDS),) $(if $(VOICE),--voice $(VOICE),)
 
 lab: ## Serve the Voice Lab review page (static only: no /api, no Google login, no real upload — use `make run` + https://localhost:8000/ui/voice-lab/lab.html for backend features).
 	@echo "--- Voice Lab (STATIC, no backend) at http://localhost:8080/ui/voice-lab/lab.html ---"

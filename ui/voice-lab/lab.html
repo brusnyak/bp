@@ -17,8 +17,9 @@
     <header class="lab-hero">
       <div class="lab-hero-inner">
         <div>
+          <p class="lab-kicker">Hlas · local EN↔SK speech translation</p>
           <h1>Voice Lab</h1>
-          <p class="lab-sub">Static review page: voices, QC candidates, test clips. No backend needed.</p>
+          <p class="lab-sub">A presentation-ready evidence room. Play the voice comparison, replay a conference turn, then inspect the measurements.</p>
           <div class="lab-stats" id="statStrip"></div>
         </div>
         <nav class="lab-nav">
@@ -31,37 +32,83 @@
     </header>
 
     <main class="lab-container">
-      <section>
-        <h2>Dev plan <button id="planToggle" class="btn-small">show</button></h2>
-        <p class="lab-hint">Live view of the repo <code>PLAN.md</code> — same file, zero drift.</p>
+      <section class="demo-brief" aria-labelledby="demoPathTitle">
+        <div>
+          <p class="section-kicker">Demo path</p>
+          <h2 id="demoPathTitle">One room, one story</h2>
+          <p>Start with the fast personal Slovak voice, replay a measured bilingual turn, then show exactly where Slovak recognition remains the constraint.</p>
+        </div>
+        <ol class="demo-steps">
+          <li><strong>Listen</strong><span>Generic vs personal Slovak output</span></li>
+          <li><strong>Replay</strong><span>Saved pipeline turns and timings</span></li>
+          <li><strong>Verify</strong><span>Recognition accuracy and speed matrix</span></li>
+        </ol>
+      </section>
+
+      <section class="pipeline-section" aria-labelledby="pipelineTitle">
+        <p class="section-kicker">What happens in every turn</p>
+        <h2 id="pipelineTitle">Speech becomes translated playback</h2>
+        <div class="pipeline-flow" role="img" aria-label="Microphone audio flows through voice activity detection, speech recognition, translation, and personal voice synthesis to playback or a virtual audio cable.">
+          <div><span class="material-symbols-outlined" aria-hidden="true">mic</span><strong>Speech</strong><small>microphone</small></div>
+          <i aria-hidden="true">→</i>
+          <div><span class="material-symbols-outlined" aria-hidden="true">graphic_eq</span><strong>VAD + STT</strong><small>caption text</small></div>
+          <i aria-hidden="true">→</i>
+          <div><span class="material-symbols-outlined" aria-hidden="true">translate</span><strong>Local MT</strong><small>EN ↔ SK</small></div>
+          <i aria-hidden="true">→</i>
+          <div><span class="material-symbols-outlined" aria-hidden="true">record_voice_over</span><strong>Personal TTS</strong><small>audio output</small></div>
+        </div>
+        <p class="lab-hint">All pipeline stages run locally. This Lab contains saved evidence; the <a href="../live-speech/live.html">Live translation page</a> is the optional microphone proof.</p>
+      </section>
+
+      <section class="lab-disclosure" aria-labelledby="voicesTitle">
+        <div class="disclosure-heading">
+          <div>
+            <p class="section-kicker">Source material</p>
+            <h2 id="voicesTitle">Speaker voices <span id="voicesCount"></span></h2>
+            <p class="lab-hint">Reference recordings used for enrolment and evaluation. Kept closed during the presentation.</p>
+          </div>
+          <button id="voicesToggle" class="btn-small" aria-expanded="false" aria-controls="voicesPanel">Show recordings</button>
+        </div>
+        <div id="voicesPanel" class="hidden"></div>
+      </section>
+
+      <section id="labEvidence" aria-live="polite"></section>
+
+      <section class="lab-disclosure">
+        <div class="disclosure-heading">
+          <div>
+            <p class="section-kicker">Project state</p>
+            <h2>Development plan</h2>
+            <p class="lab-hint">The same <code>PLAN.md</code> tracked in the repository.</p>
+          </div>
+          <button id="planToggle" class="btn-small" aria-expanded="false" aria-controls="planPanel">Show plan</button>
+        </div>
         <div id="planPanel" class="hidden">
           <pre id="planPre" class="lab-plan">loading…</pre>
         </div>
       </section>
 
-      <section>
-        <h2>Upload for future processing</h2>
-        <p class="lab-hint">Files stage in the browser for listening.
+      <section class="lab-disclosure">
+        <div class="disclosure-heading">
+          <div>
+            <p class="section-kicker">Future recording</p>
+            <h2>Stage audio for processing</h2>
+            <p class="lab-hint">Files stage in the browser for listening.
           <span id="backendHint">Checking backend…</span>
           To register one manually: save it into
           <code>speaker_voices/</code>, run <code>python3 scripts/prepare_voice_corpus.py --source-dir speaker_voices --write</code>,
           then <code>python3 scripts/update_voice_lab_library.py</code> to refresh this page.</p>
-        <div class="lab-dropzone" id="dropzone">
-          <input type="file" id="uploadInput" accept="audio/*" multiple />
-          <p><strong>Drop audio files here</strong> or click to browse</p>
-          <p class="lab-hint">WAV, M4A, MP3 — staged locally, nothing uploads anywhere.</p>
+          </div>
+          <button id="uploadToggle" class="btn-small" aria-expanded="false" aria-controls="uploadPanel">Stage audio</button>
         </div>
-        <div id="uploadList"></div>
-      </section>
-
-      <div id="librarySections"></div>
-
-      <section>
-        <h2>Refresh this page data</h2>
-        <p class="lab-hint"><code>python3 scripts/update_voice_lab_library.py</code> rescans
-          <code>speaker_voices/</code>, <code>processed/voice_qc/</code>, <code>test/</code> into
-          <code>ui/voice-lab/library.json</code>. Live system status (engines, hardware backends) is at
-          <code>/api/voice-lab/status</code> while the backend runs (<code>make run</code>).</p>
+        <div id="uploadPanel" class="hidden">
+          <div class="lab-dropzone" id="dropzone">
+            <input type="file" id="uploadInput" accept="audio/*" multiple />
+            <p><strong>Drop audio files here</strong> or click to browse</p>
+            <p class="lab-hint">WAV, M4A, MP3 — staged locally, nothing uploads anywhere.</p>
+          </div>
+          <div id="uploadList"></div>
+        </div>
       </section>
     </main>
 

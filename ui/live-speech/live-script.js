@@ -90,8 +90,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const devices = await navigator.mediaDevices.enumerateDevices();
             const audioOutputs = devices.filter(device => device.kind === 'audiooutput');
 
-            // Clear existing options except default
-            audioOutputSelect.innerHTML = '<option value="">Default</option>';
+            // Rebuild the list without silently moving playback to a virtual cable.
+            // Rehearsals should stay audible in headphones unless the user explicitly
+            // chooses their meeting cable. A prior explicit selection is restored.
+            const preferredOutput = localStorage.getItem('preferredAudioOutput');
+            audioOutputSelect.innerHTML = '<option value="">Speakers / headphones (default)</option>';
+            selectedAudioOutputDeviceId = null;
 
             let virtualDeviceFound = false;
             let virtualDeviceName = null;
@@ -105,29 +109,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Auto-detect virtual device (BlackHole or VB-Cable)
                 const label = device.label.toLowerCase();
                 if (label.includes('blackhole') || label.includes('vb-cable') || label.includes('vb cable') || label.includes('vb-audio')) {
-                    option.selected = true;
-                    selectedAudioOutputDeviceId = device.deviceId;
                     virtualDeviceFound = true;
                     virtualDeviceName = device.label;
-                    console.log(`Frontend: Auto-selected virtual audio device: ${device.label}`);
+                }
+                if (preferredOutput && device.deviceId === preferredOutput) {
+                    option.selected = true;
+                    selectedAudioOutputDeviceId = device.deviceId;
                 }
             });
 
             // Update hint text based on detection
             if (virtualDeviceFound) {
-                virtualMicHint.textContent = `✓ Virtual device detected: ${virtualDeviceName}`;
+                virtualMicHint.textContent = `Virtual output available: ${virtualDeviceName}. Choose it only when sending translated audio into a meeting.`;
                 virtualMicHint.style.color = 'var(--success-color, #4caf50)';
                 showNotification(`Audio will route to: ${virtualDeviceName}`, 'success');
             } else {
-                virtualMicHint.textContent = '⚠ No virtual device found. Install BlackHole or VB-Cable.';
+                virtualMicHint.textContent = 'Playback stays on speakers/headphones. Install BlackHole or VB-Cable only to route into a meeting.';
                 virtualMicHint.style.color = 'var(--warning-color, #ff9800)';
                 console.warn('Frontend: No virtual audio device detected. Translation will play through default output.');
             }
 
-            // Store selection in localStorage
-            if (selectedAudioOutputDeviceId) {
-                localStorage.setItem('preferredAudioOutput', selectedAudioOutputDeviceId);
-            }
+            // A disconnected saved device must not become an invisible routing choice.
+            if (preferredOutput && !selectedAudioOutputDeviceId) localStorage.removeItem('preferredAudioOutput');
 
         } catch (error) {
             console.error('Frontend: Error enumerating audio devices:', error);
@@ -408,10 +411,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (selectedAudioOutputDeviceId && typeof audio.setSinkId === 'function') {
                     audio.setSinkId(selectedAudioOutputDeviceId)
                         .then(() => {
+                            if (audio.sinkId !== selectedAudioOutputDeviceId) {
+                                console.warn(`Frontend: sinkId mismatch (want ${selectedAudioOutputDeviceId}, got ${audio.sinkId}); falling back to default output.`);
+                                showNotification('Selected output refused the stream — playing on default speakers instead.', 'error');
+                                return audio.setSinkId('');
+                            }
                             console.log('Frontend: Audio routed to virtual device');
                         })
                         .catch(err => {
                             console.error('Frontend: Error setting audio output device:', err);
+                            showNotification('Could not route to the selected output — playing on default speakers. (' + err.message + ')', 'error');
                         });
                 } else {
                     console.log('Frontend: TTS audio playing through DEFAULT speakers (BlackHole routing disabled or not supported)');
@@ -430,6 +439,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     })
                     .catch(err => {
                         console.error('Frontend: Audio playback error:', err);
+                        showNotification('Translation audio blocked: click anywhere on the page once, then speak again. (' + err.message + ')', 'error');
                         isTTSPlaying = false;
                         // Resume capture even if playback fails
                         resumeAudioCapture();
@@ -547,6 +557,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             console.log('Frontend: MediaStream obtained. Active:', mainAudioStream.active, 'Tracks:', mainAudioStream.getAudioTracks());
+            // Mic permission unlocks real device labels/ids: re-enumerate outputs so the
+            // playback dropdown carries usable deviceIds (pre-permission they are empty).
+            try { await enumerateAudioOutputDevices(); } catch (e) { console.warn('Frontend: output re-enumeration failed:', e); }
             mainAudioStream.getAudioTracks().forEach((track, index) => {
                 console.log(`Frontend: Audio Track ${index}: id=${track.id}, label=${track.label}, readyState=${track.readyState}, enabled=${track.enabled}`);
             });
@@ -790,10 +803,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function drawPip() {
         if (!pipCtx) return;
-        pipCtx.fillStyle = '#14141f';
+        // House style: solid dark-blue hero band, white source, green translation.
+        pipCtx.fillStyle = '#0A1C4F';
         pipCtx.fillRect(0, 0, pipCanvas.width, pipCanvas.height);
-        let y = 52;
-        pipCtx.fillStyle = '#f4f4f5';
+        pipCtx.fillStyle = '#C41E3A';
+        pipCtx.fillRect(0, 0, pipCanvas.width, 6);
+        pipCtx.fillStyle = 'rgba(255,255,255,0.75)';
+        pipCtx.font = '600 15px system-ui, sans-serif';
+        pipCtx.fillText('Hlas · live subtitles', 20, 30);
+        const hasText = (pipLines.transcript || pipLines.translation).trim();
+        let y = 66;
+        if (!hasText) {
+            pipCtx.fillStyle = 'rgba(255,255,255,0.55)';
+            pipCtx.font = '24px system-ui, sans-serif';
+            pipCtx.fillText('…waiting for speech…', 20, y + 30);
+            return;
+        }
+        pipCtx.fillStyle = '#ffffff';
         pipCtx.font = '30px system-ui, sans-serif';
         wrapPipText(pipCtx, pipLines.transcript, pipCanvas.width - 40).forEach((l) => {
             pipCtx.fillText(l, 20, y);
@@ -830,12 +856,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     pipCanvas.width = 640;
                     pipCanvas.height = 220;
                     pipCtx = pipCanvas.getContext('2d');
+                    drawPip(); // paint BEFORE capture: Chrome only fires loadedmetadata once a frame exists
                     pipVideo = document.createElement('video');
                     pipVideo.muted = true;
                     pipVideo.playsInline = true;
                     pipVideo.srcObject = pipCanvas.captureStream();
+                    // Canvas-fed streams carry no loaded metadata at creation: PiP
+                    // requested before readyState>=1 throws InvalidStateError
+                    // ("Metadata for the video element are not loaded yet").
                     await pipVideo.play();
-                    drawPip();
+                    if (pipVideo.readyState < 1) {
+                        await new Promise((resolve) => {
+                            const done = () => {
+                                pipVideo.removeEventListener('loadedmetadata', done);
+                                resolve();
+                            };
+                            pipVideo.addEventListener('loadedmetadata', done);
+                            setTimeout(done, 2000); // never trap the button on odd browsers
+                        });
+                    }
                 }
                 await pipVideo.requestPictureInPicture();
                 showNotification('Subtitles popped out — the window stays visible across apps.', 'success');
@@ -1041,9 +1080,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     li.dataset.voicePath = voice.path; // Store voice path
                     li.dataset.voiceText = voice.transcribed_text; // Store transcribed text
                     li.dataset.voiceLang = voice.language; // Store voice language
+                    li.dataset.voiceFilename = voice.filename || '';
+                    const noFile = !voice.filename || voice.filename === 'unknown_filename.wav';
                     li.innerHTML = `
                         <span>--${voice.name}</span>
                         <div class="voice-actions">
+                            <button data-id="${voice.id}" class="play-voice-btn" title="Listen to this voice"${noFile ? ' disabled' : ''}>Play</button>
                             <button data-id="${voice.id}" class="edit-voice-btn">Edit</button>
                             <button data-id="${voice.id}" class="delete-voice-btn">Delete</button>
                         </div>
@@ -1066,8 +1108,36 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                         expandIcon.textContent = 'expand_less';
                     }
-                } else if (event.target.classList.contains('edit-voice-btn')) {
+                } else if (event.target.classList.contains('play-voice-btn')) {
                     const voiceId = event.target.dataset.id;
+                    const row = event.target.closest('li');
+                    const filename = row && row.dataset.voiceFilename;
+                    if (!filename) {
+                        showNotification('No audio file stored for this voice.', 'error');
+                    } else {
+                        const btn = event.target;
+                        btn.disabled = true;
+                        btn.textContent = '…';
+                        const userToken = localStorage.getItem('userToken');
+                        fetch(`/api/voices/file?filename=${encodeURIComponent(filename)}`, {
+                            headers: userToken ? { Authorization: `Bearer ${userToken}` } : {},
+                        }).then((r) => {
+                            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                            return r.blob();
+                        }).then((blob) => {
+                            const url = URL.createObjectURL(blob);
+                            const preview = new Audio(url);
+                            preview.onended = () => URL.revokeObjectURL(url);
+                            return preview.play();
+                        }).catch((err) => {
+                            console.error('Frontend: Voice preview failed:', err);
+                            showNotification('Could not play this voice: ' + err.message, 'error');
+                        }).finally(() => {
+                            btn.disabled = false;
+                            btn.textContent = 'Play';
+                        });
+                    }
+                } else if (event.target.classList.contains('edit-voice-btn')) {                    const voiceId = event.target.dataset.id;
                     voiceToEdit = voices.find(v => v.id === voiceId); // Find the full voice object
                     if (voiceToEdit) {
                         voiceNameInput.value = voiceToEdit.name; // Populate input with current name
@@ -1333,9 +1403,16 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch('passages.json', { cache: 'no-store' }).then((r) => r.json()).then((passages) => {
         const box = document.getElementById('readingText');
         const tabs = Array.from(document.querySelectorAll('.passage-tab'));
-        const show = (lang) => { if (box && passages[lang]) box.textContent = passages[lang]; };
+        const langSelect = document.getElementById('modalInputLanguageSelect');
+        // One language control: tabs and dropdown mirror each other (en/sk/cs only).
+        const show = (lang) => {
+            if (box && passages[lang]) box.textContent = passages[lang];
+            if (langSelect && langSelect.querySelector(`option[value="${lang}"]`)) langSelect.value = lang;
+            tabs.forEach((b) => b.classList.toggle('active', b.dataset.lang === lang));
+        };
         tabs.forEach((b) => b.addEventListener('click', () => show(b.dataset.lang)));
-        show('en');
+        if (langSelect) langSelect.addEventListener('change', () => show(langSelect.value));
+        show((langSelect && langSelect.value) || 'en');
     }).catch(() => {
         const box = document.getElementById('readingText');
         if (box) box.textContent = 'Could not load passages.json.';
@@ -1586,52 +1663,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Translate reading statement based on selected language
-    if (modalInputLanguageSelect && readingText) {
-        const originalStatement = '"Reading this statement, I agree to provide my voice for cloning purposes. My voice will be used to synthesize translated speech within this application."';
-
-        async function translateStatement(text, targetLang) {
-            // Placeholder for actual backend MT module integration
-            // In a real scenario, this would call a backend API that performs the translation
-            console.log(`Simulating translation of "${text}" to ${targetLang}`);
-            const simulatedTranslations = {
-                "es": "Al leer esta declaración, acepto proporcionar mi voz para fines de clonación. Mi voz se utilizará para sintetizar el habla traducida dentro de esta aplicación.",
-                "fr": "En lisant cette déclaration, j'accepte de fournir ma voix à des fins de clonage. Ma voix sera utilizada para sintetizar la parole traducida al seno de esta aplicación.",
-                "de": "Mit dem Lesen dieser Erklärung stimme ich zu, meine Stimme für Klonierungszwecke zur Verfügung zu stellen. Meine Stimme wird verwendet, um übersetzte Sprache innerhalb dieser Anwendung zu synthetisieren.",
-                "it": "Leggendo questa dichiarazione, accetto di fornire la mia voce per scopi di clonazione. La mia voce verrà utilizzata per sintetizzare il parlato tradotto all'interno di questa applicazione.",
-                "pt": "Ao ler esta declaração, concordo em fornecer minha voz para fins de clonagem. Minha voz será usada para sintetizar a fala traduzida dentro deste aplicativo.",
-                "pl": "Czytając to oświadczenie, zgadzam się udostępnić swój głos do celów klonowania. Mój głos zostanie użyty do syntezy przetłumaczonej mowy w tej aplikacji.",
-                "tr": "Bu ifadeyi okuyarak, sesimi klonlama amacıyla sağlamayı kabul ediyorum. Sesim, bu uygulama içinde çevrilmiş konuşmayı sentezlemek için kullanılacaktır.",
-                "ru": "Читая это заявление, я соглашаюсь предоставить свой голос для целей клоonирования. Мой голос будет использоваться для синтеза переведенной речи в этом приложении.",
-                "nl": "Door deze verklaring te lezen, stem ik ermee in mijn stem te verstrekken voor kloningsdoeleinden. Mijn stem zal worden gebruikt om vertaalde spraak binnen deze applicatie te synthetiseren.",
-                "cs": "Přečtením tohoto prohlášení souhlasím s poskytnutím svého hlasu pro účely klonování. Můj hlas bude použit k syntéze přeložené řeči v rámci této aplikace.",
-                "ar": "بقراءة هذا البيان، أوافق على تقديم صوتي لأغراض الاستنساخ. سيتم استخدام صوتي لتوليف الكلام المترجم داخل هذا التطبيق.",
-                "zh-cn": "通过阅读此声明，我同意提供我的声音用于克隆目的。我的声音将用于在此应用程序中合成翻译后的语音。",
-                "ja": "この声明を読むことにより、私はクローン作成目的で自分の声を提供することに同意します。私の声は、このアプリケーション内で翻訳された音声を合成するために使用されます。",
-                "hu": "Ezen nyilatkozat elolvasásával hozzájárulok ahhoz, hogy hangomat klónozási célokra felhasználják. Hangomat a lefordított beszéd szintetizálására fogják használni ebben az alkalmazásban.",
-                "ko": "이 진술서를 읽음으로써, 저는 복제 목적으로 제 목소리를 제공하는 데 동의합니다. 제 목소리는 이 애플리케이션 내에서 번역된 음성을 합성하는 데 사용될 것입니다.",
-                "hi": "इस कथन को पढ़कर, मैं क्लोनिंग उद्देश्यों के लिए अपनी आवाज़ प्रदान करने के लिए सहमत हूँ। मेरी आवाज़ का उपयोग इस एप्लिकेशन के भीतर अनुवादित भाषण को संश्लेषित करने के लिए किया जाएगा।",
-                "sk": "Prečítaním tohto vyhlásenia súhlasím s poskytnutím svojho hlasu na účely klonovania. Môj hlas bude použitý na syntézu preloženej reči v rámci tejto aplikácie."
-            };
-
-            // Simulate a network delay
-            await new Promise(resolve => setTimeout(resolve, 500));
-
-            return simulatedTranslations[targetLang] || `[Translation to ${targetLang} not available] ${text}`;
-        }
-
-        modalInputLanguageSelect.addEventListener('change', async (event) => {
-            const selectedLang = event.target.value;
-            if (selectedLang === 'en') { // If English is selected, revert to original
-                readingText.textContent = originalStatement;
-            } else {
-                const translatedText = await translateStatement(originalStatement, selectedLang);
-                readingText.textContent = translatedText;
-            }
-        });
-        // Set initial text
-        readingText.textContent = originalStatement;
-    }
+    // NOTE: a previous simulated consent-statement translator used to fight the
+    // passage tabs over #readingText (hardcoded placeholder "translations", one of
+    // them garbled). Removed 2026-09-29: passages.json is the single source.
 
     // Voice Naming Modal interactions
     if (saveVoiceNameBtn) {
