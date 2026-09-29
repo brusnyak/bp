@@ -5,15 +5,15 @@ Protocol (same for every candidate — no paper verdicts):
   fixed SK v2b clips -> WER/CER (+chrF for MT/S2ST) + RTF + device -> matrix JSON.
 
 Clips (local-only, never committed):
-  speaker_voices/sk_trhove_rano_v2b.m4a  (109s, ref in speaker_voices.json)
-  speaker_voices/sk_script_reading.m4a   (134s, ref in speaker_voices.json)
+  speaker_voices/me_sk_trhove_b.m4a  (109s, ref in speaker_voices.json)
+  speaker_voices/me_sk_script.m4a   (134s, ref in speaker_voices.json)
 
 Out: processed/new_models/<engine>_matrix.json (read by the Lab like sk_direction).
 
 Usage (on charger):
   .venv-eval/bin/pip install -r requirements-eval.txt   # once
-  .venv-eval/bin/python scripts/bench_new_models.py --engine seamless --clips sk_trhove_rano_v2b
-  .venv-eval/bin/python scripts/bench_new_models.py --engine zipformer --clips sk_trhove_rano_v2b,sk_script_reading
+  .venv-eval/bin/python scripts/bench_new_models.py --engine seamless --clips me_sk_trhove_b
+  .venv-eval/bin/python scripts/bench_new_models.py --engine zipformer --clips me_sk_trhove_b,me_sk_script
 
 Each --engine is implemented as a function below. Unimplemented engines exit with
 a TODO + install notes instead of failing silently.
@@ -30,8 +30,8 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT_DIR = os.path.join(REPO_ROOT, "processed", "new_models")
 
 CLIPS = {
-    "sk_trhove_rano_v2b": "speaker_voices/sk_trhove_rano_v2b.m4a",
-    "sk_script_reading": "speaker_voices/sk_script_reading.m4a",
+    "me_sk_trhove_b": "speaker_voices/me_sk_trhove_b.m4a",
+    "me_sk_script": "speaker_voices/me_sk_script.m4a",
 }
 
 
@@ -139,7 +139,7 @@ ENGINES = {"seamless": run_seamless, "zipformer": run_zipformer, "cohere": run_c
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--engine", required=True, choices=sorted(ENGINES))
-    ap.add_argument("--clips", default="sk_trhove_rano_v2b")
+    ap.add_argument("--clips", default="me_sk_trhove_b")
     args = ap.parse_args()
     os.makedirs(OUT_DIR, exist_ok=True)
     wanted = [c for c in args.clips.split(",") if c in CLIPS]

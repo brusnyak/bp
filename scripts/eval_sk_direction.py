@@ -38,9 +38,9 @@ OUT_DIR = os.path.join(REPO_ROOT, "processed", "sk_direction")
 OUT_JSON = os.path.join(OUT_DIR, "sk_direction_matrix.json")
 
 CLIPS = [
-    ("sk_script_reading", "speaker_voices/sk_script_reading.m4a"),
-    ("sk_trhove_rano_v2", "speaker_voices/sk_trhove_rano_v2.m4a"),
-    ("sk_trhove_rano_v2b", "speaker_voices/sk_trhove_rano_v2b.m4a"),
+    ("me_sk_script", "speaker_voices/me_sk_script.m4a"),
+    ("me_sk_trhove", "speaker_voices/me_sk_trhove.m4a"),
+    ("me_sk_trhove_b", "speaker_voices/me_sk_trhove_b.m4a"),
 ]
 
 BY_FILE = {c[0]: c[1] for c in CLIPS}
@@ -83,7 +83,7 @@ def load_sk_reference(clip_id):
 
 def load_en_reference(clip_id, mt, sk_ref):
     """Return ground-truth English reference if available, or clean MT-translated reference."""
-    if clip_id == "sk_script_reading":
+    if clip_id == "me_sk_script":
         meta = json.load(open(os.path.join(REPO_ROOT, "speaker_voices", "speaker_voices.json"), encoding="utf-8"))
         for e in meta:
             p = e.get("path", "") or e.get("filename", "") or ""

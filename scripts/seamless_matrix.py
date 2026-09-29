@@ -4,7 +4,7 @@
 Full 109s+ clips in one shot OOM this 16GB box (attention is O(n^2) + swap death);
 30s chunks hold RAM flat. Extends processed/new_models/seamless_matrix.json.
 
-Run (on charger): .venv-eval/bin/python scripts/seamless_matrix.py --clip sk_script_reading
+Run (on charger): .venv-eval/bin/python scripts/seamless_matrix.py --clip me_sk_script
 """
 from __future__ import annotations
 
@@ -16,8 +16,8 @@ import time
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT_DIR = os.path.join(REPO_ROOT, "processed", "new_models")
 CLIPS = {
-    "sk_trhove_rano_v2b": "speaker_voices/sk_trhove_rano_v2b.m4a",
-    "sk_script_reading": "speaker_voices/sk_script_reading.m4a",
+    "me_sk_trhove_b": "speaker_voices/me_sk_trhove_b.m4a",
+    "me_sk_script": "speaker_voices/me_sk_script.m4a",
 }
 
 
