@@ -26,8 +26,9 @@ hypotheses a week and testing one.
 
 | Workload | Rate | Evidence |
 |---|---|---|
-| Piper VITS fine-tune (2500 steps, batch 8, 50 clips) | **0.07–0.08 it/s ≈ 13 s/step → ~8–9 h** | `MEASURED` 2026-09-29, `/tmp/overnight_hq.log` epoch timing, `scripts/finetune_personal_voice.py` |
-| Same, on MPS instead of CPU | **0.04–0.07 it/s — slower than CPU** | `MEASURED` 2026-08, script docstring (VITS constant-padding ops leave the MPS fast path) |
+| Piper VITS fine-tune (2500 steps, batch 8, 50 clips) | **4 h 40 min → 0.149 it/s ≈ 6.7 s/step** (measured to completion 2026-09-30 01:48) | `MEASURED` `/tmp/overnight_hq.log`, `/tmp/piper_finetune_work_sk/…/version_0/checkpoints/last-v1.ckpt` (`global_step=2500`) |
+| Same, first estimate mid-run | 0.07–0.08 it/s (~13 s/step) — **2× pessimistic**; the per-epoch timer counted epochs, not batches | `MEASURED` superseded by the row above |
+| Same, on MPS instead of CPU | **slower than CPU** | `MEASURED` 2026-08, script docstring (VITS constant-padding ops leave the MPS fast path) |
 | OmniVoice bulk corpus, 30 s clip | **RTF 0.93–1.22 (MPS, float32)** | `MEASURED` `processed/omni_hq_sk/manifest.json` (50 clips), `processed/omni_hq_en/manifest.json` (15 clips) |
 | faster-whisper `base`, 115 s English clip | **0.52 s** (WER 0.077) | `MEASURED` `processed/stt_baseline.json` |
 | Whisper `small-sk`, per Slovak sentence | **~3.0 s** | `MEASURED` `documentation/demo_report_2026-09.md` |
@@ -57,7 +58,7 @@ development throughput, and it should be framed that way to avoid the
 |---|---|---|
 | EN bulk corpus, 15 clips | ~25 min (MPS) | yes (≈2× with CUDA) |
 | SK corpus assembly + QC | < 1 min | no |
-| **SK Piper fine-tune, 2500 steps** | **~8–9 h (CPU)** | **yes — and it is the whole cost** |
+| **SK Piper fine-tune, 2500 steps** | **4 h 40 min (CPU)** | **yes — and it is the whole cost** |
 | Voice QC (WER thirds, F0, jitter, HNR) | ~2–3 min | mildly |
 | Ear QC in Voice Lab | human-limited | no |
 
@@ -74,7 +75,7 @@ norm rather than a measurement, it is marked as such.
 
 | Workload | Now (M1 Pro 16 GB) | Projected | Multiplier basis |
 |---|---|---|---|
-| Piper 2500-step fine-tune | **~8–9 h** | **~1–1.5 h** | `PROJECTED` ~6× — VITS is ~30 M params and fits 8 GB VRAM; CUDA has no MPS padding fallback. Community norm, not measured here |
+| Piper 2500-step fine-tune | **4 h 40 min** | **~1–1.5 h** | `PROJECTED` ~3–4× — capped at 4× by the corrected baseline below; VITS is ~30 M params and fits 8 GB VRAM, and CUDA has no MPS padding fallback. Community norm, not measured here |
 | OmniVoice bulk, 15–20 clips | ~25 min | **~10–15 min** | `PROJECTED` ~2× (CUDA vs unified MPS, float32) |
 | Chatterbox AR synthesis | RTF 6.7 | **RTF ~1–2** | `PROJECTED` ~4× — autoregressive transformer is the case CUDA helps most |
 | Whisper STT sweeps | serial | **parallel with training** | 32 GB removes the 16 GB contention that currently serialises every job |
@@ -158,6 +159,22 @@ the NVIDIA laptop is the better research box and the Mac stays the demo box.
 ## 8. Refresh log
 
 - 2026-09-29 — opened. Measured baseline captured from the overnight run;
-  Scenarios A/B/C projected. Pending: completed 2500-step wall time and final
-  `val_mel`, ear-QC verdict for `me_omni_piper_sk`, and a sweep of new model
-  releases (STT/MT/TTS) for the 2-week report.
+  Scenarios A/B/C projected.
+- 2026-09-30 01:48 — **first training run completed and measured.** SK voice
+  `me_omni_piper_sk`: 2500 steps, 50 clips / 19.4 min, **4 h 40 min** on CPU
+  (0.149 it/s). Two corrections applied to this document: the mid-run
+  extrapolation of ~8–9 h was **2× pessimistic** (epoch timer misread), and the
+  NVIDIA multiplier is therefore ~3–4×, not ~6×. Also fixed a real export bug
+  (see below). Synthesis verified: model loads, RTF ≈ 0.04, RMS 0.116.
+- **Bug found and fixed:** `scripts/finetune_personal_voice.py` exported
+  `last.ckpt` by filename. With piper's own `val_mel` checkpoint callback
+  writing into the same directory, Lightning left the **newest** state in
+  `last-v1.ckpt` (step 2500) and an **older** one in `last.ckpt` (step 2090) —
+  so the first export shipped a checkpoint 410 steps short. The script now
+  selects the most recently written `*.ckpt`. The corrected ONNX was
+  re-exported from `last-v1.ckpt`. Evidence:
+  `last.ckpt` → `global_step 2090`; `last-v1.ckpt` → `global_step 2500`;
+  distinct md5s recorded in the session log.
+- Pending: ear-QC verdict for `me_omni_piper_sk` vs the shipped
+  `sk_SK-personal-male-medium`, and a sweep of new model releases for the
+  2-week report.
