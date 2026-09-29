@@ -119,7 +119,7 @@ def main():
     t0 = time.perf_counter()
     en_label, stt_en = make_stt(a.en_stt)
     mt = {"en": CTranslate2MT("Helsinki-NLP/opus-mt-en-sk"), "sk": CTranslate2MT("Helsinki-NLP/opus-mt-sk-en")}
-    tts = {"sk": PiperTTS(model_id="sk_SK-lili-medium"), "en": PiperTTS(model_id="en_US-ryan-medium")}  # spoken to B / to A
+    tts = {"sk": PiperTTS(model_id="sk_SK-personal-male-medium"), "en": PiperTTS(model_id="en_US-personal-v2")}  # spoken to B / to A
     sk_engines = [make_stt(s) for s in a.sk_stt.split(",")]
     for lang, eng in [("en", stt_en)] + [("sk", e) for _, e in sk_engines]:  # warm-up: first inference is much slower
         w, sr, _ = tts[lang].synthesize("Test." if lang == "en" else "Skúška.", language=lang)
