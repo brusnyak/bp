@@ -179,6 +179,9 @@ Next action items to explore and benchmark:
   OOMs 16GB into 14GB swap — playbook rule: never full-clip transformers here). trhove: RTF 0.99,
   chrF 49.7; script_reading: RTF 0.77, chrF 39.5. Fluent, one "willow→fur coat" slip. Verdict: quality
   reference + offline-voice potential, NOT a live path (3× cascade compute). Next: STT rungs.
+- **Turbo rung, definitive negative (2026-09-29, pushed)**: large-v3-turbo on all 3 SK clips —
+  WER 0.41–0.52 vs small-sk 0.23–0.35, 27–30s vs 18–22s. Distillation cost it low-resource
+  capacity. No adoption; matrix keeps the rung as the documented ceiling check.
 
 ## Next
 
