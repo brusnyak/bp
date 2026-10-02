@@ -100,6 +100,29 @@ utterance: STT 0.1–0.3 s + MT 0.04 s + **first-sentence TTS 1.2–1.4 s**. TTS
   needs a faster GPU or streaming/batched TTS (OmniVoice accepts a list of texts per call; untested), since the fixed per-call cost
   dominates.
 
+## 5. Shipped engine on CUDA, 12 vs 16 steps, batching, VRAM (Kaggle T4, kernel `bp-gpu-final`, data `processed/gpu_bench/final_T4/`)
+
+The kernel clones the public repo and runs the real `backend/tts/omni_tts.py` (cached prompt, warm-up, clause streaming). 60 s per ramp
+level, so n_utts per cell is small (2-55); treat single cells as indicative.
+
+- **Engine smoke:** model load 22 s; enrollment (prompt + one-off warm-up) 3.3 s for the first reference, 0.08 s for the second, cached
+  prompt 0.0 s. `synthesize_stream` first chunk **0.75 s at 16 steps, 0.52-0.55 s at 12 steps** (TTS only). With VAD 0.3 s + STT ~0.2 s +
+  MT 0.04 s that puts first audio at about **1.1 s** (12 steps) — under the 1.3 s estimated in section 4. RTF 0.23-0.38.
+- **VRAM: 5.7-5.9 GB peak** for the whole cascade (whisper + MT + OmniVoice) at any load, so a card needs ~8 GB to be comfortable. GPU
+  utilisation hits 90-95 % at saturation: the T4 is **compute-bound, not memory-bound**.
+- **Capacity, shipped engine, one T4:**
+
+| steps | all talk (duty 1.0) | meeting (duty 0.25) |
+|---|---|---|
+| 16 (earlier raw run) | 1 stream keeps up, 2 queue, 8 collapse | 8 participants OK (p95 first audio 2.1 s), knee 12 |
+| **12** | **4 streams keep up** (p95 first audio 2.0 s), 8 collapse (35.5 s) | **12 participants OK** (p95 2.6 s), 16 degrades (7.6 s), 24 collapses |
+
+- **Batching (4 requests per `generate()` call, 12 steps) does not help on the T4:** at 4 continuous streams p95 first audio is 4.4 s
+  (unbatched 2.0 s), at 12 meeting participants 6.2 s (unbatched 2.6 s). It only helps once the GPU is already overloaded (24 meeting
+  participants: p95 12.5 s vs 19.1 s). With the GPU at 90-95 % there is no idle capacity to batch into; a larger GPU is the lever.
+- Round-trip WER at 12 vs 16 steps was indistinguishable in section 4 (n=12); there is **no ear verdict yet**. Clips for it are in the
+  Voice Lab ("GPU clones", `final_T4/engine_{sk,en}_steps{12,16}`). Default stays 16; switch with `OMNIVOICE_STEPS=12` after listening.
+
 ## Not measured / limits
 
 - **VRAM and GPU utilisation: not captured** (the sampler crashed on the 2-GPU `nvidia-smi` output; fixed in `load_bench.py`, not yet re-run). The "bottleneck is VRAM" idea
@@ -114,5 +137,4 @@ utterance: STT 0.1–0.3 s + MT 0.04 s + **first-sentence TTS 1.2–1.4 s**. TTS
 - A cloned-voice cascade is **faster than real time on a free T4** (RTF 0.2–0.3) and holds a 3-minute presentation with no processing
   backlog. Better compute is needed for *concurrency* (several simultaneous cloned voices), not for a single presenter.
 - The remaining presentation risk is playback pacing, which needs a duration-cap/backlog policy rather than hardware.
-- Next measurement: same harness with `--tts` pool size 2 on 2×T4, OmniVoice `speed` 1.2, and VRAM sampling fixed; then a live run on the
-  presentation machine.
+- Next measurement: ear check of 12 vs 16 steps, a faster GPU, then a live run with the microphone on the presentation machine.
