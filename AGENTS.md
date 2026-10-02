@@ -133,3 +133,9 @@ Demo: `documentation/demo_runbook_2026-09-28.md` (+ `monday_test_checklist.md`,
    translation → output); (b) live measurement on the presentation machine (needs a GPU box; Kaggle/Colab cannot run the
    live mic path); (c) capture numeric ear grades (log in on :8000 or export JSON). Piper fine-tuning only matters for CPU-only
    machines. Kaggle CLI + private dataset `yegorby/bp-gpu-bench-refs` + Modal token were created for this; revoke when done.
+9. **Load tests on a free T4 (2026-10-02, `documentation/load_tests_2026-10.md`, data `processed/gpu_bench/load_T4/`)**: full cascade with OmniVoice
+   clone RTF 0.18-0.34, first audio ~2 s at any length; one TTS worker = ~2 continuous speakers / ~8 meeting participants, knee at 12;
+   3-min presentation: 0 s processing queue, playback backlog 8-11 s in alternating EN/SK (clone speaks ~1.3x slower than source).
+   Next: TTS pool on 2xT4, OmniVoice `speed` ~1.2 + stale-segment drop policy, fix VRAM sampler, then a live mic run on a GPU machine.
+   UI (same day): one-click ear grading, tested/experimental language lists, phone-width layouts; OmniVoice option added to the live TTS
+   dropdown but NOT yet tested through the live UI. Kaggle token / private dataset / Modal token still to revoke when done.

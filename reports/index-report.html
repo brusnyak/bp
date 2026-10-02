@@ -432,6 +432,7 @@
     <nav class="topnav">
       <a href="#state">Stav</a>
       <a href="#funding">Financovanie</a>
+      <a href="#load">Záťaž</a>
       <a href="#explorer">Modely</a>
       <a href="#matrix">Kde beží</a>
       <a href="#eval">Poradie testov</a>
@@ -473,8 +474,8 @@
       <div class="ladder-arrow">&rarr;</div>
       <div class="state-card gap">
         <div class="sc-tag">&#9681; Medzera &middot; merané</div>
-        <div class="sc-h">Klonovanie hlasu funguje &mdash; ale ~1 hlas/deň</div>
-        <p>Cieľový hlas sa naklonuje čisto (WER nového hlasu 0.19 vs 0.54). Ale <b>tréning je 95&nbsp;% času iterácie</b> na CPU/Macu a strop 16&nbsp;GB blokuje akýkoľvek sweep.</p>
+        <div class="sc-h">Vlastný hlas naživo funguje &mdash; ale iba na GPU</div>
+        <p>OmniVoice naklonuje hlas z 5&ndash;7&nbsp;s nahrávky bez trénovania a na <b>bezplatnom T4 beží rýchlejšie než v reálnom čase</b> (RTF 0.18&ndash;0.34, merané 2&times;). Na Macu je RTF ~0.8&ndash;1, takže na živú reč nestačí. Piper fine-tune je potrebný už len pre stroje bez GPU.</p>
       </div>
       <div class="ladder-arrow">&rarr;</div>
       <div class="state-card target">
@@ -486,7 +487,7 @@
 
     <div class="gate">
       <div class="gate-l">Jediná medzera je výpočtový výkon<small>Nie výskum. Nie prepisovanie.</small></div>
-      <div class="gate-m">Všetko v stave <b>Beží teraz</b> a <b>Medzera</b> je už postavené a odmerané na vlastnom hardvéri. Skok na <b>cieľ</b> závisí od jedinej veci &mdash; <span class="hot">NVIDIA GPU (&ge;6&nbsp;GB VRAM) + &ge;16&nbsp;GB RAM.</span> Tento výkon trénuje hlasy v <b>hodinách namiesto dňa</b> a poháňa streamovacie vylepšenia (word-window MT, streamovanie po častiach), vďaka ktorým živý pipeline pôsobí simultánne.</div>
+      <div class="gate-m">Všetko v stave <b>Beží teraz</b> a <b>Medzera</b> je už postavené a odmerané. Skok na <b>cieľ</b> závisí od jedinej veci &mdash; <span class="hot">NVIDIA GPU (&ge;6&nbsp;GB VRAM) + &ge;16&nbsp;GB RAM.</span> Na jednom T4 reťazec STT&rarr;MT&rarr;naklonovaný hlas zvládne <b>3-minútovú prezentáciu bez fronty spracovania</b> a <b>~8 účastníkov bežného stretnutia naraz</b> (ďalší výkon = viac súbežných hlasov, nie lepší jediný rečník). Zostáva zmerať silnejšiu GPU a živú cestu s mikrofónom.</div>
     </div>
   </section>
 
@@ -500,9 +501,9 @@
 
     <div class="fund-grid">
       <div class="fund-card">
-        <div class="fnum">01 &middot; PRIEPUSTNOSŤ</div>
-        <h3>~1 hlas/deň &rarr; 4&ndash;6/deň</h3>
-        <p>Tréning je <b>95&nbsp;% času iterácie</b> (merané). Kapitola s jedným trénovaným hlasom je report; s abláciou cez kroky &times; základný hlas je to experiment.</p>
+        <div class="fnum">01 &middot; SÚBEŽNOSŤ</div>
+        <h3>1 GPU &rarr; ~2 súvislí rečníci / ~8 na stretnutí</h3>
+        <p>Na T4 s jedným OmniVoice workerom: <b>koleno pri 12 streamoch</b>, pád pri 16+ (merané, <code>load_tests_2026-10.md</code>). Úzke miesto je jediný TTS worker; viac GPU alebo dávkovanie škáluje počet súčasných hlasov. Tréning Piper hlasov už nie je podmienka.</p>
       </div>
       <div class="fund-card">
         <div class="fnum">02 &middot; ODOMKNUTIE KVALITY</div>
@@ -533,6 +534,33 @@
         </div>
       </div>
     </div>
+  </section>
+
+  <!-- ============ LOAD TESTS ============ -->
+  <section id="load">
+    <div class="sec-head">
+      <div class="sec-num">&sect;8 &middot; záťažový test, bezplatný T4</div>
+      <h2>Celý reťazec s naklonovaným hlasom: dĺžka reči, súbežnosť, prezentácia</h2>
+      <p class="sec-sub">Kaggle Tesla T4 (15.6&nbsp;GB), faster-whisper &rarr; Opus-MT CT2 &rarr; OmniVoice (klon vlastného hlasu, 16 krokov), jeden TTS worker. Reálne nahrávky autora, dátum 2026-10-02. Zdroj: <code>documentation/load_tests_2026-10.md</code>, <code>processed/gpu_bench/load_T4/load_bench.json</code>.</p>
+    </div>
+    <div class="fund-grid">
+      <div class="fund-card">
+        <div class="fnum">01 &middot; DĹŽKA REČI</div>
+        <h3>RTF 0.18&ndash;0.34, prvý zvuk ~2&nbsp;s</h3>
+        <p>Reč 3&ndash;45&nbsp;s, oba smery: celkový výpočet je <b>3&ndash;5&times; rýchlejší než reč</b> a prvý preložený zvuk príde za 0.8&ndash;2.8&nbsp;s bez ohľadu na dĺžku (TTS po vetách). 85&ndash;90&nbsp;% času je TTS; STT na GPU ~0.1&ndash;1.1&nbsp;s (Mac 1.3&nbsp;s).</p>
+      </div>
+      <div class="fund-card">
+        <div class="fnum">02 &middot; SÚBEŽNOSŤ</div>
+        <h3>~2 súvislí rečníci, ~8 na stretnutí, koleno pri 12</h3>
+        <p>Pri 25&nbsp;% času hovorenia: 2&ndash;8 účastníkov p95 prvého zvuku <b>2.1&ndash;2.3&nbsp;s</b>, 12 = 7.5&nbsp;s, 16 = 21&nbsp;s, 24 = zrútené. Keď hovoria všetci stále: 1 stream drží krok, 2 vytvárajú frontu, 8 sa zrúti (RTF práce 1.6). Strop určuje jeden TTS worker (~3.3&nbsp;s TTS na 8&nbsp;s reči).</p>
+      </div>
+      <div class="fund-card">
+        <div class="fnum">03 &middot; PREZENTÁCIA</div>
+        <h3>3 minúty bez fronty spracovania</h3>
+        <p>22 segmentov (171&nbsp;s reči): fronta spracovania <b>0&nbsp;s</b>, oneskorenie poslucháča p50 3.9&nbsp;s / p95 7.0&nbsp;s. Pri striedaní EN&harr;SK sa nahromadí prehrávanie (8&ndash;11&nbsp;s na konci), lebo klon hovorí ~1.3&times; pomalšie než zdroj &mdash; problém tempa, nie výkonu.</p>
+      </div>
+    </div>
+    <p class="sec-sub" style="margin-top:1rem"><b>Nezmerané:</b> VRAM a vyťaženie GPU (sampler nezachytil), silnejšia GPU, pool TTS na 2&times;T4, živá cesta cez mikrofón. Jeden beh na bunku, <code>wer_vs_idle</code> je drift voči nečinnému prepisu, nie absolútna presnosť.</p>
   </section>
 
   <!-- ============ LATENCY ============ -->
@@ -859,6 +887,7 @@ const MATRIX = [
 ];
 
 const EVAL = [
+  { n:"Záťažový test na silnejšej GPU + pool TTS + tempo", d:"T4 hotový (<code>load_tests_2026-10.md</code>): 1 worker = ~2 súvislí rečníci / ~8 na stretnutí, 3 min prezentácia bez fronty. Zostáva: 2&times;T4 pool, OmniVoice <code>speed</code> 1.2 proti nahromadeniu prehrávania, oprava VRAM samplera, potom živý beh s mikrofónom na cieľovom stroji.", where:"T4 hotové → silnejšia GPU" },
   { n:"X-Voice: podobnosť hlasu + tempo + RTF na CUDA", d:"Mac test hotový (WER 0.000, RTF ~4); Colab T4: X-Voice RTF 0.6&ndash;0.8, OmniVoice 0.14. Zostáva: speaker-similarity vs me_sk referencia, sluchový verdikt, stage 2 + predikátor tempa, a RTF na akejkoľvek CUDA karte (najprv najslabšia dostupná &mdash; 4090 je len VENDOR číslo).", where:"Mac hotové → CUDA" },
   { n:"MADLAD-400-3B-CT2 test kvality", d:"chrF na zašumenom STT vstupe vs Opus-MT na SK&harr;EN, beam 1. Najprv CPU, CUDA ak je k dispozícii.", where:"CPU → CUDA" },
   { n:"Ablácia počtu krokov (2500 / 5000 / 10000)", d:"Najlacnejší experiment kvality. Počkať na sluchový verdikt o me_omni_piper_sk.", where:"CUDA / 3 Mac dni" },
@@ -876,6 +905,7 @@ const IDX = [
   { t:"Náklady tréningu", f:"processed/overnight_hq_2026-09-30.log &middot; compute_capacity_report_2026-09.md &sect;2&ndash;&sect;3" },
   { t:"Prototypy (spikes)", f:"processed/new_models/nemotron_matrix.json &middot; scripts/bench_nemotron.py &middot; processed/new_models/seamless_matrix.json &middot; processed/new_models/chatterbox_matrix.json &middot; scripts/bench_new_models.py" },
   { t:"X-Voice SK zero-shot (2026-10-02)", f:"processed/engine_ab/xvoice_zeroshot_v2.wav &middot; processed/new_models/xvoice_matrix.json &middot; processed/gpu_bench/colab_T4.json &middot; processed/gpu_bench/kaggle_T4/ &middot; documentation/model_landscape_2026-10.md &sect;10" },
+  { t:"Záťažový test T4 (2026-10-02)", f:"scripts/gpu_bench/load_bench.py &middot; scripts/gpu_bench/kaggle_load/ &middot; processed/gpu_bench/load_T4/load_bench.json &middot; documentation/load_tests_2026-10.md" },
   { t:"Zahrnuté predošlé verdikty", f:"PLAN.md &bdquo;Measured 2026-09-29&ldquo; (turbo negatívny, zipformer/cohere kills, VAD anomália, opravy chýb živého TTS hlasu)" }
 ];
 
