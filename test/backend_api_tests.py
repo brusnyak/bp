@@ -127,10 +127,15 @@ def grades_snapshot(tmp_path, monkeypatch):
     if os.path.exists(real):
         with open(real, encoding="utf-8") as f:
             backup = f.read()
+    else:  # fresh clone: the store is generated + gitignored (setup.py builds it); build it here so the tests don't depend on the Mac's data
+        import subprocess, sys
+        subprocess.run([sys.executable, "scripts/grade_library.py", "--apply"], check=True, capture_output=True)
     yield
     if backup is not None:
         with open(real, "w", encoding="utf-8") as f:
             f.write(backup)
+    elif os.path.exists(real):
+        os.remove(real)
 
 
 def test_ratings_get_returns_store(grades_snapshot):

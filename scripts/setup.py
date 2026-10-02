@@ -45,7 +45,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dev", action="store_true", help="install requirements-dev.txt")
     ap.add_argument("--skip-models", action="store_true")
-    ap.add_argument("--no-npm", action="store_true")
+    ap.add_argument("--no-npm", action="store_true", help="ignored (kept so old CI lines keep working; the npm step was dead: chart.js is vendored)")
     a = ap.parse_args()
     t0 = time.time()
 
@@ -85,9 +85,9 @@ def main():
         step("MT + Slovak speech models (one-time CTranslate2 conversion, isolated env; skips what exists)")
         run([sys.executable, "scripts/convert_models.py"])
 
-    if not a.no_npm and shutil.which("npm") and (ROOT / "package.json").exists():
-        step("UI assets (npm)")
-        run(["npm", "install", "--no-audit", "--no-fund"], shell=(os.name == "nt"))
+    # Voice Lab ear-grade store (processed/ear_grades.json is generated + gitignored; /api/ratings and the ratings tests need it).
+    step("Voice Lab grade store")
+    run([PY, "scripts/grade_library.py", "--apply"])
 
     print(f"\nDone in {time.time() - t0:.0f}s. Start: {PY} app.py  ->  https://localhost:8000 (accept the self-signed cert)")
 
