@@ -1,13 +1,13 @@
 """OmniVoice zero-shot cloning engine (k2-fsa/OmniVoice, Apache-2.0).
 
 Rewritten 2026-10-02 against the real OmniVoice API (the first version passed a non-existent `speaker_audio` kwarg, so it
-never cloned). Measured on a free Kaggle T4: RTF 0.18-0.34 at num_step=16 (documentation/load_tests_2026-10.md); on Apple MPS
+never cloned). Measured on a free Kaggle T4: RTF 0.18-0.34 at num_step=16 (0.2 at 12) (documentation/load_tests_2026-10.md); on Apple MPS
 RTF ~0.8-1, so it is a GPU engine.
 
 - The voice-clone prompt (reference audio tokens + reference text) is built once per reference file and cached: this is the
   "warm prep" that belongs at enrollment time, not per sentence. Reference text comes from a `<ref>.txt` sidecar if present;
   otherwise OmniVoice transcribes the reference once (extra model load) and the result is cached with the prompt.
-- Pace/latency knobs, env-overridable: OMNIVOICE_STEPS (default 16), OMNIVOICE_SPEED (default 1.0). Defaults are the measured
+- Pace/latency knobs, env-overridable: OMNIVOICE_STEPS (default 12: ear-checked 2026-10-02, EN 5/5 both, SK 4/5 vs 2/5 for 16), OMNIVOICE_SPEED (default 1.0). Defaults are the measured
   baseline; tune with scripts/gpu_bench/tts_tune.py before changing them.
 - synthesize_stream yields clause-level chunks (first audio after the first clause, not the whole sentence).
 """
@@ -43,7 +43,7 @@ class OmniVoiceTTS:
             raise ImportError("OmniVoice package is not installed. Install it with: pip install omnivoice")
         self.model_name = model_name
         self.device = hardware.detect_backend("tts_clone") if device == "auto" else device
-        self.num_step = int(os.environ.get("OMNIVOICE_STEPS", "16"))
+        self.num_step = int(os.environ.get("OMNIVOICE_STEPS", "12"))
         self.speed = float(os.environ.get("OMNIVOICE_SPEED", "1.0"))
         logger.info("OmniVoiceTTS: loading %s on %s (num_step=%s, speed=%s)", model_name, self.device, self.num_step, self.speed)
         t0 = time.perf_counter()

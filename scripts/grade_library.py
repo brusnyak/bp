@@ -25,7 +25,8 @@ Output schema:
     {"grade": "pass|review|kill|unscored|na", "signals": {...}, "note": ""},
     "ear": {"grade": null, "keep": null, "note": ""}}]}
 
-Usage: python3 scripts/grade_library.py [--apply]
+Usage: python3 scripts/grade_library.py [--apply] [--import voice-ratings.json]
+  --import merges a Voice Lab "Download my ratings (JSON)" export into the ear verdicts (newer `updated` wins, keep 1/2 -> keep/kill)
   default prints a rollup; --apply writes processed/ear_grades.json
   (preserving any ear verdicts already stored).
 """
@@ -150,6 +151,24 @@ def main():
                        for g in json.load(f).get("grades", [])}
         except (OSError, ValueError):
             pass
+    if "--import" in sys.argv:
+        with open(sys.argv[sys.argv.index("--import") + 1]) as f:
+            exported = json.load(f)
+        for name, r in exported.items():
+            keep = {1: "keep", 2: "kill", 0: None}.get(r.get("keep"), r.get("keep"))
+            for key in [k for k in old if k[1] == name] or [(None, name)]:
+                cur = old.get(key, {})
+                if key[0] is None or (cur.get("updated") or 0) > (r.get("updated") or 0):
+                    continue  # unknown to the library, or the stored verdict is newer
+                cur.update({k: v for k, v in {"grade": r.get("grade") or None, "keep": keep, "sim": r.get("sim"),
+                                              "note": r.get("note", cur.get("note", "")), "updated": r.get("updated")}.items()
+                            if v is not None})
+                if r.get("defects"):
+                    cur["defects"] = r["defects"]
+                for k_def in ("steadiness", "hiss", "muffled"):
+                    if r.get(k_def):
+                        cur.setdefault("defects", {})[k_def] = r[k_def]
+                old[key] = cur
     grades = []
     for section in library.get("sections", []):
         sid = section.get("id", "")
@@ -167,7 +186,8 @@ def main():
                         "keep": ear.get("keep"),
                         "sim": ear.get("sim"),
                         "defects": ear.get("defects", {}),
-                        "note": ear.get("note", "")},
+                        "note": ear.get("note", ""),
+                        **({"updated": ear["updated"]} if ear.get("updated") else {})},
             })
     rollup = {}
     for g in grades:

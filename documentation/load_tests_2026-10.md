@@ -120,8 +120,8 @@ level, so n_utts per cell is small (2-55); treat single cells as indicative.
 - **Batching (4 requests per `generate()` call, 12 steps) does not help on the T4:** at 4 continuous streams p95 first audio is 4.4 s
   (unbatched 2.0 s), at 12 meeting participants 6.2 s (unbatched 2.6 s). It only helps once the GPU is already overloaded (24 meeting
   participants: p95 12.5 s vs 19.1 s). With the GPU at 90-95 % there is no idle capacity to batch into; a larger GPU is the lever.
-- Round-trip WER at 12 vs 16 steps was indistinguishable in section 4 (n=12); there is **no ear verdict yet**. Clips for it are in the
-  Voice Lab ("GPU clones", `final_T4/engine_{sk,en}_steps{12,16}`). Default stays 16; switch with `OMNIVOICE_STEPS=12` after listening.
+- **Owner ear verdict (2026-10-02, `voice-ratings.json`, one clip per cell):** EN 12 steps 5/5 keep, EN 16 steps 5/5 keep; SK 12 steps **4/5**, SK 16 steps **2/5 ("not clear, cuts off the words")**. So 12 steps is not worse by ear (round-trip WER also equal in section 4) and is now the default (`OMNIVOICE_STEPS`, `backend/tts/omni_tts.py`). One clip each: the 16-step SK cut-off may be a one-off, not a systematic fault.
+- Same ratings, other clips: OmniVoice clones EN/SK/CS 5/5 keep, X-Voice 4/5 keep, SeamlessM4T S2ST all kill (generic voice), old Piper-based demo material 1-3 (kill).
 
 ## Not measured / limits
 
