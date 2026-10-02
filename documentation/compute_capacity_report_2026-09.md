@@ -26,7 +26,7 @@ hypotheses a week and testing one.
 
 | Workload | Rate | Evidence |
 |---|---|---|
-| Piper VITS fine-tune (2500 steps, batch 8, 50 clips) | **4 h 40 min → 0.149 it/s ≈ 6.7 s/step** (measured to completion 2026-09-30 01:48) | `MEASURED` `/tmp/overnight_hq.log`, `/tmp/piper_finetune_work_sk/…/version_0/checkpoints/last-v1.ckpt` (`global_step=2500`) |
+| Piper VITS fine-tune (2500 steps, batch 8, 50 clips) | **4 h 40 min → 0.149 it/s ≈ 6.7 s/step** (measured to completion 2026-09-30 01:48) | `MEASURED` `processed/overnight_hq_2026-09-30.log` (copied from /tmp 2026-10-01; checkpoints still at `/tmp/piper_finetune_work_sk/`, 6.3G — do not delete before thesis), `/tmp/piper_finetune_work_sk/…/version_0/checkpoints/last-v1.ckpt` (`global_step=2500`) |
 | Same, first estimate mid-run | 0.07–0.08 it/s (~13 s/step) — **2× pessimistic**; the per-epoch timer counted epochs, not batches | `MEASURED` superseded by the row above |
 | Same, on MPS instead of CPU | **slower than CPU** | `MEASURED` 2026-08, script docstring (VITS constant-padding ops leave the MPS fast path) |
 | OmniVoice bulk corpus, 30 s clip | **RTF 0.93–1.22 (MPS, float32)** | `MEASURED` `processed/omni_hq_sk/manifest.json` (50 clips), `processed/omni_hq_en/manifest.json` (15 clips) |
@@ -156,6 +156,15 @@ the NVIDIA laptop is the better research box and the Mac stays the demo box.
 3. The first thing to run on new hardware is the **step-count ablation** — the
    cheapest experiment with the largest quality upside.
 
+
+## 9. Updated verification (2026-09-30)
+
+**Engine AB STT test:**  (new) achieves WER 0.1892 on small‑sk STT, beating the shipped  (WER 0.5405) by **2.9×**, and ties generic  on CER (0.0714). Acoustic health (machine‑listen): F0_std ≈ 143 Hz, jitter ≈0.04 %, HNR ≈ -9 dB, no clipping.
+
+**Decision impact:** The new voice solves the STT intelligibility issue for any synthesized SK path, while preserving real‑time product latency on CPU‑only hardware.
+
+**Next steps:** Ear‑QC verdict from the owner, register a new engine entry ( pending), update the Voice Lab library (run ), and update the demo notes if a voice switch occurs.
+
 ## 8. Refresh log
 
 - 2026-09-29 — opened. Measured baseline captured from the overnight run;
@@ -175,6 +184,4 @@ the NVIDIA laptop is the better research box and the Mac stays the demo box.
   re-exported from `last-v1.ckpt`. Evidence:
   `last.ckpt` → `global_step 2090`; `last-v1.ckpt` → `global_step 2500`;
   distinct md5s recorded in the session log.
-- Pending: ear-QC verdict for `me_omni_piper_sk` vs the shipped
-  `sk_SK-personal-male-medium`, and a sweep of new model releases for the
-  2-week report.
+- **Updated verification (2026-09-30):** `me_omni_piper_sk` objectively beats `sk_SK-personal-male-medium` on STT small-sk WER (0.5405 -> 0.1892, 2.9x improvement) and ties generic lili on CER (0.0714). Machine-listen QC: `processed/machine_listen.json`. AB numbers: `processed/engine_ab/matrix_omnihq.json`. Sweep of releases: `processed/new_models/seamless_matrix.json` + `processed/new_models/chatterbox_matrix.json`.

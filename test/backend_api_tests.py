@@ -114,3 +114,63 @@ async def test_initialize_full_pipeline_live():
     assert session["stt_model"] is not None
     assert session["tts_engine"] is not None
     assert session["tts_engine_name"] == session["session_config"]["tts_model_choice"] == "piper_sk_personal"
+
+
+# --- Ratings sync (Voice Lab persistence, 2026-10-01) ---
+@pytest.fixture()
+def grades_snapshot(tmp_path, monkeypatch):
+    """Snapshot processed/ear_grades.json around each ratings test (real file,
+    gitignored — same destroy-instead-of-restore lesson as speaker metadata)."""
+    import backend.main as m
+    real = m.EAR_GRADES_PATH
+    backup = None
+    if os.path.exists(real):
+        with open(real, encoding="utf-8") as f:
+            backup = f.read()
+    yield
+    if backup is not None:
+        with open(real, "w", encoding="utf-8") as f:
+            f.write(backup)
+
+
+def test_ratings_get_returns_store(grades_snapshot):
+    response = client.get("/api/ratings")
+    assert response.status_code == 200
+    body = response.json()
+    assert isinstance(body.get("grades"), list)
+    assert any(g["name"] == "clean_sk_personal" for g in body["grades"])
+
+
+def test_ratings_post_merges_ear_slot(grades_snapshot):
+    payload = {"name": "clean_sk_personal",
+               "ear": {"grade": 1, "keep": 2, "defects": {"steadiness": 3},
+                       "note": "test trembling", "sim": 20}}
+    response = client.post("/api/ratings", json=payload)
+    assert response.status_code == 200
+    slot = response.json()["ear"]
+    assert slot["grade"] == 1 and slot["keep"] == "kill"
+    assert slot["defects"] == {"steadiness": 3}
+    # persisted to disk, readable back
+    assert client.get("/api/ratings").status_code == 200
+
+
+def test_ratings_post_unknown_name_404(grades_snapshot):
+    response = client.post("/api/ratings", json={"name": "no_such_clip", "ear": {}})
+    assert response.status_code == 404
+
+
+def test_ratings_post_bad_grade_400(grades_snapshot):
+    response = client.post("/api/ratings",
+                           json={"name": "clean_sk_personal", "ear": {"grade": 9}})
+    assert response.status_code == 400
+
+
+def test_ratings_require_auth():
+    saved = dict(app.dependency_overrides)
+    app.dependency_overrides.clear()
+    try:
+        assert client.get("/api/ratings").status_code in (401, 403)
+        assert client.post("/api/ratings", json={}).status_code in (401, 403)
+    finally:
+        app.dependency_overrides.clear()
+        app.dependency_overrides.update(saved)

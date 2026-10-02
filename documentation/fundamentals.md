@@ -104,3 +104,48 @@ Protocol (same for all): fixed SK v2b clips → WER/CER + RTF + device, recorded
 3. Language list → SK? else CZ/multilingual (proxy rule, §6)?
 4. Architecture family (§3) → predicts the latency shape before you run it.
 5. Reported RTF + on WHAT hardware (H100 numbers are fiction for us; M1 CPU/MPS only).
+
+## 9. Connectors: how separate models get glued (added 2026-10-02)
+
+A "connector" is whatever turns one model's output into the next model's input.
+Knowing which kind you have predicts latency, error propagation and cost.
+
+| Connector | What crosses the boundary | Example | Failure mode |
+|---|---|---|---|
+| Text (cascade) | plain tokens | our STT→MT→TTS | errors compound; prosody and speaker identity are lost at the text bottleneck |
+| Linear projector | encoder embeddings → one matrix → LLM input space | LLaVA-style, most speech-LLMs | cheap, but the LLM sees every audio frame (long sequences) |
+| Q-Former / resampler | fixed set of learned queries cross-attend to encoder output | BLIP-2, Qwen-Audio variants | fixed-length summary; can drop fast speech detail |
+| Cross-attention | decoder attends to encoder states at every layer | Whisper, Opus-MT | cost grows with input length; this is the 30 s Whisper window |
+| Discrete audio tokens | codec turns audio into ids a Transformer can "speak" | Mimi (Moshi), Seamless units, OmniVoice | codec quality caps output quality |
+| Speaker/style embedding | one vector conditions the decoder | Piper speaker id, OpenVoice tone | one vector cannot carry all of a voice (our trembling-voice failure) |
+| Reference prompt (in-context) | a few seconds of audio as a prefix | OmniVoice, F5, X-Voice | cost per call, quality depends on prompt cleanliness |
+
+Rule of thumb: the further left in the pipeline information is dropped, the less any later
+model can recover. That is why cascade latency is easy to read (sum of stages) and
+why S2S wins prosody but needs data we do not have for Slovak.
+
+## 10. Ground basics still missing above (added 2026-10-02)
+
+- **Loss and gradient descent**: loss = one number saying how wrong; gradient = which way each
+  weight should move; learning rate = step size. Too high → diverges; too low → looks "trained" but
+  is not (our 18-clip fine-tune).
+- **Overfitting**: train loss falls, validation loss rises. With 12 min of voice data, the validation
+  curve decides the stop point, not the step budget.
+- **Embeddings**: tokens/frames/speakers as vectors; "similar" = close. Speaker similarity QC is
+  cosine distance between two such vectors.
+- **Tokenization**: text → ids. Slovak diacritics split badly in English-heavy vocabularies, which is
+  one reason `initial_prompt` with Slovak text helps Whisper.
+- **Softmax and temperature**: scores → probabilities; low temperature = safer, repetitive; high = varied, error-prone.
+- **Metrics**: WER = (sub+del+ins)/ref words; chrF = character n-gram F-score (better than BLEU for
+  Slovak morphology); RTF = compute time / audio time (<1 = faster than realtime); F0 = pitch.
+- **Fine-tune vs LoRA vs zero-shot**: fine-tune moves all weights (needs GPU/time); LoRA trains small
+  adapter matrices (minutes of data, fits smaller GPUs); zero-shot trains nothing, conditions on a prompt.
+
+### Build-to-learn exercises (each ≤1 evening, CPU only)
+
+1. Perceptron on AND/OR, then fail on XOR; add one hidden layer and fix it (NumPy, ~30 lines).
+2. Backprop for a 2-layer MLP on a toy set, check gradients numerically.
+3. Single attention head on a 5-token sentence; print the attention matrix.
+4. Compute a mel spectrogram of `me_sk` clip with `librosa`; plot; see what VAD sees.
+5. Compute WER by hand-rolled edit distance and match `jiwer` output on 3 clips.
+6. Read `scripts/bench_new_models.py` end to end; add one engine stub.

@@ -59,6 +59,33 @@
       "text": "Dobrý den, toto je hlasový vzorek pro systém překladu řeči.",
       "model_id": "cs_CZ-jirka-medium",
       "made_at": "2026-09-28 06:10:38"
+    },
+    {
+      "label": "piper_omni_ns02",
+      "engine": "piper_omni_hq",
+      "language": "sk",
+      "sample_rate": 22050,
+      "synthesis_latency_s": null,
+      "text": "noise_scale sweep",
+      "model_id": "me_omni_piper_sk"
+    },
+    {
+      "label": "piper_omni_ns035",
+      "engine": "piper_omni_hq",
+      "language": "sk",
+      "sample_rate": 22050,
+      "synthesis_latency_s": null,
+      "text": "noise_scale sweep",
+      "model_id": "me_omni_piper_sk"
+    },
+    {
+      "label": "piper_omni_ns067",
+      "engine": "piper_omni_hq",
+      "language": "sk",
+      "sample_rate": 22050,
+      "synthesis_latency_s": null,
+      "text": "noise_scale sweep",
+      "model_id": "me_omni_piper_sk"
     }
   ]
 }

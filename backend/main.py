@@ -936,6 +936,72 @@ async def get_voice_file(
              "ogg": "audio/ogg", "flac": "audio/flac"}.get(ext.lstrip("."), "audio/wav")
     return FileResponse(path, media_type=media, filename=filename)
 
+EAR_GRADES_PATH = os.path.join("processed", "ear_grades.json")
+
+
+class RatingIn(BaseModel):
+    name: str
+    ear: Dict[str, Any] = {}
+
+
+def _read_ear_grades() -> Dict[str, Any]:
+    try:
+        with open(EAR_GRADES_PATH, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {"version": 1, "grades": []}
+
+
+def _write_ear_grades(store: Dict[str, Any]) -> None:
+    tmp = EAR_GRADES_PATH + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(store, f, indent=2, ensure_ascii=False)
+    os.replace(tmp, EAR_GRADES_PATH)
+
+
+@router.get("/ratings", summary="Read ear-grade store (Voice Lab sync)")
+async def get_ratings(current_user: User = Depends(get_current_user)):
+    """Return processed/ear_grades.json so the Lab can merge server-side
+    verdicts over browser localStorage. Authenticated like /voices/upload."""
+    return _read_ear_grades()
+
+
+@router.post("/ratings", summary="Save one ear-grade verdict (Voice Lab sync)")
+async def post_rating(body: RatingIn, current_user: User = Depends(get_current_user)):
+    """Merge one Lab verdict into processed/ear_grades.json. The item must
+    already exist in the store (run scripts/grade_library.py first); the note
+    is capped, defect values are validated. Returns the stored ear slot."""
+    store = _read_ear_grades()
+    grades = store.get("grades", [])
+    entry = next((g for g in grades if g.get("name") == body.name), None)
+    if entry is None:
+        raise HTTPException(status_code=404, detail=f"No graded item named '{body.name}'.")
+    ear = body.ear if isinstance(body.ear, dict) else {}
+    grade = ear.get("grade")
+    if grade is not None and (not isinstance(grade, int) or not 0 <= grade <= 5):
+        raise HTTPException(status_code=400, detail="grade must be an int 0-5.")
+    keep = ear.get("keep")
+    if keep is not None and keep not in (0, 1, 2, "keep", "kill"):
+        raise HTTPException(status_code=400, detail="keep must be 0-2 or keep/kill.")
+    defects = ear.get("defects") or {}
+    if not isinstance(defects, dict) or any(
+            k not in ("steadiness", "hiss", "muffled") or not isinstance(v, int)
+            or not 0 <= v <= 4 for k, v in defects.items()):
+        raise HTTPException(status_code=400, detail="defects must map steadiness/hiss/muffled to ints 0-4.")
+    note = str(ear.get("note", ""))[:500]
+    sim = ear.get("sim")
+    if sim is not None and (not isinstance(sim, (int, float)) or not 0 <= sim <= 100):
+        raise HTTPException(status_code=400, detail="sim must be 0-100.")
+    slot = {"grade": grade if grade else None,
+            "keep": ({1: "keep", 2: "kill"}.get(keep, keep) if isinstance(keep, int) else keep),
+            "sim": sim, "defects": defects, "note": note, "updated": round(time.time(), 0)}
+    old_updated = (entry.get("ear") or {}).get("updated", 0)
+    if slot["updated"] >= old_updated:
+        entry["ear"] = slot
+        _write_ear_grades(store)
+        logging.info(f"Backend: rating saved for '{body.name}' by user {current_user.id}")
+    return {"name": body.name, "ear": entry["ear"]}
+
 @router.get("/voice-lab/status", summary="Voice-lab system status (no auth, local eval page)")
 async def voice_lab_status():
     """Read-only status for the local voice-lab eval page (ui/voice-lab/).

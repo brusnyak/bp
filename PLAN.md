@@ -87,6 +87,17 @@ Next action items to explore and benchmark:
 4. **VAD chunking optimization**:
    - Tighter silence thresholds for Slovak turn completion to reduce trailing audio padded into STT.
 
+## Measured 2026-10-01 (Nemotron streaming bench — negative)
+
+- **Nemotron 3.5 ASR streaming 0.6B on owner mic** (`scripts/bench_nemotron.py` →
+  `processed/new_models/nemotron_matrix.json`, pure-C W8A8 runtime, sk-SK prompt):
+  SK WER 0.864 (trhove_b) / 0.750 (script) with RU/UK/SL language drift;
+  EN rainbow 0.188; RTF 0.32–0.33 (same speed band as small-sk).
+  Auto-prompt worse (0.984). Verdict: rejected for SK — streaming partials are
+  moot this far behind small-sk (0.23–0.35). sherpa_onnx 1.13.8 cannot run this
+  model (no online transducer config; offline path rejects the bundle).
+  Report row updated in `documentation/model_landscape_2026-10.md` §1.
+
 ## Measured 2026-09-29 (STT input control + zero-shot clones + Lab showcase)
 
 - **STT input control** (`processed/stt_input_test/clean_synth_matrix.json`): same 200-char SK passage

@@ -89,20 +89,43 @@ def synth_omni(name: str, mode: str) -> dict:
 
 def main() -> None:
     os.makedirs(OUT_DIR, exist_ok=True)
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--reuse", action="store_true",
+                    help="reuse existing <engine>.wav instead of re-synthesizing (cheap re-score)")
+    ap.add_argument("--matrix", default="matrix.json", help="output matrix filename")
+    a = ap.parse_args()
     import librosa
     import numpy as np
     import jiwer
     from backend.stt.faster_whisper_stt import FasterWhisperSTT
 
+    # Order matters only for readability. piper_omni_hq is the voice trained on the
+    # OmniVoice HQ corpus (2026-09-30) - added to test whether training on
+    # OmniVoice-cloned audio inherits its STT intelligibility (see engine_ab
+    # history: piper_personal scored WER 0.540 as STT input vs omni_zeroshot 0.054).
+    ENGINES = [
+        ("piper_generic", lambda: synth_piper("sk_SK-lili-medium", "piper_generic")),
+        ("piper_personal", lambda: synth_piper("sk_SK-personal-male-medium", "piper_personal")),
+        ("piper_omni_hq", lambda: synth_piper("me_omni_piper_sk", "piper_omni_hq")),
+        ("omni_generic", lambda: synth_omni("omni_generic", "generic")),
+        ("omni_zeroshot", lambda: synth_omni("omni_zeroshot", "zeroshot")),
+    ]
+
     print("== synthesis (sequential, one engine at a time) ==", flush=True)
-    synth = [synth_piper("sk_SK-lili-medium", "piper_generic")]
-    print(synth[-1], flush=True)
-    synth.append(synth_piper("sk_SK-personal-male-medium", "piper_personal"))
-    print(synth[-1], flush=True)
-    synth.append(synth_omni("omni_generic", "generic"))
-    print(synth[-1], flush=True)
-    synth.append(synth_omni("omni_zeroshot", "zeroshot"))
-    print(synth[-1], flush=True)
+    synth = []
+    for name, make in ENGINES:
+        cached = os.path.join(OUT_DIR, name + ".wav")
+        if a.reuse and os.path.exists(cached):
+            import soundfile as sf
+            audio_s = sf.info(cached).duration
+            synth.append({"engine": name, "wav": cached, "audio_s": round(audio_s, 2),
+                          "rtf": None, "source": "cached wav"})
+            print(f"{name}: cached ({audio_s:.1f}s)", flush=True)
+            continue
+        s = make()
+        synth.append(s)
+        print(s, flush=True)
 
     print("== STT scoring (sequential, one rung at a time) ==", flush=True)
     ref_n = norm(TEXT)
@@ -120,12 +143,15 @@ def main() -> None:
                         "stt_s": round(stt_s, 2),
                         "hyp": hyp[:200]})
             matrix.append(row)
-            print(f"{s['engine']:15s} {rung:8s} synth_rtf={s['rtf']:.3f} "
+            rtf_s = f"{s['rtf']:.3f}" if s.get("rtf") is not None else "cached"
+            print(f"{s['engine']:15s} {rung:8s} synth_rtf={rtf_s} "
                   f"WER {row['wer']:.3f} CER {row['cer']:.3f} STT {stt_s:.2f}s", flush=True)
         del stt
-    with open(os.path.join(OUT_DIR, "matrix.json"), "w", encoding="utf-8") as f:
-        json.dump({"text": TEXT, "results": matrix}, f, indent=2, ensure_ascii=False)
-    print(f"wrote {os.path.relpath(OUT_DIR, REPO_ROOT)}/matrix.json")
+    out_name = a.matrix
+    with open(os.path.join(OUT_DIR, out_name), "w", encoding="utf-8") as f:
+        json.dump({"text": TEXT, "generated": time.strftime("%Y-%m-%d %H:%M:%S"),
+                   "results": matrix}, f, indent=2, ensure_ascii=False)
+    print(f"wrote {os.path.relpath(os.path.join(OUT_DIR, out_name), REPO_ROOT)}")
 
 
 if __name__ == "__main__":
