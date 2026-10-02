@@ -135,6 +135,8 @@ section > h2 {
   padding: 1.1rem 1.35rem;
   margin-bottom: 1rem;
 }
+.lab-card { min-width: 0; overflow-wrap: anywhere; }
+.lab-card audio, .lab-card input[type="text"] { max-width: 100%; box-sizing: border-box; }
 .lab-card h4 { margin: 0 0 0.3rem; font-family: var(--font-heading); font-size: 1.2rem; }
 .lab-card-top { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
 .lab-meta { font-size: 0.88rem; color: var(--secondary-color); margin: 0.2rem 0; line-height: 1.55; }
@@ -259,6 +261,8 @@ section > h2 {
 }
 
 @media (max-width: 700px) {
+  .lab-card { padding: 0.9rem 1rem; }
+  .lab-card-top { flex-wrap: wrap; }
   .lab-hero-inner { flex-direction: column; }
   .lab-hero h1 { font-size: 2rem; }
   .matrix-table { display: block; overflow-x: auto; }
