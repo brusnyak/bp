@@ -161,7 +161,7 @@ class Sampler(threading.Thread):
         while not self.stop:
             try:
                 o = subprocess.run(["nvidia-smi", "--query-gpu=memory.used,utilization.gpu", "--format=csv,noheader,nounits"],
-                                   capture_output=True, text=True, timeout=5).stdout.strip().split(",")
+                                   capture_output=True, text=True, timeout=5).stdout.strip().splitlines()[0].split(",")  # first GPU (Kaggle had 2xT4: multi-line output killed the sampler)
                 self.rows.append((time.time(), float(o[0]), float(o[1])))
             except Exception:
                 return

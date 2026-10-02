@@ -68,14 +68,41 @@ of the owner's reference clip, num_step=16)**. All stages on the GPU, TTS serial
 | alternating EN↔SK | 162 s | 0 s | 2.5 / 10.6 / 11.5 s | no (drifts at the end) |
 
 - Processing never queued (0 s wait): each segment finished long before the next one ended. The listener delay is a **playback**
-  effect: translated audio plays back to back, OmniVoice speaks slower than the source (out/in up to 1.3×, e.g. 15 s for 11.5 s), so
-  a few long segments build a backlog that is only worked off in pauses. The alternating run ends with 8–11 s of backlog.
-- This is a speaking-rate/design issue, not a compute one: more GPU does not remove it. Options (untested): OmniVoice speed
-  parameter ≈1.15–1.3, drop or shorten stale segments when the backlog exceeds a threshold, shorter sentences.
+  effect: translated audio plays back to back, and individual segments run longer than their source (out/in up to 1.31-1.45x, e.g. 15 s
+  for 11.5 s) while others run shorter. On average the translated speech is about as long as the source (EN→SK 0.99-1.07,
+  SK→EN 0.71), so this is segment-level variance building a backlog that is only worked off in pauses (the alternating run ends with
+  8-11 s of backlog). Correction to the first write-up: the clone is **not** systematically slower than the speaker.
+- This is a pacing-policy issue, not a compute one. Section 4 measures what OmniVoice's `speed`/`duration` can do about it.
+
+## 4. Latency and pace tuning (OmniVoice on the same T4, `scripts/gpu_bench/tts_tune.py`, n=12 sentences per direction)
+
+Where the ~2 s to first audio comes from: **not the VAD** (the app endpoints at `SILENCE_TIMEOUT` = 0.3 s, the sweep assumed 0.5 s). Per
+utterance: STT 0.1–0.3 s + MT 0.04 s + **first-sentence TTS 1.2–1.4 s**. TTS has a large fixed cost per call (~0.8 s at 16 steps; a
+6-word chunk takes 1.0 s, a 12-word sentence 1.4 s), so shorter chunks help less than expected.
+
+| setting (first sentence, ~6 s of audio) | EN→SK gen | SK→EN gen | round-trip WER EN→SK / SK→EN |
+|---|---|---|---|
+| num_step 32 | 2.62 s | 2.30 s | 0.25 / 0.20 |
+| **16 (current)** | 1.43 s | 1.18 s | 0.23 / 0.15 |
+| 12 | 1.10 s | 0.91 s | 0.28 / 0.15 |
+| 8 | 0.76 s | 0.63 s | **0.39** / 0.14 |
+
+- Generation time is proportional to `num_step`. 16→12 saves ~23 % at no clear quality cost (differences are inside the noise of 12
+  sentences); 8 saves 47 % but Slovak output degrades (round-trip WER 0.23→0.39). SK output is the fragile direction.
+- First clause only (≤6 words) instead of the whole first sentence: 1.43→1.04 s (EN→SK), 1.18→0.91 s (SK→EN).
+- `speed` barely moves anything: 1.2 shortens audio only 5-8 % (not 20 %) and cuts generation ~8 %; 1.35 gives −14 % audio.
+  Explicit `duration` works as a cap (ratio 0.83-0.90 with `match0.85`/`match1.0`) with no clear WER cost, so it is the tool for
+  the playback backlog; but one cannot stretch it far.
+- Voice-prompt build is 0.11-0.21 s on the T4 (cold ≈ warm): caching it per reference and warming the model at enrollment (done in
+  `backend/tts/omni_tts.py`) removes a one-off first-call cost, not a per-sentence one. "Instant cloning" *is* what OmniVoice already
+  does (reference prompt); there is no cheaper cloning step to switch to, and training a voice is the thing we are avoiding.
+- Estimated best software-only first audio: 0.3 (VAD) + 0.2 (STT) + 0.04 (MT) + ~0.8 (12 steps, first clause) ≈ **1.3 s**. Under 1 s
+  needs a faster GPU or streaming/batched TTS (OmniVoice accepts a list of texts per call; untested), since the fixed per-call cost
+  dominates.
 
 ## Not measured / limits
 
-- **VRAM and GPU utilisation: not captured** (the `nvidia-smi` sampler returned nothing in the kernel). The "bottleneck is VRAM" idea
+- **VRAM and GPU utilisation: not captured** (the sampler crashed on the 2-GPU `nvidia-smi` output; fixed in `load_bench.py`, not yet re-run). The "bottleneck is VRAM" idea
   stays unproven.
 - One GPU model, one run per cell, serialised TTS only. A TTS pool (2×T4 were available), batched generation, fewer steps and a
   faster GPU are untested; they should raise the ~2-speaker ceiling roughly in proportion to TTS throughput.
@@ -86,6 +113,6 @@ of the owner's reference clip, num_step=16)**. All stages on the GPU, TTS serial
 
 - A cloned-voice cascade is **faster than real time on a free T4** (RTF 0.2–0.3) and holds a 3-minute presentation with no processing
   backlog. Better compute is needed for *concurrency* (several simultaneous cloned voices), not for a single presenter.
-- The remaining presentation risk is playback pacing, which needs a speed/backlog policy rather than hardware.
+- The remaining presentation risk is playback pacing, which needs a duration-cap/backlog policy rather than hardware.
 - Next measurement: same harness with `--tts` pool size 2 on 2×T4, OmniVoice `speed` 1.2, and VRAM sampling fixed; then a live run on the
   presentation machine.
