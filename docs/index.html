@@ -768,13 +768,13 @@ const MODELS = [
   { dom:"TTS", name:"OmniVoice (hromadný generátor)", flag:false, sub:["MPS float32", "medzijazykový klon"],
     sk:"covers", skText:"klon z EN/SK referencií", lic:"restricted", licText:"závislosť projektu",
     ev:["measured"], verdict:"keep", vText:"Ponechať (hromadné)",
-    key:"MEASURED RTF 0.93&ndash;1.22, hromadná QC priem. WER 0.052.",
-    note:"Ponechať na hromadné použitie, kým vyzývateľ neporazí 0.05 QC pri rovnakej či lepšej rýchlosti." },
+    key:"MEASURED Mac RTF 0.93&ndash;1.22, hromadná QC priem. WER 0.052. <b>Colab T4 (fp16): RTF 0.14&ndash;0.16 na dlhom texte, 0.40&ndash;0.65 na ~1 s fráze</b> (0.7 s na vyslovenie 1.1 s) &mdash; už rýchlejšie než real-time.",
+    note:"Ponechať na hromadné použitie, kým vyzývateľ neporazí 0.05 QC pri rovnakej či lepšej rýchlosti. Na T4 je to realistický živý klonovací engine (cena ~0.7 s na vetu navyše oproti Piperu ~0.1 s); sluchová kvalita na GPU zatiaľ neposúdená." },
   { dom:"TTS", name:"X-Voice 0.4B (NOVÉ, otestované 2026-10-02)", flag:true, sub:["0.4B flow-matching DiT", "IPA vstup, 30 jazykov", "kód MIT / váhy CC-BY-NC"],
     sk:"native", skText:"SK aj CZ v zozname 30 jazykov", lic:"nc", licText:"váhy CC-BY-NC (práca áno, produkt nie)",
     ev:["measured","vendor"], verdict:"test", vText:"Kvalita výborná, rýchlosť na Macu nie",
-    key:"MEASURED (1 vzorka, M1 Pro MPS fp32, nfe 32, ref 7 s): WER cez small-sk <b>0.000</b> vs omni-zeroshot 0.054 (rovnaký text, ref aj skórovač); cez base 0.49 vs 0.51. Rýchlosť ~<b>RTF 4.2</b> (rozdiel krátky/dlhý beh), výstup 24 s na text, ktorý Piper povie za 11&ndash;13 s. VENDOR: RTF 0.073 na RTX 4090.",
-    note:"Prvý nájdený otvorený klonovací model, ktorý uvádza SK natívne a dá sa spustiť lokálne. Na Macu nie je živý (RTF ~4), takže práve tu je argument pre CUDA: potrebné je ~60&times; zrýchlenie na ceste k RTF &lt;0.1. <b>Neoverené:</b> podobnosť hlasu a sluchový verdikt (nemerané), rýchlosť na konkrétnych kartách (len VENDOR pre 4090; slabšie karty sú PROJECTED/neznáme), tempo reči (~2&times; pomalšie než prirodzené, predikátor tempa/stage 2 netestovaný). Prvý pokus mal WER 0.24 kvôli chybe protokolu (text referencie dlhší než orezané audio) &mdash; opravené a zaznamenané." },
+    key:"MEASURED (1 vzorka, M1 Pro MPS fp32, nfe 32, ref 7 s): WER cez small-sk <b>0.000</b> vs omni-zeroshot 0.054 (rovnaký text, ref aj skórovač); cez base 0.49 vs 0.51. Rýchlosť ~<b>RTF 4.2</b> (rozdiel krátky/dlhý beh), výstup 24 s na text, ktorý Piper povie za 11&ndash;13 s. <b>Colab T4 (MEASURED, n=1): marginal RTF 0.61&ndash;0.80</b> (SK/CS/EN), t.j. ~5&ndash;6&times; rýchlejšie než Mac. VENDOR: RTF 0.073 na RTX 4090 (u nás nemerané).",
+    note:"Prvý nájdený otvorený klonovací model, ktorý uvádza SK natívne a dá sa spustiť lokálne. Na Macu nie je živý (RTF ~4); na bezplatnom T4 je to 0.6&ndash;0.8, stále nie live. <b>&bdquo;Potrebná RTX 4090&ldquo; nie je podložené</b>: žiadna silnejšia karta zatiaľ nameraná nebola. <b>Neoverené:</b> podobnosť hlasu a sluchový verdikt (nemerané), rýchlosť na konkrétnych kartách (len VENDOR pre 4090; slabšie karty sú PROJECTED/neznáme), tempo reči (~2&times; pomalšie než prirodzené, predikátor tempa/stage 2 netestovaný). Prvý pokus mal WER 0.24 kvôli chybe protokolu (text referencie dlhší než orezané audio) &mdash; opravené a zaznamenané." },
   { dom:"TTS", name:"Chatterbox multilingual / Turbo", flag:false, sub:["0.5B Llama backbone", "Turbo 350M", "ONNX buildy"],
     sk:"none", skText:"ŽIADNA slovenčina vo váhach (karta opravená)", lic:"safe", licText:"MIT",
     ev:["vendor","measured"], verdict:"watch", vText:"Pre SK len proxy",
@@ -851,14 +851,15 @@ const MATRIX = [
   { w:"MADLAD-3B CT2 test kvality", c:["cond|pomalé CPU","cond|pomalé CPU","yes","yes","yes"] },
   { w:"Piper fine-tune 2500 krokov", c:["cond|4h40 blokované","cond|pomalšie","cond|~2-3h","cond|~1-1.5h","yes|&lt;1h + eval"] },
   { w:"Chatterbox Turbo / CosyVoice syntéza", c:["cond|MPS pomalé","cond|CPU pomalé","yes","yes","yes"] },
-  { w:"X-Voice 0.4B klonovanie (SK zero-shot)", c:["cond|MPS RTF ~4 MEASURED","cond|CPU pomalé","cond|VENDOR 4090 RTF 0.07","cond|neznáme","cond|neznáme"] },
+  { w:"X-Voice 0.4B klonovanie (SK zero-shot)", c:["cond|MPS RTF ~4 MEASURED","cond|CPU pomalé","cond|T4 RTF 0.6-0.8 MEASURED","cond|neznáme","cond|VENDOR 4090 RTF 0.07"] },
+  { w:"OmniVoice klonovanie (SK zero-shot)", c:["cond|MPS RTF ~0.8-1 MEASURED","cond|CPU pomalé","yes|T4 RTF 0.14 MEASURED","yes","yes"] },
   { w:"SeamlessM4T po častiach", c:["cond|nie celé klipy","cond|pomalšie","yes","yes","yes|+ batch"] },
   { w:"Hibiki-Zero 3B", c:["no|žiaden SK pár","no","no","cond|hraničné","yes"] },
   { w:"STT sweep počas tréningu", c:["no|strop 16 GB","no","yes","yes","yes"] }
 ];
 
 const EVAL = [
-  { n:"X-Voice: podobnosť hlasu + tempo + RTF na CUDA", d:"Mac test hotový (WER 0.000, RTF ~4). Zostáva: speaker-similarity vs me_sk referencia, sluchový verdikt, stage 2 + predikátor tempa, a RTF na akejkoľvek CUDA karte (najprv najslabšia dostupná &mdash; 4090 je len VENDOR číslo).", where:"Mac hotové → CUDA" },
+  { n:"X-Voice: podobnosť hlasu + tempo + RTF na CUDA", d:"Mac test hotový (WER 0.000, RTF ~4); Colab T4: X-Voice RTF 0.6&ndash;0.8, OmniVoice 0.14. Zostáva: speaker-similarity vs me_sk referencia, sluchový verdikt, stage 2 + predikátor tempa, a RTF na akejkoľvek CUDA karte (najprv najslabšia dostupná &mdash; 4090 je len VENDOR číslo).", where:"Mac hotové → CUDA" },
   { n:"MADLAD-400-3B-CT2 test kvality", d:"chrF na zašumenom STT vstupe vs Opus-MT na SK&harr;EN, beam 1. Najprv CPU, CUDA ak je k dispozícii.", where:"CPU → CUDA" },
   { n:"Ablácia počtu krokov (2500 / 5000 / 10000)", d:"Najlacnejší experiment kvality. Počkať na sluchový verdikt o me_omni_piper_sk.", where:"CUDA / 3 Mac dni" },
   { n:"Canary AST zlučovací test", d:"SK reč → EN text v jednom kroku vs kaskáda STT+MT, na latenciu + chrF. Jediné e2e pokrývajúce SK po páde Nemotronu.", where:"Mac / CUDA" },
@@ -874,7 +875,7 @@ const IDX = [
   { t:"Sluchové hodnotenia", f:"processed/ear_grades.json cez scripts/grade_library.py &middot; ui/voice-lab/library.json" },
   { t:"Náklady tréningu", f:"processed/overnight_hq_2026-09-30.log &middot; compute_capacity_report_2026-09.md &sect;2&ndash;&sect;3" },
   { t:"Prototypy (spikes)", f:"processed/new_models/nemotron_matrix.json &middot; scripts/bench_nemotron.py &middot; processed/new_models/seamless_matrix.json &middot; processed/new_models/chatterbox_matrix.json &middot; scripts/bench_new_models.py" },
-  { t:"X-Voice SK zero-shot (2026-10-02)", f:"processed/engine_ab/xvoice_zeroshot_v2.wav &middot; processed/new_models/xvoice_matrix.json &middot; documentation/model_landscape_2026-10.md &sect;10" },
+  { t:"X-Voice SK zero-shot (2026-10-02)", f:"processed/engine_ab/xvoice_zeroshot_v2.wav &middot; processed/new_models/xvoice_matrix.json &middot; processed/gpu_bench/colab_T4.json &middot; documentation/model_landscape_2026-10.md &sect;10" },
   { t:"Zahrnuté predošlé verdikty", f:"PLAN.md &bdquo;Measured 2026-09-29&ldquo; (turbo negatívny, zipformer/cohere kills, VAD anomália, opravy chýb živého TTS hlasu)" }
 ];
 
