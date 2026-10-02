@@ -42,7 +42,7 @@ New work lands as a **branch on the remote**, never as a direct rewrite of `main
 1. Contributor: commit on a `win/*` (or similar) branch, push, open a PR (that is how
    `79a8476` and the `lite` branch arrived).
 2. Mac: `git fetch`, merge that branch into the integration line, resolve conflicts,
-   then run the three gates — `make test` (33 expected), `.venv/bin/python
+   then run the three gates — `make test` (38 expected), `.venv/bin/python
    test/interrupt_smoke_test.py` (needs `make run`), `make demo-check`.
 3. Only after the gates pass: ff `main` at `~/Documents/STU/BP` onto the tip.
 
@@ -63,7 +63,7 @@ works too). ~92 s on a warm Mac, ~850 s cold on the Windows laptop. The old
 | `make run` | backend, `https://localhost:8000` (self-signed cert in `certs/`) |
 | `make demo-check` | demo pre-flight: assets + live server (`scripts/demo_preflight.py --server`) |
 | `make lab` | Voice Lab static page, `http://localhost:8080/ui/voice-lab/lab.html`, no backend |
-| `make test` | 33 tests: hardware, VAD, MT, API, auth, security, config |
+| `make test` | 38 tests: hardware, VAD, MT, API, auth, security, config, ratings |
 | `python3 scripts/update_voice_lab_library.py --no-test` | regenerate `ui/voice-lab/library.json` (never hand-edit) |
 | `.venv/bin/python test/interrupt_smoke_test.py` | live WS rehearsal, needs `make run` |
 | `.venv/bin/python scripts/e2e_ensk_new_voice.py` | full EN→SK offline run, writes `processed/e2e_ensk.json` |
@@ -127,3 +127,9 @@ Demo: `documentation/demo_runbook_2026-09-28.md` (+ `monday_test_checklist.md`,
    (done / worked-on / future work).
 7. Housekeeping: delete `test/full_pipeline_test.py`; re-run
    `python3 scripts/update_voice_lab_library.py --no-test` for the `*_v2b` takes.
+8. **GPU path (2026-10-02, evidence in `documentation/model_landscape_2026-10.md` §10.2–10.4):** free T4 (Colab + Kaggle) runs
+   OmniVoice cloning at RTF 0.14–0.17 (long) / ~0.7 s per phrase and X-Voice at 0.46–0.80; owner ear: clones good, Seamless =
+   generic voice. Next: (a) meeting simulation with OmniVoice as TTS on a GPU (`scripts/meeting_sim.py`, timeline input →
+   translation → output); (b) live measurement on the presentation machine (needs a GPU box; Kaggle/Colab cannot run the
+   live mic path); (c) capture numeric ear grades (log in on :8000 or export JSON). Piper fine-tuning only matters for CPU-only
+   machines. Kaggle CLI + private dataset `yegorby/bp-gpu-bench-refs` + Modal token were created for this; revoke when done.
