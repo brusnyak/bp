@@ -222,11 +222,11 @@ Next action items to explore and benchmark:
 | `make run` | Full backend (https://localhost:8000) |
 | `make demo-check` | Demo pre-flight (assets + live server; `scripts/demo_preflight.py --server`) |
 | `make test` | Backend suite: piper pipeline + VAD + hardware + auth + API tests (20 pass, 2026-09-28) |
-| `venv/bin/python test/interrupt_smoke_test.py` | Live WS rehearsal over `/ws` (needs `make run`) |
+| `.venv/bin/python test/interrupt_smoke_test.py` | Live WS rehearsal over `/ws` (needs `make run`) |
 | `python3 scripts/update_voice_lab_library.py --no-test` | Refresh Voice Lab manifest |
-| `venv/bin/python scripts/voice_similarity_qc.py --synthesize-only` | Synthesize QC candidates |
+| `.venv/bin/python scripts/voice_similarity_qc.py --synthesize-only` | Synthesize QC candidates |
 | `.venv-stt/bin/python scripts/stt_parakeet_spike.py --clip en\|sk` | Parakeet spike (separate venv) |
-| `venv/bin/python scripts/pipeline_latency_probe.py` | First-output latency probe |
+| `.venv/bin/python scripts/pipeline_latency_probe.py` | First-output latency probe |
 | `.venv/bin/python scripts/vad_close_probe.py` | Trailing-silence VAD probe (needs `make run`) |
 | `.venv/bin/python scripts/assemble_train_corpus.py --lang sk\|en` | `omni_hq_<lang>` manifest → Piper train corpus dir |
 
@@ -239,4 +239,4 @@ Next action items to explore and benchmark:
 - To add before sending: the completed 2500-step result, the ear-QC verdict for
   `me_omni_piper_sk`, and a sweep of new STT/MT/TTS releases.
 
-| `venv/bin/python scripts/machine_listen_qc.py` | Machine listening panel (WER thirds + acoustic health) |
+| `.venv/bin/python scripts/machine_listen_qc.py` | Machine listening panel (WER thirds + acoustic health) |
