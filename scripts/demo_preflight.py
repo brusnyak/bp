@@ -117,10 +117,10 @@ def check_server():
     return results
 
 
-def report(title, results):
+def report(title, results, miss="FAIL"):
     print(f"\n{title}")
     for ok, name, detail in results:
-        print(f"  {'PASS' if ok else 'FAIL'}  {name}  --  {detail}")
+        print(f"  {'PASS' if ok else miss}  {name}  --  {detail}")
     return all(ok for ok, _, _ in results)
 
 
@@ -138,9 +138,9 @@ def main():
         required, soft = split_fresh(required)
     required_ok = report("REQUIRED (demo cannot start without these)", required)
     if soft:
-        report("OWNER-LOCAL (not in git; generic voice / no Google login without them)", soft)
+        report("OWNER-LOCAL (not in git; generic voice / no Google login without them)", soft, miss="WARN")
     optional_ok = report("OPTIONAL (fallbacks / non-default paths)",
-                         check_paths(OPTIONAL, REPO_ROOT))
+                         check_paths(OPTIONAL, REPO_ROOT), miss="WARN")
     server_ok = True
     if args.server:
         server_ok = report("SERVER (make run must be up)", check_server())
