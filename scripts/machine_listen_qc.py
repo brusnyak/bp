@@ -41,8 +41,11 @@ TARGETS = {
     "piper_male_sk_test.wav": ("sk", SK_AB),
     "sk2500_ns05.wav": ("sk", SK_AB),
     "sk2500_ns08.wav": ("sk", SK_AB),
-    "enpers_ns03.wav": ("en", EN_TEXT),
+        "enpers_ns03.wav": ("en", EN_TEXT),
     "enpers_ns05.wav": ("en", EN_TEXT),
+    # NEW: 2026-09-30 SK Piper fine-tune on OmniVoice HQ corpus
+    "piper_omni_hq_sk_test.wav": ("sk", SK_AB),
+    "piper_omni_hq_en_test.wav": ("en", EN_TEXT),
 }
 
 

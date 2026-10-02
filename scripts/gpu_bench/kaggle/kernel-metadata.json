@@ -1,0 +1,3 @@
+{"id": "yegorby/bp-gpu-bench", "title": "bp-gpu-bench", "code_file": "kaggle_bench.py", "language": "python",
+ "kernel_type": "script", "is_private": true, "enable_gpu": true, "enable_internet": true,
+ "dataset_sources": ["yegorby/bp-gpu-bench-refs"], "competition_sources": [], "kernel_sources": []}

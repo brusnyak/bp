@@ -27,16 +27,102 @@
     try { return JSON.parse(localStorage.getItem("hlas-ratings") || "{}"); }
     catch (e) { return {}; }
   }
-  function saveRating(name, patch) {
+  function saveRating(name, patch, statusEl) {
     const all = getRatings();
-    all[name] = Object.assign(all[name] || {}, patch);
-    localStorage.setItem("hlas-ratings", JSON.stringify(all));
+    all[name] = Object.assign(all[name] || {}, patch, { updated: Date.now() / 1000 });
+    try {
+      localStorage.setItem("hlas-ratings", JSON.stringify(all));
+    } catch (e) { /* private mode: page still works, export just yields {} */ }
+    if (statusEl) {
+      statusEl.textContent = "saving…";
+      statusEl.className = "lab-save idle";
+    }
+    pushRating(name, all[name], statusEl);
+  }
+
+  let pushTimers = {};
+  function pushRating(name, rating, statusEl) {
+    const token = localStorage.getItem("userToken");
+    if (!backendUp || !token) {
+      if (statusEl) {
+        statusEl.textContent = backendUp ? "local only (login to sync)" : "local only";
+        statusEl.className = "lab-save idle";
+      }
+      return;
+    }
+    clearTimeout(pushTimers[name]);
+    pushTimers[name] = setTimeout(async () => {
+      try {
+        const r = await fetch("/api/ratings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+          body: JSON.stringify({ name, ear: rating }),
+        });
+        if (statusEl) {
+          statusEl.textContent = r.ok ? "saved ✓" : "sync failed (" + r.status + ")";
+          statusEl.className = "lab-save " + (r.ok ? "pass" : "fail");
+        }
+      } catch (e) {
+        if (statusEl) {
+          statusEl.textContent = "sync failed (backend unreachable)";
+          statusEl.className = "lab-save fail";
+        }
+      }
+    }, 400);
+  }
+
+  async function pullRatings() {
+    const token = localStorage.getItem("userToken");
+    if (!backendUp || !token) return;
+    try {
+      const r = await fetch("/api/ratings", {
+        headers: { Authorization: "Bearer " + token },
+      });
+      if (!r.ok) return;
+      const store = await r.json();
+      const all = getRatings();
+      let changed = false;
+      (store.grades || []).forEach((g) => {
+        const ear = g.ear || {};
+        if (ear.grade == null && ear.keep == null && !ear.note &&
+            !(ear.defects && Object.keys(ear.defects).length) && ear.sim == null) return;
+        const local = all[g.name] || {};
+        if ((ear.updated || 0) >= (local.updated || 0)) {
+          all[g.name] = Object.assign({}, local, ear, { updated: ear.updated || Date.now() / 1000 });
+          changed = true;
+        }
+      });
+      if (changed) localStorage.setItem("hlas-ratings", JSON.stringify(all));
+    } catch (e) { /* static mode: local ratings stand alone */ }
   }
 
   function ratingRow(item) {
     const wrap = el("div", "lab-rate");
     const saved = getRatings()[item.name] || {};
-    wrap.appendChild(document.createTextNode("sounds like me: "));
+    const saveState = el("span", "lab-save idle", "");
+    wrap.appendChild(document.createTextNode("ear grade "));
+    const grade = document.createElement("select");
+    grade.setAttribute("aria-label", "Ear grade 1-5 for " + item.name);
+    ["?", "1", "2", "3", "4", "5"].forEach((o, i) => {
+      const opt = document.createElement("option");
+      opt.value = String(i); opt.textContent = o === "?" ? "?/5" : o + "/5";
+      grade.appendChild(opt);
+    });
+    grade.value = String(saved.grade !== undefined ? saved.grade : 0);
+    grade.addEventListener("change", () => saveRating(item.name, { grade: Number(grade.value) }, saveState));
+    wrap.appendChild(grade);
+    wrap.appendChild(document.createTextNode(" keep "));
+    const keep = document.createElement("select");
+    keep.setAttribute("aria-label", "Keep or kill for " + item.name);
+    ["?", "keep", "kill"].forEach((o, i) => {
+      const opt = document.createElement("option");
+      opt.value = String(i); opt.textContent = o;
+      keep.appendChild(opt);
+    });
+    keep.value = String(saved.keep !== undefined ? saved.keep : 0);
+    keep.addEventListener("change", () => saveRating(item.name, { keep: Number(keep.value) }, saveState));
+    wrap.appendChild(keep);
+    wrap.appendChild(document.createTextNode(" sounds like me: "));
     const slider = document.createElement("input");
     slider.type = "range"; slider.min = "0"; slider.max = "100";
     slider.value = saved.sim !== undefined ? saved.sim : "50";
@@ -44,7 +130,7 @@
     const val = el("strong", null, String(slider.value));
     slider.addEventListener("input", () => {
       val.textContent = slider.value;
-      saveRating(item.name, { sim: Number(slider.value) });
+      saveRating(item.name, { sim: Number(slider.value) }, saveState);
     });
     wrap.appendChild(slider); wrap.appendChild(document.createTextNode(" "));
     wrap.appendChild(val);
@@ -58,14 +144,55 @@
         sel.appendChild(opt);
       });
       sel.value = String(saved[key] !== undefined ? saved[key] : 0);
-      sel.addEventListener("change", () => saveRating(item.name, { [key]: Number(sel.value) }));
+      sel.addEventListener("change", () => saveRating(item.name, { [key]: Number(sel.value) }, saveState));
       wrap.appendChild(sel);
     });
+    wrap.appendChild(document.createTextNode(" note "));
+    const note = document.createElement("input");
+    note.type = "text";
+    note.placeholder = "trembling at 0:03, robotic vowels…";
+    note.value = saved.note || "";
+    note.setAttribute("aria-label", "Ear note for " + item.name);
+    note.addEventListener("change", () => saveRating(item.name, { note: note.value }, saveState));
+    wrap.appendChild(note);
+    wrap.appendChild(document.createTextNode(" "));
+    wrap.appendChild(saveState);
     return wrap;
   }
 
   function metaLine(parts) {
     return el("p", "lab-meta", parts.filter(Boolean).join(" · "));
+  }
+
+  const GRADABLE = new Set(["voices", "qc", "zeroshot", "corpus_sk", "corpus_en",
+    "conversation", "demo_audio", "meeting", "spikes", "stt_input", "gpu_clones"]);
+
+  function gradePills(item, top) {
+    if (item.grade && item.grade !== "na") {
+      const kind = item.grade === "pass" ? "pass" : item.grade === "review" ? "idle" : "fail";
+      top.appendChild(pill("machine: " + item.grade, kind));
+    }
+    const saved = getRatings()[item.name] || {};
+    const earGrade = item.ear && item.ear.grade != null ? item.ear.grade : saved.grade;
+    const earKeep = item.ear && item.ear.keep != null ? item.ear.keep : saved.keep;
+    if (earGrade) top.appendChild(pill("ear: " + earGrade + "/5", "idle"));
+    if (earKeep === 1 || earKeep === "keep") top.appendChild(pill("keep", "pass"));
+    else if (earKeep === 2 || earKeep === "kill") top.appendChild(pill("kill", "fail"));
+    const defects = (item.ear && item.ear.defects) || {};
+    [["steadiness", "tremor"], ["hiss", "hiss"], ["muffled", "muffled"]].forEach(([key, label]) => {
+      const v = defects[key] !== undefined ? defects[key] : saved[key];
+      if (v >= 3) top.appendChild(pill("!" + label, "fail"));
+      else if (v === 2) top.appendChild(pill("~" + label, "idle"));
+    });
+  }
+
+  function gradeNotes(item, card) {
+    const lines = [];
+    if (item.grade_note) lines.push("machine: " + item.grade_note);
+    const saved = getRatings()[item.name] || {};
+    const note = (item.ear && item.ear.note) || saved.note;
+    if (note) lines.push("ear: " + note);
+    if (lines.length) card.appendChild(metaLine(lines));
   }
 
   function itemCard(item, sectionId) {
@@ -85,6 +212,7 @@
         item.in_registry ? "in registry" : "not registered",
         item.in_registry ? "pass" : "fail"));
     }
+    gradePills(item, top);
     card.appendChild(top);
     if (sectionId === "voices") {
       card.appendChild(metaLine([
@@ -165,6 +293,7 @@
         meta.note || null,
       ]));
     }
+    gradeNotes(item, card);
     if (sectionId !== "conversation" && item.meta && Object.keys(item.meta).length) {
       card.appendChild(metaLine(
         Object.entries(item.meta).map(([k, v]) => k + ": " + v)));
@@ -179,14 +308,26 @@
     } else if (!(sectionId === "stt_input" && !item.file)) {
       card.appendChild(audioEl(item.file));
     }
-    if (sectionId === "qc") card.appendChild(ratingRow(item));
+    if (GRADABLE.has(sectionId)) card.appendChild(ratingRow(item));
     return card;
   }
 
   function renderStats(library) {
     const strip = document.getElementById("statStrip");
     const counts = {};
-    library.sections.forEach((s) => { counts[s.id] = s.items.length; });
+    const libEar = new Set();
+    let machineKill = 0;
+    library.sections.forEach((s) => {
+      counts[s.id] = s.items.length;
+      s.items.forEach((i) => {
+        if (i.grade === "kill" || i.grade === "review") machineKill++;
+        if ((i.ear || {}).grade != null || (i.ear || {}).keep != null) libEar.add(i.name);
+      });
+    });
+    let earScored = libEar.size;
+    Object.entries(getRatings()).forEach(([name, r]) => {
+      if ((r.grade || r.keep) && !libEar.has(name)) earScored++;
+    });
     const scored = (library.sections.find((s) => s.id === "qc") || { items: [] }).items
       .filter((i) => i.similarity !== undefined && i.similarity !== null).length;
     [
@@ -194,6 +335,8 @@
       ["QC candidates", counts.qc || 0],
       ["SK matrix", counts.sk_direction || 0],
       ["Scored", scored],
+      ["Ear graded", earScored],
+      ["Needs ear", machineKill],
       ["Test clips", counts.test || 0],
     ].forEach(([label, n]) => {
       const chip = el("span", "lab-stat", label);
@@ -358,8 +501,13 @@
     const mix = items.find((i) => i.name === "_mix");
     if (mix) {
       const card = el("div", "lab-card");
-      card.appendChild(el("h4", null, "Whole conversation (" + (mix.meta.total_s || "?") + "s, one player)"));
+      const mixTop = el("div", "lab-card-top");
+      mixTop.appendChild(el("h4", null, "Whole conversation (" + (mix.meta.total_s || "?") + "s, one player)"));
+      gradePills(mix, mixTop);
+      card.appendChild(mixTop);
+      gradeNotes(mix, card);
       card.appendChild(audioEl(mix.file));
+      card.appendChild(ratingRow(mix));
       const chapters = mix.meta.chapters || [];
       if (chapters.length) {
         const tbl = el("table", "matrix-table");
@@ -392,7 +540,9 @@
       const top = el("div", "lab-card-top");
       top.appendChild(el("h4", null, "Turn " + item.name + " · Speaker " + (meta.speaker || "?")));
       top.appendChild(pill(meta.direction || "", "idle"));
+      gradePills(item, top);
       card.appendChild(top);
+      gradeNotes(item, card);
       [["Script", meta.script], ["Heard", meta.heard], ["Translated", meta.translation]].forEach(([k, v]) => {
         if (v) {
           const p = el("p", "turn-copy");
@@ -414,21 +564,42 @@
         meta.live ? "live /ws measurement" : null,
       ]));
       if (item.file) card.appendChild(audioEl(item.file));
+      card.appendChild(ratingRow(item));
       section.appendChild(card);
     });
     host.appendChild(section);
   }
 
-  function audioCard(item) {
+  function audioCard(item, sectionId) {
     const card = el("div", "lab-card");
-    card.appendChild(el("h4", null, item.name));
+    const top = el("div", "lab-card-top");
+    top.appendChild(el("h4", null, item.name));
+    gradePills(item, top);
+    card.appendChild(top);
     const meta = item.meta || {};
     const lines = Object.entries(meta).filter(([, v]) => v !== undefined && v !== null && v !== "");
     if (lines.length) {
       card.appendChild(metaLine(lines.map(([k, v]) => k + ": " + v)));
     }
-    card.appendChild(audioEl(item.file));
+    gradeNotes(item, card);
+    if (item.file) card.appendChild(audioEl(item.file));
+    if (sectionId && GRADABLE.has(sectionId)) card.appendChild(ratingRow(item));
     return card;
+  }
+
+  function sectionOf(item) {
+    const f = item.file || "";
+    if (f.includes("/omni_hq_sk/")) return "corpus_sk";
+    if (f.includes("/omni_hq_en/")) return "corpus_en";
+    if (f.includes("/omnivoice/")) return "zeroshot";
+    if (f.includes("/voice_qc/")) return "qc";
+    if (f.includes("/speaker_voices/")) return "voices";
+    if (f.includes("/conversation/")) return "conversation";
+    if (f.includes("/demo_audio/")) return "demo_audio";
+    if (f.includes("/meeting/")) return "meeting";
+    if (f.includes("/new_models/")) return "spikes";
+    if (f.includes("/stt_input_test/")) return "stt_input";
+    return "";
   }
 
   function renderAudioList(items, host, title, lead, id) {    if (!items.length) return;
@@ -440,9 +611,9 @@
       det.className = "lab-more";
       det.appendChild(el("summary", null, "All corpus clips (" + items.length + ")"));
       const list = el("div", "lab-card-list");
-      rest.forEach((item) => list.appendChild(audioCard(item)));
+      rest.forEach((item) => list.appendChild(audioCard(item, sectionOf(item))));
       det.appendChild(list);
-      head.forEach((item) => section.appendChild(audioCard(item)));
+      head.forEach((item) => section.appendChild(audioCard(item, sectionOf(item))));
       section.appendChild(det);
       host.appendChild(section);
       return;
@@ -478,7 +649,7 @@
     }
     const rest2 = id === "training-corpus" ? [] : items;
     rest2.forEach((item) => {
-      section.appendChild(audioCard(item));
+      section.appendChild(audioCard(item, sectionOf(item)));
     });
     host.appendChild(section);
   }
@@ -519,6 +690,11 @@
       "Zero-shot voice clones",
       "OmniVoice clones from the new v2b recordings (isolated eval, not the live pipeline). Judge blind against the Piper pair above.",
       "zero-shot-clones");
+    const gpuClones = library.sections.find((section) => section.id === "gpu_clones");
+    if (gpuClones) renderAudioList(gpuClones.items, host,
+      "GPU clones + speech-to-speech",
+      "X-Voice and OmniVoice clones from your 5-7 s reference clips, plus SeamlessM4T speech-to-speech (no Slovak speech output). Grade: does it sound like you, is it steady, would you use it live?",
+      "gpu-clones");
     const demoAudio = library.sections.find((section) => section.id === "demo_audio");
     if (demoAudio) renderAudioList(demoAudio.items, host,
       "Demo turns (offline fallback)",
@@ -536,6 +712,11 @@
       "New-model spikes",
       "Isolated-eval results on fixed clips: RTF, chrF/WER, hypothesis text, output audio. Kill reasons recorded in PLAN.md.",
       "model-spikes");
+    const streamAudit = library.sections.find((section) => section.id === "stream_audit");
+    if (streamAudit) renderAudioList(streamAudit.items, host,
+      "Streaming pipeline audit",
+      "Live /ws stage timing per direction: VAD-close to text, text to translation, translation to audio. Streaming holds iff speech contains pauses.",
+      "streaming-audit");
   }
 
   // Backend-aware upload: if the FastAPI backend answers, staged files can be
@@ -690,7 +871,8 @@
     setupUpload();
     setupPlanToggle();
     loadPlan();
-    probeBackend();
+    await probeBackend();
+    await pullRatings();
     const dl = el("button", "btn-small", "Download my ratings (JSON)");
     dl.addEventListener("click", () => {
       const blob = new Blob([localStorage.getItem("hlas-ratings") || "{}"],

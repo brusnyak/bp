@@ -5,60 +5,74 @@
       "title": "Speaker voices (reference recordings)",
       "items": [
         {
-          "name": "cs_staromestske_v2",
-          "file": "../../speaker_voices/cs_staromestske_v2.m4a",
+          "name": "me_cs_staromestske",
+          "file": "../../speaker_voices/me_cs_staromestske.m4a",
           "language": "cs",
           "transcript": "Včera odpoledne jsem šel na Staroměstské náměstí. Potkal jsem tam starého kamaráda, který prodával housky a koláče. „Tři rohlíky a čtyři koláče, prosím!\" poprosil jsem. „Ahoj! Kde ses toulal celé měsíce?\" zeptal se mě. Vypravoval jsem mu o své práci a o dlouhé cestě vlakem přes hory a údolí. Pak jsme si sedli na lavičku a dali si kávu. Okolo běhaly děti a házely si míčem. V pekárně voněla čerstvá mouka a pečivo. „Věřil bys, že tohle místo znám už čtyřicet let?\" řekl a ukázal na věž. Musel jsem se smát. Když se setmělo, vydali jsme se domů přes Karlův most. Kousek od mostu stojí můj starý dům. Nad řekou kroužili racci a z hospody se ozývala hudba. Bylo to jedno z nejhezčích odpolední tohoto měsíce. Kdy se sem zase vrátím?",
           "in_registry": true,
-          "featured": true
+          "featured": true,
+          "grade": "pass",
+          "grade_note": "registered reference take with transcript"
         },
         {
-          "name": "en_rainbow_v2",
-          "file": "../../speaker_voices/en_rainbow_v2.m4a",
+          "name": "me_en_rainbow",
+          "file": "../../speaker_voices/me_en_rainbow.m4a",
           "language": "en",
           "transcript": "When the sunlight strikes raindrops in the air, they act as a prism and form a rainbow. The rainbow is a division of white light into many beautiful colors. These take the shape of a long round arch, with its path high above, and its two ends apparently beyond the horizon. There is, according to legend, a boiling pot of gold at one end. People look, but no one ever finds it. When a man looks for something beyond his reach, his friends say he is looking for the pot of gold at the end of the rainbow. Throughout the centuries people have explained the rainbow in various ways. Some have accepted it as a miracle without physical explanation. To the Hebrews it was a token that there would be no more universal floods. The Greeks used to imagine that it was a sign from the gods to foretell war or heavy rain. The Norsemen considered the rainbow as a bridge over which the gods passed from earth to their home in the sky. Others have tried to explain the phenomenon physically. Aristotle thought that the rainbow was caused by reflection of the sun's rays by the rain. Since then physicists have found that it is not reflection, but refraction by the raindrops which causes the rainbow. Many complicated ideas about the rainbow have been formed. The difference in the rainbow depends considerably upon the size of the drops, and the width of the rainbow increases as the size of the drops increases. The actual primary rainbow observed is said to be the effect of superposition of a number of bows. If the red of the second bow falls upon the green of the first, the result is to give a bow with an abnormally wide yellow band, since red and green light when mixed form yellow.",
           "in_registry": true,
-          "featured": false
+          "featured": false,
+          "grade": "pass",
+          "grade_note": "registered reference take with transcript"
         },
         {
-          "name": "en_rainbow_v2b",
-          "file": "../../speaker_voices/en_rainbow_v2b.m4a",
+          "name": "me_en_rainbow_b",
+          "file": "../../speaker_voices/me_en_rainbow_b.m4a",
           "language": "en",
           "transcript": "When the sunlight strikes raindrops in the air, they act as a prism and form a rainbow. The rainbow is a division of white light into many beautiful colors. These take the shape of a long round arch, with its path high above, and its two ends apparently beyond the horizon. There is, according to legend, a boiling pot of gold at one end. People look, but no one ever finds it. When a man looks for something beyond his reach, his friends say he is looking for the pot of gold at the end of the rainbow. Throughout the centuries people have explained the rainbow in various ways. Some have accepted it as a miracle without physical explanation. To the Hebrews it was a token that there would be no more universal floods. The Greeks used to imagine that it was a sign from the gods to foretell war or heavy rain. The Norsemen considered the rainbow as a bridge over which the gods passed from earth to their home in the sky. Others have tried to explain the phenomenon physically. Aristotle thought that the rainbow was caused by reflection of the sun's rays by the rain. Since then physicists have found that it is not reflection, but refraction by the raindrops which causes the rainbow. Many complicated ideas about the rainbow have been formed. The difference in the rainbow depends considerably upon the size of the drops, and the width of the rainbow increases as the size of the drops increases. The actual primary rainbow observed is said to be the effect of superposition of a number of bows. If the red of the second bow falls upon the green of the first, the result is to give a bow with an abnormally wide yellow band, since red and green light when mixed form yellow.",
           "in_registry": true,
-          "featured": true
+          "featured": true,
+          "grade": "pass",
+          "grade_note": "registered reference take with transcript"
         },
         {
-          "name": "en_script_reading",
-          "file": "../../speaker_voices/en_script_reading.m4a",
+          "name": "me_en_script",
+          "file": "../../speaker_voices/me_en_script.m4a",
           "language": "en",
           "transcript": "Good morning, and welcome to this live demonstration of real time speech translation. I am speaking English, and you will hear my own voice speaking Slovak within seconds. The system listens through the microphone and detects when speech begins and ends. First the speech is transcribed into text, then translated, then spoken again. Every step runs locally on this computer, with no cloud and no waiting room. Latency is the time between my words and the translated voice you hear. Our goal is a delay of only a few seconds, short enough for natural conversation. Voice cloning means the Slovak output sounds like me, not like a stranger. To teach the system my voice, I record a few minutes of clean speech. A quiet room matters more than an expensive microphone. Please speak at a steady pace, with short pauses between sentences. Numbers, names, and technical terms need extra care in both languages. The subtitle line shows partial results while I am still speaking. You can pop the subtitles out into a floating window above any application. The translated voice is routed into the meeting as a virtual microphone. Other participants hear Slovak, while I keep speaking English. Questions from the audience will be translated in the opposite direction. Thank you for listening, and I look forward to your questions.",
           "in_registry": true,
-          "featured": false
+          "featured": false,
+          "grade": "pass",
+          "grade_note": "registered reference take with transcript"
         },
         {
-          "name": "sk_script_reading",
-          "file": "../../speaker_voices/sk_script_reading.m4a",
+          "name": "me_sk_script",
+          "file": "../../speaker_voices/me_sk_script.m4a",
           "language": "sk",
           "transcript": "Dobré ráno a vitajte v tejto živej ukážke prekladu reči v reálnom čase. Hovorím po anglicky a môj hlas budete počuť hovoriť po slovensky do niekoľkých sekúnd. Systém počúva mikrofónom a detekuje, kedy reč začína a končí. Najprv je reč prepísaná do textu, potom preložená a potom opäť prevedená. Každý krok beží lokálne na tomto počítači, bez oblaku a bez čakárne. Latency je čas medzi mojimi slovami a preloženým hlasom, ktorý počuješ. Naším cieľom je zdržanie len pár sekúnd, dosť krátke na prirodzený rozhovor. Hlasové klonovanie znamená, že slovenský výstup znie ako ja, nie ako cudzinec. Aby som učil systém mojím hlasom, zaznamenávam pár minút čistej reči. Na tichej miestnosti záleží viac ako na drahom mikrofóne. Prosím hovorte stálym tempom, s krátkymi prestávkami medzi vetami. Čísla, názvy a technické výrazy si vyžadujú mimoriadnu starostlivosť v oboch jazykoch. Linka titulkov ukazuje čiastočné výsledky, zatiaľ čo ja som ešte hovoriť. Titulky môžete presunúť do plávajúceho okna nad akoukoľvek aplikáciou. Preložený hlas je presmerovaný na zhromaždenie ako virtuálny mikrofón. Ostatní účastníci počúvajú slovenčinu, zatiaľ čo ja stále hovorím anglicky. Otázky publika budú preložené opačným smerom. Ďakujem vám za vypočutie a teším sa na vaše otázky.",
           "in_registry": true,
-          "featured": false
+          "featured": false,
+          "grade": "pass",
+          "grade_note": "registered reference take with transcript"
         },
         {
-          "name": "sk_trhove_rano_v2",
-          "file": "../../speaker_voices/sk_trhove_rano_v2.m4a",
+          "name": "me_sk_trhove",
+          "file": "../../speaker_voices/me_sk_trhove.m4a",
           "language": "sk",
           "transcript": "Včera ráno som išiel na trh kúpiť čerstvý chlieb a mlieko. Stretol som tam starého priateľa Ľuba, ktorý predával med a syry. „Ahoj! Kde si sa túľal celé mesiace?\" spýtal sa ma s úsmevom. Porozprával som mu o svojej práci a o dlhej ceste vlakom cez hory a doliny, až ma bolel každý kĺb. Po chvíli sme si sadli na lavičku pod veľkú vŕbu a dali sme si kávu. „Môžem prísť aj zajtra?\" spýtal som sa. Okolo nás pobehovali deti a hádzali si farebnú loptu. Jedno dievčatko nieslo džbán plný malín a smialo sa na celé kolo. Vôňa čerstvého pečiva sa niesla vzduchom a ja som si spomenul na detstvo u starých rodičov. V diaľke vŕzgali brzdy električky. Ľubo mi potom ukázal fotografie zo svojej záhrady. Medzi riadkami cibule a cesnaku rástli ľalie, pivonky a neskutočne veľké tekvice. „Pozri, táto váži vyše deväť kíl!\" pochválil sa. Neveril som vlastným očiam. „Musím už ísť, ale v piatok prídem zas,\" povedal som a pobrali sme sa domov. Ešte dnes cítim chuť toho chleba s maslom a medom. Bolo to jedno z najkrajších rán tohto jesenného mesiaca. Koľko takýchto dní nám ešte život prinesie?",
           "in_registry": true,
-          "featured": false
+          "featured": false,
+          "grade": "pass",
+          "grade_note": "registered reference take with transcript"
         },
         {
-          "name": "sk_trhove_rano_v2b",
-          "file": "../../speaker_voices/sk_trhove_rano_v2b.m4a",
+          "name": "me_sk_trhove_b",
+          "file": "../../speaker_voices/me_sk_trhove_b.m4a",
           "language": "sk",
           "transcript": "Včera ráno som išiel na trh kúpiť čerstvý chlieb a mlieko. Stretol som tam starého priateľa Ľuba, ktorý predával med a syry. „Ahoj! Kde si sa túľal celé mesiace?\" spýtal sa ma s úsmevom. Porozprával som mu o svojej práci a o dlhej ceste vlakom cez hory a doliny, až ma bolel každý kĺb. Po chvíli sme si sadli na lavičku pod veľkú vŕbu a dali sme si kávu. „Môžem prísť aj zajtra?\" spýtal som sa. Okolo nás pobehovali deti a hádzali si farebnú loptu. Jedno dievčatko nieslo džbán plný malín a smialo sa na celé kolo. Vôňa čerstvého pečiva sa niesla vzduchom a ja som si spomenul na detstvo u starých rodičov. V diaľke vŕzgali brzdy električky. Ľubo mi potom ukázal fotografie zo svojej záhrady. Medzi riadkami cibule a cesnaku rástli ľalie, pivonky a neskutočne veľké tekvice. „Pozri, táto váži vyše deväť kíl!\" pochválil sa. Neveril som vlastným očiam. „Musím už ísť, ale v piatok prídem zas,\" povedal som a pobrali sme sa domov. Ešte dnes cítim chuť toho chleba s maslom a medom. Bolo to jedno z najkrajších rán tohto jesenného mesiaca. Koľko takýchto dní nám ešte život prinesie?",
           "in_registry": true,
-          "featured": true
+          "featured": true,
+          "grade": "pass",
+          "grade_note": "registered reference take with transcript"
         }
       ]
     },
@@ -73,7 +87,9 @@
           "language": "?",
           "sample_rate": null,
           "synthesis_latency_s": null,
-          "similarity": null
+          "similarity": null,
+          "grade": "unscored",
+          "grade_note": "no scores.json entry; ear decides"
         },
         {
           "name": "male_alldata_denoised",
@@ -82,7 +98,82 @@
           "language": "?",
           "sample_rate": null,
           "synthesis_latency_s": null,
-          "similarity": null
+          "similarity": null,
+          "grade": "unscored",
+          "grade_note": "no scores.json entry; ear decides"
+        },
+        {
+          "name": "piper_omni_hq_en_test",
+          "file": "../../processed/voice_qc/piper_omni_hq_en_test.wav",
+          "engine": "?",
+          "language": "?",
+          "sample_rate": null,
+          "synthesis_latency_s": null,
+          "similarity": null,
+          "grade": "unscored",
+          "grade_note": "no scores.json entry; ear decides",
+          "ear": {
+            "grade": 2,
+            "keep": "kill",
+            "sim": null,
+            "defects": {
+              "steadiness": 3
+            },
+            "note": "trembling in voice, not worth using in simulation (EN test). Owner chat review 2026-10-01. Machine: intelligibility fixed (WER 0.19) but naturalness fails; HNR -10dB vs +4 generic."
+          }
+        },
+        {
+          "name": "piper_omni_hq_sk_test",
+          "file": "../../processed/voice_qc/piper_omni_hq_sk_test.wav",
+          "engine": "?",
+          "language": "?",
+          "sample_rate": null,
+          "synthesis_latency_s": null,
+          "similarity": null,
+          "grade": "unscored",
+          "grade_note": "no scores.json entry; ear decides",
+          "ear": {
+            "grade": 2,
+            "keep": "kill",
+            "sim": null,
+            "defects": {
+              "steadiness": 3
+            },
+            "note": "trembling in voice, not worth using in simulation (SK test). Owner chat review 2026-10-01. Machine: intelligibility fixed (WER 0.19) but naturalness fails; HNR -10dB vs +4 generic."
+          }
+        },
+        {
+          "name": "piper_omni_ns02",
+          "file": "../../processed/voice_qc/piper_omni_ns02.wav",
+          "engine": "piper_omni_hq",
+          "language": "sk",
+          "sample_rate": 22050,
+          "synthesis_latency_s": null,
+          "similarity": null,
+          "grade": "unscored",
+          "grade_note": "no scores.json entry; ear decides"
+        },
+        {
+          "name": "piper_omni_ns035",
+          "file": "../../processed/voice_qc/piper_omni_ns035.wav",
+          "engine": "piper_omni_hq",
+          "language": "sk",
+          "sample_rate": 22050,
+          "synthesis_latency_s": null,
+          "similarity": null,
+          "grade": "unscored",
+          "grade_note": "no scores.json entry; ear decides"
+        },
+        {
+          "name": "piper_omni_ns067",
+          "file": "../../processed/voice_qc/piper_omni_ns067.wav",
+          "engine": "piper_omni_hq",
+          "language": "sk",
+          "sample_rate": 22050,
+          "synthesis_latency_s": null,
+          "similarity": null,
+          "grade": "unscored",
+          "grade_note": "no scores.json entry; ear decides"
         },
         {
           "name": "sandbox_sk_SK-lili-medium_sk",
@@ -91,7 +182,9 @@
           "language": "sk",
           "sample_rate": 22050,
           "synthesis_latency_s": 0.1954,
-          "similarity": null
+          "similarity": null,
+          "grade": "unscored",
+          "grade_note": "no scores.json entry; ear decides"
         },
         {
           "name": "sandbox_sk_SK-personal-male-medium_sk",
@@ -100,7 +193,9 @@
           "language": "sk",
           "sample_rate": 22050,
           "synthesis_latency_s": 0.2426,
-          "similarity": null
+          "similarity": null,
+          "grade": "unscored",
+          "grade_note": "no scores.json entry; ear decides"
         }
       ]
     },
@@ -117,7 +212,9 @@
             "mt_word_first_s": 0.052,
             "tts_s": 0.23,
             "audio_s": 5.9
-          }
+          },
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade"
         },
         {
           "name": "en_sk_01",
@@ -128,7 +225,9 @@
             "mt_word_first_s": 0.031,
             "tts_s": 0.23,
             "audio_s": 6.0
-          }
+          },
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade"
         },
         {
           "name": "sk_en_00",
@@ -139,7 +238,9 @@
             "mt_word_first_s": 0.034,
             "tts_s": 0.18,
             "audio_s": 4.3
-          }
+          },
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade"
         },
         {
           "name": "sk_en_01",
@@ -150,7 +251,9 @@
             "mt_word_first_s": 0.037,
             "tts_s": 0.17,
             "audio_s": 4.3
-          }
+          },
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade"
         }
       ]
     },
@@ -160,7 +263,7 @@
       "items": [
         {
           "name": "sk_script_reading",
-          "file": "../../speaker_voices/sk_script_reading.m4a",
+          "file": "../../speaker_voices/me_sk_script.m4a",
           "audio_s": 134.3,
           "ref_chars": 1263,
           "en_ref_chars": 1320,
@@ -192,11 +295,13 @@
               "rtf": 0.205,
               "lang": "sk"
             }
-          }
+          },
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade"
         },
         {
           "name": "sk_trhove_rano_v2",
-          "file": "../../speaker_voices/sk_trhove_rano_v2.m4a",
+          "file": "../../speaker_voices/me_sk_trhove.m4a",
           "audio_s": 103.6,
           "ref_chars": 1080,
           "en_ref_chars": 1126,
@@ -228,11 +333,13 @@
               "rtf": 0.291,
               "lang": "sk"
             }
-          }
+          },
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade"
         },
         {
           "name": "sk_trhove_rano_v2b",
-          "file": "../../speaker_voices/sk_trhove_rano_v2b.m4a",
+          "file": "../../speaker_voices/me_sk_trhove_b.m4a",
           "audio_s": 109.0,
           "ref_chars": 1080,
           "en_ref_chars": 1126,
@@ -264,7 +371,9 @@
               "rtf": 0.254,
               "lang": "sk"
             }
-          }
+          },
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade"
         }
       ]
     },
@@ -275,27 +384,37 @@
         {
           "name": "gantt_meeting",
           "file": "charts/gantt_meeting.png",
-          "caption": "Two speaker lanes over meeting time: speech, STT/MT/TTS, translated playback (processed/meeting/meeting_timeline.json)"
+          "caption": "Two speaker lanes over meeting time: speech, STT/MT/TTS, translated playback (processed/meeting/meeting_timeline.json)",
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade"
         },
         {
           "name": "latency_by_direction",
           "file": "charts/latency_by_direction.png",
-          "caption": "Mean STT/MT/TTS seconds per turn, EN→SK vs SK→EN (processed/conversation_sim.json)"
+          "caption": "Mean STT/MT/TTS seconds per turn, EN→SK vs SK→EN (processed/conversation_sim.json)",
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade"
         },
         {
           "name": "synth_by_length",
           "file": "charts/synth_by_length.png",
-          "caption": "Piper synth seconds + RTF at ~7/15/30s output, generic vs personal (processed/synth_lengths)"
+          "caption": "Piper synth seconds + RTF at ~7/15/30s output, generic vs personal (processed/synth_lengths)",
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade"
         },
         {
           "name": "timeline_meeting",
           "file": "charts/timeline_meeting.png",
-          "caption": "Every simulated conference turn in order, per-stage stack (processed/conversation_sim.json)"
+          "caption": "Every simulated conference turn in order, per-stage stack (processed/conversation_sim.json)",
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade"
         },
         {
           "name": "wer_synth_vs_mic",
           "file": "charts/wer_synth_vs_mic.png",
-          "caption": "SK WER: clean Piper synth input vs real microphone, base vs small-sk (processed/stt_input_test + sk_direction)"
+          "caption": "SK WER: clean Piper synth input vs real microphone, base vs small-sk (processed/stt_input_test + sk_direction)",
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade"
         }
       ]
     },
@@ -305,11 +424,22 @@
       "items": [
         {
           "name": "clean_sk_generic",
-          "file": "../../processed/stt_input_test/clean_sk_generic.wav"
+          "file": "../../processed/stt_input_test/clean_sk_generic.wav",
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade"
         },
         {
           "name": "clean_sk_personal",
-          "file": "../../processed/stt_input_test/clean_sk_personal.wav"
+          "file": "../../processed/stt_input_test/clean_sk_personal.wav",
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade",
+          "ear": {
+            "grade": 1,
+            "keep": "kill",
+            "sim": null,
+            "defects": {},
+            "note": "robotic trembling throughout, mumbling in parts; source recording decent, degradation is in the old model weights (owner chat review 2026-10-01)"
+          }
         },
         {
           "name": "_matrix",
@@ -356,7 +486,9 @@
             "target_text": "Dobrý deň. Toto je ukážka klonovania hlasu v reálnom čase, vytvorená lokálne bez cloudu.",
             "synthesis_s": 19.979,
             "rtf": 2.779
-          }
+          },
+          "grade": "unscored",
+          "grade_note": "clone output; blind A/B against Piper pair decides"
         },
         {
           "name": "v2b_head_sk_sk",
@@ -366,7 +498,9 @@
             "target_text": "Dobrý deň. Toto je ukážka klonovania hlasu v reálnom čase, vytvorená lokálne bez cloudu.",
             "synthesis_s": 22.085,
             "rtf": 2.895
-          }
+          },
+          "grade": "unscored",
+          "grade_note": "clone output; blind A/B against Piper pair decides"
         }
       ]
     },
@@ -384,6 +518,15 @@
             "stt_s": 0.3677,
             "mt_s": 0.1629,
             "tts_s": 0.2364
+          },
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade",
+          "ear": {
+            "grade": 2,
+            "keep": "kill",
+            "sim": null,
+            "defects": {},
+            "note": "recognizably the owner but processed trembling in TTS output; unusable as demo fallback (owner chat review 2026-10-01)"
           }
         },
         {
@@ -396,6 +539,15 @@
             "stt_s": 1.1992,
             "mt_s": 0.1748,
             "tts_s": 0.1516
+          },
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade",
+          "ear": {
+            "grade": 1,
+            "keep": "kill",
+            "sim": null,
+            "defects": {},
+            "note": "bad synth; garbage STT→MT (\"creepy eyeball\"); evidence of old-voice unrecognizability, unusable as demo fallback (owner chat review 2026-10-01)"
           }
         }
       ]
@@ -440,6 +592,15 @@
                 "playback_at": 93.34
               }
             ]
+          },
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade",
+          "ear": {
+            "grade": 2,
+            "keep": "kill",
+            "sim": null,
+            "defects": {},
+            "note": "entire sim bad quality; playbacks use the old personal voices, regen with me_omni_piper_sk pending (owner chat review 2026-10-01)"
           }
         },
         {
@@ -462,6 +623,15 @@
             "playback_starts": 25.16,
             "streaming": false,
             "live": true
+          },
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade",
+          "ear": {
+            "grade": 2,
+            "keep": "kill",
+            "sim": null,
+            "defects": {},
+            "note": "entire sim bad quality; playbacks use the old personal voices, regen with me_omni_piper_sk pending (owner chat review 2026-10-01)"
           }
         },
         {
@@ -484,6 +654,15 @@
             "playback_starts": 37.448,
             "streaming": false,
             "live": true
+          },
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade",
+          "ear": {
+            "grade": 2,
+            "keep": "kill",
+            "sim": null,
+            "defects": {},
+            "note": "entire sim bad quality; playbacks use the old personal voices, regen with me_omni_piper_sk pending (owner chat review 2026-10-01)"
           }
         },
         {
@@ -506,6 +685,15 @@
             "playback_starts": 65.325,
             "streaming": false,
             "live": true
+          },
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade",
+          "ear": {
+            "grade": 2,
+            "keep": "kill",
+            "sim": null,
+            "defects": {},
+            "note": "entire sim bad quality; playbacks use the old personal voices, regen with me_omni_piper_sk pending (owner chat review 2026-10-01)"
           }
         },
         {
@@ -528,313 +716,808 @@
             "playback_starts": 93.342,
             "streaming": false,
             "live": true
+          },
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade",
+          "ear": {
+            "grade": 2,
+            "keep": "kill",
+            "sim": null,
+            "defects": {},
+            "note": "entire sim bad quality; playbacks use the old personal voices, regen with me_omni_piper_sk pending (owner chat review 2026-10-01)"
           }
         }
       ]
     },
     {
-      "id": "corpus",
-      "title": "Piper training corpus (OmniVoice bulk HQ)",
+      "id": "corpus_sk",
+      "title": "Piper training corpus (OmniVoice HQ SK)",
       "items": [
         {
-          "name": "hq_00",
-          "file": "../../processed/bulk_hq/hq_00.wav",
+          "name": "omni_hq_sk_00",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_00.wav",
           "meta": {
             "audio_s": 30.21,
             "rtf": 1.523,
             "qc_wer": 0.058,
             "qc_rms": 0.1164
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_01",
-          "file": "../../processed/bulk_hq/hq_01.wav",
+          "name": "omni_hq_sk_01",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_01.wav",
           "meta": {
             "audio_s": 28.91,
             "rtf": 1.064,
             "qc_wer": 0.0351,
             "qc_rms": 0.1184
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_02",
-          "file": "../../processed/bulk_hq/hq_02.wav",
+          "name": "omni_hq_sk_02",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_02.wav",
           "meta": {
             "audio_s": 29.08,
             "rtf": 1.069,
             "qc_wer": 0.0345,
             "qc_rms": 0.1158
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_03",
-          "file": "../../processed/bulk_hq/hq_03.wav",
+          "name": "omni_hq_sk_03",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_03.wav",
           "meta": {
             "audio_s": 35.53,
             "rtf": 1.187,
             "qc_wer": 0.0,
             "qc_rms": 0.1071
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_04",
-          "file": "../../processed/bulk_hq/hq_04.wav",
+          "name": "omni_hq_sk_04",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_04.wav",
           "meta": {
             "audio_s": 32.16,
             "rtf": 1.141,
             "qc_wer": 0.0411,
             "qc_rms": 0.1092
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_05",
-          "file": "../../processed/bulk_hq/hq_05.wav",
+          "name": "omni_hq_sk_05",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_05.wav",
           "meta": {
             "audio_s": 21.45,
             "rtf": 0.975,
             "qc_wer": 0.0444,
             "qc_rms": 0.102
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_06",
-          "file": "../../processed/bulk_hq/hq_06.wav",
+          "name": "omni_hq_sk_06",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_06.wav",
           "meta": {
             "audio_s": 15.98,
             "rtf": 1.049,
             "qc_wer": 0.1471,
             "qc_rms": 0.1076
-          }
+          },
+          "grade": "review",
+          "grade_note": "WER in review band"
         },
         {
-          "name": "hq_07",
-          "file": "../../processed/bulk_hq/hq_07.wav",
+          "name": "omni_hq_sk_07",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_07.wav",
           "meta": {
             "audio_s": 19.24,
             "rtf": 1.014,
             "qc_wer": 0.1163,
             "qc_rms": 0.1165
-          }
+          },
+          "grade": "review",
+          "grade_note": "WER in review band"
         },
         {
-          "name": "hq_08",
-          "file": "../../processed/bulk_hq/hq_08.wav",
+          "name": "omni_hq_sk_08",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_08.wav",
           "meta": {
             "audio_s": 18.79,
             "rtf": 1.045,
             "qc_wer": 0.0426,
             "qc_rms": 0.1137
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_09",
-          "file": "../../processed/bulk_hq/hq_09.wav",
+          "name": "omni_hq_sk_09",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_09.wav",
           "meta": {
             "audio_s": 21.83,
             "rtf": 0.988,
             "qc_wer": 0.0566,
             "qc_rms": 0.1129
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_10",
-          "file": "../../processed/bulk_hq/hq_10.wav",
+          "name": "omni_hq_sk_10",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_10.wav",
           "meta": {
             "audio_s": 22.36,
             "rtf": 0.981,
             "qc_wer": 0.0,
             "qc_rms": 0.124
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_11",
-          "file": "../../processed/bulk_hq/hq_11.wav",
+          "name": "omni_hq_sk_11",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_11.wav",
           "meta": {
             "audio_s": 19.08,
             "rtf": 1.007,
             "qc_wer": 0.0465,
             "qc_rms": 0.1197
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_12",
-          "file": "../../processed/bulk_hq/hq_12.wav",
+          "name": "omni_hq_sk_12",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_12.wav",
           "meta": {
             "audio_s": 21.71,
             "rtf": 0.999,
             "qc_wer": 0.0,
             "qc_rms": 0.1124
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_13",
-          "file": "../../processed/bulk_hq/hq_13.wav",
+          "name": "omni_hq_sk_13",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_13.wav",
           "meta": {
             "audio_s": 21.7,
             "rtf": 1.012,
             "qc_wer": 0.0476,
             "qc_rms": 0.1168
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_14",
-          "file": "../../processed/bulk_hq/hq_14.wav",
+          "name": "omni_hq_sk_14",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_14.wav",
           "meta": {
             "audio_s": 20.84,
             "rtf": 1.014,
             "qc_wer": 0.0732,
             "qc_rms": 0.1158
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_15",
-          "file": "../../processed/bulk_hq/hq_15.wav",
+          "name": "omni_hq_sk_15",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_15.wav",
           "meta": {
             "audio_s": 33.11,
             "rtf": 1.339,
             "qc_wer": 0.0645,
             "qc_rms": 0.115
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_16",
-          "file": "../../processed/bulk_hq/hq_16.wav",
+          "name": "omni_hq_sk_16",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_16.wav",
           "meta": {
             "audio_s": 31.34,
             "rtf": 1.52,
             "qc_wer": 0.0625,
             "qc_rms": 0.106
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_17",
-          "file": "../../processed/bulk_hq/hq_17.wav",
+          "name": "omni_hq_sk_17",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_17.wav",
           "meta": {
             "audio_s": 28.63,
             "rtf": 1.1,
             "qc_wer": 0.0923,
             "qc_rms": 0.1118
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_18",
-          "file": "../../processed/bulk_hq/hq_18.wav",
+          "name": "omni_hq_sk_18",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_18.wav",
           "meta": {
             "audio_s": 35.51,
             "rtf": 1.21,
             "qc_wer": 0.029,
             "qc_rms": 0.1157
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_19",
-          "file": "../../processed/bulk_hq/hq_19.wav",
+          "name": "omni_hq_sk_19",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_19.wav",
           "meta": {
             "audio_s": 32.25,
             "rtf": 1.204,
             "qc_wer": 0.0411,
             "qc_rms": 0.1181
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_20",
-          "file": "../../processed/bulk_hq/hq_20.wav",
+          "name": "omni_hq_sk_20",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_20.wav",
           "meta": {
             "audio_s": 20.72,
             "rtf": 1.043,
             "qc_wer": 0.0,
             "qc_rms": 0.1092
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_21",
-          "file": "../../processed/bulk_hq/hq_21.wav",
+          "name": "omni_hq_sk_21",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_21.wav",
           "meta": {
             "audio_s": 20.7,
             "rtf": 1.002,
             "qc_wer": 0.0952,
             "qc_rms": 0.1175
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_22",
-          "file": "../../processed/bulk_hq/hq_22.wav",
+          "name": "omni_hq_sk_22",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_22.wav",
           "meta": {
             "audio_s": 21.38,
             "rtf": 0.965,
             "qc_wer": 0.122,
             "qc_rms": 0.1151
-          }
+          },
+          "grade": "review",
+          "grade_note": "WER in review band"
         },
         {
-          "name": "hq_23",
-          "file": "../../processed/bulk_hq/hq_23.wav",
+          "name": "omni_hq_sk_23",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_23.wav",
           "meta": {
             "audio_s": 21.84,
             "rtf": 1.005,
             "qc_wer": 0.0488,
             "qc_rms": 0.1243
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_24",
-          "file": "../../processed/bulk_hq/hq_24.wav",
+          "name": "omni_hq_sk_24",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_24.wav",
           "meta": {
             "audio_s": 18.52,
             "rtf": 1.022,
             "qc_wer": 0.0909,
             "qc_rms": 0.1114
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_25",
-          "file": "../../processed/bulk_hq/hq_25.wav",
+          "name": "omni_hq_sk_25",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_25.wav",
           "meta": {
             "audio_s": 18.33,
             "rtf": 0.989,
             "qc_wer": 0.0625,
             "qc_rms": 0.1176
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_26",
-          "file": "../../processed/bulk_hq/hq_26.wav",
+          "name": "omni_hq_sk_26",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_26.wav",
           "meta": {
             "audio_s": 20.21,
             "rtf": 1.004,
             "qc_wer": 0.0256,
             "qc_rms": 0.1174
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_27",
-          "file": "../../processed/bulk_hq/hq_27.wav",
+          "name": "omni_hq_sk_27",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_27.wav",
           "meta": {
             "audio_s": 16.68,
             "rtf": 1.042,
             "qc_wer": 0.0,
             "qc_rms": 0.1114
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_28",
-          "file": "../../processed/bulk_hq/hq_28.wav",
+          "name": "omni_hq_sk_28",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_28.wav",
           "meta": {
             "audio_s": 18.05,
             "rtf": 0.991,
             "qc_wer": 0.0526,
             "qc_rms": 0.1019
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
         },
         {
-          "name": "hq_29",
-          "file": "../../processed/bulk_hq/hq_29.wav",
+          "name": "omni_hq_sk_29",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_29.wav",
           "meta": {
             "audio_s": 19.28,
             "rtf": 1.001,
             "qc_wer": 0.0244,
             "qc_rms": 0.1085
-          }
+          },
+          "grade": "pass",
+          "grade_note": "WER in pass band"
+        },
+        {
+          "name": "omni_hq_sk_30",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_30.wav",
+          "meta": {
+            "audio_s": 33.51,
+            "rtf": 1.209,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no small-sk WER; clipping suspected (peak 1.0); ear decides"
+        },
+        {
+          "name": "omni_hq_sk_31",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_31.wav",
+          "meta": {
+            "audio_s": 31.44,
+            "rtf": 1.197,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no small-sk WER; clipping suspected (peak 1.0); ear decides"
+        },
+        {
+          "name": "omni_hq_sk_32",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_32.wav",
+          "meta": {
+            "audio_s": 28.32,
+            "rtf": 0.96,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no small-sk WER; clipping suspected (peak 1.0); ear decides"
+        },
+        {
+          "name": "omni_hq_sk_33",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_33.wav",
+          "meta": {
+            "audio_s": 35.52,
+            "rtf": 1.201,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no small-sk WER; clipping suspected (peak 1.0); ear decides"
+        },
+        {
+          "name": "omni_hq_sk_34",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_34.wav",
+          "meta": {
+            "audio_s": 32.04,
+            "rtf": 1.223,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no small-sk WER; clipping suspected (peak 1.0); ear decides"
+        },
+        {
+          "name": "omni_hq_sk_35",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_35.wav",
+          "meta": {
+            "audio_s": 21.05,
+            "rtf": 1.02,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no small-sk WER; clipping suspected (peak 1.0); ear decides"
+        },
+        {
+          "name": "omni_hq_sk_36",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_36.wav",
+          "meta": {
+            "audio_s": 21.71,
+            "rtf": 0.998,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no small-sk WER; clipping suspected (peak 1.0); ear decides"
+        },
+        {
+          "name": "omni_hq_sk_37",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_37.wav",
+          "meta": {
+            "audio_s": 21.33,
+            "rtf": 0.975,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no small-sk WER; clipping suspected (peak 1.0); ear decides"
+        },
+        {
+          "name": "omni_hq_sk_38",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_38.wav",
+          "meta": {
+            "audio_s": 23.06,
+            "rtf": 0.987,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no small-sk WER; clipping suspected (peak 1.0); ear decides"
+        },
+        {
+          "name": "omni_hq_sk_39",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_39.wav",
+          "meta": {
+            "audio_s": 19.03,
+            "rtf": 0.987,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no small-sk WER; clipping suspected (peak 1.0); ear decides"
+        },
+        {
+          "name": "omni_hq_sk_40",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_40.wav",
+          "meta": {
+            "audio_s": 18.42,
+            "rtf": 0.931,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no small-sk WER; clipping suspected (peak 1.0); ear decides"
+        },
+        {
+          "name": "omni_hq_sk_41",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_41.wav",
+          "meta": {
+            "audio_s": 20.0,
+            "rtf": 0.946,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no small-sk WER; clipping suspected (peak 1.0); ear decides"
+        },
+        {
+          "name": "omni_hq_sk_42",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_42.wav",
+          "meta": {
+            "audio_s": 17.31,
+            "rtf": 0.97,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no small-sk WER; clipping suspected (peak 1.0); ear decides"
+        },
+        {
+          "name": "omni_hq_sk_43",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_43.wav",
+          "meta": {
+            "audio_s": 18.15,
+            "rtf": 0.949,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no small-sk WER; clipping suspected (peak 1.0); ear decides"
+        },
+        {
+          "name": "omni_hq_sk_44",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_44.wav",
+          "meta": {
+            "audio_s": 19.1,
+            "rtf": 0.966,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no small-sk WER; clipping suspected (peak 1.0); ear decides"
+        },
+        {
+          "name": "omni_hq_sk_45",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_45.wav",
+          "meta": {
+            "audio_s": 18.17,
+            "rtf": 0.952,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no small-sk WER; clipping suspected (peak 1.0); ear decides"
+        },
+        {
+          "name": "omni_hq_sk_46",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_46.wav",
+          "meta": {
+            "audio_s": 19.15,
+            "rtf": 0.966,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no small-sk WER; clipping suspected (peak 1.0); ear decides"
+        },
+        {
+          "name": "omni_hq_sk_47",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_47.wav",
+          "meta": {
+            "audio_s": 15.26,
+            "rtf": 0.979,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no small-sk WER; clipping suspected (peak 1.0); ear decides"
+        },
+        {
+          "name": "omni_hq_sk_48",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_48.wav",
+          "meta": {
+            "audio_s": 14.89,
+            "rtf": 1.063,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no small-sk WER; clipping suspected (peak 1.0); ear decides"
+        },
+        {
+          "name": "omni_hq_sk_49",
+          "file": "../../processed/omni_hq_sk/omni_hq_sk_49.wav",
+          "meta": {
+            "audio_s": 19.29,
+            "rtf": 0.939,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no small-sk WER; clipping suspected (peak 1.0); ear decides"
+        }
+      ]
+    },
+    {
+      "id": "corpus_en",
+      "title": "Piper training corpus (OmniVoice HQ EN)",
+      "items": [
+        {
+          "name": "omni_hq_en_00",
+          "file": "../../processed/omni_hq_en/omni_hq_en_00.wav",
+          "meta": {
+            "audio_s": 47.71,
+            "rtf": 1.204,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no EN rung WER (audio sane: rms 0.1001); ear decides"
+        },
+        {
+          "name": "omni_hq_en_01",
+          "file": "../../processed/omni_hq_en/omni_hq_en_01.wav",
+          "meta": {
+            "audio_s": 54.26,
+            "rtf": 1.063,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no EN rung WER (audio sane: rms 0.1025); ear decides"
+        },
+        {
+          "name": "omni_hq_en_02",
+          "file": "../../processed/omni_hq_en/omni_hq_en_02.wav",
+          "meta": {
+            "audio_s": 49.83,
+            "rtf": 1.007,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no EN rung WER (audio sane: rms 0.1); ear decides"
+        },
+        {
+          "name": "omni_hq_en_03",
+          "file": "../../processed/omni_hq_en/omni_hq_en_03.wav",
+          "meta": {
+            "audio_s": 48.14,
+            "rtf": 1.151,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no EN rung WER (audio sane: rms 0.101); ear decides"
+        },
+        {
+          "name": "omni_hq_en_04",
+          "file": "../../processed/omni_hq_en/omni_hq_en_04.wav",
+          "meta": {
+            "audio_s": 59.51,
+            "rtf": 1.125,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no EN rung WER (audio sane: rms 0.1004); ear decides"
+        },
+        {
+          "name": "omni_hq_en_05",
+          "file": "../../processed/omni_hq_en/omni_hq_en_05.wav",
+          "meta": {
+            "audio_s": 52.83,
+            "rtf": 1.079,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no EN rung WER (audio sane: rms 0.0993); ear decides"
+        },
+        {
+          "name": "omni_hq_en_06",
+          "file": "../../processed/omni_hq_en/omni_hq_en_06.wav",
+          "meta": {
+            "audio_s": 35.4,
+            "rtf": 1.046,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no EN rung WER (audio sane: rms 0.1005); ear decides"
+        },
+        {
+          "name": "omni_hq_en_07",
+          "file": "../../processed/omni_hq_en/omni_hq_en_07.wav",
+          "meta": {
+            "audio_s": 40.68,
+            "rtf": 1.079,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no EN rung WER (audio sane: rms 0.0997); ear decides"
+        },
+        {
+          "name": "omni_hq_en_08",
+          "file": "../../processed/omni_hq_en/omni_hq_en_08.wav",
+          "meta": {
+            "audio_s": 48.48,
+            "rtf": 1.107,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no EN rung WER (audio sane: rms 0.1004); ear decides"
+        },
+        {
+          "name": "omni_hq_en_09",
+          "file": "../../processed/omni_hq_en/omni_hq_en_09.wav",
+          "meta": {
+            "audio_s": 42.99,
+            "rtf": 1.052,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no EN rung WER (audio sane: rms 0.1047); ear decides"
+        },
+        {
+          "name": "omni_hq_en_10",
+          "file": "../../processed/omni_hq_en/omni_hq_en_10.wav",
+          "meta": {
+            "audio_s": 43.69,
+            "rtf": 1.04,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no EN rung WER (audio sane: rms 0.1032); ear decides"
+        },
+        {
+          "name": "omni_hq_en_11",
+          "file": "../../processed/omni_hq_en/omni_hq_en_11.wav",
+          "meta": {
+            "audio_s": 49.21,
+            "rtf": 1.084,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no EN rung WER (audio sane: rms 0.0974); ear decides"
+        },
+        {
+          "name": "omni_hq_en_12",
+          "file": "../../processed/omni_hq_en/omni_hq_en_12.wav",
+          "meta": {
+            "audio_s": 43.68,
+            "rtf": 1.062,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no EN rung WER (audio sane: rms 0.1034); ear decides"
+        },
+        {
+          "name": "omni_hq_en_13",
+          "file": "../../processed/omni_hq_en/omni_hq_en_13.wav",
+          "meta": {
+            "audio_s": 48.75,
+            "rtf": 1.078,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no EN rung WER (audio sane: rms 0.1059); ear decides"
+        },
+        {
+          "name": "omni_hq_en_14",
+          "file": "../../processed/omni_hq_en/omni_hq_en_14.wav",
+          "meta": {
+            "audio_s": 47.19,
+            "rtf": 1.052,
+            "qc_wer": null,
+            "qc_rms": null
+          },
+          "grade": "review",
+          "grade_note": "no EN rung WER (audio sane: rms 0.0992); ear decides"
         }
       ]
     },
@@ -852,6 +1535,51 @@
             "mt_chrf": null,
             "wer": 0.054,
             "hyp": "Včera ráno som išiel na trh kúpiť čerstvý chlieb a mlieko. Stretol som tam starého priateľa, žuba, ktorý predával med a sedy. Porozprával som mu o svojej práci a o dlhej ceste vlakom cez Hory a Doliny."
+          },
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade",
+          "ear": {
+            "grade": 5,
+            "keep": "keep",
+            "sim": null,
+            "defects": {},
+            "note": "very good; WER 0.054 backs the ear (owner chat review 2026-10-01)"
+          }
+        },
+        {
+          "name": "nemotron_streaming_0.6b_560ms_w8a8_me_sk_trhove_b",
+          "file": "",
+          "meta": {
+            "rtf": 0.326,
+            "infer_s": 35.54,
+            "audio_s": 109.08,
+            "mt_chrf": null,
+            "wer": 0.8639,
+            "hyp": "Вчера носом ище на трих купить черствий хлеб амлеко. Streto som tam staro prijateľ Luba, klival Med Asiri. Ahoj, gdzie sitúa celém mesece, spytav Syma s usmevom. Prosprav To hívlá shory Adoliny. Ashma byl každy kolb. Po "
+          }
+        },
+        {
+          "name": "nemotron_streaming_0.6b_560ms_w8a8_me_sk_script",
+          "file": "",
+          "meta": {
+            "rtf": 0.321,
+            "infer_s": 43.07,
+            "audio_s": 134.35,
+            "mt_chrf": null,
+            "wer": 0.75,
+            "hyp": "Dobré rano, aby te v tejto ošívi o kaški je prekultu rečí v realnem czasie. Hovorím po anglicki, a moj hlas budete počut hovriť po slovenski do nekoliko sekund. Začina a konči. Najprvý je reč pripisena de tekstu, potom p"
+          }
+        },
+        {
+          "name": "nemotron_streaming_0.6b_560ms_w8a8_me_en_rainbow_b",
+          "file": "",
+          "meta": {
+            "rtf": 0.32,
+            "infer_s": 47.54,
+            "audio_s": 148.46,
+            "mt_chrf": null,
+            "wer": 0.1883,
+            "hyp": "When the sunlight's tracks rainbows in the air, they act as a prism and form a rainbow. The rainbow is a vision of white light into many beautiful colors These take the shape of a long round arch With And Intelligent a b"
           }
         },
         {
@@ -864,7 +1592,9 @@
             "mt_chrf": 49.7,
             "wer": null,
             "hyp": "Yesterday morning I went to the market to buy fresh bread and milk I met there an old friend of mine who sold honey and cheese hello where have you been for a whole month he asked me with a smile I told him about my work"
-          }
+          },
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade"
         },
         {
           "name": "seamless-chunked30_sk_script_reading",
@@ -876,7 +1606,219 @@
             "mt_chrf": 39.5,
             "wer": null,
             "hyp": "I'm speaking in English, and you'll hear my voice speak in Slovenian for a few seconds. The system listens to the microphone and detects when the speech starts and ends. On this computer, without a cloud and without a wa"
+          },
+          "grade": "na",
+          "grade_note": "evidence/functional material, not a voice grade"
+        },
+        {
+          "name": "xvoice_?",
+          "file": "",
+          "meta": {
+            "rtf": null,
+            "infer_s": null,
+            "audio_s": 15.0,
+            "mt_chrf": null,
+            "wer": null,
+            "hyp": ""
           }
+        },
+        {
+          "name": "xvoice_?",
+          "file": "",
+          "meta": {
+            "rtf": null,
+            "infer_s": null,
+            "audio_s": 24.06,
+            "mt_chrf": null,
+            "wer": null,
+            "hyp": ""
+          }
+        },
+        {
+          "name": "xvoice_?",
+          "file": "",
+          "meta": {
+            "rtf": null,
+            "infer_s": null,
+            "audio_s": null,
+            "mt_chrf": null,
+            "wer": null,
+            "hyp": ""
+          }
+        }
+      ]
+    },
+    {
+      "id": "stream_audit",
+      "title": "Streaming pipeline audit (live stage timing)",
+      "items": [
+        {
+          "name": "diag_audit",
+          "file": "",
+          "meta": {
+            "direction": "en->sk",
+            "audio_s": 5.6425,
+            "utterances": 1,
+            "vad_to_text_s": 23.614,
+            "text_to_translation_s": 0.219,
+            "translation_to_audio_s": 0.063
+          }
+        },
+        {
+          "name": "en_sk_generic_audit",
+          "file": "",
+          "meta": {
+            "direction": "en->sk",
+            "audio_s": 5.6425,
+            "utterances": 1,
+            "vad_to_text_s": 23.865,
+            "text_to_translation_s": 0.194,
+            "translation_to_audio_s": 0.065
+          }
+        },
+        {
+          "name": "en_sk_valve_audit",
+          "file": "",
+          "meta": {
+            "direction": "en->sk",
+            "audio_s": 5.6425,
+            "utterances": 1,
+            "vad_to_text_s": 23.666,
+            "text_to_translation_s": 0.2,
+            "translation_to_audio_s": 0.067
+          }
+        },
+        {
+          "name": "micro_audit",
+          "file": "",
+          "meta": {
+            "direction": "en->sk",
+            "audio_s": 5.0,
+            "utterances": 1,
+            "vad_to_text_s": 23.627,
+            "text_to_translation_s": 0.027,
+            "translation_to_audio_s": 0.021
+          }
+        },
+        {
+          "name": "sk_en_personal_audit",
+          "file": "",
+          "meta": {
+            "direction": "sk->en",
+            "audio_s": 6.4551875,
+            "utterances": 3,
+            "vad_to_text_s": 4.464,
+            "text_to_translation_s": 0.08,
+            "translation_to_audio_s": 0.087
+          }
+        }
+      ]
+    },
+    {
+      "id": "gpu_clones",
+      "title": "GPU clones + speech-to-speech (cloned from the owner's 5-7 s refs)",
+      "items": [
+        {
+          "name": "kaggle_T4/omni_cs",
+          "file": "../../processed/gpu_bench/kaggle_T4/omni_cs.wav",
+          "meta": {
+            "engine": "OmniVoice",
+            "gpu": "Tesla T4",
+            "rtf_long": 0.145
+          },
+          "grade": "unscored",
+          "grade_note": "GPU clone / S2ST output; ear decides"
+        },
+        {
+          "name": "kaggle_T4/omni_en",
+          "file": "../../processed/gpu_bench/kaggle_T4/omni_en.wav",
+          "meta": {
+            "engine": "OmniVoice",
+            "gpu": "Tesla T4",
+            "rtf_long": 0.152
+          },
+          "grade": "unscored",
+          "grade_note": "GPU clone / S2ST output; ear decides"
+        },
+        {
+          "name": "kaggle_T4/omni_sk",
+          "file": "../../processed/gpu_bench/kaggle_T4/omni_sk.wav",
+          "meta": {
+            "engine": "OmniVoice",
+            "gpu": "Tesla T4",
+            "rtf_long": 0.169
+          },
+          "grade": "unscored",
+          "grade_note": "GPU clone / S2ST output; ear decides"
+        },
+        {
+          "name": "kaggle_T4/seamless_cs_to_eng",
+          "file": "../../processed/gpu_bench/kaggle_T4/seamless_cs_to_eng.wav",
+          "meta": {
+            "engine": "SeamlessM4T v2 S2ST",
+            "gpu": "Tesla T4",
+            "gen_s": 0.97,
+            "rtf_vs_input": 0.173
+          },
+          "grade": "unscored",
+          "grade_note": "GPU clone / S2ST output; ear decides"
+        },
+        {
+          "name": "kaggle_T4/seamless_en_to_ces",
+          "file": "../../processed/gpu_bench/kaggle_T4/seamless_en_to_ces.wav",
+          "meta": {
+            "engine": "SeamlessM4T v2 S2ST",
+            "gpu": "Tesla T4",
+            "gen_s": 1.382,
+            "rtf_vs_input": 0.191
+          },
+          "grade": "unscored",
+          "grade_note": "GPU clone / S2ST output; ear decides"
+        },
+        {
+          "name": "kaggle_T4/seamless_sk_to_eng",
+          "file": "../../processed/gpu_bench/kaggle_T4/seamless_sk_to_eng.wav",
+          "meta": {
+            "engine": "SeamlessM4T v2 S2ST",
+            "gpu": "Tesla T4",
+            "gen_s": 1.044,
+            "rtf_vs_input": 0.149
+          },
+          "grade": "unscored",
+          "grade_note": "GPU clone / S2ST output; ear decides"
+        },
+        {
+          "name": "kaggle_T4/xvoice_cs",
+          "file": "../../processed/gpu_bench/kaggle_T4/xvoice_cs.wav",
+          "meta": {
+            "engine": "X-Voice",
+            "gpu": "Tesla T4",
+            "marginal_rtf": 0.461
+          },
+          "grade": "unscored",
+          "grade_note": "GPU clone / S2ST output; ear decides"
+        },
+        {
+          "name": "kaggle_T4/xvoice_en",
+          "file": "../../processed/gpu_bench/kaggle_T4/xvoice_en.wav",
+          "meta": {
+            "engine": "X-Voice",
+            "gpu": "Tesla T4",
+            "marginal_rtf": 0.772
+          },
+          "grade": "unscored",
+          "grade_note": "GPU clone / S2ST output; ear decides"
+        },
+        {
+          "name": "kaggle_T4/xvoice_sk",
+          "file": "../../processed/gpu_bench/kaggle_T4/xvoice_sk.wav",
+          "meta": {
+            "engine": "X-Voice",
+            "gpu": "Tesla T4",
+            "marginal_rtf": 0.701
+          },
+          "grade": "unscored",
+          "grade_note": "GPU clone / S2ST output; ear decides"
         }
       ]
     }

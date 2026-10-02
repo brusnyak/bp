@@ -134,6 +134,14 @@ def create_app(db_session_local_override=None) -> FastAPI:
     # Voice-lab eval page (ui/voice-lab/): serves QC candidate audio + manifests.
     # Read-only static mount, same pattern as /speaker_voices above.
     _app.mount("/voice_qc", StaticFiles(directory="processed/voice_qc"), name="voice_qc")
+    # The Lab's library.json points at ../../processed/<dir>/*.wav. Mount only the audio
+    # dirs it references, audio extensions only: processed/ also holds session logs and
+    # per-user enrollment recordings that must not be served.
+    for _d in ("conversation", "demo_audio", "meeting", "new_models", "gpu_bench", "omni_hq_en",
+               "omni_hq_sk", "omnivoice", "stt_input_test"):
+        if os.path.isdir(f"processed/{_d}"):
+            _app.mount(f"/processed/{_d}", _AudioOnlyStatic(directory=f"processed/{_d}"), name=f"processed_{_d}")
+    _app.mount("/processed/voice_qc", _AudioOnlyStatic(directory="processed/voice_qc"), name="processed_voice_qc")
 
     # Templates for serving HTML
     templates = Jinja2Templates(directory="ui")
@@ -276,7 +284,7 @@ def create_app(db_session_local_override=None) -> FastAPI:
             if session_data:
                 current_stt_model = session_data.get("stt_model")
                 current_main_mt_model = session_data["mt_models"].get(f"{session_data['session_config']['source_lang']}-{session_data['session_config']['target_lang']}")
-                current_tts_model_instance = session_data.get("piper_tts_model") or session_data.get("coqui_tts_model") # Include Coqui TTS
+                current_tts_model_instance = session_data.get("tts_engine")  # registry engine (backend/tts/base.py); the old piper_tts_model/coqui_tts_model keys are no longer set
                 current_vad_instance = session_data.get("vad_instance")
                 
                 if (

@@ -82,6 +82,13 @@ def _piper_sk_personal_factory() -> PiperTTS:
     return _piper("sk_SK-personal-male-medium", "sk_SK-lili-medium")
 
 
+def _piper_sk_omni_factory() -> PiperTTS:
+    # SK voice fine-tuned on the OmniVoice HQ corpus (2026-09-30, 2500 steps,
+    # small-sk WER 0.19 vs 0.54 for sk_personal). Ear verdict pending — not
+    # the default until the owner picks it in the Voice Lab.
+    return _piper("me_omni_piper_sk", "sk_SK-lili-medium")
+
+
 def _piper_generic_sk_factory() -> PiperTTS:
     # Generic SK base voice (lili), no fine-tune. Reference point for
     # generic-vs-cloned comparisons (added 2026-09-29 for the live meeting A/B).
@@ -112,6 +119,7 @@ TTS_ENGINES: Dict[str, Callable[[], object]] = {
     "piper_personal": _piper_personal_factory,
     "piper_personal_v2": _piper_personal_v2_factory,
     "piper_sk_personal": _piper_sk_personal_factory,
+    "piper_sk_omni": _piper_sk_omni_factory,
     "piper_generic_sk": _piper_generic_sk_factory,
     "piper_generic_en": _piper_generic_en_factory,
 }

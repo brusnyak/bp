@@ -147,10 +147,16 @@ def main():
     # 5. SK->EN Direction Matrix (STT WER/CER + MT chrF + latencies).
     sk_matrix_file = os.path.join(REPO_ROOT, "processed", "sk_direction", "sk_direction_matrix.json")
     sk_matrix = load_json(sk_matrix_file)
+    # Pre-rename clip ids (matrix is measured evidence, never rewritten);
+    # matched to current files by exact transcript length 2026-10-01.
+    SK_RENAMED = {"sk_script_reading": "me_sk_script",
+                  "sk_trhove_rano_v2": "me_sk_trhove",
+                  "sk_trhove_rano_v2b": "me_sk_trhove_b"}
     if sk_matrix and "clips" in sk_matrix:
         matrix_items = []
         for clip_id, cdata in sk_matrix["clips"].items():
-            audio_path = os.path.join("..", "..", "speaker_voices", f"{clip_id}.m4a")
+            audio_path = os.path.join("..", "..", "speaker_voices",
+                                      f"{SK_RENAMED.get(clip_id, clip_id)}.m4a")
             matrix_items.append({
                 "name": clip_id,
                 "file": audio_path,
@@ -346,7 +352,53 @@ def main():
             {"id": "stream_audit", "title": "Streaming pipeline audit (live stage timing)", "items": stream_items}
         )
 
+    # 11. GPU clones + S2ST (scripts/gpu_bench/*: Kaggle/Modal/Colab runs). One dir per run under
+    # processed/gpu_bench/<run>/ holding gpu_bench.json + wavs; Lab item = run/stem so runs never collide.
+    gpu_root = os.path.join(REPO_ROOT, "processed", "gpu_bench")
+    gpu_items = []
+    for run in sorted(os.listdir(gpu_root)) if os.path.isdir(gpu_root) else []:
+        rdir = os.path.join(gpu_root, run)
+        if run == "refs" or not os.path.isdir(rdir):
+            continue
+        res = load_json(os.path.join(rdir, "gpu_bench.json")) or {}
+        gpu = (res.get("machine") or {}).get("name", run)
+        rows = {}
+        for r in res.get("results", []):
+            if r.get("engine") == "xvoice":
+                rows[f"xvoice_{r['lang']}"] = {"engine": "X-Voice", "gpu": gpu, "marginal_rtf": r.get("marginal_rtf")}
+            elif r.get("engine") == "omnivoice" and r.get("text") == "long":
+                rows[f"omni_{r['lang']}"] = {"engine": "OmniVoice", "gpu": gpu, "rtf_long": r.get("rtf")}
+        for r in res.get("s2st", []):
+            rows[f"seamless_{r['in']}_to_{r['out']}"] = {"engine": "SeamlessM4T v2 S2ST", "gpu": gpu,
+                                                       "gen_s": r.get("gen_s"), "rtf_vs_input": r.get("rtf_vs_input")}
+        for name in audio_files(rdir):
+            stem = os.path.splitext(name)[0]
+            gpu_items.append({"name": f"{run}/{stem}", "file": f"../../processed/gpu_bench/{run}/{name}",
+                              "meta": rows.get(stem, {})})
+    if gpu_items:
+        library["sections"].append(
+            {"id": "gpu_clones", "title": "GPU clones + speech-to-speech (cloned from the owner's 5-7 s refs)", "items": gpu_items}
+        )
+
     out = os.path.join(REPO_ROOT, "ui", "voice-lab", "library.json")
+    # Merge ear grades (scripts/grade_library.py output) so the static page
+    # can show machine advisories + owner verdicts with no backend.
+    grades = load_json(os.path.join(REPO_ROOT, "processed", "ear_grades.json")) or {}
+    by_key = {(g.get("section"), g.get("name")): g for g in grades.get("grades", [])}
+    for s in library["sections"]:
+        for item in s.get("items", []):
+            g = by_key.get((s["id"], item.get("name")))
+            if g:
+                item["grade"] = g["machine"].get("grade")
+                item["grade_note"] = g["machine"].get("note", "")
+                ear = g.get("ear", {}) or {}
+                if ear.get("grade") is not None or ear.get("keep") is not None \
+                        or ear.get("note") or ear.get("defects") or ear.get("sim") is not None:
+                    item["ear"] = {"grade": ear.get("grade"),
+                                   "keep": ear.get("keep"),
+                                   "sim": ear.get("sim"),
+                                   "defects": ear.get("defects", {}),
+                                   "note": ear.get("note", "")}
     with open(out, "w") as f:
         json.dump(library, f, indent=2, ensure_ascii=False)
     counts = {s["id"]: len(s["items"]) for s in library["sections"]}
