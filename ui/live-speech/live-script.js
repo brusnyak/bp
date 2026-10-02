@@ -121,11 +121,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // Update hint text based on detection
             if (virtualDeviceFound) {
                 virtualMicHint.textContent = `Virtual output available: ${virtualDeviceName}. Choose it only when sending translated audio into a meeting.`;
-                virtualMicHint.style.color = 'var(--success-color, #4caf50)';
+                virtualMicHint.style.color = 'var(--log-success-color)';
                 showNotification(`Audio will route to: ${virtualDeviceName}`, 'success');
             } else {
                 virtualMicHint.textContent = 'Playback stays on speakers/headphones. Install BlackHole or VB-Cable only to route into a meeting.';
-                virtualMicHint.style.color = 'var(--warning-color, #ff9800)';
+                virtualMicHint.style.color = 'var(--secondary-color)'; // informational, not a warning (orange failed contrast)
                 console.warn('Frontend: No virtual audio device detected. Translation will play through default output.');
             }
 
@@ -946,6 +946,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (outputLanguageSelect) {
         outputLanguageSelect.addEventListener('change', sendConfigUpdate);
     }
+
+    // Keep the EN/SK badges beside the column titles in sync with the selects (they were static markup: "CS" showed for Slovak)
+    const syncLanguageBadges = () => {
+        [['inputLanguageSelect', 'inputLanguageBadge'], ['outputLanguageSelect', 'outputLanguageBadge']].forEach(([selId, badgeId]) => {
+            const sel = document.getElementById(selId);
+            const badge = document.getElementById(badgeId);
+            if (sel && badge) badge.textContent = sel.value === 'auto' ? 'AUTO' : sel.value.toUpperCase();
+        });
+    };
+    ['inputLanguageSelect', 'outputLanguageSelect'].forEach((id) => {
+        const sel = document.getElementById(id);
+        if (sel) sel.addEventListener('change', syncLanguageBadges);
+    });
+    syncLanguageBadges();
 
     // Event listener for the Initialize Pipeline button
     if (initBtn) {

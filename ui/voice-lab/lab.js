@@ -96,33 +96,54 @@
     } catch (e) { /* static mode: local ratings stand alone */ }
   }
 
+  // One click per decision: 1-5 grade and keep/kill are toggle buttons (click again to clear); detail ratings sit behind "more".
   function ratingRow(item) {
     const wrap = el("div", "lab-rate");
     const saved = getRatings()[item.name] || {};
     const saveState = el("span", "lab-save idle", "");
-    wrap.appendChild(document.createTextNode("ear grade "));
-    const grade = document.createElement("select");
-    grade.setAttribute("aria-label", "Ear grade 1-5 for " + item.name);
-    ["?", "1", "2", "3", "4", "5"].forEach((o, i) => {
-      const opt = document.createElement("option");
-      opt.value = String(i); opt.textContent = o === "?" ? "?/5" : o + "/5";
-      grade.appendChild(opt);
-    });
-    grade.value = String(saved.grade !== undefined ? saved.grade : 0);
-    grade.addEventListener("change", () => saveRating(item.name, { grade: Number(grade.value) }, saveState));
-    wrap.appendChild(grade);
-    wrap.appendChild(document.createTextNode(" keep "));
-    const keep = document.createElement("select");
-    keep.setAttribute("aria-label", "Keep or kill for " + item.name);
-    ["?", "keep", "kill"].forEach((o, i) => {
-      const opt = document.createElement("option");
-      opt.value = String(i); opt.textContent = o;
-      keep.appendChild(opt);
-    });
-    keep.value = String(saved.keep !== undefined ? saved.keep : 0);
-    keep.addEventListener("change", () => saveRating(item.name, { keep: Number(keep.value) }, saveState));
-    wrap.appendChild(keep);
-    wrap.appendChild(document.createTextNode(" sounds like me: "));
+
+    function toggleGroup(label, options, key, current) {
+      const group = el("div", "lab-seg");
+      group.setAttribute("role", "group");
+      group.setAttribute("aria-label", label + " for " + item.name);
+      const buttons = options.map(([text, value, cls]) => {
+        const b = el("button", "lab-seg-btn" + (cls ? " " + cls : ""), text);
+        b.type = "button";
+        b.setAttribute("aria-pressed", String(Number(current) === value));
+        b.addEventListener("click", () => {
+          const next = b.getAttribute("aria-pressed") === "true" ? 0 : value;
+          buttons.forEach((x) => x.setAttribute("aria-pressed", "false"));
+          if (next) b.setAttribute("aria-pressed", "true");
+          saveRating(item.name, { [key]: next }, saveState);
+        });
+        group.appendChild(b);
+        return b;
+      });
+      return group;
+    }
+
+    const main = el("div", "lab-rate-main");
+    main.appendChild(el("span", "lab-rate-label", "Ear"));
+    main.appendChild(toggleGroup("Ear grade 1-5", [1, 2, 3, 4, 5].map((n) => [String(n), n]), "grade", saved.grade || 0));
+    main.appendChild(toggleGroup("Keep or kill", [["keep", 1, "keep"], ["kill", 2, "kill"]], "keep", saved.keep || 0));
+    main.appendChild(saveState);
+    wrap.appendChild(main);
+
+    const note = document.createElement("input");
+    note.type = "text";
+    note.placeholder = "note: trembling at 0:03, robotic vowels…";
+    note.value = saved.note || "";
+    note.setAttribute("aria-label", "Ear note for " + item.name);
+    note.addEventListener("change", () => saveRating(item.name, { note: note.value }, saveState));
+    wrap.appendChild(note);
+
+    const more = document.createElement("details");
+    more.className = "lab-rate-more";
+    const sum = document.createElement("summary");
+    sum.textContent = "more: sounds like me, tremor, hiss, phone-fog";
+    more.appendChild(sum);
+    const grid = el("div", "lab-rate-grid");
+    grid.appendChild(document.createTextNode("sounds like me: "));
     const slider = document.createElement("input");
     slider.type = "range"; slider.min = "0"; slider.max = "100";
     slider.value = saved.sim !== undefined ? saved.sim : "50";
@@ -132,10 +153,9 @@
       val.textContent = slider.value;
       saveRating(item.name, { sim: Number(slider.value) }, saveState);
     });
-    wrap.appendChild(slider); wrap.appendChild(document.createTextNode(" "));
-    wrap.appendChild(val);
+    grid.appendChild(slider); grid.appendChild(val);
     [["steadiness", "tremor"], ["hiss", "hiss"], ["muffled", "phone-fog"]].forEach(([key, label]) => {
-      wrap.appendChild(document.createTextNode(" " + label + " "));
+      grid.appendChild(document.createTextNode(" " + label + " "));
       const sel = document.createElement("select");
       sel.setAttribute("aria-label", label + " for " + item.name);
       ["?", "1-none", "2-slight", "3-clear", "4-strong"].forEach((o, i) => {
@@ -145,18 +165,10 @@
       });
       sel.value = String(saved[key] !== undefined ? saved[key] : 0);
       sel.addEventListener("change", () => saveRating(item.name, { [key]: Number(sel.value) }, saveState));
-      wrap.appendChild(sel);
+      grid.appendChild(sel);
     });
-    wrap.appendChild(document.createTextNode(" note "));
-    const note = document.createElement("input");
-    note.type = "text";
-    note.placeholder = "trembling at 0:03, robotic vowels…";
-    note.value = saved.note || "";
-    note.setAttribute("aria-label", "Ear note for " + item.name);
-    note.addEventListener("change", () => saveRating(item.name, { note: note.value }, saveState));
-    wrap.appendChild(note);
-    wrap.appendChild(document.createTextNode(" "));
-    wrap.appendChild(saveState);
+    more.appendChild(grid);
+    wrap.appendChild(more);
     return wrap;
   }
 
@@ -338,7 +350,8 @@
       ["Ear graded", earScored],
       ["Needs ear", machineKill],
       ["Test clips", counts.test || 0],
-    ].forEach(([label, n]) => {
+    ].filter(([label, n]) => n || !["Scored", "Test clips"].includes(label))  // dead zero counters read as broken
+     .forEach(([label, n]) => {
       const chip = el("span", "lab-stat", label);
       chip.prepend(el("strong", null, String(n)));
       strip.appendChild(chip);
@@ -599,6 +612,7 @@
     if (f.includes("/meeting/")) return "meeting";
     if (f.includes("/new_models/")) return "spikes";
     if (f.includes("/stt_input_test/")) return "stt_input";
+    if (f.includes("/gpu_bench/")) return "gpu_clones";
     return "";
   }
 

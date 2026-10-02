@@ -5,7 +5,7 @@
     --primary-color: #C41E3A; /* Lingonberry Red */
     --primary-color-dark: #8A0F24; /* Deep Berry */
     --secondary-color: #666666; /* Text Light */
-    --accent-color: #4CAF50; /* Green accent */
+    --accent-color: #2E7D32; /* Green accent (white text >=4.5:1; was #4CAF50 = 2.8:1) */
     --danger-color: #D32F2F; /* Darker Red */
     --background-color-start: #F7F9FC; /* Winter Snow */
     --background-color-end: #E6EEF2; /* Misty Fjord */
@@ -75,7 +75,7 @@
     --primary-color: #FF4081; /* Vibrant Pink/Red for accents */
     --primary-color-dark: #D81B60; /* Darker shade for hover states */
     --secondary-color: #A0A0A0; /* Lighter grey */
-    --accent-color: #4CAF50; /* Green accent */
+    --accent-color: #2E7D32; /* Green accent (white text >=4.5:1; was #4CAF50 = 2.8:1) */
     --danger-color: #FF5252; /* Red danger */
     --background-color-start: #1A1A2E; /* Deep, dark blue/purple */
     --background-color-end: #2C2C4A; /* Slightly lighter dark blue/purple for sections */
