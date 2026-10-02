@@ -560,7 +560,7 @@
         <p>22 segmentov (171&nbsp;s reči): fronta spracovania <b>0&nbsp;s</b>, oneskorenie poslucháča p50 3.9&nbsp;s / p95 7.0&nbsp;s. Pri striedaní EN&harr;SK sa nahromadí prehrávanie (8&ndash;11&nbsp;s na konci): preložená reč je v priemere rovnako dlhá ako zdroj, ale jednotlivé segmenty až 1.45&times; &mdash; problém tempa, nie výkonu. <b>Prvý zvuk ~2&nbsp;s</b> nie je VAD (0.3&nbsp;s), ale TTS prvej vety (1.2&ndash;1.4&nbsp;s); nasadený engine s 12 krokmi a streamovaním po klauzách dáva prvý zvuk TTS za 0.55&nbsp;s, t.j. ~1.1&nbsp;s celkovo; pod 1&nbsp;s treba rýchlejšiu GPU (§ <code>load_tests_2026-10.md</code> &sect;4).</p>
       </div>
     </div>
-    <p class="sec-sub" style="margin-top:1rem"><b>Nezmerané:</b> silnejšia GPU, živá cesta cez mikrofón, sluchový verdikt 12 vs 16 krokov. Jeden beh na bunku, <code>wer_vs_idle</code> je drift voči nečinnému prepisu, nie absolútna presnosť.</p>
+    <p class="sec-sub" style="margin-top:1rem"><b>Sluchový verdikt autora:</b> OmniVoice klony EN/SK/CS 5/5, 12 krokov SK 4/5 vs 16 krokov SK 2/5 (&bdquo;sekne slová&ldquo;), preto je 12 krokov predvolené; SeamlessM4T = generický hlas (zamietnuté). <b>Nezmerané:</b> silnejšia GPU, živá cesta cez mikrofón. Jeden beh na bunku, <code>wer_vs_idle</code> je drift voči nečinnému prepisu, nie absolútna presnosť.</p>
   </section>
 
   <!-- ============ LATENCY ============ -->
@@ -887,7 +887,7 @@ const MATRIX = [
 ];
 
 const EVAL = [
-  { n:"Záťažový test na silnejšej GPU + pool TTS + tempo", d:"T4 hotový (<code>load_tests_2026-10.md</code>): 12 krokov = ~4 súvislí rečníci / ~12 na stretnutí, VRAM ~5.8&nbsp;GB, 3 min prezentácia bez fronty. Zostáva: sluchový verdikt 12 vs 16 krokov, strop trvania proti nahromadeniu prehrávania, silnejšia GPU, potom živý beh s mikrofónom na cieľovom stroji.", where:"T4 hotové → silnejšia GPU" },
+  { n:"Záťažový test na silnejšej GPU + pool TTS + tempo", d:"T4 hotový (<code>load_tests_2026-10.md</code>): 12 krokov = ~4 súvislí rečníci / ~12 na stretnutí, VRAM ~5.8&nbsp;GB, 3 min prezentácia bez fronty. Sluchový verdikt 12 vs 16 krokov hotový (12 lepšie). Zostáva: strop trvania proti nahromadeniu prehrávania, silnejšia GPU, potom živý beh s mikrofónom na cieľovom stroji.", where:"T4 hotové → silnejšia GPU" },
   { n:"X-Voice: podobnosť hlasu + tempo + RTF na CUDA", d:"Mac test hotový (WER 0.000, RTF ~4); Colab T4: X-Voice RTF 0.6&ndash;0.8, OmniVoice 0.14. Zostáva: speaker-similarity vs me_sk referencia, sluchový verdikt, stage 2 + predikátor tempa, a RTF na akejkoľvek CUDA karte (najprv najslabšia dostupná &mdash; 4090 je len VENDOR číslo).", where:"Mac hotové → CUDA" },
   { n:"MADLAD-400-3B-CT2 test kvality", d:"chrF na zašumenom STT vstupe vs Opus-MT na SK&harr;EN, beam 1. Najprv CPU, CUDA ak je k dispozícii.", where:"CPU → CUDA" },
   { n:"Ablácia počtu krokov (2500 / 5000 / 10000)", d:"Najlacnejší experiment kvality. Počkať na sluchový verdikt o me_omni_piper_sk.", where:"CUDA / 3 Mac dni" },
