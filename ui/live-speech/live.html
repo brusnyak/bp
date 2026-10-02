@@ -10,7 +10,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/ui/images/icon-192.png" />
     <link rel="apple-touch-icon" href="/ui/images/icon-192.png" />
     <link rel="stylesheet" href="/ui/global-styles.css" />
-    <link rel="stylesheet" href="/ui/live-speech/live-style.css" />
+    <link rel="stylesheet" href="/ui/live-speech/live-style.css?v=20261002e" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <script src="/ui/vendor/chart.min.js"></script>
     <script>
@@ -150,6 +150,7 @@
               <option value="piper">Piper (Generic Voice)</option>
               <option value="piper_sk_personal">My Slovak clone (fast)</option>
               <option value="piper_personal_v2">My English clone (fast)</option>
+              <option value="omnivoice">OmniVoice clone (GPU, untested live)</option>
               <option value="xtts">XTTS (Custom Voice, slower)</option>
             </select>
           </div>
@@ -247,7 +248,7 @@
               <option value="en" selected>English (English)</option>
               <option value="sk">Slovak (Slovenčina)</option>
               </optgroup>
-              <optgroup label="Experimental: downloads a model, generic voice, untested">
+              <optgroup label="Experimental: downloads a translation model; cloned voice needs OmniVoice on a GPU">
               <option value="es">Spanish (Español)</option>
               <option value="fr">French (Français)</option>
               <option value="de">German (Deutsch)</option>
@@ -305,7 +306,7 @@
               <option value="cs">Czech (Čeština)</option>
               <option value="sk" selected>Slovak (Slovenčina)</option>
               </optgroup>
-              <optgroup label="Experimental: downloads a model, generic voice, untested">
+              <optgroup label="Experimental: downloads a translation model; cloned voice needs OmniVoice on a GPU">
               <option value="es">Spanish (Español)</option>
               <option value="fr">French (Français)</option>
               <option value="de">German (Deutsch)</option>
@@ -498,6 +499,6 @@
     <!-- Custom Notification Bar -->
     <div id="notificationBar" class="notification-bar" role="alert" aria-live="assertive"></div>
 
-    <script src="/ui/live-speech/live-script.js?v=20261002c"></script>
+    <script src="/ui/live-speech/live-script.js?v=20261002e"></script>
   </body>
 </html>
