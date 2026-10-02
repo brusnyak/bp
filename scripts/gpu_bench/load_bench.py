@@ -47,18 +47,57 @@ class Cascade:
         self.lock = threading.Lock()  # TTS worker
         self.tts_kind = a.tts
         self.refs = {}
-        if a.tts == "omni":
+        self.steps = a.steps
+        self.batch = a.batch
+        self.inputs = a.inputs
+        if a.tts in ("omni", "engine"):
             import torch
-            from omnivoice import OmniVoice
             self.torch = torch
-            dtype = torch.float16 if a.device == "cuda" else torch.float32
+        if a.tts == "engine":  # the shipped backend/tts/omni_tts.py (cached clone prompt, warm-up, env knobs)
+            os.environ["OMNIVOICE_STEPS"] = str(a.steps)
+            from backend.tts.omni_tts import OmniVoiceTTS
+            self.engine = OmniVoiceTTS(device=a.device)
+            self.omni = self.engine.model
+            self.sr = self.engine.sample_rate
+            for tgt in ("en", "sk"):
+                self.engine.prepare_voice(os.path.join(a.inputs, f"{tgt}.wav"))
+        elif a.tts == "omni":
+            from omnivoice import OmniVoice
+            dtype = self.torch.float16 if a.device == "cuda" else self.torch.float32
             self.omni = OmniVoice.from_pretrained("k2-fsa/OmniVoice", device_map=a.device, dtype=dtype)
             self.sr = self.omni.sampling_rate
             for tgt in ("en", "sk"):  # the clone speaks the TARGET language
                 txt = open(os.path.join(a.inputs, f"{tgt}.txt"), encoding="utf-8").read().strip()
                 self.refs[tgt] = self.omni.create_voice_clone_prompt(os.path.join(a.inputs, f"{tgt}.wav"), txt)
+            if a.batch > 1:
+                self._start_batcher()
         else:
             self.sr = 24000
+
+    # -- batched TTS: one worker collects requests for up to 40 ms and calls generate() once with lists
+    def _start_batcher(self):
+        import queue
+        self.bq = queue.Queue()
+        def worker():
+            while True:
+                first = self.bq.get()
+                reqs = [first]
+                t_end = time.perf_counter() + 0.04
+                while len(reqs) < self.batch:
+                    left = t_end - time.perf_counter()
+                    if left <= 0:
+                        break
+                    try:
+                        reqs.append(self.bq.get(timeout=left))
+                    except queue.Empty:
+                        break
+                wavs = self.omni.generate(text=[r["text"] for r in reqs], language=[r["tgt"] for r in reqs],
+                                          voice_clone_prompt=[self.refs[r["tgt"]] for r in reqs], num_step=self.steps)
+                if self.dev == "cuda":
+                    self.torch.cuda.synchronize()
+                for r, w in zip(reqs, wavs):
+                    r["dur"] = len(w) / self.sr; r["done"].set()
+        threading.Thread(target=worker, daemon=True).start()
 
     def run_stt(self, audio, src):
         t0 = time.perf_counter()
@@ -78,10 +117,18 @@ class Cascade:
     def run_tts(self, text, tgt):
         """returns (audio_seconds, wait_s, run_s)"""
         tw = time.perf_counter()
+        if self.tts_kind == "omni" and self.batch > 1:
+            req = {"text": text, "tgt": tgt, "done": threading.Event()}
+            self.bq.put(req)
+            req["done"].wait()
+            return req["dur"], 0.0, time.perf_counter() - tw  # queue wait is folded into run_s: batch window + queue + generate
         with self.lock:
             t0 = time.perf_counter()
-            if self.tts_kind == "omni":
-                audio = self.omni.generate(text=text, language=tgt, voice_clone_prompt=self.refs[tgt], num_step=16)[0]
+            if self.tts_kind == "engine":
+                audio, sr, _ = self.engine.synthesize(text, language=tgt, speaker_wav_path=os.path.join(self.inputs, f"{tgt}.wav"))
+                dur = len(audio) / sr
+            elif self.tts_kind == "omni":
+                audio = self.omni.generate(text=text, language=tgt, voice_clone_prompt=self.refs[tgt], num_step=self.steps)[0]
                 if self.dev == "cuda":
                     self.torch.cuda.synchronize()
                 dur = len(audio) / self.sr
@@ -267,7 +314,8 @@ def exp_timeline(c, clips, a):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--models-dir", default="ct2"); ap.add_argument("--inputs", default="inputs")
-    ap.add_argument("--out", default="results"); ap.add_argument("--tts", default="omni", choices=["omni", "stub"])
+    ap.add_argument("--out", default="results"); ap.add_argument("--tts", default="omni", choices=["omni", "engine", "stub"])
+    ap.add_argument("--steps", type=int, default=16); ap.add_argument("--batch", type=int, default=1)
     ap.add_argument("--device", default="cuda"); ap.add_argument("--levels", default="1,2,4,8,12,16,24,32")
     ap.add_argument("--duration", type=float, default=90.0); ap.add_argument("--reps", type=int, default=3)
     ap.add_argument("--only", default="sweep,ramp,timeline")
@@ -280,7 +328,7 @@ def main():
         c.utterance(clips[src][0][0], src)
     idle_refs(c, clips)
     sampler = Sampler(); sampler.start()
-    machine = {"date": time.strftime("%Y-%m-%d %H:%M"), "device": a.device, "tts": a.tts,
+    machine = {"date": time.strftime("%Y-%m-%d %H:%M"), "device": a.device, "tts": a.tts, "steps": a.steps, "batch": a.batch,
                "assumed": {"vad_hangover_s": VAD_HANGOVER_S, "segment_pause_s": SEG_PAUSE_S}}
     try:
         import torch
