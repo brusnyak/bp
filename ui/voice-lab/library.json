@@ -89,7 +89,14 @@
           "synthesis_latency_s": null,
           "similarity": null,
           "grade": "unscored",
-          "grade_note": "no scores.json entry; ear decides"
+          "grade_note": "no scores.json entry; ear decides",
+          "ear": {
+            "grade": 4,
+            "keep": null,
+            "sim": null,
+            "defects": {},
+            "note": "decent"
+          }
         },
         {
           "name": "male_alldata_denoised",
@@ -100,7 +107,14 @@
           "synthesis_latency_s": null,
           "similarity": null,
           "grade": "unscored",
-          "grade_note": "no scores.json entry; ear decides"
+          "grade_note": "no scores.json entry; ear decides",
+          "ear": {
+            "grade": 4,
+            "keep": null,
+            "sim": null,
+            "defects": {},
+            "note": "some trembling"
+          }
         },
         {
           "name": "piper_omni_hq_en_test",
@@ -113,7 +127,7 @@
           "grade": "unscored",
           "grade_note": "no scores.json entry; ear decides",
           "ear": {
-            "grade": 2,
+            "grade": 1,
             "keep": "kill",
             "sim": null,
             "defects": {
@@ -133,7 +147,7 @@
           "grade": "unscored",
           "grade_note": "no scores.json entry; ear decides",
           "ear": {
-            "grade": 2,
+            "grade": 1,
             "keep": "kill",
             "sim": null,
             "defects": {
@@ -151,7 +165,14 @@
           "synthesis_latency_s": null,
           "similarity": null,
           "grade": "unscored",
-          "grade_note": "no scores.json entry; ear decides"
+          "grade_note": "no scores.json entry; ear decides",
+          "ear": {
+            "grade": 1,
+            "keep": null,
+            "sim": null,
+            "defects": {},
+            "note": ""
+          }
         },
         {
           "name": "piper_omni_ns035",
@@ -162,7 +183,14 @@
           "synthesis_latency_s": null,
           "similarity": null,
           "grade": "unscored",
-          "grade_note": "no scores.json entry; ear decides"
+          "grade_note": "no scores.json entry; ear decides",
+          "ear": {
+            "grade": 1,
+            "keep": null,
+            "sim": null,
+            "defects": {},
+            "note": ""
+          }
         },
         {
           "name": "piper_omni_ns067",
@@ -173,7 +201,14 @@
           "synthesis_latency_s": null,
           "similarity": null,
           "grade": "unscored",
-          "grade_note": "no scores.json entry; ear decides"
+          "grade_note": "no scores.json entry; ear decides",
+          "ear": {
+            "grade": 1,
+            "keep": null,
+            "sim": null,
+            "defects": {},
+            "note": ""
+          }
         },
         {
           "name": "sandbox_sk_SK-lili-medium_sk",
@@ -195,7 +230,14 @@
           "synthesis_latency_s": 0.2426,
           "similarity": null,
           "grade": "unscored",
-          "grade_note": "no scores.json entry; ear decides"
+          "grade_note": "no scores.json entry; ear decides",
+          "ear": {
+            "grade": 3,
+            "keep": null,
+            "sim": null,
+            "defects": {},
+            "note": "trembling in voice"
+          }
         }
       ]
     },
@@ -214,7 +256,14 @@
             "audio_s": 5.9
           },
           "grade": "na",
-          "grade_note": "evidence/functional material, not a voice grade"
+          "grade_note": "evidence/functional material, not a voice grade",
+          "ear": {
+            "grade": 4,
+            "keep": null,
+            "sim": null,
+            "defects": {},
+            "note": ""
+          }
         },
         {
           "name": "en_sk_01",
@@ -227,7 +276,14 @@
             "audio_s": 6.0
           },
           "grade": "na",
-          "grade_note": "evidence/functional material, not a voice grade"
+          "grade_note": "evidence/functional material, not a voice grade",
+          "ear": {
+            "grade": 3,
+            "keep": null,
+            "sim": null,
+            "defects": {},
+            "note": ""
+          }
         },
         {
           "name": "sk_en_00",
@@ -240,7 +296,14 @@
             "audio_s": 4.3
           },
           "grade": "na",
-          "grade_note": "evidence/functional material, not a voice grade"
+          "grade_note": "evidence/functional material, not a voice grade",
+          "ear": {
+            "grade": 2,
+            "keep": null,
+            "sim": null,
+            "defects": {},
+            "note": ""
+          }
         },
         {
           "name": "sk_en_01",
@@ -253,7 +316,14 @@
             "audio_s": 4.3
           },
           "grade": "na",
-          "grade_note": "evidence/functional material, not a voice grade"
+          "grade_note": "evidence/functional material, not a voice grade",
+          "ear": {
+            "grade": 2,
+            "keep": null,
+            "sim": null,
+            "defects": {},
+            "note": ""
+          }
         }
       ]
     },
@@ -488,7 +558,14 @@
             "rtf": 2.779
           },
           "grade": "unscored",
-          "grade_note": "clone output; blind A/B against Piper pair decides"
+          "grade_note": "clone output; blind A/B against Piper pair decides",
+          "ear": {
+            "grade": 5,
+            "keep": "keep",
+            "sim": null,
+            "defects": {},
+            "note": ""
+          }
         },
         {
           "name": "v2b_head_sk_sk",
@@ -500,7 +577,14 @@
             "rtf": 2.895
           },
           "grade": "unscored",
-          "grade_note": "clone output; blind A/B against Piper pair decides"
+          "grade_note": "clone output; blind A/B against Piper pair decides",
+          "ear": {
+            "grade": 5,
+            "keep": "keep",
+            "sim": null,
+            "defects": {},
+            "note": ""
+          }
         }
       ]
     },
@@ -522,7 +606,7 @@
           "grade": "na",
           "grade_note": "evidence/functional material, not a voice grade",
           "ear": {
-            "grade": 2,
+            "grade": 3,
             "keep": "kill",
             "sim": null,
             "defects": {},
@@ -596,7 +680,7 @@
           "grade": "na",
           "grade_note": "evidence/functional material, not a voice grade",
           "ear": {
-            "grade": 2,
+            "grade": 1,
             "keep": "kill",
             "sim": null,
             "defects": {},
@@ -627,7 +711,7 @@
           "grade": "na",
           "grade_note": "evidence/functional material, not a voice grade",
           "ear": {
-            "grade": 2,
+            "grade": 1,
             "keep": "kill",
             "sim": null,
             "defects": {},
@@ -658,7 +742,7 @@
           "grade": "na",
           "grade_note": "evidence/functional material, not a voice grade",
           "ear": {
-            "grade": 2,
+            "grade": 1,
             "keep": "kill",
             "sim": null,
             "defects": {},
@@ -689,7 +773,7 @@
           "grade": "na",
           "grade_note": "evidence/functional material, not a voice grade",
           "ear": {
-            "grade": 2,
+            "grade": 1,
             "keep": "kill",
             "sim": null,
             "defects": {},
@@ -720,7 +804,7 @@
           "grade": "na",
           "grade_note": "evidence/functional material, not a voice grade",
           "ear": {
-            "grade": 2,
+            "grade": 1,
             "keep": "kill",
             "sim": null,
             "defects": {},
@@ -1594,7 +1678,14 @@
             "hyp": "Yesterday morning I went to the market to buy fresh bread and milk I met there an old friend of mine who sold honey and cheese hello where have you been for a whole month he asked me with a smile I told him about my work"
           },
           "grade": "na",
-          "grade_note": "evidence/functional material, not a voice grade"
+          "grade_note": "evidence/functional material, not a voice grade",
+          "ear": {
+            "grade": 1,
+            "keep": "kill",
+            "sim": null,
+            "defects": {},
+            "note": ""
+          }
         },
         {
           "name": "seamless-chunked30_sk_script_reading",
@@ -1608,7 +1699,14 @@
             "hyp": "I'm speaking in English, and you'll hear my voice speak in Slovenian for a few seconds. The system listens to the microphone and detects when the speech starts and ends. On this computer, without a cloud and without a wa"
           },
           "grade": "na",
-          "grade_note": "evidence/functional material, not a voice grade"
+          "grade_note": "evidence/functional material, not a voice grade",
+          "ear": {
+            "grade": 1,
+            "keep": "kill",
+            "sim": null,
+            "defects": {},
+            "note": ""
+          }
         },
         {
           "name": "xvoice_v1_ref_text_mismatch",
@@ -1715,7 +1813,14 @@
             "rtf_long": 0.145
           },
           "grade": "unscored",
-          "grade_note": "GPU clone / S2ST output; ear decides"
+          "grade_note": "GPU clone / S2ST output; ear decides",
+          "ear": {
+            "grade": 5,
+            "keep": "keep",
+            "sim": null,
+            "defects": {},
+            "note": ""
+          }
         },
         {
           "name": "kaggle_T4/omni_en",
@@ -1726,7 +1831,14 @@
             "rtf_long": 0.152
           },
           "grade": "unscored",
-          "grade_note": "GPU clone / S2ST output; ear decides"
+          "grade_note": "GPU clone / S2ST output; ear decides",
+          "ear": {
+            "grade": 5,
+            "keep": "keep",
+            "sim": null,
+            "defects": {},
+            "note": ""
+          }
         },
         {
           "name": "kaggle_T4/omni_sk",
@@ -1737,7 +1849,14 @@
             "rtf_long": 0.169
           },
           "grade": "unscored",
-          "grade_note": "GPU clone / S2ST output; ear decides"
+          "grade_note": "GPU clone / S2ST output; ear decides",
+          "ear": {
+            "grade": 5,
+            "keep": "keep",
+            "sim": null,
+            "defects": {},
+            "note": ""
+          }
         },
         {
           "name": "kaggle_T4/seamless_cs_to_eng",
@@ -1749,7 +1868,14 @@
             "rtf_vs_input": 0.173
           },
           "grade": "unscored",
-          "grade_note": "GPU clone / S2ST output; ear decides"
+          "grade_note": "GPU clone / S2ST output; ear decides",
+          "ear": {
+            "grade": null,
+            "keep": "kill",
+            "sim": null,
+            "defects": {},
+            "note": ""
+          }
         },
         {
           "name": "kaggle_T4/seamless_en_to_ces",
@@ -1761,7 +1887,14 @@
             "rtf_vs_input": 0.191
           },
           "grade": "unscored",
-          "grade_note": "GPU clone / S2ST output; ear decides"
+          "grade_note": "GPU clone / S2ST output; ear decides",
+          "ear": {
+            "grade": null,
+            "keep": "kill",
+            "sim": null,
+            "defects": {},
+            "note": ""
+          }
         },
         {
           "name": "kaggle_T4/seamless_sk_to_eng",
@@ -1773,7 +1906,14 @@
             "rtf_vs_input": 0.149
           },
           "grade": "unscored",
-          "grade_note": "GPU clone / S2ST output; ear decides"
+          "grade_note": "GPU clone / S2ST output; ear decides",
+          "ear": {
+            "grade": null,
+            "keep": "kill",
+            "sim": null,
+            "defects": {},
+            "note": ""
+          }
         },
         {
           "name": "kaggle_T4/xvoice_cs",
@@ -1784,7 +1924,14 @@
             "marginal_rtf": 0.461
           },
           "grade": "unscored",
-          "grade_note": "GPU clone / S2ST output; ear decides"
+          "grade_note": "GPU clone / S2ST output; ear decides",
+          "ear": {
+            "grade": 4,
+            "keep": "keep",
+            "sim": null,
+            "defects": {},
+            "note": ""
+          }
         },
         {
           "name": "kaggle_T4/xvoice_en",
@@ -1795,7 +1942,14 @@
             "marginal_rtf": 0.772
           },
           "grade": "unscored",
-          "grade_note": "GPU clone / S2ST output; ear decides"
+          "grade_note": "GPU clone / S2ST output; ear decides",
+          "ear": {
+            "grade": 4,
+            "keep": "keep",
+            "sim": null,
+            "defects": {},
+            "note": ""
+          }
         },
         {
           "name": "kaggle_T4/xvoice_sk",
@@ -1806,7 +1960,14 @@
             "marginal_rtf": 0.701
           },
           "grade": "unscored",
-          "grade_note": "GPU clone / S2ST output; ear decides"
+          "grade_note": "GPU clone / S2ST output; ear decides",
+          "ear": {
+            "grade": 4,
+            "keep": "keep",
+            "sim": null,
+            "defects": {},
+            "note": ""
+          }
         },
         {
           "name": "final_T4/engine_en_steps12",
@@ -1816,6 +1977,15 @@
             "gpu": "Tesla T4",
             "rtf": 0.23,
             "first_chunk_s": 0.52
+          },
+          "grade": "unscored",
+          "grade_note": "GPU clone / S2ST output; ear decides",
+          "ear": {
+            "grade": 5,
+            "keep": "keep",
+            "sim": null,
+            "defects": {},
+            "note": ""
           }
         },
         {
@@ -1826,6 +1996,15 @@
             "gpu": "Tesla T4",
             "rtf": 0.349,
             "first_chunk_s": 0.75
+          },
+          "grade": "unscored",
+          "grade_note": "GPU clone / S2ST output; ear decides",
+          "ear": {
+            "grade": 5,
+            "keep": "keep",
+            "sim": null,
+            "defects": {},
+            "note": ""
           }
         },
         {
@@ -1836,6 +2015,15 @@
             "gpu": "Tesla T4",
             "rtf": 0.24,
             "first_chunk_s": 0.55
+          },
+          "grade": "unscored",
+          "grade_note": "GPU clone / S2ST output; ear decides",
+          "ear": {
+            "grade": 4,
+            "keep": null,
+            "sim": null,
+            "defects": {},
+            "note": ""
           }
         },
         {
@@ -1846,6 +2034,15 @@
             "gpu": "Tesla T4",
             "rtf": 0.382,
             "first_chunk_s": 0.75
+          },
+          "grade": "unscored",
+          "grade_note": "GPU clone / S2ST output; ear decides",
+          "ear": {
+            "grade": 2,
+            "keep": null,
+            "sim": null,
+            "defects": {},
+            "note": "not clear, cut's off the words"
           }
         }
       ]
