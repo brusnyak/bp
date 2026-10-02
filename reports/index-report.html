@@ -557,7 +557,7 @@
       <div class="fund-card">
         <div class="fnum">03 &middot; PREZENTÁCIA</div>
         <h3>3 minúty bez fronty spracovania</h3>
-        <p>22 segmentov (171&nbsp;s reči): fronta spracovania <b>0&nbsp;s</b>, oneskorenie poslucháča p50 3.9&nbsp;s / p95 7.0&nbsp;s. Pri striedaní EN&harr;SK sa nahromadí prehrávanie (8&ndash;11&nbsp;s na konci), lebo klon hovorí ~1.3&times; pomalšie než zdroj &mdash; problém tempa, nie výkonu.</p>
+        <p>22 segmentov (171&nbsp;s reči): fronta spracovania <b>0&nbsp;s</b>, oneskorenie poslucháča p50 3.9&nbsp;s / p95 7.0&nbsp;s. Pri striedaní EN&harr;SK sa nahromadí prehrávanie (8&ndash;11&nbsp;s na konci): preložená reč je v priemere rovnako dlhá ako zdroj, ale jednotlivé segmenty až 1.45&times; &mdash; problém tempa, nie výkonu. <b>Prvý zvuk ~2&nbsp;s</b> nie je VAD (0.3&nbsp;s), ale TTS prvej vety (1.2&ndash;1.4&nbsp;s); 12 krokov + prvá klauza ho zníži na ~1.3&nbsp;s, pod 1&nbsp;s treba rýchlejšiu GPU (§ <code>load_tests_2026-10.md</code> &sect;4).</p>
       </div>
     </div>
     <p class="sec-sub" style="margin-top:1rem"><b>Nezmerané:</b> VRAM a vyťaženie GPU (sampler nezachytil), silnejšia GPU, pool TTS na 2&times;T4, živá cesta cez mikrofón. Jeden beh na bunku, <code>wer_vs_idle</code> je drift voči nečinnému prepisu, nie absolútna presnosť.</p>
