@@ -145,3 +145,6 @@ Demo: `documentation/demo_runbook_2026-09-28.md` (+ `monday_test_checklist.md`,
    on a GPU machine, faster GPU, duration cap vs playback backlog.
 11. **Project state (2026-10-02, owner):** ratings imported (`scripts/grade_library.py --apply --import voice-ratings.json`). Everything left needs better compute: live mic run
    with OmniVoice on a GPU machine, faster GPU numbers, duration cap vs playback backlog. Kaggle/Modal cleanup due 2026-10-09 (vault action-queue).
+12. **Lightened + dry-setup measured (2026-10-02, `documentation/setup_friction_2026-10.md`):** project 9.4 GB -> 2.9 GB (side venvs + legacy `venv` removed, freezes in `documentation/envs/`);
+   fresh clone = 89 s / 705 MB .git (history carries old model binaries; rewrite not done, would break the Windows fork), `setup.py --dev` 428 s, tests 38/38, ~9 min total.
+   Owner voice backup outside git: `~/Documents/STU/BP-voice-backup`.
