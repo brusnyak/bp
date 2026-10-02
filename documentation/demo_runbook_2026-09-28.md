@@ -86,7 +86,7 @@ Never debug live: switch down the ladder, keep talking.
 
 ```bash
 make run &
-venv/bin/python test/interrupt_smoke_test.py     # drives the real /ws with test wavs
+.venv/bin/python test/interrupt_smoke_test.py     # drives the real /ws with test wavs
 ```
 A green run prints `transcription_result` → `translation_result` pairs and a pile of
 `tts_audio` chunks, and the server log ends with a clean

@@ -47,7 +47,7 @@ Audio Stream (Frontend) -> VAD -> STT (FasterWhisper) -> MT (SeamlessM4T v2) -> 
     It's highly recommended to use a virtual environment to manage dependencies.
     ```bash
     python3 -m venv venv
-    source venv/bin/activate
+    source .venv/bin/activate
     ```
 
 3.  **Install Dependencies:**
