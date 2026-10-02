@@ -1611,38 +1611,26 @@
           "grade_note": "evidence/functional material, not a voice grade"
         },
         {
-          "name": "xvoice_?",
+          "name": "xvoice_v1_ref_text_mismatch",
           "file": "",
           "meta": {
             "rtf": null,
             "infer_s": null,
             "audio_s": 15.0,
             "mt_chrf": null,
-            "wer": null,
+            "wer": 0.2432,
             "hyp": ""
           }
         },
         {
-          "name": "xvoice_?",
+          "name": "xvoice_v2_ref_matched",
           "file": "",
           "meta": {
             "rtf": null,
             "infer_s": null,
             "audio_s": 24.06,
             "mt_chrf": null,
-            "wer": null,
-            "hyp": ""
-          }
-        },
-        {
-          "name": "xvoice_?",
-          "file": "",
-          "meta": {
-            "rtf": null,
-            "infer_s": null,
-            "audio_s": null,
-            "mt_chrf": null,
-            "wer": null,
+            "wer": 0.0,
             "hyp": ""
           }
         }

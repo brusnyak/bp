@@ -757,12 +757,15 @@ body {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background-color: var(--danger-color); /* Default off */
+  background-color: var(--secondary-color); /* Default idle: grey, red is reserved for errors */
   transition: background-color 0.3s ease;
 }
 
 .indicator.on {
   background-color: var(--accent-color);
+}
+.indicator.error {
+  background-color: var(--danger-color);
 }
 
 /* Main Content Columns */
@@ -1124,7 +1127,6 @@ body {
 .reading-text {
   background-color: var(--background-color-end);
   border: 1px solid var(--border-color);
-  border-left: 4px solid var(--primary-color);
   padding: 1rem;
   border-radius: 0.5rem;
   font-style: italic;
@@ -1141,7 +1143,7 @@ body {
 .hint-text {
   font-size: 0.85em;
   margin-top: 4px;
-  color: var(--text-muted, #888);
+  color: var(--secondary-color);
 }
 
 .error-text {
@@ -1328,4 +1330,17 @@ body {
     flex-direction: row;
     justify-content: center;
   }
+}
+
+/* Labels that stay available to screen readers but not drawn (the visible text is the language badge) */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }

@@ -318,12 +318,14 @@ def main():
         m = load_json(os.path.join(spikes_dir, name)) or {}
         for r in m.get("results", [m] if "clip" in m else []):
             wav = r.get("output_wav", "")
+            if not (r.get("clip") or r.get("run")):  # timing/note rows, not a clip
+                continue
             spike_items.append({
-                "name": f"{m.get('engine', '?')}_{r.get('clip', '?')}",
+                "name": f"{m.get('engine', '?')}_{r.get('clip') or r.get('run') or '?'}",
                 "file": "../../" + wav if wav else "",
                 "meta": {"rtf": r.get("rtf"), "infer_s": r.get("infer_s"),
                          "audio_s": r.get("audio_s"),
-                         "mt_chrf": r.get("mt_chrf_vs_opusref"), "wer": r.get("wer", r.get("wer_smallsk")),
+                         "mt_chrf": r.get("mt_chrf_vs_opusref"), "wer": r.get("wer", r.get("wer_smallsk", r.get("wer_small_sk"))),
                          "hyp": (r.get("hyp_text") or "")[:220]},
             })
     if spike_items:
@@ -360,7 +362,9 @@ def main():
         rdir = os.path.join(gpu_root, run)
         if run == "refs" or not os.path.isdir(rdir):
             continue
-        res = load_json(os.path.join(rdir, "gpu_bench.json")) or {}
+        res = load_json(os.path.join(rdir, "gpu_bench.json"))
+        if not res:  # e.g. load_inputs/ (test clips) or a load_bench-only run: not a cloning run
+            continue
         gpu = (res.get("machine") or {}).get("name", run)
         rows = {}
         for r in res.get("results", []):
