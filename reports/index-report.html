@@ -487,7 +487,7 @@
 
     <div class="gate">
       <div class="gate-l">Jediná medzera je výpočtový výkon<small>Nie výskum. Nie prepisovanie.</small></div>
-      <div class="gate-m">Všetko v stave <b>Beží teraz</b> a <b>Medzera</b> je už postavené a odmerané. Skok na <b>cieľ</b> závisí od jedinej veci &mdash; <span class="hot">NVIDIA GPU (&ge;6&nbsp;GB VRAM) + &ge;16&nbsp;GB RAM.</span> Na jednom T4 reťazec STT&rarr;MT&rarr;naklonovaný hlas zvládne <b>3-minútovú prezentáciu bez fronty spracovania</b> a <b>~8 účastníkov bežného stretnutia naraz</b> (ďalší výkon = viac súbežných hlasov, nie lepší jediný rečník). Zostáva zmerať silnejšiu GPU a živú cestu s mikrofónom.</div>
+      <div class="gate-m">Všetko v stave <b>Beží teraz</b> a <b>Medzera</b> je už postavené a odmerané. Skok na <b>cieľ</b> závisí od jedinej veci &mdash; <span class="hot">NVIDIA GPU (&ge;6&nbsp;GB VRAM) + &ge;16&nbsp;GB RAM.</span> Na jednom T4 reťazec STT&rarr;MT&rarr;naklonovaný hlas zvládne <b>3-minútovú prezentáciu bez fronty spracovania</b> a <b>~12 účastníkov bežného stretnutia naraz (12 krokov)</b> (ďalší výkon = viac súbežných hlasov, nie lepší jediný rečník). Zostáva zmerať silnejšiu GPU a živú cestu s mikrofónom.</div>
     </div>
   </section>
 
@@ -502,8 +502,8 @@
     <div class="fund-grid">
       <div class="fund-card">
         <div class="fnum">01 &middot; SÚBEŽNOSŤ</div>
-        <h3>1 GPU &rarr; ~2 súvislí rečníci / ~8 na stretnutí</h3>
-        <p>Na T4 s jedným OmniVoice workerom: <b>koleno pri 12 streamoch</b>, pád pri 16+ (merané, <code>load_tests_2026-10.md</code>). Úzke miesto je jediný TTS worker; viac GPU alebo dávkovanie škáluje počet súčasných hlasov. Tréning Piper hlasov už nie je podmienka.</p>
+        <h3>1 GPU &rarr; ~4 súvislí rečníci / ~12 na stretnutí</h3>
+        <p>Na T4 s jedným OmniVoice workerom: <b>koleno pri 16 účastníkoch</b> (12 krokov; merané, <code>load_tests_2026-10.md</code>). GPU je compute-bound (90&ndash;95&nbsp;%), takže počet súčasných hlasov škáluje silnejšia GPU, nie dávkovanie. Tréning Piper hlasov už nie je podmienka.</p>
       </div>
       <div class="fund-card">
         <div class="fnum">02 &middot; ODOMKNUTIE KVALITY</div>
@@ -546,21 +546,21 @@
     <div class="fund-grid">
       <div class="fund-card">
         <div class="fnum">01 &middot; DĹŽKA REČI</div>
-        <h3>RTF 0.18&ndash;0.34, prvý zvuk ~2&nbsp;s</h3>
+        <h3>RTF 0.18&ndash;0.34, prvý zvuk ~1.1&ndash;2&nbsp;s</h3>
         <p>Reč 3&ndash;45&nbsp;s, oba smery: celkový výpočet je <b>3&ndash;5&times; rýchlejší než reč</b> a prvý preložený zvuk príde za 0.8&ndash;2.8&nbsp;s bez ohľadu na dĺžku (TTS po vetách). 85&ndash;90&nbsp;% času je TTS; STT na GPU ~0.1&ndash;1.1&nbsp;s (Mac 1.3&nbsp;s).</p>
       </div>
       <div class="fund-card">
         <div class="fnum">02 &middot; SÚBEŽNOSŤ</div>
-        <h3>~2 súvislí rečníci, ~8 na stretnutí, koleno pri 12</h3>
-        <p>Pri 25&nbsp;% času hovorenia: 2&ndash;8 účastníkov p95 prvého zvuku <b>2.1&ndash;2.3&nbsp;s</b>, 12 = 7.5&nbsp;s, 16 = 21&nbsp;s, 24 = zrútené. Keď hovoria všetci stále: 1 stream drží krok, 2 vytvárajú frontu, 8 sa zrúti (RTF práce 1.6). Strop určuje jeden TTS worker (~3.3&nbsp;s TTS na 8&nbsp;s reči).</p>
+        <h3>12 krokov: ~4 súvislí rečníci, ~12 na stretnutí</h3>
+        <p>Jeden T4, jeden TTS worker. Pri 25&nbsp;% času hovorenia: <b>12 účastníkov p95 prvého zvuku 2.6&nbsp;s</b>, 16 = 7.6&nbsp;s, 24 zrútené (16 krokov: 8 účastníkov). Keď hovoria všetci stále: <b>4 streamy držia krok</b>, 8 sa zrúti. GPU je vyťažená na 90&ndash;95&nbsp;% a VRAM stačí ~5.8&nbsp;GB &mdash; limit je výpočet, nie pamäť; dávkovanie TTS na T4 nepomáha.</p>
       </div>
       <div class="fund-card">
         <div class="fnum">03 &middot; PREZENTÁCIA</div>
         <h3>3 minúty bez fronty spracovania</h3>
-        <p>22 segmentov (171&nbsp;s reči): fronta spracovania <b>0&nbsp;s</b>, oneskorenie poslucháča p50 3.9&nbsp;s / p95 7.0&nbsp;s. Pri striedaní EN&harr;SK sa nahromadí prehrávanie (8&ndash;11&nbsp;s na konci): preložená reč je v priemere rovnako dlhá ako zdroj, ale jednotlivé segmenty až 1.45&times; &mdash; problém tempa, nie výkonu. <b>Prvý zvuk ~2&nbsp;s</b> nie je VAD (0.3&nbsp;s), ale TTS prvej vety (1.2&ndash;1.4&nbsp;s); 12 krokov + prvá klauza ho zníži na ~1.3&nbsp;s, pod 1&nbsp;s treba rýchlejšiu GPU (§ <code>load_tests_2026-10.md</code> &sect;4).</p>
+        <p>22 segmentov (171&nbsp;s reči): fronta spracovania <b>0&nbsp;s</b>, oneskorenie poslucháča p50 3.9&nbsp;s / p95 7.0&nbsp;s. Pri striedaní EN&harr;SK sa nahromadí prehrávanie (8&ndash;11&nbsp;s na konci): preložená reč je v priemere rovnako dlhá ako zdroj, ale jednotlivé segmenty až 1.45&times; &mdash; problém tempa, nie výkonu. <b>Prvý zvuk ~2&nbsp;s</b> nie je VAD (0.3&nbsp;s), ale TTS prvej vety (1.2&ndash;1.4&nbsp;s); nasadený engine s 12 krokmi a streamovaním po klauzách dáva prvý zvuk TTS za 0.55&nbsp;s, t.j. ~1.1&nbsp;s celkovo; pod 1&nbsp;s treba rýchlejšiu GPU (§ <code>load_tests_2026-10.md</code> &sect;4).</p>
       </div>
     </div>
-    <p class="sec-sub" style="margin-top:1rem"><b>Nezmerané:</b> VRAM a vyťaženie GPU (sampler nezachytil), silnejšia GPU, pool TTS na 2&times;T4, živá cesta cez mikrofón. Jeden beh na bunku, <code>wer_vs_idle</code> je drift voči nečinnému prepisu, nie absolútna presnosť.</p>
+    <p class="sec-sub" style="margin-top:1rem"><b>Nezmerané:</b> silnejšia GPU, živá cesta cez mikrofón, sluchový verdikt 12 vs 16 krokov. Jeden beh na bunku, <code>wer_vs_idle</code> je drift voči nečinnému prepisu, nie absolútna presnosť.</p>
   </section>
 
   <!-- ============ LATENCY ============ -->
@@ -887,7 +887,7 @@ const MATRIX = [
 ];
 
 const EVAL = [
-  { n:"Záťažový test na silnejšej GPU + pool TTS + tempo", d:"T4 hotový (<code>load_tests_2026-10.md</code>): 1 worker = ~2 súvislí rečníci / ~8 na stretnutí, 3 min prezentácia bez fronty. Zostáva: 2&times;T4 pool, OmniVoice <code>speed</code> 1.2 proti nahromadeniu prehrávania, oprava VRAM samplera, potom živý beh s mikrofónom na cieľovom stroji.", where:"T4 hotové → silnejšia GPU" },
+  { n:"Záťažový test na silnejšej GPU + pool TTS + tempo", d:"T4 hotový (<code>load_tests_2026-10.md</code>): 12 krokov = ~4 súvislí rečníci / ~12 na stretnutí, VRAM ~5.8&nbsp;GB, 3 min prezentácia bez fronty. Zostáva: sluchový verdikt 12 vs 16 krokov, strop trvania proti nahromadeniu prehrávania, silnejšia GPU, potom živý beh s mikrofónom na cieľovom stroji.", where:"T4 hotové → silnejšia GPU" },
   { n:"X-Voice: podobnosť hlasu + tempo + RTF na CUDA", d:"Mac test hotový (WER 0.000, RTF ~4); Colab T4: X-Voice RTF 0.6&ndash;0.8, OmniVoice 0.14. Zostáva: speaker-similarity vs me_sk referencia, sluchový verdikt, stage 2 + predikátor tempa, a RTF na akejkoľvek CUDA karte (najprv najslabšia dostupná &mdash; 4090 je len VENDOR číslo).", where:"Mac hotové → CUDA" },
   { n:"MADLAD-400-3B-CT2 test kvality", d:"chrF na zašumenom STT vstupe vs Opus-MT na SK&harr;EN, beam 1. Najprv CPU, CUDA ak je k dispozícii.", where:"CPU → CUDA" },
   { n:"Ablácia počtu krokov (2500 / 5000 / 10000)", d:"Najlacnejší experiment kvality. Počkať na sluchový verdikt o me_omni_piper_sk.", where:"CUDA / 3 Mac dni" },

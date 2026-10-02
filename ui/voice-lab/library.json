@@ -1807,6 +1807,46 @@
           },
           "grade": "unscored",
           "grade_note": "GPU clone / S2ST output; ear decides"
+        },
+        {
+          "name": "final_T4/engine_en_steps12",
+          "file": "../../processed/gpu_bench/final_T4/results/engine/engine_en_steps12.wav",
+          "meta": {
+            "engine": "OmniVoice (shipped backend class)",
+            "gpu": "Tesla T4",
+            "rtf": 0.23,
+            "first_chunk_s": 0.52
+          }
+        },
+        {
+          "name": "final_T4/engine_en_steps16",
+          "file": "../../processed/gpu_bench/final_T4/results/engine/engine_en_steps16.wav",
+          "meta": {
+            "engine": "OmniVoice (shipped backend class)",
+            "gpu": "Tesla T4",
+            "rtf": 0.349,
+            "first_chunk_s": 0.75
+          }
+        },
+        {
+          "name": "final_T4/engine_sk_steps12",
+          "file": "../../processed/gpu_bench/final_T4/results/engine/engine_sk_steps12.wav",
+          "meta": {
+            "engine": "OmniVoice (shipped backend class)",
+            "gpu": "Tesla T4",
+            "rtf": 0.24,
+            "first_chunk_s": 0.55
+          }
+        },
+        {
+          "name": "final_T4/engine_sk_steps16",
+          "file": "../../processed/gpu_bench/final_T4/results/engine/engine_sk_steps16.wav",
+          "meta": {
+            "engine": "OmniVoice (shipped backend class)",
+            "gpu": "Tesla T4",
+            "rtf": 0.382,
+            "first_chunk_s": 0.75
+          }
         }
       ]
     }

@@ -379,6 +379,15 @@ def main():
             stem = os.path.splitext(name)[0]
             gpu_items.append({"name": f"{run}/{stem}", "file": f"../../processed/gpu_bench/{run}/{name}",
                               "meta": rows.get(stem, {})})
+    # shipped-engine smoke clips (final_T4/results/engine/engine_<lang>_steps<N>.wav): same SK/EN sentence at 16 vs 12 steps, for the ear check
+    eng_dir = os.path.join(gpu_root, "final_T4", "results", "engine")
+    eng = load_json(os.path.join(eng_dir, "engine_smoke.json")) or {}
+    for name in audio_files(eng_dir) if os.path.isdir(eng_dir) else []:
+        stem = os.path.splitext(name)[0]
+        m = eng.get(stem.replace("engine_", ""), {})
+        gpu_items.append({"name": f"final_T4/{stem}", "file": f"../../processed/gpu_bench/final_T4/results/engine/{name}",
+                          "meta": {"engine": "OmniVoice (shipped backend class)", "gpu": "Tesla T4", "rtf": m.get("rtf"),
+                                   "first_chunk_s": m.get("first_chunk_s")}})
     if gpu_items:
         library["sections"].append(
             {"id": "gpu_clones", "title": "GPU clones + speech-to-speech (cloned from the owner's 5-7 s refs)", "items": gpu_items}
