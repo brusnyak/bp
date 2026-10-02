@@ -141,5 +141,7 @@ Demo: `documentation/demo_runbook_2026-09-28.md` (+ `monday_test_checklist.md`,
    dropdown but NOT yet tested through the live UI. Kaggle token / private dataset / Modal token still to revoke when done.
 10. **Shipped OmniVoice engine on T4 (kernel bp-gpu-final, 2026-10-02):** first chunk 0.52-0.55 s @12 steps (0.75 @16) => first audio ~1.1 s;
    VRAM ~5.8 GB (needs ~8 GB card), GPU 90-95 % at saturation (compute-bound); 12 steps = ~4 continuous speakers / ~12 meeting participants;
-   batching 4/call does NOT help on T4. `OMNIVOICE_STEPS` default stays 16 until the owner ear-checks 12 (Voice Lab: final_T4/engine_*). Next: live mic run
+   batching 4/call does NOT help on T4. `OMNIVOICE_STEPS` default is now 12 (owner ear check: SK 12 steps 4/5 vs 16 steps 2/5 cut-off; EN 5/5 both). Next: live mic run
    on a GPU machine, faster GPU, duration cap vs playback backlog.
+11. **Project state (2026-10-02, owner):** ratings imported (`scripts/grade_library.py --apply --import voice-ratings.json`). Everything left needs better compute: live mic run
+   with OmniVoice on a GPU machine, faster GPU numbers, duration cap vs playback backlog. Kaggle/Modal cleanup due 2026-10-09 (vault action-queue).
