@@ -152,6 +152,11 @@ section > h2 {
 .pill.pass { background: rgba(0, 163, 0, 0.12); color: var(--log-success-color); }
 .pill.fail { background: rgba(211, 47, 47, 0.1); color: var(--danger-color); }
 .pill.idle { background: var(--soft-gray); color: var(--secondary-color); }
+.lab-save { font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
+.lab-save.pass { color: var(--log-success-color); }
+.lab-save.fail { color: var(--danger-color); }
+.lab-save.idle { color: var(--secondary-color); font-weight: 400; }
+.lab-rate input[type="text"] { width: 100%; margin-top: 0.3rem; }
 .pass { color: var(--log-success-color); }
 .fail { color: var(--danger-color); }
 
