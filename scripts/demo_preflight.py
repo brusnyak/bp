@@ -48,6 +48,20 @@ OPTIONAL = [
 ]
 
 
+# Owner-local assets: gitignored by design (personal voices cannot be re-downloaded). On a fresh clone they are expected to be
+# missing and the app falls back to the generic Piper voice, so they are reported as warnings there, not failures.
+OWNER_LOCAL = {
+    "backend/tts/piper_models/sk_SK-personal-male-medium.onnx",
+    "backend/tts/piper_models/sk_SK-personal-male-medium.onnx.json",
+    "speaker_voices/speaker_voices.json",
+}
+
+
+def is_fresh_clone(repo_root):
+    """No personal SK voice on disk = not the owner's machine."""
+    return not os.path.exists(os.path.join(repo_root, "backend/tts/piper_models/sk_SK-personal-male-medium.onnx"))
+
+
 def check_paths(entries, repo_root):
     results = []
     for rel, why in entries:
@@ -67,6 +81,15 @@ def check_env_secrets(repo_root):
         return []
     return [(key in keys, f".env:{key}", "needed for Google login / token signing")
             for key in ("GOOGLE_CLIENT_ID", "JWT_SECRET")]
+
+
+def split_fresh(results):
+    """On a fresh clone move owner-local misses (and GOOGLE_CLIENT_ID, only needed for login) out of the hard-required group."""
+    hard, soft = [], []
+    for ok, name, detail in results:
+        local = name in OWNER_LOCAL or name == ".env:GOOGLE_CLIENT_ID"
+        (soft if local and not ok else hard).append((ok, name, detail))
+    return hard, soft
 
 
 def check_server():
@@ -108,9 +131,14 @@ def main():
     args = ap.parse_args()
 
     print(f"Demo pre-flight -- repo: {REPO_ROOT}")
-    required_ok = report("REQUIRED (demo cannot start without these)",
-                         check_paths(REQUIRED, REPO_ROOT)
-                         + check_env_secrets(REPO_ROOT))
+    required = check_paths(REQUIRED, REPO_ROOT) + check_env_secrets(REPO_ROOT)
+    soft = []
+    if is_fresh_clone(REPO_ROOT):
+        print("Fresh clone detected (no personal SK voice): owner-local assets are warnings; the generic Piper voice is used.")
+        required, soft = split_fresh(required)
+    required_ok = report("REQUIRED (demo cannot start without these)", required)
+    if soft:
+        report("OWNER-LOCAL (not in git; generic voice / no Google login without them)", soft)
     optional_ok = report("OPTIONAL (fallbacks / non-default paths)",
                          check_paths(OPTIONAL, REPO_ROOT))
     server_ok = True

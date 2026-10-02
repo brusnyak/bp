@@ -229,7 +229,6 @@ bp/
 ├── test/                # hardware, VAD, MT, API, auth and security tests
 ├── documentation/       # Thesis notes, security audit, model evaluation
 ├── requirements.txt     # runtime deps (no torch); -dev and -convert variants alongside
-└── package.json         # UI chart assets
 ```
 
 ## Current development status
