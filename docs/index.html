@@ -15,11 +15,12 @@
     --surface-2:#f0efe9;
     --ink:    #0b0b0b;
     --ink-2:  #52514e;
-    --muted:  #898781;
+    --muted:  #6b6963;
     --line:   #e1e0d9;
     --rule:   #c3c2b7;
     --accent: #2a78d6;
-    --signal: #d9541f;
+    --accent-text:#1f5fb0;
+    --signal: #b8400f;
 
     --ev-measured-bg:#e3f3e4; --ev-measured-fg:#076307;
     --ev-vendor-bg:  #e3eefb; --ev-vendor-fg:  #1b5bb0;
@@ -49,6 +50,7 @@
     --line:   #2c2c2a;
     --rule:   #383835;
     --accent: #3987e5;
+    --accent-text:#74b1ef;
     --signal: #e26a3a;
 
     --ev-measured-bg:#13331a; --ev-measured-fg:#5fd27a;
@@ -143,7 +145,7 @@
     min-width: 0;
   }
   .tile .t-label {
-    font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .04em;
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .04em;
     text-transform: uppercase; color: var(--muted); margin-bottom: 9px; line-height: 1.3;
   }
   .tile .t-value {
@@ -170,17 +172,17 @@
     background: color-mix(in srgb, var(--accent) 6%, var(--surface));
   }
   .sc-tag {
-    font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em;
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em;
     text-transform: uppercase; color: var(--muted); margin-bottom: 10px; font-weight: 700;
   }
   .state-card.now .sc-tag { color: var(--ev-measured-fg); }
   .state-card.gap .sc-tag { color: var(--ev-projected-fg); }
-  .state-card.target .sc-tag { color: var(--accent); }
-  .sc-h { font-size: 15.5px; font-weight: 700; letter-spacing: -.01em; margin-bottom: 8px; line-height: 1.22; }
-  .state-card.target .sc-h { color: var(--accent); }
+  .state-card.target .sc-tag { color: var(--accent-text); }
+  .sc-h { font-size: 15.5px; font-weight: 700; letter-spacing: -.01em; margin-bottom: 8px; line-height: 1.3; }
+  .state-card.target .sc-h { color: var(--accent-text); }
   .state-card p { font-size: 12.5px; color: var(--ink-2); margin: 0; }
   .state-card p b { color: var(--ink); font-weight: 650; }
-  .ladder-arrow { display: flex; align-items: center; justify-content: center; color: var(--rule); font-size: 20px; font-family: var(--font-mono); }
+  .ladder-arrow { display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 20px; font-family: var(--font-mono); }
 
   .gate {
     display: grid; grid-template-columns: 190px 1fr; gap: 20px; align-items: center;
@@ -188,8 +190,8 @@
     border: 1.5px solid color-mix(in srgb, var(--signal) 42%, var(--line));
     border-radius: 12px; padding: 20px 24px;
   }
-  .gate-l { font-family: var(--font-mono); font-size: 14px; font-weight: 800; letter-spacing: .03em; color: var(--signal); line-height: 1.25; }
-  .gate-l small { display: block; font-size: 10.5px; letter-spacing: .05em; color: var(--ink-2); margin-top: 7px; font-weight: 600; }
+  .gate-l { font-family: var(--font-mono); font-size: 14px; font-weight: 800; letter-spacing: .03em; color: var(--signal); line-height: 1.3; }
+  .gate-l small { display: block; font-size: 11px; letter-spacing: .05em; color: var(--ink-2); margin-top: 7px; font-weight: 600; }
   .gate-m { font-size: 14.5px; color: var(--ink-2); line-height: 1.5; }
   .gate-m b { color: var(--ink); font-weight: 700; }
   .gate-m .hot { color: var(--signal); font-weight: 700; }
@@ -203,6 +205,18 @@
   }
   h2 { font-size: clamp(20px, 2.4vw, 27px); margin: 0 0 8px; letter-spacing: -.015em; font-weight: 750; }
   .sec-sub { color: var(--ink-2); font-size: 14.5px; max-width: 76ch; margin: 0; }
+
+  /* ---- timeline ---- */
+  .timeline { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow); }
+  .tl-row { display: grid; grid-template-columns: 92px minmax(0,1.1fr) minmax(0,1.4fr) 112px; gap: 16px; align-items: start; padding: 15px 18px; border-top: 1px solid var(--line); }
+  .tl-row:first-child { border-top: none; }
+  .tl-row .verdict { justify-self: end; }
+  section { scroll-margin-top: 72px; }
+  .tl-date { font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--ink-2); font-variant-numeric: tabular-nums; padding-top: 2px; }
+  .tl-what { font-size: 14px; font-weight: 700; line-height: 1.3; }
+  .tl-what small { display: block; font-size: 11.5px; font-weight: 400; color: var(--muted); font-family: var(--font-mono); margin-top: 4px; }
+  .tl-so { font-size: 13px; color: var(--ink-2); }
+  .tl-so b { color: var(--ink); font-weight: 650; }
 
   /* ---- latency chart ---- */
   .chart-card {
@@ -222,7 +236,7 @@
     font-variant-numeric: tabular-nums; color: #fff; right: 9px; top: 50%; transform: translateY(-50%); white-space: nowrap;
   }
   .bval.outside { color: var(--ink); left: calc(100% + 9px); right: auto; }
-  .btag { font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--signal); font-weight: 700; margin-left: 6px; }
+  .btag { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--signal); font-weight: 700; margin-left: 6px; }
   .chart-note { font-size: 13px; color: var(--ink-2); margin: 16px 0 0; padding-top: 14px; border-top: 1px solid var(--line); }
   .chart-note b { color: var(--ink); }
 
@@ -248,7 +262,7 @@
   .ask-step { display: flex; gap: 11px; align-items: flex-start; }
   .ask-rank {
     font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: #fff;
-    background: var(--accent); width: 22px; height: 22px; border-radius: 6px;
+    background: var(--accent-text); width: 22px; height: 22px; border-radius: 6px;
     display: flex; align-items: center; justify-content: center; flex: 0 0 auto;
   }
   .ask-step:nth-child(2) .ask-rank { background: var(--muted); }
@@ -261,13 +275,13 @@
     display: flex; flex-wrap: wrap; gap: 7px 16px; margin-bottom: 20px;
     padding: 14px 16px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px;
   }
-  .legend .lg-title { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); width: 100%; margin-bottom: 2px; }
+  .legend .lg-title { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); width: 100%; margin-bottom: 2px; }
   .legend-item { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--ink-2); }
 
   .controls { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
   .filter-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .filter-row .fr-label {
-    font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .05em; text-transform: uppercase;
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .05em; text-transform: uppercase;
     color: var(--muted); width: 84px; flex: 0 0 auto;
   }
   .chip {
@@ -302,12 +316,12 @@
   .m-left { min-width: 0; }
   .m-name { font-size: 15.5px; font-weight: 700; letter-spacing: -.01em; display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
   .m-name .dom {
-    font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: .06em;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: .06em;
     color: var(--ink-2); background: var(--surface-2); border: 1px solid var(--line);
     border-radius: 5px; padding: 2px 6px;
   }
   .m-name .new-dot {
-    font-family: var(--font-mono); font-size: 9.5px; font-weight: 800; letter-spacing: .08em;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 800; letter-spacing: .08em;
     color: #fff; background: var(--signal); border-radius: 5px; padding: 2px 6px;
   }
   .m-sub { font-family: var(--font-mono); font-size: 12px; color: var(--muted); margin-top: 6px; display: flex; gap: 14px; flex-wrap: wrap; }
@@ -317,7 +331,7 @@
   .badges { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; max-width: 220px; }
 
   .badge {
-    font-family: var(--font-mono); font-size: 10px; font-weight: 700; letter-spacing: .03em;
+    font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: .03em;
     padding: 3px 7px; border-radius: 5px; white-space: nowrap;
   }
   .badge.measured { background: var(--ev-measured-bg); color: var(--ev-measured-fg); }
@@ -341,7 +355,7 @@
   .m-body { display: none; padding: 0 18px 17px; }
   .model.open .m-body { display: block; }
   .m-body .row { padding: 13px 0; border-top: 1px solid var(--line); }
-  .m-body .r-k { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+  .m-body .r-k { font-family: var(--font-mono); font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
   .m-body .r-v { font-size: 13.5px; color: var(--ink-2); }
   .m-body .r-v b { color: var(--ink); font-weight: 650; }
   .no-match { text-align: center; padding: 40px; color: var(--muted); font-family: var(--font-mono); font-size: 13px; }
@@ -351,7 +365,7 @@
   table.matrix { border-collapse: collapse; width: 100%; min-width: 760px; background: var(--surface); font-size: 13px; }
   table.matrix th, table.matrix td { padding: 11px 13px; text-align: left; border-bottom: 1px solid var(--line); }
   table.matrix thead th {
-    font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .03em; text-transform: uppercase;
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .03em; text-transform: uppercase;
     color: var(--muted); font-weight: 600; vertical-align: bottom; background: var(--surface-2);
     position: sticky; top: 0;
   }
@@ -362,7 +376,7 @@
   .cell.yes { color: var(--ev-measured-fg); font-weight: 700; }
   .cell.cond { color: var(--ev-projected-fg); font-weight: 650; }
   .cell.no { color: var(--muted); }
-  .mnote { color: var(--ink-2); font-size: 10px; display: block; margin-top: 2px; font-weight: 400; letter-spacing: 0; }
+  .mnote { color: var(--ink-2); font-size: 11px; display: block; margin-top: 2px; font-weight: 400; letter-spacing: 0; }
 
   /* ---- eval order ---- */
   .eval-list { display: flex; flex-direction: column; gap: 10px; }
@@ -371,7 +385,7 @@
     background: var(--surface); border: 1px solid var(--line); border-radius: 11px;
     padding: 15px 18px; box-shadow: var(--shadow);
   }
-  .eval .e-rank { font-family: var(--font-mono); font-size: 22px; font-weight: 800; color: var(--rule); font-variant-numeric: tabular-nums; }
+  .eval .e-rank { font-family: var(--font-mono); font-size: 22px; font-weight: 800; color: var(--muted); font-variant-numeric: tabular-nums; }
   .eval:first-child .e-rank { color: var(--signal); }
   .eval .e-name { font-size: 14.5px; font-weight: 700; }
   .eval .e-desc { font-size: 12.5px; color: var(--ink-2); margin-top: 3px; }
@@ -380,7 +394,7 @@
     background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px; padding: 5px 9px; white-space: nowrap;
   }
   .deprioritised { margin-top: 18px; padding: 15px 18px; background: var(--surface-2); border: 1px dashed var(--rule); border-radius: 11px; }
-  .deprioritised .dp-t { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .deprioritised .dp-t { font-family: var(--font-mono); font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
   .deprioritised p { margin: 0; font-size: 13px; color: var(--ink-2); }
   .deprioritised b { color: var(--ink); }
 
@@ -405,6 +419,15 @@
     .ladder { grid-template-columns: 1fr; }
     .ladder-arrow { transform: rotate(90deg); height: 16px; }
     .gate { grid-template-columns: 1fr; gap: 12px; }
+  }
+  code { overflow-wrap: anywhere; }
+  @media (max-width: 700px) {
+    .topbar-inner { flex-wrap: wrap; height: auto; padding-top: 8px; padding-bottom: 8px; gap: 6px 12px; }
+    .brand { white-space: normal; flex: 1 1 0; min-width: 0; }
+    .topnav { order: 3; flex: 1 0 100%; margin-left: 0; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+    .topnav a { white-space: nowrap; }
+    .timeline .tl-row { grid-template-columns: 1fr; gap: 6px; }
+    .tl-row .verdict { justify-self: start; }
   }
   @media (max-width: 560px) {
     .m-head { grid-template-columns: 1fr; }
@@ -433,6 +456,7 @@
       <a href="#state">Stav</a>
       <a href="#funding">Financovanie</a>
       <a href="#load">Záťaž</a>
+      <a href="#timeline">Časová os</a>
       <a href="#explorer">Modely</a>
       <a href="#matrix">Kde beží</a>
       <a href="#eval">Poradie testov</a>
@@ -445,13 +469,13 @@
 <div class="wrap">
 
   <header class="hero">
-    <div class="kicker">Prehľad lokálnych rečových modelov &middot; dátum výskumu 2026-10-01</div>
-    <h1>Kaskáda je pre slovenčinu jediná cesta &mdash; úlohou je rozbehnúť ju v reálnom čase.</h1>
-    <p class="lede">Živý preklad EN&#8596;SK s prioritou slovenčiny, výhradne lokálne. Jeden rozhodovací dokument nahrádza šesť roztrúsených výskumných súborov. Každé číslo nesie práve jeden dôkazový štítok; argument pre financovanie stojí len na <b>MEASURED</b> riadkoch. Nový hardvér kupuje priepustnosť a odomknutie kvality &mdash; <b>nie</b> rýchlejšie demo, to už beží na CPU notebooku z roku 2020.</p>
+    <h1>Slovenčina na lokálnom hardvéri funguje. Vlastný hlas v reálnom čase potrebuje GPU.</h1>
+    <p class="lede">Prehľad výskumu pre bakalársku prácu: <b>čo sa v rečových technológiách zmenilo v rokoch 2025&ndash;2026, čo sme z toho odmerali a čo ostáva zablokované výpočtovým výkonom</b>. Živý preklad EN&harr;SK beží lokálne na CPU notebooku; ten istý reťazec s naklonovaným hlasom beží rýchlejšie než reálny čas na bezplatnom T4, ale nie na Macu. Každé číslo nesie jeden dôkazový štítok &mdash; argument stojí len na <b>MEASURED</b> riadkoch.</p>
     <div class="meta-row">
       <span><b>Mac</b> M1 Pro 16&nbsp;GB (merané)</span>
       <span><b>Win</b> Ryzen 5 8645HS 14&nbsp;GB len CPU</span>
-      <span><b>Pipeline</b> faster-whisper &rarr; Opus-MT CT2 &rarr; Piper ONNX</span>
+      <span><b>Pipeline</b> faster-whisper &rarr; Opus-MT CT2 &rarr; Piper ONNX / OmniVoice</span>
+      <span><b>Výskum</b> 2026-10-01 &middot; testy 2026-10-02</span>
     </div>
   </header>
 
@@ -460,7 +484,6 @@
   <!-- ============ PIPELINE STATE ============ -->
   <section id="state" class="state-section">
     <div class="sec-head">
-      <div class="sec-num">pipeline v troch stavoch</div>
       <h2>Čo beží dnes &mdash; a jediná vec medzi súčasnosťou a ideálom</h2>
       <p class="sec-sub">Systém už funguje od začiatku do konca. Cieľový stav je ten istý živý pipeline hovoriaci naklonovaným hlasom, tempom, ktoré z neho spraví experiment namiesto jedného dema. Oddeľuje ich jediná vec.</p>
     </div>
@@ -487,14 +510,13 @@
 
     <div class="gate">
       <div class="gate-l">Jediná medzera je výpočtový výkon<small>Nie výskum. Nie prepisovanie.</small></div>
-      <div class="gate-m">Všetko v stave <b>Beží teraz</b> a <b>Medzera</b> je už postavené a odmerané. Skok na <b>cieľ</b> závisí od jedinej veci &mdash; <span class="hot">NVIDIA GPU (&ge;6&nbsp;GB VRAM) + &ge;16&nbsp;GB RAM.</span> Na jednom T4 reťazec STT&rarr;MT&rarr;naklonovaný hlas zvládne <b>3-minútovú prezentáciu bez fronty spracovania</b> a <b>~12 účastníkov bežného stretnutia naraz (12 krokov)</b> (ďalší výkon = viac súbežných hlasov, nie lepší jediný rečník). Zostáva zmerať silnejšiu GPU a živú cestu s mikrofónom.</div>
+      <div class="gate-m">Všetko v stave <b>Beží teraz</b> a <b>Medzera</b> je už postavené a odmerané. Skok na <b>cieľ</b> závisí od jedinej veci &mdash; <span class="hot">NVIDIA GPU (&ge;8&nbsp;GB VRAM) + &ge;16&nbsp;GB RAM.</span> Na jednom T4 reťazec STT&rarr;MT&rarr;naklonovaný hlas zvládne <b>3-minútovú prezentáciu bez fronty spracovania</b> a <b>~12 účastníkov bežného stretnutia naraz (12 krokov)</b> (ďalší výkon = viac súbežných hlasov, nie lepší jediný rečník). Zostáva zmerať silnejšiu GPU a živú cestu s mikrofónom.</div>
     </div>
   </section>
 
   <!-- ============ FUNDING ============ -->
   <section id="funding">
     <div class="sec-head">
-      <div class="sec-num">&sect;7 &middot; čo financovanie kúpi</div>
       <h2>Tri odomknutia, na jednej strane</h2>
       <p class="sec-sub">Produkt už dosahuje cieľ latencie na CPU notebooku z roku 2020. Hardvér sa nikdy nežiada ako oprava dema &mdash; financuje priepustnosť a tri experimenty kvality, ktoré sa na Macu v rozumnom čase otestovať nedajú.</p>
     </div>
@@ -526,7 +548,7 @@
         </div>
         <div class="ask-step">
           <div class="ask-rank">2</div>
-          <div><div class="as-t">Zapožičaný NVIDIA notebook</div><div class="as-d">Min. užitočná špecifikácia: ľubovoľná karta &ge;6&nbsp;GB VRAM + &ge;16&nbsp;GB RAM. Odomkne tréning ~2&ndash;3&nbsp;h.</div></div>
+          <div><div class="as-t">Zapožičaný NVIDIA notebook</div><div class="as-d">Min. užitočná špecifikácia: ľubovoľná karta &ge;8&nbsp;GB VRAM + &ge;16&nbsp;GB RAM. Odomkne tréning ~2&ndash;3&nbsp;h.</div></div>
         </div>
         <div class="ask-step">
           <div class="ask-rank">3</div>
@@ -539,7 +561,6 @@
   <!-- ============ LOAD TESTS ============ -->
   <section id="load">
     <div class="sec-head">
-      <div class="sec-num">&sect;8 &middot; záťažový test, bezplatný T4</div>
       <h2>Celý reťazec s naklonovaným hlasom: dĺžka reči, súbežnosť, prezentácia</h2>
       <p class="sec-sub">Kaggle Tesla T4 (15.6&nbsp;GB), faster-whisper &rarr; Opus-MT CT2 &rarr; OmniVoice (klon vlastného hlasu, 16 krokov), jeden TTS worker. Reálne nahrávky autora, dátum 2026-10-02. Zdroj: <code>documentation/load_tests_2026-10.md</code>, <code>processed/gpu_bench/load_T4/load_bench.json</code>.</p>
     </div>
@@ -563,10 +584,73 @@
     <p class="sec-sub" style="margin-top:1rem"><b>Sluchový verdikt autora:</b> OmniVoice klony EN/SK/CS 5/5, 12 krokov SK 4/5 vs 16 krokov SK 2/5 (&bdquo;sekne slová&ldquo;), preto je 12 krokov predvolené; SeamlessM4T = generický hlas (zamietnuté). <b>Nezmerané:</b> silnejšia GPU, živá cesta cez mikrofón. Jeden beh na bunku, <code>wer_vs_idle</code> je drift voči nečinnému prepisu, nie absolútna presnosť.</p>
   </section>
 
+  <!-- ============ TIMELINE ============ -->
+  <section id="timeline">
+    <div class="sec-head">
+      <h2>Čo sa zmenilo v 2025&ndash;2026 a čo to znamená pre projekt</h2>
+      <p class="sec-sub">Chronológia technológií, ktoré sa dotýkajú reťazca STT &rarr; MT &rarr; TTS s klonovaním hlasu. Dátum pri článkoch je dátum arXiv identifikátora, pri vlastných testoch dátum merania. Plný inventár 34 modelov je nižšie.</p>
+    </div>
+    <div class="timeline">
+      <div class="tl-row">
+        <div class="tl-date">2025-09</div>
+        <div class="tl-what">SloPalSpeech: slovenské fine-tuny Whispera<small>arXiv 2509.19270</small></div>
+        <div class="tl-so">Naša STT základňa <b>whisper-small-sk</b> je z tejto línie. Autori uvádzajú FLEURS WER 7.6 (medium) a 6.4 (turbo), VENDOR; medium na našom mikrofóne netestované.</div>
+        <span class="verdict keep">Použité</span>
+      </div>
+      <div class="tl-row">
+        <div class="tl-date">2026-02</div>
+        <div class="tl-what">Hibiki-Zero 3B (Kyutai)<small>arXiv 2602.11072</small></div>
+        <div class="tl-so">Priamy speech-to-speech bez zarovnaných dát; adaptácia na nový jazyk &lt;1000 h reči. Slovenčina nie je medzi pármi &mdash; je to <b>dátový projekt</b>, nie hľadanie modelu.</div>
+        <span class="verdict watch">Budúca práca</span>
+      </div>
+      <div class="tl-row">
+        <div class="tl-date">2026-02</div>
+        <div class="tl-what">DEEP benchmark strojového prekladu<small>arXiv 2602.19583</small></div>
+        <div class="tl-so">Opus-MT je najrýchlejší (57 s oproti 870 s MADLAD; MADLAD BLEU 36.0). Preklad nie je úzke miesto, Opus-MT zostáva.</div>
+        <span class="verdict keep">Použité</span>
+      </div>
+      <div class="tl-row">
+        <div class="tl-date">2026-05</div>
+        <div class="tl-what">X-Voice 0.4B (klonovanie, 30 jazykov vr. SK/CZ)<small>arXiv 2605.05611</small></div>
+        <div class="tl-so">Jediný nový model pokrývajúci SK klonovanie. Mac: WER 0.000, RTF ~4; T4: RTF 0.6&ndash;0.8, váhy CC-BY-NC. <b>Pomalší než OmniVoice.</b></div>
+        <span class="verdict test">Zmerané</span>
+      </div>
+      <div class="tl-row">
+        <div class="tl-date">2026-06</div>
+        <div class="tl-what">VoxCPM2 a COMPASS<small>arXiv 2606.06928, 2606.03241</small></div>
+        <div class="tl-so">VoxCPM2 nemá SK/CZ. COMPASS: jedno skóre klame (rozdiely &gt;30&nbsp;% v prirodzenosti a podobnosti hlasu) &mdash; <b>hodnotíme v samostatných stĺpcoch</b>.</div>
+        <span class="verdict watch">Metodika</span>
+      </div>
+      <div class="tl-row">
+        <div class="tl-date">2026-07</div>
+        <div class="tl-what">Lokálne LLM vs. dedikovaný MT; NVIDIA MagpieTTS v2607<small>arXiv 2607.26286</small></div>
+        <div class="tl-so">Opus/NLLB vyhrávajú podľa páru, LLM nie je automaticky lepšie. MagpieTTS pokrýva 12 jazykov bez SK.</div>
+        <span class="verdict watch">Referencia</span>
+      </div>
+      <div class="tl-row">
+        <div class="tl-date">2026-08</div>
+        <div class="tl-what">Kyutai Pocket TTS (100M, CPU v reálnom čase)<small>kyutai.org, 2026-08-25</small></div>
+        <div class="tl-so">Zaujímavý pre CPU stroje; pokrytie slovenčiny neoverené a nezmerané.</div>
+        <span class="verdict watch">Sledovať</span>
+      </div>
+      <div class="tl-row">
+        <div class="tl-date">2026-10-01</div>
+        <div class="tl-what">NVIDIA Nemotron 3.5 ASR streaming<small>vlastný bench</small></div>
+        <div class="tl-so">Nominálne pokrýva SK, v meraní nie: WER 0.75&ndash;0.86 a drift do ruštiny/ukrajinčiny/slovinčiny (small-sk 0.23&ndash;0.35). <b>Zamietnuté pre SK.</b></div>
+        <span class="verdict reject">Zamietnuté</span>
+      </div>
+      <div class="tl-row">
+        <div class="tl-date">2026-10-02</div>
+        <div class="tl-what">OmniVoice zero-shot klon (600+ jazykov, Apache-2.0) na T4<small>vlastný bench</small></div>
+        <div class="tl-so">Reťazec s klonovaným hlasom RTF 0.18&ndash;0.34, prvý zvuk ~1.1&nbsp;s, ~12 účastníkov na jednej GPU. <b>Toto je dôvod, prečo ďalší krok potrebuje GPU.</b></div>
+        <span class="verdict keep">Zmerané</span>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ LATENCY ============ -->
   <section id="latency">
     <div class="sec-head">
-      <div class="sec-num">&sect;1 &middot; úzke miesto, merané</div>
       <h2>Kde slovenský vstupný ťah trávi čas</h2>
       <p class="sec-sub">Smer SK&rarr;EN je limitovaný STT. Akékoľvek zlepšenie STT dopadne priamo na najhoršiu latenciu ťahu. Prvý pokus o streamovacie STT (Nemotron 3.5) sa zmeral a pre slovenčinu zamietol &mdash; small-sk zostáva stupienkom a zrýchlenie STT otvoreným problémom.</p>
     </div>
@@ -580,7 +664,6 @@
   <!-- ============ EXPLORER ============ -->
   <section id="explorer">
     <div class="sec-head">
-      <div class="sec-num">&sect;1&ndash;4 &middot; inventár modelov</div>
       <h2>Každý model, so štítkom a verdiktom</h2>
       <p class="sec-sub">Filtrujte podľa domény, pokrytia slovenčiny, licencie alebo verdiktu. Kliknutím na riadok zobrazíte kľúčové číslo a odôvodnenie. Každé tvrdenie si drží dôkazový štítok &mdash; overené verzus smerodajné sa nikdy nemieša.</p>
     </div>
@@ -637,9 +720,8 @@
   <!-- ============ MATRIX ============ -->
   <section id="matrix">
     <div class="sec-head">
-      <div class="sec-num">&sect;5 &middot; matica spustiteľnosti</div>
       <h2>Čo kde beží</h2>
-      <p class="sec-sub">Minimálna užitočná špecifikácia: <b>ľubovoľná NVIDIA karta &ge;6&nbsp;GB VRAM a stroj s &ge;16&nbsp;GB RAM</b>. Pod touto hranicou sú jediným ziskom zrýchlenia STT/MT, ktoré CPU už zvláda.</p>
+      <p class="sec-sub">Minimálna užitočná špecifikácia: <b>ľubovoľná NVIDIA karta &ge;8&nbsp;GB VRAM a stroj s &ge;16&nbsp;GB RAM</b>. Pod touto hranicou sú jediným ziskom zrýchlenia STT/MT, ktoré CPU už zvláda.</p>
     </div>
     <div class="matrix-scroll">
       <table class="matrix">
@@ -661,7 +743,6 @@
   <!-- ============ EVAL ORDER ============ -->
   <section id="eval">
     <div class="sec-head">
-      <div class="sec-num">&sect;6 &middot; odporúčané poradie testov</div>
       <h2>Najprv testuj to prvé</h2>
       <p class="sec-sub">Zoradené podľa páky na latenciu za hodinu práce. Prvý test beží na Macu už dnes &mdash; na vyriešenie najväčšej otázky netreba žiaden nový hardvér.</p>
     </div>
@@ -675,7 +756,6 @@
   <!-- ============ EVIDENCE INDEX ============ -->
   <section id="evidence">
     <div class="sec-head">
-      <div class="sec-num">&sect;8 &middot; index dôkazov v repozitári</div>
       <h2>Každé merané tvrdenie, podľa súboru</h2>
       <p class="sec-sub">Ponechané ako referencia na overenie oproti repozitáru. Tieto súbory podkladajú <span class="badge measured" style="font-size:9px;padding:2px 5px;">MEASURED</span> riadky vyššie.</p>
     </div>
@@ -925,11 +1005,11 @@ const EV_LABEL = { measured:"MEASURED", vendor:"VENDOR", community:"COMMUNITY", 
   const measured = MODELS.filter(m=>m.ev.includes("measured")).length;
   const toTest = MODELS.filter(m=>m.verdict==="test").length;
   const tiles = [
-    { label:"Najpomalší článok", value:"1.3<small>s</small>", sub:"Slovenské STT, MEASURED — jediná páka na latenciu", hot:true },
-    { label:"Živý engine", value:"0.04<small> RTF</small>", sub:"Piper ONNX na CPU, MEASURED — bezkonkurenčné", hot:false },
-    { label:"Zmapované modely", value:String(total), sub:measured+" s MEASURED číslom na vlastnom hardvéri", hot:false },
-    { label:"Vo fronte na test", value:String(toTest), sub:"Najprv test kvality MADLAD-3B", hot:false },
-    { label:"Požiadavka na hardvér", value:"6<small>GB</small>", sub:"min. užitočná NVIDIA VRAM + ≥16 GB RAM", hot:false }
+    { label:"Najpomalší článok", value:"1.3<small>s</small>", sub:"Slovenské STT na CPU, MEASURED — jediná páka na latenciu", hot:true },
+    { label:"Živý engine na CPU", value:"0.04<small> RTF</small>", sub:"Piper ONNX, generický hlas, MEASURED", hot:false },
+    { label:"Klonovaný hlas, T4", value:"0.18&ndash;0.34<small> RTF</small>", sub:"celý reťazec, 3&ndash;45 s reči, MEASURED", hot:false },
+    { label:"Prvý preložený zvuk", value:"~1.1<small>s</small>", sub:"T4, 12 krokov, streamovanie po klauzách", hot:false },
+    { label:"Hardvér pre ďalší krok", value:"&ge;8<small>GB</small>", sub:"NVIDIA VRAM (merané 5.8 GB) + &ge;16 GB RAM", hot:false }
   ];
   document.getElementById("tiles").innerHTML = tiles.map(t=>`
     <div class="tile ${t.hot?'hot':''}">
