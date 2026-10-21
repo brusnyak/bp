@@ -1,0 +1,22 @@
+{
+  "pair": "hi-en",
+  "source": "hi",
+  "target": "en",
+  "stt": {
+    "engine": "faster_whisper",
+    "model": "base",
+    "language": "hi"
+  },
+  "mt": {
+    "engine": "opus-mt",
+    "model": "Helsinki-NLP--opus-mt-hi-en"
+  },
+  "tts": {
+    "engine": "piper",
+    "voice": "en_US-ryan-medium"
+  },
+  "clip": null,
+  "reference": null,
+  "license": "commercial-ok",
+  "notes": "scaffolded by bp language add — fill clip/reference, then run: bp language test hi-en"
+}

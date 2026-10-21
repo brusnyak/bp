@@ -1,0 +1,22 @@
+{
+  "pair": "en-pl",
+  "source": "en",
+  "target": "pl",
+  "stt": {
+    "engine": "faster_whisper",
+    "model": "base",
+    "language": "en"
+  },
+  "mt": {
+    "engine": "opus-mt",
+    "model": "Helsinki-NLP/opus-mt-en-pl"
+  },
+  "tts": {
+    "engine": "piper",
+    "voice": "pl_XX-unknown-medium"
+  },
+  "clip": null,
+  "reference": null,
+  "license": "unknown",
+  "notes": "licence for 'Helsinki-NLP/opus-mt-en-pl' could not be verified (HF returns HTTP 401 for unauthenticated lookups) — confirm the model card, or pass --license. scaffolded by bp language add — fill clip/reference, then run: bp language test en-pl"
+}

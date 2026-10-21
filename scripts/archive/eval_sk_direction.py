@@ -31,7 +31,7 @@ import re
 import sys
 import time
 
-REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, REPO_ROOT)
 
 OUT_DIR = os.path.join(REPO_ROOT, "processed", "sk_direction")

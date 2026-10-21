@@ -1,0 +1,12 @@
+{
+  "pair": "cs-en",
+  "source": "cs",
+  "target": "en",
+  "stt": { "engine": "faster_whisper", "model": "small-sk", "language": "cs" },
+  "mt": { "engine": "opus-mt", "model": "Helsinki-NLP/opus-mt-cs-en" },
+  "tts": { "engine": "piper", "voice": "en_US-ryan-medium" },
+  "clip": "speaker_voices/me_cs_staromestske.m4a",
+  "reference": null,
+  "license": "commercial-ok",
+  "notes": "MT direction not converted yet. The cs STT uses the multilingual SK-tuned model with language=cs (Czech-as-proxy, see PLAN.md STT matrix)."
+}

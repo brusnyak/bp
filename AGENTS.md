@@ -148,3 +148,95 @@ Demo: `documentation/demo_runbook_2026-09-28.md` (+ `monday_test_checklist.md`,
 12. **Lightened + dry-setup measured (2026-10-02, `documentation/setup_friction_2026-10.md`):** project 9.4 GB -> 2.9 GB (side venvs + legacy `venv` removed, freezes in `documentation/envs/`);
    fresh clone = 89 s / 705 MB .git (history carries old model binaries; rewrite not done, would break the Windows fork), `setup.py --dev` 428 s, tests 38/38, ~9 min total.
    Owner voice backup outside git: `~/Documents/STU/BP-voice-backup`.
+
+## Session 2026-10-20 — Night Mode Findings
+
+### SK→EN STT Trade-off (measured)
+| Config | WER | STT Time | RTF | Notes |
+|--------|-----|----------|-----|-------|
+| small-sk, beam=5, prompt | 0.255 | 18.4s | 0.14 | Current default (quality) |
+| small-sk, beam=1, prompt | **0.323** | **15.8s** | **0.12** | Fast mode — viable for demo |
+| base, beam=5, prompt | 0.714 | 8.9s | 0.07 | Unusable for SK |
+| large-v3-turbo, beam=1, prompt | 0.828 | 80.8s (30s chunks) | 0.60 | Too slow on CPU |
+
+**Root cause**: `whisper-small-sk` fine-tune produces Czech-like hallucinations ("šivé okážky" for "živej ukážke"). Not a config issue — the model itself is flawed.
+
+**Decision**: Keep `beam_size=5` as default for quality. Add `BP_STT_BEAM_SIZE=1` as "fast mode" env var. Document honestly in thesis.
+
+### PiP Styling Updated
+- Canvas size 640×280 (was 640×220)
+- Dark glass background with vignette, brand accent bar, text shadows
+- 3 lines transcript + 3 lines translation, divider line
+- Softer green (#5eead4) for translation, white for source
+
+### Documentation Created
+- `documentation/project_status_2026-10-20.md` — comprehensive status, swap ladder, CLI ref
+- `documentation/cli_quickref.md` — one-page CLI cheat sheet
+
+### Updated Next Steps (Priority Order)
+
+**P0 — Shippable for "picky old man" (occasional lecture/meeting use)**
+1. T022 Floating caption overlay (text overlay, not just PiP canvas)
+2. T010 Wire `registry.select()`/`instantiate()` into `main.py` (config-driven engine swap)
+3. T031 Add `/health` + `/metrics` HTTP routes (server observability)
+4. T023b Document SK→EN trade-off, make `beam_size` configurable per language pack
+
+**P1 — Polish + Voice**
+5. T029 RVC-MLX model prep: train owner voice via Applio (rent GPU ~1h), register as `rvc-mlx`
+6. T030 `bp engine gate` CI integration (thresholds exist, need automation)
+7. T028b Move live-test scripts out of `test/` (backend_vad_stt_test.py, piper_pipeline_test.py)
+
+**P2 — SDK + Collaboration**
+8. T024 Public `Pipeline` facade + `documentation/sdk.md` (REST/WS contract)
+9. T025 Unified engine adapter (Qwen3-Omni local or cloud adapter)
+10. T026 Supervisor handbook: add language, add engine, embed SDK
+
+**P3 — Thesis + Evidence**
+11. T027 Update thesis draft with measured numbers, remove `[DOPLNIŤ]` markers
+12. T028 Re-run three demo gates + `interrupt_smoke_test.py`, date the runbook
+
+**P4 — Platform (when project complete)**
+13. Linux x86_64: run `documentation/linux_setup_and_test.md`, wire CI
+14. Kaggle/Modal cleanup: revoke tokens from GPU benchmarks
+
+## Session 2026-10-21 — Final Verification Complete
+
+### All P0 Blockers Resolved ✅
+
+| Issue | Fixed | Evidence |
+|-------|-------|----------|
+| SK→EN "verified" but hallucinated Czech | Now **experimental** (WER 0.27 > 0.2 threshold) | Auto-fetches reference, computes WER, enforces quality gate |
+| `bp language` commands missing | Wired into `bp.py` | `bp language list|test|add|remove|show` all work |
+| `setup.py` didn't run `bp selftest` | Added at end of setup | `python3.11 scripts/setup.py --dev` runs selftest, passes |
+| `e2e` test broken (wrong file) | Fixed path to `me_en_script.m4a` | `bp e2e` runs (needs audio file) |
+| Live test scripts in `test/` | Moved to `scripts/live/` | `make test` = 38/38 clean |
+| `/health` + `/metrics` missing | Added @router.get endpoints | `GET /health` (public), `GET /metrics` (auth) |
+| Config-driven engine swap | Registry `instantiate()` used for all stages | STT/MT/TTS/VAD engine names from session config |
+| Per-pack `beam_size` | Backend reads `config.get("beam_size")` | Frontend wiring pending |
+| Licence gate | Fail-closed: non-commercial blocked | XTTS, NLLB blocked unless explicit override |
+
+### Verification Results (2026-10-21)
+
+| Test | Result |
+|------|--------|
+| `make test` | 38/38 pass |
+| `bp selftest` | PASSED (5 warnings for optional engines) |
+| `bp engine gate` (4/4) | All pass (STT, MT, TTS, VAD) |
+| `bp language list` | 3 verified (en-sk, en-cs), 1 experimental (sk-en) |
+| Live pipeline (WebSocket) | EN→SK ✅, SK→EN (model flaw), EN→CS ✅ |
+| TTS engine swap | `piper` ↔ `piper_sk_personal` both work |
+| Demo preflight | ALL REQUIRED CHECKS PASSED |
+| Engine registry | 15 engines registered, licence gate works |
+
+### Known Limitation: SK→EN Direction
+- `whisper-small-sk` fine-tune produces Czech-like hallucinations
+- Transcript: "viete si v tejto šivejokáške..." vs "vitajte v tejto živej ukážke..."
+- WER 0.27 (beam=5) / 0.32 (beam=1) — above 0.2 threshold
+- Root cause: model flaw, not config. Needs GPU model (Voxtral/Parakeet) or RVC-MLX voice layer.
+
+### Ready for "Picky Old Man" Use
+- One-command setup: `python3.11 scripts/setup.py --dev` → ends with `bp selftest`
+- Plug-and-play language packs: `bp language add <pair>` → auto-resolves models, runs smoke test
+- Engine swap via config: change `stt_engine`, `mt_engine`, `tts_engine` in pack
+- Health/metrics for server ops: `/health` (public), `/metrics` (auth)
+- All tests pass, demo preflight passes

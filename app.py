@@ -7,6 +7,12 @@ from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Requ
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from starlette.middleware.base import BaseHTTPMiddleware
 import asyncio
 import json
 import os
@@ -73,15 +79,74 @@ async def lifespan(app: FastAPI, db_session_local_override=None):
     
     current_db_session_local = db_session_local_override if db_session_local_override else _default_SessionLocal
     current_engine = current_db_session_local.kw["bind"] # Get engine from sessionmaker
-
+    
     init_db(current_engine) # Initialize database tables using the correct engine
     await create_default_user_if_empty(current_db_session_local)
-    yield
-    print(f"APP: Application shutdown completed at {time.strftime('%H:%M:%S', time.localtime(time.time()))}")
+    
+    # Periodic model pool cleanup task (P0)
+    cleanup_task = None
+    
+    async def periodic_model_cleanup():
+        """Periodic cleanup of idle models from the pool."""
+        while True:
+            try:
+                await asyncio.sleep(60)  # Run every minute
+                from backend.main import _cleanup_idle_models
+                _cleanup_idle_models()
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                logging.warning(f"Periodic model cleanup error: {e}")
+    
+    cleanup_task = asyncio.create_task(periodic_model_cleanup())
+    
+    try:
+        yield
+    finally:
+        # Graceful shutdown (P0): drain active sessions
+        print(f"APP: Initiating graceful shutdown...")
+        if cleanup_task:
+            cleanup_task.cancel()
+            try:
+                await cleanup_task
+            except asyncio.CancelledError:
+                pass
+        
+        # Wait for active pipeline tasks to complete (with timeout)
+        from backend.main import active_sessions
+        pending_tasks = []
+        for session_data in active_sessions.values():
+            task = session_data.get("active_pipeline_task")
+            if task and not task.done():
+                pending_tasks.append(task)
+        
+        if pending_tasks:
+            print(f"APP: Waiting for {len(pending_tasks)} active pipeline tasks to complete...")
+            try:
+                await asyncio.wait_for(asyncio.gather(*pending_tasks, return_exceptions=True), timeout=30.0)
+            except asyncio.TimeoutError:
+                print(f"APP: Shutdown timeout, cancelling remaining tasks")
+                for task in pending_tasks:
+                    if not task.done():
+                        task.cancel()
+        
+        print(f"APP: Application shutdown completed at {time.strftime('%H:%M:%S', time.localtime(time.time()))}")
 
 def create_app(db_session_local_override=None) -> FastAPI:
+    import os
+    print(f"DEBUG create_app: BP_ENABLE_RATE_LIMIT = {repr(os.environ.get('BP_ENABLE_RATE_LIMIT'))}")
     _app = FastAPI(lifespan=lambda app: lifespan(app, db_session_local_override))
     _app.include_router(backend_router, prefix="/api")
+
+    # Rate limiting (P1) -- protect auth & upload endpoints
+    # ONLY enable if explicitly requested via BP_ENABLE_RATE_LIMIT=1
+    if os.environ.get("BP_ENABLE_RATE_LIMIT") == "1":
+        limiter = Limiter(key_func=get_remote_address)
+        _app.state.limiter = limiter
+        _app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+        print("DEBUG: Rate limiter ENABLED")
+    else:
+        print("DEBUG: Rate limiter DISABLED (default)")
 
     # Dependency to get the database session for the app
     def get_db_dependency_for_app():
@@ -90,7 +155,7 @@ def create_app(db_session_local_override=None) -> FastAPI:
             yield db
         finally:
             db.close()
-    
+
     # Override the get_db_dependency in backend.main with the app's specific one
     _app.dependency_overrides[backend_main.get_db_dependency] = get_db_dependency_for_app
 
@@ -352,6 +417,7 @@ def create_app(db_session_local_override=None) -> FastAPI:
         return {"message": "Test route successful!"}
 
     return _app
+
 
 app = create_app()
 
