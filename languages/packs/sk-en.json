@@ -1,0 +1,17 @@
+{
+  "pair": "sk-en",
+  "source": "sk",
+  "target": "en",
+  "stt": {
+    "engine": "faster_whisper",
+    "model": "small-sk",
+    "language": "sk",
+    "initial_prompt": "Slovenská transkripcia s diakritikou: á, ä, č, ď, é, í, ĺ, ľ, ň, ó, ô, ŕ, š, ť, ú, ý, ž."
+  },
+  "mt": { "engine": "opus-mt", "model": "Helsinki-NLP--opus-mt-sk-en" },
+  "tts": { "engine": "piper", "voice": "en_US-ryan-medium" },
+  "clip": "speaker_voices/me_sk_script.m4a",
+  "reference": null,
+  "license": "commercial-ok",
+  "notes": "Reference pair, slower direction (SK STT is the latency bottleneck ~1.3 s)."
+}

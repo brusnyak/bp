@@ -16,6 +16,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../b
 
 os.environ.setdefault("BP_DEMO_USER", "1")  # some tests log in as the demo user (opt-in, see app.py)
 os.environ.setdefault("JWT_SECRET", "test-only-secret-not-used-outside-pytest")
+os.environ.setdefault("BP_DISABLE_RATE_LIMIT", "1")  # disable rate limiting in tests
 
 from app import create_app # Import the app-creating function
 from backend.main import get_db_dependency # Import get_db_dependency
@@ -33,6 +34,10 @@ def app_with_test_db():
     It also creates and configures the FastAPI app instance.
     """
     print("\nSetting up in-memory database for tests...")
+    # Ensure rate limiting is disabled for tests
+    import os
+    os.environ["BP_DISABLE_RATE_LIMIT"] = "1"
+    
     # Create a test engine and session for the entire test session
     test_engine, TestSessionLocal = get_db_session_and_engine(SQLALCHEMY_DATABASE_URL)
     

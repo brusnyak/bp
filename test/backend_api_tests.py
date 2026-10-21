@@ -8,15 +8,15 @@ import numpy as np
 from unittest.mock import patch, AsyncMock
 import io
 
-# Assuming the FastAPI app is defined in backend.main and can be imported
 # For testing, we'll use a TestClient
 from fastapi.testclient import TestClient
-from app import app # Import the main FastAPI app instance
+from app import create_app
 from backend.main import SPEAKER_VOICES_DIR, SPEAKER_VOICES_METADATA_FILE, AUDIO_SAMPLE_RATE, initialize_all_models, _read_speaker_voices_metadata, _write_speaker_voices_metadata, get_current_user
 from backend.utils.db_manager import User
 from fastapi import Depends
 
 # Create a TestClient for the FastAPI application
+app = create_app()
 client = TestClient(app)
 
 # --- Fixtures for Test Setup and Teardown ---

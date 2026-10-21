@@ -1,0 +1,22 @@
+{
+  "pair": "fr-en",
+  "source": "fr",
+  "target": "en",
+  "stt": {
+    "engine": "faster_whisper",
+    "model": "base",
+    "language": "fr"
+  },
+  "mt": {
+    "engine": "opus-mt",
+    "model": "Helsinki-NLP--opus-mt-fr-en"
+  },
+  "tts": {
+    "engine": "piper",
+    "voice": "en_US-personal-medium"
+  },
+  "clip": null,
+  "reference": null,
+  "license": "commercial-ok",
+  "notes": "scaffolded by bp language add — fill clip/reference, then run: bp language test fr-en"
+}

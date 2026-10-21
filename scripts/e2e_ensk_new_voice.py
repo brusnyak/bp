@@ -29,7 +29,7 @@ def main():
     t_all = time.perf_counter()
     rep = {}
 
-    wav, sr = librosa.load(os.path.join(REPO_ROOT, "speaker_voices", "en_script_reading.m4a"),
+    wav, sr = librosa.load(os.path.join(REPO_ROOT, "speaker_voices", "me_en_script.m4a"),
                            sr=16000, mono=True)
     stt = FasterWhisperSTT(model_size="base")
     segs, stt_t, lang = stt.transcribe_audio(np.asarray(wav, dtype=np.float32), sr, language="en")
@@ -45,7 +45,7 @@ def main():
     print(f"MT: {mt_t:.1f}s, {len(translated)} chars")
 
     hybrid = TTS_ENGINES["hybrid"]()
-    ref = os.path.join(REPO_ROOT, "speaker_voices", "en_script_reading.m4a")
+    ref = os.path.join(REPO_ROOT, "speaker_voices", "me_en_script.m4a")
     # Clone the first 600 chars (full 1300-char clip in one go risks long-tail synthesis;
     # chunking is T045's production behavior — this measures the same path).
     sample = translated[:600]
