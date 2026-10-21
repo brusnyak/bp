@@ -1,0 +1,12 @@
+{
+  "pair": "en-de",
+  "source": "en",
+  "target": "de",
+  "stt": { "engine": "faster_whisper", "model": "base", "language": "en" },
+  "mt": { "engine": "opus-mt", "model": "Helsinki-NLP/opus-mt-en-de" },
+  "tts": { "engine": "piper", "voice": "de_DE-thorsten-medium", "fallback": "de_DE-eva_k-x_low" },
+  "clip": "speaker_voices/me_en_script.m4a",
+  "reference": null,
+  "license": "commercial-ok",
+  "notes": "Component not yet converted/downloaded — resolves to missing until scripts/convert_models.py runs for the MT pair and the Piper voice is fetched. Shipped as experimental on purpose (declares the target, records the gap)."
+}

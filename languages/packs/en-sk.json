@@ -1,0 +1,12 @@
+{
+  "pair": "en-sk",
+  "source": "en",
+  "target": "sk",
+  "stt": { "engine": "faster_whisper", "model": "base", "language": "en" },
+  "mt": { "engine": "opus-mt", "model": "Helsinki-NLP--opus-mt-en-sk" },
+  "tts": { "engine": "piper", "voice": "sk_SK-personal-male-medium", "fallback": "sk_SK-lili-medium" },
+  "clip": "speaker_voices/me_en_script.m4a",
+  "reference": null,
+  "license": "commercial-ok",
+  "notes": "Reference pair. EN in, SK out; SK voice is the owner's fine-tune with a generic fallback."
+}

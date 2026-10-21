@@ -1,0 +1,40 @@
+MIT License
+
+Copyright (c) 2026 Yegor Brusnyak
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+Third-party components included in this project are subject to their own licenses:
+
+- faster-whisper / CTranslate2 / Whisper models: MIT
+- Opus-MT models (Helsinki-NLP): CC-BY-4.0 (verify per model)
+- Piper TTS / Piper voices: MIT
+- RVC-MLX / Retrieval-based Voice Conversion: MIT (Acelogic)
+- onyx / ONNX Runtime: MIT
+- Coqui XTTS v2: Coqui Public Model License (non-commercial)
+- NLLB-200: CC-BY-NC-4.0 (non-commercial)
+- OmniVoice: license needs verification (k2-fsa/OmniVoice)
+
+The following engines are NON-COMMERCIAL and blocked by default in the default profile:
+- Coqui XTTS v2 (CPML)
+- NLLB-200 (CC-BY-NC-4.0)
+
+See `documentation/s2s_landscape_2026-10-18.md` for full license analysis.

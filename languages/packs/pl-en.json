@@ -1,0 +1,22 @@
+{
+  "pair": "pl-en",
+  "source": "pl",
+  "target": "en",
+  "stt": {
+    "engine": "faster_whisper",
+    "model": "base",
+    "language": "pl"
+  },
+  "mt": {
+    "engine": "opus-mt",
+    "model": "Helsinki-NLP--opus-mt-pl-en"
+  },
+  "tts": {
+    "engine": "piper",
+    "voice": "en_US-ryan-medium"
+  },
+  "clip": "speaker_voices/me_en_script.m4a",
+  "reference": "Good morning, and welcome to this live demonstration of real-time speech translation. I am speaking English, and you will hear my own voice speaking Slovak within seconds.",
+  "license": "commercial-ok",
+  "notes": "scaffolded by bp language add — fill clip/reference, then run: bp language test pl-en"
+}

@@ -1,0 +1,12 @@
+{
+  "pair": "en-cs",
+  "source": "en",
+  "target": "cs",
+  "stt": { "engine": "faster_whisper", "model": "base", "language": "en" },
+  "mt": { "engine": "opus-mt", "model": "Helsinki-NLP--opus-mt-en-cs" },
+  "tts": { "engine": "piper", "voice": "cs_CZ-jirka-medium" },
+  "clip": "speaker_voices/me_en_script.m4a",
+  "reference": null,
+  "license": "commercial-ok",
+  "notes": "First non-reference pair; all three components already present in ct2_models/ and piper_models/."
+}

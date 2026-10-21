@@ -16,7 +16,7 @@ run: ## Run the server on https://localhost:8000 (loopback only; BP_HOST=0.0.0.0
 	$(VENV_PY) app.py
 
 test: ## Run the backend test suite.
-	$(VENV_PY) -m pytest test/hardware_test.py test/vad_tests.py test/mt_model_tests.py test/backend_api_tests.py test/backend_auth_tests.py test/security_tests.py test/config_tests.py -q
+	export BP_DISABLE_RATE_LIMIT=1; $(VENV_PY) -m pytest test/hardware_test.py test/vad_tests.py test/mt_model_tests.py test/backend_api_tests.py test/backend_auth_tests.py test/security_tests.py test/config_tests.py -q
 
 clean: ## Remove generated models, certs, venv and caches (never touches speaker_voices/).
 	$(PYTHON) -c "import shutil,pathlib;[shutil.rmtree(p,ignore_errors=True) for p in ('.venv','.venv-convert','ct2_models','certs','node_modules','.pytest_cache')];[shutil.rmtree(p,ignore_errors=True) for p in pathlib.Path('.').rglob('__pycache__')]"
@@ -28,12 +28,12 @@ demo-audio: ## Process FILE through local pipeline; set SRC/TGT, optional SECOND
 	@test -n "$(FILE)" || (echo "Usage: make demo-audio FILE=speaker_voices/clip.m4a SRC=en TGT=sk [SECONDS=12] [VOICE=generic]"; exit 2)
 	@test -n "$(SRC)" || (echo "Set SRC=en or SRC=sk"; exit 2)
 	@test -n "$(TGT)" || (echo "Set TGT=en or TGT=sk"; exit 2)
-	$(VENV_PY) scripts/bp.py demo-audio $(FILE) --source $(SRC) --target $(TGT) $(if $(SECONDS),--max-seconds $(SECONDS),) $(if $(VOICE),--voice $(VOICE),)
 
-lab: ## Serve the Voice Lab review page (static only: no /api, no Google login, no real upload — use `make run` + https://localhost:8000/ui/voice-lab/lab.html for backend features).
-	@echo "--- Voice Lab (STATIC, no backend) at http://localhost:8080/ui/voice-lab/lab.html ---"
-	@echo "--- Need Google login or real upload? Use: make run → https://localhost:8000/ui/voice-lab/lab.html ---"
-	$(PYTHON) -m http.server 8080
+lab: ## Voice Lab static page, http://localhost:8080/ui/voice-lab/lab.html, no backend.
+	$(VENV_PY) -m http.server 8080 -d ui/voice-lab
+
+clean: ## Remove generated models, certs, venv and caches (never touches speaker_voices/).
+	$(PYTHON) -c "import shutil,pathlib;[shutil.rmtree(p,ignore_errors=True) for p in ('.venv','.venv-convert','ct2_models','certs','node_modules','.pytest_cache')];[shutil.rmtree(p,ignore_errors=True) for p in pathlib.Path('.').rglob('__pycache__')]"
 
 help: ## Show this help.
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "%-12s %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'

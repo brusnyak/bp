@@ -30,7 +30,7 @@ class FasterWhisperSTT:
         )
 
     def transcribe_audio(
-        self, audio_data: np.ndarray, sample_rate: int, language: Optional[str] = None, vad_filter: bool = True
+        self, audio_data: np.ndarray, sample_rate: int, language: Optional[str] = None, vad_filter: bool = True, initial_prompt: Optional[str] = None
     ) -> Tuple[list, float, Optional[str]]: # Changed return type to list of segments, transcription time, and detected language
         """
         Transcribes audio data using Faster-Whisper.
@@ -39,6 +39,7 @@ class FasterWhisperSTT:
             audio_data (np.ndarray): Audio data as a NumPy array (float32).
             sample_rate (int): Sample rate of the audio data.
             language (Optional[str]): Language of the audio. If None, it will be detected.
+            initial_prompt (Optional[str]): Optional prompt to guide the decoder (e.g., Slovak diacritics).
 
         Returns:
             Tuple[str, float]: A tuple containing the transcribed text and the transcription time in seconds.
@@ -64,6 +65,8 @@ class FasterWhisperSTT:
             "beam_size": self.beam_size,
             "vad_filter": vad_filter,
         }
+        if initial_prompt:
+            transcribe_options["initial_prompt"] = initial_prompt
         if not vad_filter: # If external VAD is enabled (and FasterWhisper's is disabled)
             transcribe_options["no_speech_threshold"] = None # Disable FasterWhisper's internal no-speech detection
 

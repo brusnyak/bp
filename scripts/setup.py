@@ -89,6 +89,9 @@ def main():
     step("Voice Lab grade store")
     run([PY, "scripts/grade_library.py", "--apply"])
 
+    step("Self-test (verify models load, engines available, pipeline pass)")
+    run([PY, "scripts/bp.py", "selftest"])
+
     print(f"\nDone in {time.time() - t0:.0f}s. Start: {PY} app.py  ->  https://localhost:8000 (accept the self-signed cert)")
 
 

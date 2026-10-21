@@ -1,0 +1,13 @@
+{
+  "id": "yegorby/bp-gpu-test-suite",
+  "title": "BP GPU Test Suite",
+  "code_file": "kaggle_gpu_test.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [],
+  "competition_sources": [],
+  "kernel_sources": []
+}

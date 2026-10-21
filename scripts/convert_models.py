@@ -14,7 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 TMP = ROOT / ".venv-convert"
 PY = TMP / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
-PAIRS = ["en-sk", "sk-en", "en-cs"]
+PAIRS = ["en-sk", "sk-en", "en-cs", "pl-en", "fr-en", "zh-en", "hi-en", "ja-en", "en-zh", "en-hi"]
 ENV = {**os.environ, "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"}
 
 

@@ -1,0 +1,22 @@
+{
+  "pair": "en-zh",
+  "source": "en",
+  "target": "zh",
+  "stt": {
+    "engine": "faster_whisper",
+    "model": "base",
+    "language": "en"
+  },
+  "mt": {
+    "engine": "opus-mt",
+    "model": "Helsinki-NLP--opus-mt-en-zh"
+  },
+  "tts": {
+    "engine": "piper",
+    "voice": "zh_CN-chaowen-medium"
+  },
+  "clip": null,
+  "reference": null,
+  "license": "commercial-ok",
+  "notes": "scaffolded by bp language add — fill clip/reference, then run: bp language test en-zh"
+}

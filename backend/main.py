@@ -10,13 +10,15 @@ import io
 import soundfile as sf
 import time
 import os
-from typing import Dict, Any, Optional, Tuple, List
-from fastapi import FastAPI, Depends # Import Depends
+from typing import Dict, Any, Optional, Tuple, List, Callable
+from fastapi import FastAPI, Depends, Request # Import Depends, Request
 from pydantic import BaseModel, Field # Import Field
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, OAuth2PasswordRequestForm # Import security components
 import uuid
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
@@ -81,6 +83,28 @@ def get_db_dependency():
 
 # Security dependency for user authentication
 security = HTTPBearer()
+
+# Rate limiter (P1) -- protect auth & upload endpoints
+# ONLY enable if explicitly requested via BP_ENABLE_RATE_LIMIT=1
+import os
+if os.environ.get("BP_ENABLE_RATE_LIMIT") == "1":
+    from slowapi import Limiter
+    from slowapi.util import get_remote_address
+    limiter = Limiter(key_func=get_remote_address)
+else:
+    limiter = None
+
+# Helper to conditionally apply rate limiting
+def rate_limit(limit: str):
+    """Conditionally apply rate limiting based on whether limiter is enabled."""
+    if limiter is None:
+        def noop_decorator(func):
+            return func
+        return noop_decorator
+    return limiter.limit(limit)
+
+# Engine registry (T010) -- selection + licence gate + instantiation
+from backend.registry import instantiate, select, license_ok, engines as reg_engines
 
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db_dependency)):
     from backend.utils.auth import decode_access_token
@@ -238,6 +262,162 @@ _ongoing_conversions: Dict[str, asyncio.Lock] = {}
 # Dictionary for per-session locks (prevents race conditions)
 _session_locks: Dict[str, asyncio.Lock] = {}
 
+# ===== Model Pool with Bounds (P0) =============================================
+# One instance per (stage, engine, config) per process, shared across sessions.
+# Configurable limits per stage; LRU eviction when limits exceeded.
+MODEL_POOL_CONFIG = {
+    "stt": {"max_instances": 3, "idle_ttl_s": 300},      # 3 STT models max, 5 min idle TTL
+    "mt": {"max_instances": 5, "idle_ttl_s": 300},       # 5 MT models max
+    "tts": {"max_instances": 5, "idle_ttl_s": 300},      # 5 TTS models max
+    "vad": {"max_instances": 2, "idle_ttl_s": 600},      # VAD is tiny, rarely pooled
+}
+
+# Model pool: key=(stage, engine, config_hash) -> {"instance": obj, "ref_count": int, "last_used": float, "created_at": float}
+_model_pool: Dict[tuple, Dict[str, Any]] = {}
+_model_pool_locks: Dict[tuple, asyncio.Lock] = {}
+
+def _pool_key(stage: str, engine: str, **config) -> tuple:
+    """Stable key for a model instance based on stage, engine, and config."""
+    import hashlib
+    import json
+    cfg_str = json.dumps(config, sort_keys=True)
+    cfg_hash = hashlib.md5(cfg_str.encode()).hexdigest()[:8]
+    return (stage, engine, cfg_hash)
+
+async def get_pooled_model(stage: str, engine: str, factory: Callable, **config) -> tuple:
+    """
+    Get or create a pooled model instance.
+    Returns (model_instance, is_new) where is_new=True if freshly created.
+    """
+    key = _pool_key(stage, engine, **config)
+    
+    # Get or create lock for this key
+    if key not in _model_pool_locks:
+        _model_pool_locks[key] = asyncio.Lock()
+    
+    async with _model_pool_locks[key]:
+        if key in _model_pool:
+            # Existing instance - increment ref count
+            _model_pool[key]["ref_count"] += 1
+            _model_pool[key]["last_used"] = time.time()
+            return _model_pool[key]["instance"], False
+        
+        # Check if we need to evict (per-stage limit)
+        stage_limit = MODEL_POOL_CONFIG.get(stage, {}).get("max_instances", 10)
+        current_stage_count = sum(1 for k in _model_pool if k[0] == stage)
+        
+        if current_stage_count >= stage_limit:
+            # LRU eviction: find oldest unused model in this stage
+            candidates = [(k, v) for k, v in _model_pool.items() if k[0] == stage and v["ref_count"] == 0]
+            if candidates:
+                oldest = min(candidates, key=lambda x: x[1]["last_used"])
+                evict_key = oldest[0]
+                logging.info(f"Backend: Evicting LRU model {evict_key} (stage={stage}, limit={stage_limit})")
+                del _model_pool[evict_key]
+            else:
+                logging.warning(f"Backend: Model pool limit reached for {stage} ({stage_limit}), but all instances in use")
+        
+        # Create new instance
+        logging.info(f"Backend: Creating new pooled {stage}/{engine} instance (key={key})")
+        model = factory()
+        _model_pool[key] = {
+            "instance": model,
+            "ref_count": 1,
+            "last_used": time.time(),
+            "created_at": time.time(),
+            "stage": stage,
+            "engine": engine,
+            "config": config
+        }
+        return model, True
+
+
+def release_pooled_model(stage: str, engine: str, **config) -> bool:
+    """
+    Decrement ref count; delete if zero and idle TTL expired.
+    Returns True if model was actually released (ref_count hit 0 and TTL expired).
+    """
+    key = _pool_key(stage, engine, **config)
+    if key not in _model_pool:
+        return False
+    
+    _model_pool[key]["ref_count"] -= 1
+    _model_pool[key]["last_used"] = time.time()
+    
+    if _model_pool[key]["ref_count"] <= 0:
+        # Check idle TTL
+        idle_ttl = MODEL_POOL_CONFIG.get(stage, {}).get("idle_ttl_s", 300)
+        if time.time() - _model_pool[key]["last_used"] >= idle_ttl:
+            del _model_pool[key]
+            if key in _model_pool_locks:
+                del _model_pool_locks[key]
+            logging.info(f"Backend: Released pooled {stage}/{engine} (key={key}) after idle TTL")
+            return True
+    return False
+
+
+def cleanup_session_models(client_info: str):
+    """Called when a session disconnects - releases its model references."""
+    session_data = active_sessions.get(client_info)
+    if not session_data:
+        return
+    
+    config = session_data.get("session_config", {})
+    
+    # Release STT
+    if session_data.get("stt_model"):
+        stt_size = config.get("stt_model_size", "base")
+        release_pooled_model("stt", "faster_whisper", model_size=stt_size)
+    
+    # Release MT models
+    for mt_key, mt_model in session_data.get("mt_models", {}).items():
+        if mt_model:
+            src, tgt = mt_key.split("-", 1)
+            release_pooled_model("mt", "opus-mt", source=src, target=tgt)
+    
+    # Release TTS
+    if session_data.get("tts_engine"):
+        tts_choice = config.get("tts_model_choice", "piper")
+        release_pooled_model("tts", tts_choice)
+    
+    # VAD is tiny, not pooled
+    
+    logging.info(f"Backend: Session {client_info} model refs released")
+
+
+def get_model_pool_stats() -> Dict[str, Any]:
+    """Return current pool stats for /metrics."""
+    return {
+        "total_instances": len(_model_pool),
+        "by_stage": {
+            stage: sum(1 for k in _model_pool if k[0] == stage)
+            for stage in ("vad", "stt", "mt", "tts", "unified")
+        },
+        "details": [
+            {
+                "stage": k[0], "engine": k[1], "config_hash": k[2],
+                "ref_count": v["ref_count"],
+                "age_s": round(time.time() - v["created_at"], 1),
+                "idle_s": round(time.time() - v["last_used"], 1),
+            }
+            for k, v in _model_pool.items()
+        ]
+    }
+
+
+def _cleanup_idle_models():
+    """Background task to clean up idle models. Called periodically."""
+    now = time.time()
+    for key, info in list(_model_pool.items()):
+        stage = key[0]
+        idle_ttl = MODEL_POOL_CONFIG.get(stage, {}).get("idle_ttl_s", 300)
+        if info["ref_count"] == 0 and (now - info["last_used"]) >= idle_ttl:
+            logging.info(f"Backend: Cleaning up idle model {key} (stage={stage})")
+            del _model_pool[key]
+            if key in _model_pool_locks:
+                del _model_pool_locks[key]
+
+
 # Available MT models for hybrid system
 AVAILABLE_MT_MODELS = {
     "opus_mt": "CTranslate2 optimized Opus-MT models",
@@ -329,16 +509,30 @@ def _save_audio_segment_for_debug(audio_segment_np: np.ndarray, filename_prefix:
 
 # --- Model Initialization Functions ---
 async def _initialize_stt_model(session_data: Dict[str, Any], stt_model_size: str = DEFAULT_STT_MODEL_SIZE):
-    """Initializes the FasterWhisperSTT model for a given session."""
+    """Initializes the STT model for a given session via the engine registry.
+    Engine name comes from session_config['stt_engine'] or defaults to 'faster_whisper'."""
+    config = session_data.get("session_config", {})
+    stt_engine = config.get("stt_engine", "faster_whisper")
     current_stt_model = session_data.get("stt_model")
-    if current_stt_model is None or current_stt_model.model_size != stt_model_size:
+    if current_stt_model is None or getattr(current_stt_model, "model_size", None) != stt_model_size:
         init_start = time.perf_counter()
-        logging.info(f"Backend: Session {session_data['client_info']}: Initializing FasterWhisperSTT model '{stt_model_size}' at {time.strftime('%H:%M:%S', time.localtime(init_start))}...")
-        session_data["stt_model"] = FasterWhisperSTT(model_size=stt_model_size, compute_type="int8")
+        logging.info(f"Backend: Session {session_data['client_info']}: Getting pooled {stt_engine} STT model '{stt_model_size}' at {time.strftime('%H:%M:%S', time.localtime(init_start))}...")
+        beam = int(os.environ.get("BP_STT_BEAM_SIZE", "5"))
+        # Allow per-pack beam_size override
+        if "beam_size" in config:
+            beam = int(config["beam_size"])
+        
+        def stt_factory():
+            model = instantiate("stt", stt_engine, model_size=stt_model_size)
+            if hasattr(model, "beam_size"):
+                model.beam_size = beam
+            return model
+        
+        session_data["stt_model"], is_new = await get_pooled_model("stt", stt_engine, stt_factory, model_size=stt_model_size)
         init_end = time.perf_counter()
-        logging.info(f"Backend: Session {session_data['client_info']}: FasterWhisperSTT model '{stt_model_size}' initialized at {time.strftime('%H:%M:%S', time.localtime(init_end))}. Duration: {init_end - init_start:.2f}s")
+        logging.info(f"Backend: Session {session_data['client_info']}: STT {'created' if is_new else 'reused'} at {time.strftime('%H:%M:%S', time.localtime(init_end))}. Duration: {init_end - init_start:.2f}s")
     else:
-        logging.info(f"Backend: Session {session_data['client_info']}: FasterWhisperSTT model '{stt_model_size}' already initialized.")
+        logging.info(f"Backend: Session {session_data['client_info']}: {stt_engine} STT model '{stt_model_size}' already initialized.")
 
 async def _initialize_captioner(session_data: Dict[str, Any], source_lang: str):
     """T044: lazily create this session's SessionCaptioner (streaming partial-text captions,
@@ -358,7 +552,7 @@ async def _initialize_captioner(session_data: Dict[str, Any], source_lang: str):
         session_data["captioner"] = None
 
 async def _initialize_mt_model(session_data: Dict[str, Any], source_lang: str, target_lang: str, websocket: Optional[WebSocket] = None):
-    """Initializes a specific CTranslate2MT model for a given session."""
+    """Initializes a specific CTranslate2MT model for a given session via the engine registry."""
     mt_models_for_session = session_data.setdefault("mt_models", {})
     model_key = f"{source_lang}-{target_lang}"
 
@@ -371,19 +565,17 @@ async def _initialize_mt_model(session_data: Dict[str, Any], source_lang: str, t
     mt_model_name = get_mt_model_name(source_lang, target_lang)
     mt_model_path = f"ct2_models/{mt_model_name.replace('/', '--')}"
 
-    if model_key not in mt_models_for_session or mt_models_for_session[model_key].ctranslate2_model_dir != mt_model_path:
+    if model_key not in mt_models_for_session or getattr(mt_models_for_session[model_key], "ctranslate2_model_dir", None) != mt_model_path:
         # Acquire a lock for this model key to prevent multiple simultaneous conversions
         if model_key not in _ongoing_conversions:
             _ongoing_conversions[model_key] = asyncio.Lock()
         
         async with _ongoing_conversions[model_key]:
             # Re-check if model is already initialized or converted after acquiring lock
-            if model_key in mt_models_for_session and mt_models_for_session[model_key].ctranslate2_model_dir == mt_model_path:
+            if model_key in mt_models_for_session and getattr(mt_models_for_session[model_key], "ctranslate2_model_dir", None) == mt_model_path:
                 logging.info(f"Backend: Session {session_data['client_info']}: CTranslate2MT for {model_key} already initialized by another task.")
                 return
-            if os.path.exists(mt_model_path):
-                logging.info(f"Backend: Session {session_data['client_info']}: CTranslate2 model for {mt_model_name} already exists at {mt_model_path}.")
-            else:
+            if not os.path.exists(mt_model_path):
                 logging.info(f"Backend: Session {session_data['client_info']}: MT model not found locally at {mt_model_path}. Attempting dynamic conversion for {mt_model_name}...")
                 if websocket:
                     await websocket.send_text(json.dumps({"type": "mt_conversion_status", "status": "started", "model_name": mt_model_name}))
@@ -399,11 +591,27 @@ async def _initialize_mt_model(session_data: Dict[str, Any], source_lang: str, t
                     raise HTTPException(status_code=500, detail=f"Failed to dynamically convert MT model {mt_model_name}: {e}")
 
             init_start = time.time()
-            logging.info(f"Backend: Session {session_data['client_info']}: Initializing CTranslate2MT for {model_key} at {time.strftime('%H:%M:%S', time.localtime(init_start))}...")
+            logging.info(f"Backend: Session {session_data['client_info']}: Getting pooled MT for {model_key} at {time.strftime('%H:%M:%S', time.localtime(init_start))}...")
             try:
-                mt_models_for_session[model_key] = CTranslate2MT(model_path=mt_model_path, device="cpu") # Corrected model_path
+                # Licence gate: allow_noncommercial from session config (default False)
+                config = session_data.get("session_config", {})
+                mt_engine = config.get("mt_engine", "opus-mt")
+                allow_nc = config.get("allow_noncommercial", False)
+                allow_unk = config.get("allow_unknown_license", False)
+                
+                def mt_factory():
+                    return instantiate("mt", mt_engine, model_path=mt_model_path, device="cpu",
+                                      allow_noncommercial=allow_nc, allow_unknown=allow_unk)
+                
+                mt_models_for_session[model_key], is_new = await get_pooled_model(
+                    "mt", mt_engine, mt_factory, source=source_lang, target=target_lang
+                )
                 init_end = time.time()
-                logging.info(f"Backend: Session {session_data['client_info']}: CTranslate2MT initialized for {model_key} on CPU (MPS fallback) at {time.strftime('%H:%M:%S', time.localtime(init_end))}. Duration: {init_end - init_start:.2f}s")
+                logging.info(f"Backend: Session {session_data['client_info']}: MT {'created' if is_new else 'reused'} on CPU at {time.strftime('%H:%M:%S', time.localtime(init_end))}. Duration: {init_end - init_start:.2f}s")
+            except PermissionError as pe:
+                # Licence gate blocked it — log and raise with context
+                logging.error(f"Backend: Session {session_data['client_info']}: MT licence gate blocked '{model_key}': {pe}")
+                raise HTTPException(status_code=403, detail=str(pe))
             except Exception as e:
                 logging.error(f"Backend: Session {session_data['client_info']}: ERROR: Failed to initialize CTranslate2MT for {model_key}: {e}")
                 if model_key in mt_models_for_session:
@@ -415,9 +623,27 @@ async def _initialize_mt_model(session_data: Dict[str, Any], source_lang: str, t
 async def _initialize_tts_models(session_data: Dict[str, Any], tts_model_choice: str, speaker_wav_path: Optional[str], speaker_text: Optional[str], speaker_lang: Optional[str]):
     """Initializes the selected TTS engine for a session via the TTS_ENGINES registry
     (backend/tts/base.py) — to add/remove an engine, edit that registry, not this function."""
-    factory = TTS_ENGINES.get(tts_model_choice)
-    if factory is None:
-        logging.warning(f"Backend: Session {session_data['client_info']}: Skipping TTS initialization as '{tts_model_choice}' is selected or invalid.")
+    # Licence gate flags from session config
+    allow_nc = session_data.get("session_config", {}).get("allow_noncommercial", False)
+    allow_unk = session_data.get("session_config", {}).get("allow_unknown_license", False)
+
+    try:
+        # Use the central registry — it validates availability + licence
+        factory = lambda: instantiate("tts", tts_model_choice,
+                                       allow_noncommercial=allow_nc, allow_unknown=allow_unk)
+    except PermissionError as pe:
+        logging.warning(f"Backend: Session {session_data['client_info']}: TTS licence gate blocked '{tts_model_choice}': {pe}")
+        session_data["tts_engine"] = None
+        session_data["tts_engine_name"] = None
+        return
+    except KeyError:
+        logging.warning(f"Backend: Session {session_data['client_info']}: Skipping TTS initialization as '{tts_model_choice}' is unknown.")
+        session_data["tts_engine"] = None
+        session_data["tts_engine_name"] = None
+        return
+    except RuntimeError as re:
+        # Engine not installed here (e.g., XTTS without torch, OmniVoice without GPU deps)
+        logging.warning(f"Backend: Session {session_data['client_info']}: TTS engine '{tts_model_choice}' not available here: {re}")
         session_data["tts_engine"] = None
         session_data["tts_engine_name"] = None
         return
@@ -428,7 +654,6 @@ async def _initialize_tts_models(session_data: Dict[str, Any], tts_model_choice:
     target = (session_data.get("session_config") or {}).get("target_lang", "")
     if tts_model_choice == "piper" and target.startswith("sk"):
         tts_model_choice = "piper_sk_personal"
-        factory = TTS_ENGINES.get(tts_model_choice)
         # SANDBOX-FIX (2026-09-28): write the effective choice back, same pattern as
         # the STT size upgrade in initialize_all_models. Without this, tts_engine_name
         # ('piper_sk_personal') never equals session_config['tts_model_choice'] ('piper'),
@@ -440,17 +665,20 @@ async def _initialize_tts_models(session_data: Dict[str, Any], tts_model_choice:
         return
 
     init_start = time.time()
-    logging.info(f"Backend: Session {session_data['client_info']}: Initializing TTS engine '{tts_model_choice}' at {time.strftime('%H:%M:%S', time.localtime(init_start))}...")
+    logging.info(f"Backend: Session {session_data['client_info']}: Getting pooled TTS engine '{tts_model_choice}' at {time.strftime('%H:%M:%S', time.localtime(init_start))}...")
     try:
-        session_data["tts_engine"] = factory()
+        session_data["tts_engine"], is_new = await get_pooled_model(
+            "tts", tts_model_choice, factory
+        )
         session_data["tts_engine_name"] = tts_model_choice
-        # Write back the EFFECTIVE choice (remapped or not) so the label always
-        # names the initialized engine. The 2026-09-28 fix only wrote back on the
-        # remap branch; without a target-sk remap the label kept a stale engine name
-        # while a different engine was initialized, and the pipeline lookup
-        # (engine_name == session_config choice) silently produced no synthesis
-        # (measured live 2026-09-29: sk->en turns got zero TTS bytes).
         session_data["session_config"]["tts_model_choice"] = tts_model_choice
+        init_end = time.time()
+        logging.info(f"Backend: Session {session_data['client_info']}: TTS {'created' if is_new else 'reused'} at {time.strftime('%H:%M:%S', time.localtime(init_end))}. Duration: {init_end - init_start:.2f}s.")
+    except Exception as e:
+        logging.error(f"Backend: Session {session_data['client_info']}: ERROR: Failed to initialize TTS engine '{tts_model_choice}': {e}")
+        session_data["tts_engine"] = None
+        session_data["tts_engine_name"] = None
+        raise
         init_end = time.time()
         logging.info(f"Backend: Session {session_data['client_info']}: TTS engine '{tts_model_choice}' initialized at {time.strftime('%H:%M:%S', time.localtime(init_end))}. Duration: {init_end - init_start:.2f}s.")
     except Exception as e:
@@ -460,14 +688,24 @@ async def _initialize_tts_models(session_data: Dict[str, Any], tts_model_choice:
         raise
 
 async def _initialize_vad_instance(session_data: Dict[str, Any]):
-    """Initializes the WebRTC VAD instance for a given session."""
+    """Initializes the WebRTC VAD instance for a given session via the engine registry."""
     current_vad_instance = session_data.get("vad_instance")
     if current_vad_instance is None:
         init_start = time.time()
-        logging.info(f"Backend: Session {session_data['client_info']}: Initializing WebRTC VAD with aggressiveness={VAD_AGGRESSIVENESS} at {time.strftime('%H:%M:%S', time.localtime(init_start))}...")
-        session_data["vad_instance"] = webrtcvad.Vad(VAD_AGGRESSIVENESS)
+        logging.info(f"Backend: Session {session_data['client_info']}: Getting pooled WebRTC VAD with aggressiveness={VAD_AGGRESSIVENESS} at {time.strftime('%H:%M:%S', time.localtime(init_start))}...")
+        
+        def vad_factory():
+            vad_obj = instantiate("vad", "webrtcvad")
+            if hasattr(vad_obj, "set_aggressiveness"):
+                vad_obj.set_aggressiveness(VAD_AGGRESSIVENESS)
+            return vad_obj
+        
+        session_data["vad_instance"], is_new = await get_pooled_model("vad", "webrtcvad", vad_factory)
+        # Override aggressiveness if the pooled instance was reused
+        if hasattr(session_data["vad_instance"], "set_aggressiveness"):
+            session_data["vad_instance"].set_aggressiveness(VAD_AGGRESSIVENESS)
         init_end = time.time()
-        logging.info(f"Backend: Session {session_data['client_info']}: WebRTC VAD initialized at {time.strftime('%H:%M:%S', time.localtime(init_end))}. Duration: {init_end - init_start:.2f}s")
+        logging.info(f"Backend: Session {session_data['client_info']}: VAD {'created' if is_new else 'reused'} at {time.strftime('%H:%M:%S', time.localtime(init_end))}. Duration: {init_end - init_start:.2f}s")
     else:
         logging.info(f"Backend: Session {session_data['client_info']}: WebRTC VAD already initialized.")
 
@@ -518,7 +756,8 @@ async def initialize_all_models(client_info: str, source_lang: str, target_lang:
 
 # --- Voice Management Endpoints ---
 @router.post("/register", summary="Register a new user")
-async def register_user(user: UserCreate, db: Session = Depends(get_db_dependency)):
+@rate_limit("5/minute")
+async def register_user(request: Request, user: UserCreate, db: Session = Depends(get_db_dependency)):
     db_user_email = db.query(User).filter(User.email == user.email).first()
     if db_user_email:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -534,7 +773,8 @@ async def register_user(user: UserCreate, db: Session = Depends(get_db_dependenc
     return {"message": "User registered successfully"}
 
 @router.post("/token", summary="Login and get an access token")
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db_dependency)):
+@rate_limit("10/minute")
+async def login_for_access_token(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db_dependency)):
     user = db.query(User).filter(User.email == form_data.username).first() # username field is used for email
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Incorrect email or password")
@@ -543,7 +783,8 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     return {"access_token": create_access_token(user.email), "token_type": "bearer"}
 
 @router.post("/login", summary="Login endpoint for frontend")
-async def login(user_login: UserLogin, db: Session = Depends(get_db_dependency)):
+@rate_limit("10/minute")
+async def login(request: Request, user_login: UserLogin, db: Session = Depends(get_db_dependency)):
     """
     Login endpoint that matches the frontend's expected format.
     Accepts JSON with email and password, returns token and user info.
@@ -567,7 +808,8 @@ async def auth_config():
     return {"google_client_id": os.environ.get("GOOGLE_CLIENT_ID")}
 
 @router.post("/auth/google", summary="Login with a Google ID token")
-async def login_with_google(body: GoogleAuthRequest, db: Session = Depends(get_db_dependency)):
+@rate_limit("10/minute")
+async def login_with_google(request: Request, body: GoogleAuthRequest, db: Session = Depends(get_db_dependency)):
     """Verifies a Google Identity Services ID token, links/creates the user by
     Google `sub`, and returns the same mock-token shape as /login so the
     frontend storage flow is unchanged."""
@@ -615,7 +857,9 @@ async def login_with_google(body: GoogleAuthRequest, db: Session = Depends(get_d
     }
 
 @router.post("/voices/upload", summary="Upload a new speaker voice", response_model=Dict[str, str])
+@rate_limit("10/minute")
 async def upload_voice(
+    request: Request,
     file: UploadFile = File(...),
     voice_name: str = Form(...),
     speaker_lang: str = Form(...), # Add speaker_lang parameter
@@ -1064,6 +1308,85 @@ async def voice_lab_status():
         "qc_candidates": (qc_manifest or {}).get("candidates", []),
         "qc_scores": (qc_scores or {}).get("results", []),
         "qc_scored": qc_scores is not None,
+    }
+
+@router.get("/health", summary="Health check — per-stage readiness, engine in use")
+async def health_check():
+    """Lightweight health check for load balancers / monitoring.
+    Returns per-stage readiness, engine name + version, active sessions.
+    No auth required — this is a public health endpoint."""
+    from backend.registry import engines as reg_engines
+    from backend.main import active_sessions
+    
+    # Check which engines are actually loaded in sessions
+    loaded_engines = {}
+    for session_data in active_sessions.values():
+        if session_data.get("stt_model"):
+            loaded_engines.setdefault("stt", set()).add("faster_whisper")
+        for mt_key, mt_model in session_data.get("mt_models", {}).items():
+            if mt_model:
+                loaded_engines.setdefault("mt", set()).add("opus-mt")
+        if session_data.get("tts_engine"):
+            tts_name = session_data.get("tts_engine_name", "piper")
+            loaded_engines.setdefault("tts", set()).add(tts_name)
+        if session_data.get("vad_instance"):
+            loaded_engines.setdefault("vad", set()).add("webrtcvad")
+    
+    return {
+        "status": "healthy",
+        "active_sessions": len(active_sessions),
+        "stages": {
+            "stt": {"ready": "stt" in loaded_engines, "engines": list(loaded_engines.get("stt", []))},
+            "mt": {"ready": "mt" in loaded_engines, "engines": list(loaded_engines.get("mt", []))},
+            "tts": {"ready": "tts" in loaded_engines, "engines": list(loaded_engines.get("tts", []))},
+            "vad": {"ready": "vad" in loaded_engines, "engines": list(loaded_engines.get("vad", []))},
+        },
+        "model_pool": get_model_pool_stats(),
+        "timestamp": time.time(),
+    }
+
+@router.get("/metrics", summary="Detailed metrics — pool stats, session details, latency")
+async def metrics(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Detailed metrics endpoint — requires auth.
+    Returns model pool stats, per-session details, capacity."""
+    from backend.utils.auth import decode_access_token
+    from backend.utils.db_manager import get_db
+    from sqlalchemy.orm import Session
+    
+    email = decode_access_token(credentials.credentials)
+    db = next(get_db(SessionLocal))
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    
+    pool_stats = get_model_pool_stats()
+    
+    # Per-session detail
+    sessions_detail = []
+    for client_info, session_data in active_sessions.items():
+        config = session_data.get("session_config", {})
+        sessions_detail.append({
+            "client": client_info,
+            "source_lang": config.get("source_lang"),
+            "target_lang": config.get("target_lang"),
+            "tts_engine": config.get("tts_model_choice"),
+            "stt_model": config.get("stt_model_size"),
+            "has_stt": session_data.get("stt_model") is not None,
+            "has_mt": bool(session_data.get("mt_models")),
+            "has_tts": session_data.get("tts_engine") is not None,
+            "has_vad": session_data.get("vad_instance") is not None,
+        })
+    
+    return {
+        "model_pool": pool_stats,
+        "active_sessions": len(active_sessions),
+        "sessions": sessions_detail,
+        "capacity": {
+            "stt_max": MODEL_POOL_CONFIG["stt"]["max_instances"],
+            "mt_max": MODEL_POOL_CONFIG["mt"]["max_instances"],
+            "tts_max": MODEL_POOL_CONFIG["tts"]["max_instances"],
+        },
+        "timestamp": time.time(),
     }
 
 def get_initialized_models(client_info: str, session_config: Dict[str, Any]) -> Tuple[Optional[FasterWhisperSTT], Optional[CTranslate2MT], Optional[Any], Optional[Any], str]:

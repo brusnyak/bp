@@ -625,6 +625,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 sessionStartTime = performance.now() / 1000;
             }
 
+            // Send "start" command to backend to begin transcription
+            if (websocket && websocket.readyState === WebSocket.OPEN) {
+                websocket.send(JSON.stringify({ type: "start" }));
+                console.log('Frontend: Sent "start" command to backend');
+            }
 
             isStreaming = true;
             startStopBtn.textContent = 'Stop';
@@ -783,8 +788,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // unsupported browsers get a notice instead of silence.
     let pipVideo = null, pipCanvas = null, pipCtx = null;
     const pipLines = { transcript: '', translation: '' };
+    const PIP_W = 640, PIP_H = 280; // wider, more room for 2-3 lines each
 
-    function wrapPipText(ctx, text, maxWidth) {
+    function wrapPipText(ctx, text, maxWidth, maxLines) {
         const words = String(text || '').split(/\s+/).filter(Boolean);
         const lines = [];
         let line = '';
@@ -798,38 +804,86 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         if (line) lines.push(line);
-        return lines.slice(-3); // keep the window to the last 3 lines per block
+        return lines.slice(-maxLines);
     }
 
     function drawPip() {
         if (!pipCtx) return;
-        // House style: solid dark-blue hero band, white source, green translation.
-        pipCtx.fillStyle = '#0A1C4F';
-        pipCtx.fillRect(0, 0, pipCanvas.width, pipCanvas.height);
-        pipCtx.fillStyle = '#C41E3A';
-        pipCtx.fillRect(0, 0, pipCanvas.width, 6);
-        pipCtx.fillStyle = 'rgba(255,255,255,0.75)';
-        pipCtx.font = '600 15px system-ui, sans-serif';
-        pipCtx.fillText('Hlas · live subtitles', 20, 30);
+        const ctx = pipCtx;
+        const w = pipCanvas.width, h = pipCanvas.height;
+
+        // Dark glass background with subtle vignette
+        const bg = ctx.createLinearGradient(0, 0, 0, h);
+        bg.addColorStop(0, 'rgba(8, 16, 40, 0.95)');
+        bg.addColorStop(1, 'rgba(4, 8, 20, 0.98)');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, w, h);
+
+        // Top accent bar (brand color)
+        ctx.fillStyle = '#C41E3A';
+        ctx.fillRect(0, 0, w, 4);
+
+        // Subtle inner glow at top
+        const glow = ctx.createLinearGradient(0, 4, 0, 24);
+        glow.addColorStop(0, 'rgba(196, 30, 58, 0.15)');
+        glow.addColorStop(1, 'rgba(196, 30, 58, 0)');
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 4, w, 20);
+
+        // Title
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.font = '500 13px system-ui, -apple-system, sans-serif';
+        ctx.fillText('Hlas · live subtitles', 20, 26);
+
         const hasText = (pipLines.transcript || pipLines.translation).trim();
-        let y = 66;
+        let y = 56;
+        const lineH = 36;
+        const maxW = w - 40;
+
         if (!hasText) {
-            pipCtx.fillStyle = 'rgba(255,255,255,0.55)';
-            pipCtx.font = '24px system-ui, sans-serif';
-            pipCtx.fillText('…waiting for speech…', 20, y + 30);
+            ctx.fillStyle = 'rgba(255,255,255,0.4)';
+            ctx.font = '400 18px system-ui, -apple-system, sans-serif';
+            ctx.fillText('…waiting for speech…', 20, y + lineH);
             return;
         }
-        pipCtx.fillStyle = '#ffffff';
-        pipCtx.font = '30px system-ui, sans-serif';
-        wrapPipText(pipCtx, pipLines.transcript, pipCanvas.width - 40).forEach((l) => {
-            pipCtx.fillText(l, 20, y);
-            y += 38;
+
+        // Source transcript (white, slightly larger)
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '400 22px system-ui, -apple-system, sans-serif';
+        wrapPipText(ctx, pipLines.transcript, maxW, 3).forEach((l) => {
+            // Subtle text shadow for readability
+            ctx.shadowColor = 'rgba(0,0,0,0.6)';
+            ctx.shadowBlur = 2;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 1;
+            ctx.fillText(l, 20, y);
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            y += lineH;
         });
-        pipCtx.fillStyle = '#4ade80';
-        pipCtx.font = '26px system-ui, sans-serif';
-        wrapPipText(pipCtx, pipLines.translation, pipCanvas.width - 40).forEach((l) => {
-            pipCtx.fillText(l, 20, y);
-            y += 34;
+
+        // Divider
+        y += 6;
+        ctx.strokeStyle = 'rgba(196, 30, 58, 0.5)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(20, y);
+        ctx.lineTo(w - 20, y);
+        ctx.stroke();
+        y += 10;
+
+        // Translation (green, slightly smaller)
+        ctx.fillStyle = '#5eead4'; // softer green
+        ctx.font = '400 20px system-ui, -apple-system, sans-serif';
+        wrapPipText(ctx, pipLines.translation, maxW, 3).forEach((l) => {
+            ctx.shadowColor = 'rgba(0,0,0,0.6)';
+            ctx.shadowBlur = 2;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 1;
+            ctx.fillText(l, 20, y);
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            y += lineH;
         });
     }
 
@@ -853,8 +907,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (!pipCanvas) {
                     pipCanvas = document.createElement('canvas');
-                    pipCanvas.width = 640;
-                    pipCanvas.height = 220;
+                    pipCanvas.width = PIP_W;
+                    pipCanvas.height = PIP_H;
                     pipCtx = pipCanvas.getContext('2d');
                     drawPip(); // paint BEFORE capture: Chrome only fires loadedmetadata once a frame exists
                     pipVideo = document.createElement('video');

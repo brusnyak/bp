@@ -13,7 +13,7 @@ import backend.utils.db_manager # Import the db_manager module
 
 from backend.utils.db_manager import Base, User # Import Base and User from db_manager
 from backend.utils.auth import get_password_hash, verify_password, decode_access_token
-from app import app # Import app from app.py
+from app import create_app
 from backend.main import get_db # Import get_db from main.py
 
 API = "/api"  # router is mounted under /api (app.py) — bare paths 404

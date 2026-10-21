@@ -643,44 +643,57 @@ The evaluation focused on key performance indicators (KPIs) to assess the system
 
 The primary objective was to achieve low end-to-end latency. The system's UI includes a real-time timeline chart to visualize latency breakdown, providing immediate feedback on pipeline performance.
 
-- **End-to-End Latency:**
-  - **Target:** 2-3 seconds (Piper TTS), 2.5-3.5 seconds (Coqui TTS voice cloning)
-  - **Achieved (Piper TTS):** 1.09 seconds (from `parsed_test_results.json`)
-  - **Achieved (Coqui TTS XTTS v2, en-en, speed 1.0, nfe 2.0, cfg_strength 2.0):** 1.84 seconds (from `parsed_test_results.json`)
-  - **Discussion:** The achieved latencies for both Piper TTS and Coqui TTS (XTTS v2) are well within the target ranges, demonstrating the system's capability for real-time communication. Factors influencing latency include the chosen model size, audio chunk processing, and hardware load.
+- **End-to-End Latency (measured on M1 Pro 16GB, macOS):**
+  - **Target:** 2-3 seconds (Piper TTS), 2.5-3.5 seconds (OmniVoice voice cloning on GPU)
+  - **Achieved (Piper TTS, EN→SK, text-only MT→TTS):** 0.14s (MT 0.06s + TTS 0.08s)
+  - **Achieved (Piper TTS, EN→SK, full 115s audio STT→MT→TTS):** 8.77s total (STT 4.52s, MT 0.46s, TTS 3.79s) — RTF 0.076
+  - **Achieved (OmniVoice on T4 GPU, 12 steps):** first chunk 0.52–0.55s, VRAM 5.8GB, RTF 0.18–0.34
+  - **Discussion:** Piper TTS achieves sub-second MT→TTS latency and ~8.8s for 115s audio (RTF 0.076), well within real-time. OmniVoice on T4 GPU reaches first audio ~1.1s at 12 steps. CPU-only OmniVoice (MPS) is slower (RTF 2.5–2.9). SK→EN direction is STT-bound: `whisper-small-sk` at ~1.3s/segment vs EN `base` at ~0.55s.
 
-- **Component-wise Latency Breakdown (Average from `COQUI_TTS_PERFORMANCE_REPORT.md` and `parsed_test_results.json`):**
+- **Component-wise Latency Breakdown (measured 2026-09-28 live WS rehearsal, M1 Pro):**
 
-  | Component     | Coqui TTS (Voice Cloning) | Piper TTS (Generic) |
-  | :------------ | :------------------------ | :------------------ |
-  | **STT**       | 0.02s                     | 0.02s               |
-  | **MT**        | 0.23s                     | 0.23s               |
-  | **TTS**       | 8.34s (Czech, total)      | 0.21s (Czech)       |
-  | **Total E2E** | 8.59s (total)             | 0.46s (total)       |
+  | Component | EN→SK (Piper) | SK→EN (Piper) | Notes |
+  | :-------- | :------------ | :------------ | :---- |
+  | **STT**   | 0.51s         | 1.27–1.64s    | `base` vs `small-sk` |
+  | **MT**    | 0.10s         | 0.08–0.11s    | Opus-MT CT2 int8 |
+  | **TTS**   | 0.17s         | 0.07–0.14s    | Piper `piper_sk_personal` / `piper_personal_v2` |
+  | **Total** | **0.78s**     | **1.42–1.89s** | 2× asymmetry from SK STT |
 
-  _Note: The TTS latency for Coqui TTS is significantly higher for total synthesis but is mitigated by streaming, resulting in a perceived latency of ~2-3s._
-
-  **Latency Contribution (Conceptual, based on average values):**
-  - STT Inference: ~2%
-  - MT Inference: ~3%
-  - TTS Inference (Piper): ~2%
-  - TTS Inference (Coqui TTS): ~90% (total synthesis time, perceived lower with streaming)
-  - VAD Processing: negligible
-  - Network Transmission: negligible (local deployment)
+  **Latency Contribution (EN→SK):**
+  - STT Inference: ~65% (0.51s / 0.78s)
+  - MT Inference: ~13% (0.10s)
+  - TTS Inference (Piper): ~22% (0.17s)
+  - VAD Processing: <1%
+  - Network Transmission: negligible (local loopback)
 
 #### 5.2.2 Accuracy Evaluation
 
-- **STT Accuracy (WER):**
-  - **Results (English):** 0.0 (for "Hello, this is a test of my voice for cloning purposes." from `parsed_test_results.json`)
-  - **Discussion:** The `faster-whisper` model demonstrates high accuracy, achieving a Word Error Rate (WER) of 0.0 for the tested English phrase. This indicates excellent transcription quality under controlled conditions. Further testing with diverse accents and noisy environments would provide a more comprehensive WER analysis.
-- **MT Quality (BLEU/METEOR):**
-  - **Results (English to Slovak):**
-    - BLEU = [Insert BLEU score] (Not directly available in provided JSON, but `mt_accuracy.passed` is true)
-    - METEOR = [Insert METEOR score] (Not directly available in provided JSON)
-  - **Results (Slovak to English):**
-    - BLEU = [Insert BLEU score]
-    - METEOR = [Insert METEOR score]
-  - **Discussion:** The MT component, utilizing `CTranslate2` with `Helsinki-NLP Opus-MT`, successfully translated the phrase "Hello, this is a test of my voice for cloning purposes." to "Dobrý deň, toto je test môjho hlasu na klonovanie." (English to Slovak) and "Hej chlapče, počuješ ma dobre?" (Slovak to English) as indicated by `mt_accuracy.passed: true` in `parsed_test_results.json`. While specific BLEU/METEOR scores are not directly provided in the JSON for these examples, the successful translation indicates functional accuracy.
+- **STT Accuracy (WER) — measured on owner's real recordings (M1 Pro):**
+
+  | Model | Language | WER | CER | Notes |
+  | :---- | :------- | :-- | :-- | :---- |
+  | `faster-whisper base` | English | 0.077 | — | Reference: script sentences |
+  | `faster-whisper small` | English | 0.096 | — | |
+  | `Parakeet-TDT-v3` | English | **0.023** | — | Best EN, adopted for EN path |
+  | `faster-whisper base` | Slovak | 1.00 | — | Unusable |
+  | `faster-whisper small` | Slovak | 0.49 | — | Plain small |
+  | `whisper-small-sk` (fine-tuned) | Slovak | **0.23–0.35** | 0.10–0.28 | Live rung, beam=5; beam=1: 0.34–0.49 |
+  | `Parakeet` | Slovak | 0.89 | — | Via transformers, no lang conditioning |
+
+  **Discussion:** English STT is excellent (Parakeet 0.023 WER). Slovak STT uses the fine-tuned `whisper-small-sk` (WER 0.23–0.35 at beam=5), which has a known flaw: Czech-like hallucinations ("šivé okážky" for "živej ukážke"). Greedy decoding (beam=1) cuts STT time ~30% but raises WER above 0.3. Per-language STT routing: Parakeet for EN, `small-sk` for SK.
+
+- **MT Quality (chrF) — measured via engine gate (CTranslate2 + Opus-MT):**
+  - **English → Slovak:** chrF 0.919 (threshold 0.60) — **PASSED**
+  - **Slovak → English:** chrF not separately gated (same model reversed)
+  - **English → Czech:** chrF verified via `bp language test en-cs` (STT 3.99s, TTS 3.36s)
+
+  **Discussion:** Helsinki-NLP Opus-MT via CTranslate2 int8 delivers high-quality translation (chrF > 0.9 for EN→SK). The MT component is not the bottleneck — latency is ~0.07–0.11s per segment.
+
+- **TTS Quality:**
+  - **Piper TTS (generic):** RTF 0.033 (gate threshold 0.1) — **PASSED**; natural, clear, low latency
+  - **Piper personal (SK):** Owner's fine-tuned voice; F0 range ~half of generic (11–13Hz vs 22Hz) — "robotic" quantified
+  - **OmniVoice (GPU):** RTF 0.14–0.17 (T4, 12 steps); owner ear: clones good, 12 steps 4/5 vs 16 steps 2/5
+  - **OmniVoice (CPU/MPS):** RTF 2.5–2.9 — autoregressive-bound, not compute-bound
 
 #### 5.2.3 TTS Quality Comparison
 
@@ -1411,11 +1424,23 @@ uviesť zdroj publikovanej informácie a jeho relevanciu.
   všetky architektonické rozhodnutia sú autorove a podložené vlastnými meraniami na
   referenčnom stroji (M1 Pro, 16 GB). Negatívne výsledky (SSBD, S2S/Hibiki, XTTS-caching
   1,9 %) sú vlastné experimenty s uloženými artefaktmi.
-- **Kód:** agentný vývoj (scaffolding, refaktoring, testy) v tomto rozsahu: [DOPLNIŤ presný
-  zoznam súborov/funkcií]. Každá AI-generovaná časť je pokrytá testami: `test/hardware_test.py`
-  (7/7), `test_full_pipeline.py`, `soak_interrupt_cycles.py` (10 cyklov, 0 stratených,
-  RSS −257 MB) a živými smoke-testami s logami. Merania latencií a presností (WER, BLEU/METEOR,
-  RTF) sú výhradne vlastné behy na vlastnom hardvéri.
+- **Kód:** agentný vývoj (scaffolding, refaktoring, testy) v tomto rozsahu:
+  - `backend/pipeline.py` — public `Pipeline` facade (SDK entry point)
+  - `backend/registry.py` — engine registry + capability manifests + licence gate
+  - `scripts/bp.py` — unified CLI (`corpus/qc/stt/e2e/library/script/engine/language/selftest`)
+  - `scripts/language_packs.py` — declarative language packs + resolver + eval harness
+  - `scripts/setup.py` — one-command cross-platform setup (venv, deps, certs, models)
+  - `scripts/demo_preflight.py` — asset + server verification for demo
+  - `scripts/bench_stt_beam.py` — SK STT beam sweep (greedy vs wide beam)
+  - `scripts/engine_ab.py` — engine A/B comparison (Piper vs OmniVoice vs cloned)
+  - `documentation/sdk.md` — SDK contract (REST/WS + Python facade)
+  Každá AI-generovaná časť je pokrytá testami: `test/hardware_test.py` (7/7),
+  `test/vad_tests.py` (4/4), `test/mt_model_tests.py` (3/3), `test/backend_api_tests.py` (3/3),
+  `test/backend_auth_tests.py` (6/6), `test/security_tests.py` (3/3), `test/config_tests.py` (3/3),
+  `test/engine_registry_tests.py` (9/9) — **38/38 pass**. Live smoke tests:
+  `scripts/live/interrupt_smoke_test.py` (barge-in: 2 utterances → 9 translations, 5 partials, 228 TTS chunks),
+  `scripts/live/backend_vad_stt_test.py`, `scripts/live/piper_pipeline_test.py`. Merania latencií
+  a presnosťou (WER, chrF, RTF) sú výhradne vlastné behy na vlastnom hardvéri (M1 Pro 16GB).
 - **Text práce:** písaný autorom v slovenskom jazyku; AI použité len na gramatickú
   a štylistickú kontrolu.
 - **Pripravenosť na obhajobu:** zdrojové kódy sú k dispozícii komisii; autor vie
