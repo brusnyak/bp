@@ -1,0 +1,88 @@
+{
+  "model": "nvidia/canary-1b-v2",
+  "scope": "short existing dataset smoke; not a real-mic release gate",
+  "gpu": "Tesla T4",
+  "elapsed_s": 133.89,
+  "versions": {
+    "torch": "2.11.0+cu130",
+    "transformers": "5.23.0.dev0",
+    "accelerate": "1.15.0"
+  },
+  "revision": "d455706339a6b32e1aa40f82c713a482a0c938e2",
+  "peak_allocated_gib": 1.828,
+  "peak_reserved_gib": 1.842,
+  "kernel": "yegorby/bp-canary-sk-cs-validation",
+  "version": 1,
+  "checked_at": "2026-11-03",
+  "source_sha256": "ac84b7530b803dde6d760a16fa12f8385cdb0de0c129a48f33e09a4df8054853",
+  "acceptance": "smoke_complete; route_not_verified; reference_completeness_unreviewed",
+  "memory_scope": "PyTorch allocator only; not total process VRAM",
+  "timing_scope": "one inference per row; first ASR includes cold-start overhead; no warmed repetitions",
+  "rows": [
+    {
+      "sha256": "6245aa93ff871164a5c7a6ec15873e6878a589f8a1f600456ec90662d2a89732",
+      "reference_sha256": "92d685cb66a1fa0fdd38d66a2caff3adcce77cfb5eba61ad275ed8810226c3a7",
+      "duration_s": 7.0,
+      "source_lang": "sk",
+      "target_lang": "sk",
+      "task": "asr",
+      "latency_s": 4.6052,
+      "rtf": 0.6579,
+      "wer": 0.3636,
+      "score_status": "short_clip_only_reference_completeness_unreviewed",
+      "status": "complete"
+    },
+    {
+      "sha256": "6245aa93ff871164a5c7a6ec15873e6878a589f8a1f600456ec90662d2a89732",
+      "reference_sha256": "92d685cb66a1fa0fdd38d66a2caff3adcce77cfb5eba61ad275ed8810226c3a7",
+      "duration_s": 7.0,
+      "source_lang": "sk",
+      "target_lang": "en",
+      "task": "ast",
+      "latency_s": 0.2036,
+      "rtf": 0.0291,
+      "score_status": "unscored_no_reviewed_English_reference",
+      "status": "complete"
+    },
+    {
+      "sha256": "7a8c6cea0199722a991a7b5dd4edc1dba312256a82a658b38451b09380c7779a",
+      "reference_sha256": "bab6e21bd2da3612195872baeeb7d9ec61a7958d947a776d7672e52b61ed62e9",
+      "duration_s": 5.6,
+      "source_lang": "cs",
+      "target_lang": "cs",
+      "task": "asr",
+      "latency_s": 0.2255,
+      "rtf": 0.0403,
+      "wer": 0.2857,
+      "score_status": "short_clip_only_reference_completeness_unreviewed",
+      "status": "complete"
+    },
+    {
+      "sha256": "7a8c6cea0199722a991a7b5dd4edc1dba312256a82a658b38451b09380c7779a",
+      "reference_sha256": "bab6e21bd2da3612195872baeeb7d9ec61a7958d947a776d7672e52b61ed62e9",
+      "duration_s": 5.6,
+      "source_lang": "cs",
+      "target_lang": "en",
+      "task": "ast",
+      "latency_s": 0.1524,
+      "rtf": 0.0272,
+      "score_status": "unscored_no_reviewed_English_reference",
+      "status": "complete"
+    },
+    {
+      "sha256": "99339af7e3026cff9e60d781aaa36fc8ae2358881cc9ec37328886de4ecde2a6",
+      "reference_sha256": "d3af428d8732bacd3ee35f3540138e01f517689ed5760d6a46e703ea30ec52b4",
+      "duration_s": 7.25,
+      "source_lang": "en",
+      "target_lang": "en",
+      "task": "asr",
+      "latency_s": 0.2583,
+      "rtf": 0.0356,
+      "wer": 0.0588,
+      "score_status": "short_clip_only_reference_completeness_unreviewed",
+      "status": "complete"
+    }
+  ],
+  "executed_code_sha256": "820581da54952332e9e333505355e1a81a9f93eeffd9deb5abc18691f4815986",
+  "code_note": "v1 used validate.py before addition of explicit incomplete-row exit check; all five v1 rows independently verified complete"
+}
