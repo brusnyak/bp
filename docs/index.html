@@ -469,13 +469,13 @@
 <div class="wrap">
 
   <header class="hero">
-    <h1>Slovenčina na lokálnom hardvéri funguje. Vlastný hlas v reálnom čase potrebuje GPU.</h1>
-    <p class="lede">Prehľad výskumu pre bakalársku prácu: <b>čo sa v rečových technológiách zmenilo v rokoch 2025&ndash;2026, čo sme z toho odmerali a čo ostáva zablokované výpočtovým výkonom</b>. Živý preklad EN&harr;SK beží lokálne na CPU notebooku; ten istý reťazec s naklonovaným hlasom beží rýchlejšie než reálny čas na bezplatnom T4, ale nie na Macu. Každé číslo nesie jeden dôkazový štítok &mdash; argument stojí len na <b>MEASURED</b> riadkoch.</p>
+    <h1>Živý preklad reči lokálne &mdash; EN&harr;{SK, CZ, viac}, vlastný hlas, bez cloudu</h1>
+    <p class="lede">Prehľad výskumu pre bakalársku prácu: <b>čo sa v rečových technológiách zmenilo v rokoch 2025&ndash;2026, čo sme z toho odmerali a čo ostáva zablokované výpočtovým výkonom</b>. Živý preklad beží lokálne na CPU notebooku (faster-whisper &rarr; Opus-MT CT2 &rarr; Piper ONNX); s naklonovaným hlasom rýchlejšie než v reálnom čase na bezplatnom T4. Každé číslo nesie dôkazový štítok &mdash; argument stojí len na <b>MEASURED</b> riadkoch. Slovak a Czech nie sú v Teams ani Google Meet preklade reči &mdash; to je medzera, ktorú projekt zapĺňa.</p>
     <div class="meta-row">
       <span><b>Mac</b> M1 Pro 16&nbsp;GB (merané)</span>
       <span><b>Win</b> Ryzen 5 8645HS 14&nbsp;GB len CPU</span>
-      <span><b>Pipeline</b> faster-whisper &rarr; Opus-MT CT2 &rarr; Piper ONNX / OmniVoice</span>
-      <span><b>Výskum</b> 2026-10-01 &middot; testy 2026-10-02</span>
+      <span><b>Pipeline</b> faster-whisper &rarr; Opus-MT CT2 &rarr; Piper ONNX</span>
+      <span><b>Jazyky</b> EN&harr;{SK, CZ, viac} &middot; <b>Výskum</b> 2026-11-03</span>
     </div>
   </header>
 
@@ -491,51 +491,51 @@
     <div class="ladder">
       <div class="state-card now">
         <div class="sc-tag">&#9679; Beží teraz &middot; merané</div>
-        <div class="sc-h">EN&#8596;SK naživo, na CPU notebooku z roku 2020</div>
-        <p>whisper-small-sk &rarr; Opus-MT CT2 &rarr; Piper ONNX. Spĺňa cieľ latencie bez GPU. Hovorí <b>generickým základným hlasom</b>.</p>
+        <div class="sc-h">EN&#8596;{SK, CZ} naživo, CPU notebook z roku 2020</div>
+        <p>faster-whisper &rarr; Opus-MT CT2 &rarr; Piper ONNX. Spĺňa cieľ latencie bez GPU. SK&rarr;EN je <b>experimentálny</b> (WER 0.2143 &gt; 0.2 brána). CZ overený s nulovými zmenami v kóde.</p>
       </div>
       <div class="ladder-arrow">&rarr;</div>
       <div class="state-card gap">
         <div class="sc-tag">&#9681; Medzera &middot; merané</div>
-        <div class="sc-h">Vlastný hlas naživo funguje &mdash; ale iba na GPU</div>
-        <p>OmniVoice naklonuje hlas z 5&ndash;7&nbsp;s nahrávky bez trénovania a na <b>bezplatnom T4 beží rýchlejšie než v reálnom čase</b> (RTF 0.18&ndash;0.34, merané 2&times;). Na Macu je RTF ~0.8&ndash;1, takže na živú reč nestačí. Piper fine-tune je potrebný už len pre stroje bez GPU.</p>
+        <div class="sc-h">Vlastný hlas v SK výstupe — iba cez fine-tune (Piper), žiadny open ZS-TTS pre SK</div>
+        <p>XTTS, Chatterbox, Qwen3-TTS, Kokoro nevypisujú SK. Vlastný hlas v SK výstupe potrebuje Piper fine-tune (CPU, RTF ~0.04). Vlastný hlas v <b>EN</b> výstupe: Kokoro / Qwen3-TTS / Chatterbox na GPU.</p>
       </div>
       <div class="ladder-arrow">&rarr;</div>
       <div class="state-card target">
-        <div class="sc-tag">&#9733; Cieľ &middot; ideálny stav</div>
-        <div class="sc-h">Presne ten istý pipeline &mdash; vaším vlastným naklonovaným hlasom</div>
-        <p>EN mikrofón &rarr; SK do reproduktorov, streamovane, hovoriac <b>vaším naklonovaným hlasom</b>, tempom <b>4&ndash;6 hlasov/deň</b>. To isté živé demo, len dotiahnuté do konca.</p>
+        <div class="sc-tag">&#9733; Cieľ &middot; komerčná verzia</div>
+        <div class="sc-h">Lokálny, GDPR-prívetivý, bez poplatku za minútu, multi-jazyk</div>
+        <p>KONKURENCIA: KUDO AI ~$0.80&ndash;1.25/min (SK, CZ), DeepL Voice ~$0.07&ndash;0.20/min (SK, CZ), Teams / Google Meet bez SK. Projekt: $0/min, lokálne, vlastný hlas, multi-jazyk via packs.</p>
       </div>
     </div>
 
     <div class="gate">
-      <div class="gate-l">Jediná medzera je výpočtový výkon<small>Nie výskum. Nie prepisovanie.</small></div>
-      <div class="gate-m">Všetko v stave <b>Beží teraz</b> a <b>Medzera</b> je už postavené a odmerané. Skok na <b>cieľ</b> závisí od jedinej veci &mdash; <span class="hot">NVIDIA GPU (&ge;8&nbsp;GB VRAM) + &ge;16&nbsp;GB RAM.</span> Na jednom T4 reťazec STT&rarr;MT&rarr;naklonovaný hlas zvládne <b>3-minútovú prezentáciu bez fronty spracovania</b> a <b>~12 účastníkov bežného stretnutia naraz (12 krokov)</b> (ďalší výkon = viac súbežných hlasov, nie lepší jediný rečník). Zostáva zmerať silnejšiu GPU a živú cestu s mikrofónom.</div>
+      <div class="gate-l">Medzera nie je výskum, ale SK&rarr;EN kvalita + GPU<small>Nie prepisovanie potrubia.</small></div>
+      <div class="gate-m">SK&rarr;EN je <b>experimentálny</b> (WER 0.2143 &gt; 0.2 brána); vlastný SK hlas potrebuje Piper fine-tune. Canary AST na T4 je najväčšia nádej pre SK&rarr;EN. GPU (&ge;8 GB VRAM) odomkne vlastný hlas v EN výstupe (Kokoro, Qwen3-TTS, Chatterbox) a rýchlejšie SK STT.</div>
     </div>
   </section>
 
   <!-- ============ FUNDING ============ -->
   <section id="funding">
     <div class="sec-head">
-      <h2>Tri odomknutia, na jednej strane</h2>
-      <p class="sec-sub">Produkt už dosahuje cieľ latencie na CPU notebooku z roku 2020. Hardvér sa nikdy nežiada ako oprava dema &mdash; financuje priepustnosť a tri experimenty kvality, ktoré sa na Macu v rozumnom čase otestovať nedajú.</p>
+      <h2>Komerčné pozicionovanie: lokálny, otvorený, GDPR-prívetivý, $0/min</h2>
+      <p class="sec-sub">Produkt beží lokálne — žiadny cloud v potrubí, žiadne poplatky za minútu, audio neopustí stroj. Konkurencia: KUDO AI ~$0.80&ndash;1.25/min (SK, CZ), DeepL Voice ~$0.07&ndash;0.20/min (SK, CZ), Teams Interpreter / Google Meet bez SK. Slovak a Czech nie sú pokryté Teams ani Google Meet prekladom reči.</p>
     </div>
 
     <div class="fund-grid">
       <div class="fund-card">
-        <div class="fnum">01 &middot; SÚBEŽNOSŤ</div>
-        <h3>1 GPU &rarr; ~4 súvislí rečníci / ~12 na stretnutí</h3>
-        <p>Na T4 s jedným OmniVoice workerom: <b>koleno pri 16 účastníkoch</b> (12 krokov; merané, <code>load_tests_2026-10.md</code>). GPU je compute-bound (90&ndash;95&nbsp;%), takže počet súčasných hlasov škáluje silnejšia GPU, nie dávkovanie. Tréning Piper hlasov už nie je podmienka.</p>
+        <div class="fnum">01 &middot; CENOVÁ POHĽADA</div>
+        <h3>$0/min vs. $0.07&ndash;1.25/min konkurencie</h3>
+        <p>Projekt: lokálne, bez poplatkov za minútu. <b>KUDO AI</b> ~$0.80&ndash;1.25/min (SK, CZ); <b>DeepL Voice</b> ~$0.07&ndash;0.20/min (SK, CZ); Teams Interpreter / Google Meet — <b>bez SK</b>. Lokalita vyhráva na cene a súkromí (GDPR), prehráva na SK&rarr;EN kvalite (WER 0.2143 &gt; 0.2 brána).</p>
       </div>
       <div class="fund-card">
-        <div class="fnum">02 &middot; ODOMKNUTIE KVALITY</div>
-        <h3>Výsledky, nie zrýchlenia</h3>
-        <p><b>Ablácia počtu krokov</b>, otázka kvality <b>MADLAD-3B</b> a otázka živého enginu <b>Chatterbox Turbo</b> &mdash; každá je výsledkom práce a každá je na Macu v rozumnom čase neotestovateľná.</p>
+        <div class="fnum">02 &middot; VLASTNÝ HLAS V SK VÝSTUPE</div>
+        <h3>Žiadny open ZS-TTS nevypisuje SK</h3>
+        <p>XTTS, Chatterbox, Qwen3-TTS, Kokoro — žiadny nevypisuje slovensky. Vlastný SK hlas = Piper fine-tune (CPU, RTF ~0.04). Vlastný EN hlas: Kokoro/Qwen3-TTS/Chatterbox na GPU. Canary AST na T4 je najväčšia nádej pre SK&rarr;EN.</p>
       </div>
       <div class="fund-card">
-        <div class="fnum">03 &middot; ŽIVÉ DEMO</div>
-        <h3>EN mikrofón &rarr; SK do reproduktorov</h3>
-        <p>Na Macu už funguje. Nový hardvér kupuje <b>viac hlasov</b> na prehratie a streamovacie vylepšenia (word-window MT, streamovanie po častiach), ktoré ho spravia simultánnym.</p>
+        <div class="fnum">03 &middot; MULTI-JAZYK VIA PACKS</div>
+        <h3>EN&harr;{SK, CZ, FR, AR, ZH, HI, viac}</h3>
+        <p>Jazyk je podporený, keď STT+MT+TTS existujú a <code>bp language test &lt;pár&gt;</code> prejde (WER &lt; 0.2 = <b>verified</b>, inak <b>experimental</b>). CZ overený s nulovými zmenami v kóde (Piper jirka + Opus-MT cs-en).</p>
       </div>
     </div>
 
@@ -644,6 +644,30 @@
         <div class="tl-what">OmniVoice zero-shot klon (600+ jazykov, Apache-2.0) na T4<small>vlastný bench</small></div>
         <div class="tl-so">Reťazec s klonovaným hlasom RTF 0.18&ndash;0.34, prvý zvuk ~1.1&nbsp;s, ~12 účastníkov na jednej GPU. <b>Toto je dôvod, prečo ďalší krok potrebuje GPU.</b></div>
         <span class="verdict keep">Zmerané</span>
+      </div>
+      <div class="tl-row">
+        <div class="tl-date">2026-01</div>
+        <div class="tl-what">Qwen3-ASR / Qwen3-TTS (Alibaba)<small>arXiv 2601.21337, 2601.15621</small></div>
+        <div class="tl-so">Qwen3-ASR: 52 jazykov, RTF 0.009&ndash;0.024, SK overenie chýba. Qwen3-TTS: 10 jazykov (bez SK), 3-s klonovanie, 97 ms prvý paket, Apache-2.0. EN výstupný klon na GPU.</div>
+        <span class="verdict test">Kandidát GPU</span>
+      </div>
+      <div class="tl-row">
+        <div class="tl-date">2026-11-03</div>
+        <div class="tl-what">Kokoro 82M na T4<small>vlastný bench</small></div>
+        <div class="tl-so">EN TTS, RTF 0.03, 1.33 GB VRAM na T4, Apache-2.0. Žiadne SK — EN výstup len. Deklarované v <code>backend/registry.py</code>, čaká na overenie.</div>
+        <span class="verdict test">Kandidát GPU</span>
+      </div>
+      <div class="tl-row">
+        <div class="tl-date">2026-11-03</div>
+        <div class="tl-what">Canary-1B AST (SK&rarr;EN) — test na T4<small>NVIDIA, CC-BY-4.0</small></div>
+        <div class="tl-so">Priamy speech-to-text preklad, zlúči STT+MT do jedného kroku, 25 EU jazykov vr. SK. UNKNOWN pre SK — Kaggle T4 test čaká na spustenie (brána WER &lt; 0.2).</div>
+        <span class="verdict test">Čaká na T4</span>
+      </div>
+      <div class="tl-row">
+        <div class="tl-date">2026-11-03</div>
+        <div class="tl-what">LHC — Laboratórium hybridnej komunikácie, FEI STU<small>fei.stuba.sk</small></div>
+        <div class="tl-so">B405, 4. poschodie, blok B. Laboratórium pre stretnutia s fyzicky prítomnými a diaľkovými účastníkmi. Predpokladaná cieľová integrácia: vivý preklad reči ako feature LHC hybridného stretnutia. Konkrétny software / audio rozhranie / SDK neoverené — pýtať sa vedúceho.</div>
+        <span class="verdict watch">Otázka</span>
       </div>
     </div>
   </section>
@@ -763,7 +787,7 @@
   </section>
 
   <footer>
-    <div>Dátum výskumu 2026-10-01. Webové zdroje (&sect;9) zahŕňajú OpenWhispr STT porovnanie, dokumentáciu NVIDIA NeMo-Speech, dokumentáciu modelov sherpa-onnx, DEEP MT benchmark (arxiv 2602.19583), prácu o robustnosti MT (arxiv 2403.03923v2), kyutai.org a prácu Hibiki-Zero (arxiv 2602.11072v1).</div>
+    <div>Dátum výskumu 2026-11-03. Webové zdroje (&sect;9) zahŕňajú OpenWhispr STT porovnanie, dokumentáciu NVIDIA NeMo-Speech, dokumentáciu modelov sherpa-onnx, DEEP MT benchmark (arxiv 2602.19583), prácu o robustnosti MT (arxiv 2403.03923v2), kyutai.org, prácu Hibiki-Zero (arxiv 2602.11072v1), Qwen3-ASR/TTS (arXiv 2601), Canary-1B AST (NVIDIA CC-BY-4.0), Kokoro 82M (Apache-2.0), Chatterbox Multilingual (MIT).</div>
     <div class="src">Predošlé verdikty zahrnuté z: tts_landscape_2026-09.md &middot; model_evaluation_2026-09.md &middot; tts_alternatives_research.md &middot; s2s_translation_research_2026-08.md &middot; simultaneous_translation_research_2026-08-22.md &middot; ssbd_speculative_decoding_findings_2026-08.md &middot; PLAN.md (Measured 2026-09-29)</div>
     <div class="sig">Interaktívny pohľad na model_landscape_2026-10.md &mdash; vytvorené s Dia</div>
   </footer>
@@ -804,11 +828,11 @@ const MODELS = [
     ev:["measured"], verdict:"reject", vText:"Zamietnuté pre SK",
     key:"MEASURED SK WER 0.864 / 0.750 (trhove_b / script, sk-SK prompt), auto-prompt 0.984; EN kontrola 0.188; RTF 0.32 (rovnaké pásmo ako small-sk). Rovnaký mik, kde small-sk dáva 0.23&ndash;0.35 a Parakeet-int8 0.58&ndash;0.63.",
     note:"Zamietnuté pre slovenčinu. Zlyhanie je štrukturálne, nie otázka ladenia: prepis sa uprostred vety preklápa medzi ruštinou, ukrajinčinou a slovinčinou (vypíše doslovný tag &lt;sl-SI&gt;). &bdquo;Široké pokrytie&ldquo; znamená presne to. Rýchlosť je v poriadku, takže celým príbehom je priepasť v presnosti. Pozn. k metóde: sherpa-onnx 1.13.8 tento model nespustí (žiadna online-transducer konfigurácia v Python API), bench beží na pure-C runtime. Dôkaz: processed/new_models/nemotron_matrix.json, reprodukovateľné cez scripts/bench_nemotron.py." },
-  { dom:"STT", name:"Canary-1B / Flash / 180M", flag:true, sub:["1B / Flash / 180M", "NeMo chunked/streaming", "robí aj AST"],
-    sk:"covers", skText:"25 EU jazykov vr. SK", lic:"restricted", licText:"NVIDIA open",
-    ev:["unknown"], verdict:"test", vText:"Dve stávky v jednom",
-    key:"UNKNOWN pre SK.",
-    note:"(a) 180M Flash ako rýchlejší SK stupienok; (b) AST režim zlúči STT+MT do jedného kroku pre SK&rarr;EN. Testovať (b) po Nemotrone." },
+  { dom:"STT", name:"Canary-1B AST (SK&rarr;EN)", flag:true, sub:["1B", "NeMo", "AST režim zlúči STT+MT", "25 EU jazykov vr. SK"],
+    sk:"covers", skText:"25 EU jazykov vr. SK", lic:"safe", licText:"CC-BY-4.0",
+    ev:["unknown"], verdict:"test", vText:"Čaká na T4 overenie",
+    key:"UNKNOWN pre SK — brána WER &lt; 0.2 na vlastnom mikrofóne, Kaggle T4 čaká na spustenie.",
+    note:"(a) 180M Flash ako rýchlejší SK stupienok; (b) AST režim zlúči STT+MT do jedného kroku pre SK&rarr;EN. Najväčšia nádej pre SK&rarr;EN." },
   { dom:"STT", name:"Kyutai STT 1B", flag:false, sub:["500 ms pevné oneskorenie", "400 paralelných streamov/H100"],
     sk:"none", skText:"len EN/FR, bez SK", lic:"restricted", licText:"open (Kyutai)",
     ev:["vendor"], verdict:"watch", vText:"Len referencia",
@@ -883,21 +907,21 @@ const MODELS = [
     ev:["measured","vendor"], verdict:"test", vText:"Kvalita výborná, rýchlosť na Macu nie",
     key:"MEASURED (1 vzorka, M1 Pro MPS fp32, nfe 32, ref 7 s): WER cez small-sk <b>0.000</b> vs omni-zeroshot 0.054 (rovnaký text, ref aj skórovač); cez base 0.49 vs 0.51. Rýchlosť ~<b>RTF 4.2</b> (rozdiel krátky/dlhý beh), výstup 24 s na text, ktorý Piper povie za 11&ndash;13 s. <b>T4 (MEASURED, 2 nezávislé behy Colab + Kaggle): marginal RTF 0.46&ndash;0.80</b> (SK/CS/EN), t.j. ~5&ndash;6&times; rýchlejšie než Mac. VENDOR: RTF 0.073 na RTX 4090 (u nás nemerané).",
     note:"<b>Sluchový verdikt majiteľa (chat): klony sú dobré.</b> Prvý nájdený otvorený klonovací model, ktorý uvádza SK natívne a dá sa spustiť lokálne. Na Macu nie je živý (RTF ~4); na bezplatnom T4 je to 0.6&ndash;0.8, stále nie live. <b>&bdquo;Potrebná RTX 4090&ldquo; nie je podložené</b>: žiadna silnejšia karta zatiaľ nameraná nebola. <b>Neoverené:</b> podobnosť hlasu a sluchový verdikt (nemerané), rýchlosť na konkrétnych kartách (len VENDOR pre 4090; slabšie karty sú PROJECTED/neznáme), tempo reči (~2&times; pomalšie než prirodzené, predikátor tempa/stage 2 netestovaný). Prvý pokus mal WER 0.24 kvôli chybe protokolu (text referencie dlhší než orezané audio) &mdash; opravené a zaznamenané." },
-  { dom:"TTS", name:"Chatterbox multilingual / Turbo", flag:false, sub:["0.5B Llama backbone", "Turbo 350M", "ONNX buildy"],
-    sk:"none", skText:"ŽIADNA slovenčina vo váhach (karta opravená)", lic:"safe", licText:"MIT",
-    ev:["vendor","measured"], verdict:"watch", vText:"Pre SK len proxy",
-    key:"23 jazykov, žiadne SK/CZ v dodaných váhach (marketingové tvrdenie dodávateľa opravené). MEASURED tu len cez český proxy: WER 0.054 nerozhodne pri RTF 6.7 MPS. Turbo RTF na CUDA neotestované.",
-    note:"Strategicky zaujímavé (MIT + trénovateľné + ONNX), ale pre SK je to tá istá proxy hra, nie natívny hlas. Turbo-na-CUDA je otvorená otázka." },
+  { dom:"TTS", name:"Chatterbox Multilingual / Turbo", flag:true, sub:["0.5B Llama", "5-7 s klonovanie", "4-8 GB VRAM", "MIT"],
+    sk:"none", skText:"bez SK — EN výstup len", lic:"safe", licText:"MIT",
+    ev:["vendor","measured"], verdict:"test", vText:"EN klon na GPU (kandidát)",
+    key:"VENDOR: 23 jazykov (žiadne SK/CZ v váhach), MIT, zero-shot klon. Turbo RTF na CUDA neotestované. EN výstupný klonovací engine.",
+    note:"Deklarované v backend/registry.py, čaká na overenie na T4. Pre SK len proxy." },
   { dom:"TTS", name:"CosyVoice 3 / 2", flag:false, sub:["0.5B", "tvrdenie 150 ms streaming", "9 jazykov"],
     sk:"none", skText:"9 jazykov, bez SK", lic:"safe", licText:"Apache-2.0",
     ev:["vendor"], verdict:"reject", vText:"Mimo pre SK",
     key:"VENDOR 150 ms streaming.",
     note:"Mimo pre SK výstup; architektonická referencia pre dizajn streamovacieho TTS." },
-  { dom:"TTS", name:"Kokoro 82M", flag:false, sub:["82M", "šialene rýchle na CPU"],
-    sk:"none", skText:"bez SK", lic:"safe", licText:"Apache-2.0",
-    ev:["measured"], verdict:"reject", vText:"Mŕtve pre SK",
-    key:"Očakávané zlyhanie SK, 30-min negatívny výsledok ponechaný (PLAN.md).",
-    note:"Mŕtve pre SK; len kuriozita na EN strane." },
+  { dom:"TTS", name:"Kokoro 82M", flag:true, sub:["82M", "RTF 0.03", "1.33 GB VRAM na T4", "Apache-2.0"],
+    sk:"none", skText:"bez SK — EN výstup len", lic:"safe", licText:"Apache-2.0",
+    ev:["measured"], verdict:"test", vText:"EN TTS na GPU (kandidát)",
+    key:"MEASURED T4: RTF 0.03, VRAM 1.33 GB. Žiadne SK — EN výstupný klonovacie TTS.",
+    note:"Deklarované v backend/registry.py, čaká na ušní overenie na T4." },
   { dom:"TTS", name:"MagpieTTS multilingual 357M", flag:true, sub:["NeMo + NeMo-Speech.cpp", "GGUF buildy", "12 jazykov"],
     sk:"none", skText:"12 jazykov, bez SK", lic:"restricted", licText:"NVIDIA Open Model License",
     ev:["unknown"], verdict:"reject", vText:"Mimo pre SK",
@@ -918,11 +942,11 @@ const MODELS = [
     ev:["community","unknown"], verdict:"test", vText:"Kandidát na hromadné na Macu",
     key:"COMMUNITY natívne MLX na Apple Silicon; UNKNOWN na vlastnom hlase.",
     note:"Kandidát na lokálne hromadné na Macu popri OmniVoice: žiaden fine-tune, ovládanie emócií/tempa, zostáva na zariadení. A/B proti omni-zeroshot na v2b referenciách." },
-  { dom:"TTS", name:"Qwen3-TTS", flag:false, sub:["zameranie EN/ZH"],
-    sk:"none", skText:"EN/ZH, bez SK", lic:"restricted", licText:"open",
-    ev:["unknown"], verdict:"reject", vText:"Mimo rozsahu",
-    key:"n/a pre SK.",
-    note:"Mimo rozsahu." },
+  { dom:"TTS", name:"Qwen3-TTS 0.6B/1.7B", flag:true, sub:["10 jazykov", "3-s klonovanie", "97 ms prvý paket", "Apache-2.0"],
+    sk:"none", skText:"bez SK — EN výstup len", lic:"safe", licText:"Apache-2.0",
+    ev:["vendor"], verdict:"test", vText:"EN klon na GPU (kandidát)",
+    key:"VENDOR: 3-s zero-shot klon, Apache-2.0. Žiadne SK — EN výstupný klonovací engine.",
+    note:"Deklarované v backend/registry.py, čaká na overenie na T4." },
 
   // ---- S2S ----
   { dom:"S2S", name:"SeamlessM4T v2", flag:false, sub:["101 reč-vstup / 35 reč-výstup", "po častiach"],
@@ -1005,11 +1029,11 @@ const EV_LABEL = { measured:"MEASURED", vendor:"VENDOR", community:"COMMUNITY", 
   const measured = MODELS.filter(m=>m.ev.includes("measured")).length;
   const toTest = MODELS.filter(m=>m.verdict==="test").length;
   const tiles = [
-    { label:"Najpomalší článok", value:"1.3<small>s</small>", sub:"Slovenské STT na CPU, MEASURED — jediná páka na latenciu", hot:true },
-    { label:"Živý engine na CPU", value:"0.04<small> RTF</small>", sub:"Piper ONNX, generický hlas, MEASURED", hot:false },
-    { label:"Klonovaný hlas, T4", value:"0.18&ndash;0.34<small> RTF</small>", sub:"celý reťazec, 3&ndash;45 s reči, MEASURED", hot:false },
-    { label:"Prvý preložený zvuk", value:"~1.1<small>s</small>", sub:"T4, 12 krokov, streamovanie po klauzách", hot:false },
-    { label:"Hardvér pre ďalší krok", value:"&ge;8<small>GB</small>", sub:"NVIDIA VRAM (merané 5.8 GB) + &ge;16 GB RAM", hot:false }
+    { label:"EN&harr;SK (verified)", value:"0.78&ndash;1.3<small>s</small>", sub:"turn latency, EN&rarr;SK, MEASURED", hot:false },
+    { label:"EN&harr;CZ (verified)", value:"~0.8<small>s</small>", sub:"zero code change, pack + CT2 model, MEASURED", hot:false },
+    { label:"SK&rarr;EN (experimental)", value:"WER 0.2143<small> clean</small>", sub:"above 0.2 gate; Canary AST GPU test pending", hot:true },
+    { label:"Kokoro EN TTS (GPU)", value:"0.03<small> RTF</small>", sub:"1.33 GB VRAM on T4, EN output only", hot:false },
+    { label:"Komercia vs. cloud", value:"$0<small>/min</small>", sub:"KUDO AI ~$0.80&ndash;1.25/min, DeepL ~$0.07&ndash;0.20/min", hot:false }
   ];
   document.getElementById("tiles").innerHTML = tiles.map(t=>`
     <div class="tile ${t.hot?'hot':''}">
