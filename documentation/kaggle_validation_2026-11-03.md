@@ -89,3 +89,22 @@ not performed because it revokes existing client access. Never print the values.
 
 - https://github.com/Kaggle/kaggle-cli/blob/main/docs/README.md#authentication
 - https://huggingface.co/nvidia/canary-1b-v2
+
+## Delivery receipt
+
+- Feature commit `84bb75157ae650c406b1dd52c9fe1fcbe0ea219e`, pushed as
+  `codex/kaggle-report-validation`; draft PR https://github.com/brusnyak/bp/pull/2.
+  Main is not merged or rewritten.
+- Hosted report commit `71e75816b7c1278fa4298451ea25bed9f9bbbe24` on `gh-pages`.
+  `gh api repos/brusnyak/bp/pages/builds/latest` returned `built`, no error.
+- BrowserOS live same-origin fetch returned HTTP 200 and SHA-256
+  `246f23a04c470070aa5c144224c4772442530ece6ccbb4e7577280dbe05e4f8b`,
+  matching `shasum -a 256 reports/index-report.html` exactly.
+- Live https://brusnyak.github.io/bp/ includes fresh Canary results and all 34
+  model rows. Search empty/reset, STT filtering, Enter expansion/ARIA and theme
+  switching passed. 390px viewport width matched document width; tables adapt.
+- Final Impeccable detector: zero findings. Independent reviewer confirmed
+  prior scoring/status blockers resolved. The revised guard was tested locally
+  against the downloaded v1 receipt; no second GPU run was needed.
+- Python urllib HTTPS verification failed due its local CA bundle; no TLS
+  verification was disabled. Live verification used BrowserOS's trusted HTTPS.
