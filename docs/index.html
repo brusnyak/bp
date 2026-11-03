@@ -676,7 +676,7 @@
   <section id="latency">
     <div class="sec-head">
       <h2>Kde slovenský vstupný ťah trávi čas</h2>
-      <p class="sec-sub">Smer SK&rarr;EN je limitovaný STT. Akékoľvek zlepšenie STT dopadne priamo na najhoršiu latenciu ťahu. Prvý pokus o streamovacie STT (Nemotron 3.5) sa zmeral a pre slovenčinu zamietol &mdash; small-sk zostáva stupienkom a zrýchlenie STT otvoreným problémom.</p>
+      <p class="sec-sub">Smer SK&rarr;EN je limitovaný STT. Akékoľvek zlepšenie STT dopadne priamo na najhoršiu latenciu ťahu. <b>SK&rarr;EN je experimentálny</b> (WER 0.2143 &gt; 0.2 brána) — toto číslatie platí pre measured baseline, nie pre overený smemer. Prvý pokus o streamovacie STT (Nemotron 3.5) sa zmeral a pre slovenčinu zamietol &mdash; small-sk zostáva stupienkom a zrýchlenie STT otvoreným problémom. Canary AST na T4 čaká na spustenie (brána WER &lt; 0.2).</p>
     </div>
     <div class="chart-card">
       <div class="chart-title">Latencia podľa článku, slovenský vstupný ťah &middot; <b>MEASURED na M1 Pro 16&nbsp;GB</b></div>
@@ -970,9 +970,9 @@ const MODELS = [
     key:"200 ms praktický full-duplex.",
     note:"Architektonická referencia pre full-duplex dizajn. Plán word-window streamingu v projekte je pragmatický tvar Hibiki na článkoch, ktoré pokrývajú SK." },
   { dom:"S2S", name:"Canary AST režim", flag:true, sub:["25 EU jazykov vr. SK", "reč-vstup &rarr; preložený text"],
-    sk:"covers", skText:"25 EU jazykov vr. SK", lic:"restricted", licText:"NVIDIA open",
+    sk:"covers", skText:"25 EU jazykov vr. SK", lic:"safe", licText:"CC-BY-4.0",
     ev:["unknown"], verdict:"test", vText:"Jediné e2e pokrývajúce SK",
-    key:"UNKNOWN &mdash; pred citovaním overiť kvalitu SK AST.",
+    key:"UNKNOWN &mdash; pred citovaním overiť kvalitu SK AST, Kaggle T4 čaká na spustenie.",
     note:"Jediný end-to-end prvok pokrývajúci dnes SK: reč-vstup &rarr; preložený text v jednom kroku. Test uvedený v &sect;6." }
 ];
 
