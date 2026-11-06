@@ -20,6 +20,11 @@ the reason.
 from __future__ import annotations
 
 import argparse
+import hashlib
+import importlib.metadata
+import platform
+import time
+from pathlib import Path
 import json
 import os
 import sys
@@ -83,6 +88,11 @@ def all_packs() -> list[dict]:
 
 def resolve_stt(cfg: dict) -> tuple[str | None, str | None]:
     model = cfg.get("model", "")
+    engine = cfg.get("engine", "faster_whisper")
+    # Parakeet models are downloaded from HuggingFace at runtime by transformers;
+    # they don't live under ct2_models/whisper-<name>/
+    if engine == "parakeet":
+        return model, None
     local = os.path.join(CT2_DIR, f"whisper-{model}")
     if os.path.exists(os.path.join(local, "model.bin")):
         return model, None
@@ -95,8 +105,7 @@ def resolve_mt(cfg: dict) -> tuple[str | None, str | None]:
     model = cfg.get("model", "")
     if not model:
         return None, "no MT model declared"
-    if "/" in model:
-        return None, f"MT '{model}' needs conversion (run scripts/convert_models.py)"
+    model = model.replace("/", "--")
     path = os.path.join(CT2_DIR, model)
     if not os.path.exists(os.path.join(path, "model.bin")):
         return None, f"MT '{model}' converted dir not found in ct2_models/"
@@ -111,7 +120,7 @@ def resolve_mt(cfg: dict) -> tuple[str | None, str | None]:
 
 def resolve_tts(cfg: dict) -> tuple[str | None, str | None]:
     for voice in (cfg.get("voice"), cfg.get("fallback")):
-        if voice and os.path.exists(os.path.join(PIPER_DIR, f"{voice}.onnx")):
+        if voice and all(os.path.isfile(os.path.join(PIPER_DIR, f"{voice}{suffix}")) for suffix in (".onnx", ".onnx.json")):
             return voice, None
     return None, f"piper voice not found: {cfg.get('voice')}"
 
@@ -121,6 +130,8 @@ def resolve(pack: dict) -> dict:
     mt, mt_err = resolve_mt(pack.get("mt", {}))
     tts, tts_err = resolve_tts(pack.get("tts", {}))
     errors = [e for e in (stt_err, mt_err, tts_err) if e]
+    if tts and not tts.startswith(f"{pack.get('target')}_"):
+        errors.append(f"TTS voice {tts} does not match target {pack.get('target')}")
     return {
         "stt": stt, "mt": mt, "tts": tts,
         "errors": errors,
@@ -132,20 +143,70 @@ def eval_path(pair: str) -> str:
     return os.path.join(EVAL_DIR, f"{pair}.json")
 
 
-def status(pack: dict) -> str:
-    """verified | experimental — verified requires a recorded passing eval."""
-    r = resolve(pack)
-    if not r["resolved"]:
-        return "experimental"
-    ep = eval_path(pack["pair"])
-    if os.path.isfile(ep):
+def _sha256(path: str) -> str:
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def evidence_fingerprint(pack: dict, resolved: dict) -> str | None:
+    """Bind evidence to exact pack and local engine artifacts, never cached status alone."""
+    if not resolved.get("resolved"):
+        return None
+    stt_dir = Path(CT2_DIR) / f"whisper-{resolved['stt']}"
+    mt_dir = Path(CT2_DIR) / resolved["mt"]
+    voice = Path(PIPER_DIR) / resolved["tts"]
+    files = [stt_dir / "model.bin", stt_dir / "config.json", mt_dir / "model.bin",
+             Path(str(voice) + ".onnx"), Path(str(voice) + ".onnx.json")]
+    # Include tokenizer/config changes as well as the inference weights.
+    if stt_dir.is_dir() and mt_dir.is_dir():
+        files.extend(p for directory in (stt_dir, mt_dir) for p in directory.iterdir()
+                     if p.is_file() and p.name != "model.bin")
+    if not all(p.is_file() for p in files):
+        return None
+    versions = {}
+    for dependency in ("ctranslate2", "faster-whisper", "piper-tts", "transformers"):
         try:
-            with open(ep, encoding="utf-8") as f:
-                rec = json.load(f)
-            if rec.get("status") == "verified":
-                return "verified"
-        except (OSError, json.JSONDecodeError):
-            pass
+            versions[dependency] = importlib.metadata.version(dependency)
+        except importlib.metadata.PackageNotFoundError:
+            versions[dependency] = None
+    code_paths = ("backend/registry.py", "backend/main.py", "backend/stt/faster_whisper_stt.py",
+                  "backend/mt/ctranslate2_mt.py", "backend/tts/piper_tts.py", "backend/tts/base.py")
+    code = {name: _sha256(os.path.join(REPO_ROOT, name)) for name in code_paths
+            if os.path.isfile(os.path.join(REPO_ROOT, name))}
+    payload = {"pack": pack, "assets": {str(p): _sha256(str(p)) for p in sorted(set(files))},
+               "evaluator_sha256": _sha256(__file__), "runtime_code": code, "versions": versions,
+               "machine": [platform.system(), platform.machine()],
+               "runtime_overrides": {name: os.environ.get(name) for name in
+                    ("BP_DEVICE", "BP_COMPUTE_TYPE", "BP_MT_DEVICE", "BP_STT_BEAM_SIZE", "BP_SK_STT_MODEL")}}
+    return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
+
+
+def status(pack: dict) -> str:
+    """A legacy WER pass is STT evidence, never a full route verification."""
+    resolved = resolve(pack)
+    if not resolved["resolved"]:
+        return "experimental"
+    try:
+        with open(eval_path(pack["pair"]), encoding="utf-8") as handle:
+            record = json.load(handle)
+        review = record.get("quality_review", {})
+        required = ("stt", "mt_meaning", "tts_intelligibility", "live_latency", "runtime_policy")
+        if (record.get("schema") != 2 or record.get("acceptance") != "full_route_verified"
+                or not review.get("reviewer") or not review.get("reference_sha256")
+                or review.get("reference_sha256") != record.get("reference_sha256")
+                or not all(review.get(k) == "pass" for k in required)):
+            return "experimental"
+        fingerprint = evidence_fingerprint(pack, resolved)
+        audio = record.get("audio_out", "")
+        if (fingerprint and record.get("fingerprint") == fingerprint
+                and os.path.isfile(audio) and os.path.getsize(audio) > 0
+                and record.get("audio_sha256") == _sha256(audio)):
+            return "verified"
+    except (OSError, ValueError, TypeError):
+        pass
     return "experimental"
 
 
@@ -164,7 +225,7 @@ def cmd_list(args: argparse.Namespace) -> None:
         print(f"{pack['pair']:8s} {mark(r['stt']):>10s} {mark(r['mt']):>28s} "
               f"{mark(r['tts']):>30s}  {status(pack)}")
     print()
-    print("verified = components resolve AND a passing eval record exists;")
+    print("verified = current artifact fingerprint AND reviewed full-route evidence;")
     print("experimental = missing component or no recorded eval. Detail: bp language show <pair>")
 
 
@@ -197,6 +258,8 @@ def _detect_tts(target: str) -> str | None:
 def hf_model_info(repo_id: str, timeout: float = 6.0) -> tuple[bool, str]:
     """(exists_on_hf, licence) for a HF model id. Best-effort: never blocks adding a
     pack offline (returns (True, 'unknown') when the network is unreachable)."""
+    if os.environ.get("HF_HUB_OFFLINE") == "1":
+        return True, "unknown"  # existence/licence remain unverified in offline mode
     try:
         req = urllib.request.Request(f"https://huggingface.co/api/models/{repo_id}",
                                      headers={"User-Agent": "bp-language-add"})
@@ -274,7 +337,7 @@ def cmd_test(args: argparse.Namespace) -> None:
     r = resolve(pack)
     clip = args.clip or pack.get("clip")
     record = {
-        "pair": pack["pair"], "source": pack["source"], "target": pack["target"],
+        "schema": 2, "pair": pack["pair"], "source": pack["source"], "target": pack["target"],
         "engines": {"stt": r["stt"], "mt": r["mt"], "tts": r["tts"],
                     "stt_cfg": pack.get("stt"), "mt_cfg": pack.get("mt"),
                     "tts_cfg": pack.get("tts")},
@@ -299,6 +362,7 @@ def cmd_test(args: argparse.Namespace) -> None:
     from backend.tts.piper_tts import PiperTTS
 
     wav, sr = librosa.load(os.path.join(REPO_ROOT, clip), sr=16000, mono=True)
+    inference_start = time.perf_counter()
     stt = FasterWhisperSTT(model_size=pack["stt"]["model"])
     segs, t_stt, detected = stt.transcribe_audio(
         np.asarray(wav, dtype=np.float32), sr, language=pack["stt"]["language"])
@@ -307,14 +371,17 @@ def cmd_test(args: argparse.Namespace) -> None:
 
     mt_ref = pack["mt"]["model"]
     # CTranslate2MT takes a directory path (or an HF id with '/'), not a bare name.
-    mt_path = mt_ref if "/" in mt_ref else os.path.join(CT2_DIR, mt_ref)
+    mt_path = os.path.join(CT2_DIR, r["mt"])
     mt = CTranslate2MT(model_path=mt_path)
     chunks = CTranslate2MT.split_chunks(text) or [text]
+    mt_start = time.perf_counter()
     translated_parts, _ = mt.translate_segments(chunks, pack["source"], pack["target"])
+    t_mt = time.perf_counter() - mt_start
     translation = " ".join(translated_parts).strip()
 
-    tts = PiperTTS(model_id=pack["tts"]["voice"])
+    tts = PiperTTS(model_id=r["tts"])
     audio, out_sr, t_tts = tts.synthesize(translation, language=pack["target"])
+    inference_wall = time.perf_counter() - inference_start
     out_audio = os.path.join(REPO_ROOT, "processed",
                              f"language_eval_{pack['pair']}.wav")
     os.makedirs(os.path.dirname(out_audio), exist_ok=True)
@@ -328,8 +395,12 @@ def cmd_test(args: argparse.Namespace) -> None:
         "transcript": text,
         "translation": translation,
         "detected_lang": detected,
-        "latency_s": {"stt": round(t_stt, 3), "tts": round(t_tts, 3),
-                      "end_to_end": round(t_stt + t_tts, 3)},
+        "latency_s": {"stt": round(t_stt, 3), "mt": round(t_mt, 3), "tts": round(t_tts, 3),
+                      "stages_total": round(t_stt + t_mt + t_tts, 3),
+                      "inference_wall": round(inference_wall, 3)},
+        "timing_scope": "offline pipeline wall includes model construction; excludes capture/playback",
+        "fingerprint": evidence_fingerprint(pack, r),
+        "audio_sha256": _sha256(out_audio) if os.path.isfile(out_audio) else None,
         "audio_out": out_audio,
     })
     # Auto-fetch reference from speaker_voices.json if not provided in pack
@@ -353,20 +424,13 @@ def cmd_test(args: argparse.Namespace) -> None:
             wer_val = round(wer(ref, text), 4)
             record["wer"] = wer_val
             record["reference"] = ref
+            record["reference_sha256"] = hashlib.sha256(ref.encode()).hexdigest()
         except ImportError:
             record["wer"] = "jiwer not installed"
-    # Determine status: verified only if WER < 0.2 (configurable threshold)
-    # Lowered from 0.3 because jiwer normalization masks semantic errors
-    # (Czech-like hallucinations can score deceptively low WER)
     WER_THRESHOLD = 0.2
-    if wer_val is not None and wer_val < WER_THRESHOLD:
-        record["status"] = "verified"
-    else:
-        record["status"] = "experimental"
-        if wer_val is not None:
-            record["reason"] = f"WER {wer_val:.3f} >= threshold {WER_THRESHOLD}"
-        else:
-            record["reason"] = "no reference available for quality verification"
+    record["status"] = "experimental"
+    record["acceptance"] = "stt_evaluated" if wer_val is not None and wer_val < WER_THRESHOLD else "smoke_tested"
+    record["reason"] = "STT WER does not establish MT meaning, TTS intelligibility or live latency; reviewed full-route evidence is required."
     _write_eval(pack["pair"], record)
     print(f"{pack['pair']}: {record['status'].upper()}  stt {t_stt:.2f}s  tts {t_tts:.2f}s  clip {clip}")
     if wer_val is not None:

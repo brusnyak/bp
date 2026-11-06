@@ -4,83 +4,119 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
-    <title>Authentication</title>
+    <title>Sign in · Live Speech Translation</title>
     <link rel="manifest" href="/ui/manifest.webmanifest" />
     <meta name="theme-color" content="#0A1C4F" />
     <link rel="apple-touch-icon" href="/ui/images/icon-192.png" />
     <link rel="stylesheet" href="/ui/global-styles.css">
-    <link rel="stylesheet" href="auth.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="/ui/auth/auth.css">
+    <link rel="stylesheet" href="/ui/vendor/fonts.css" />
+    <link rel="stylesheet" href="/ui/vendor/material-symbols.css" />
 </head>
-<body>
-    <div class="auth-container">
-            <div class="auth-card">
-                <div class="theme-toggle-wrapper">
-                    <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
-                        <span class="material-symbols-outlined"></span>
-                    </button>
-                </div>
-                <div class="auth-header">
-                    <h1>🌐 Live Speech Translation</h1>
-                    <p>Real-time translation with voice cloning</p>
-                </div>
-                <div class="auth-tabs">
-                    <button id="login-tab" class="tab-button active">Login</button>
-                    <button id="register-tab" class="tab-button">Register</button>
-                </div>
-
-            <div id="login-form" class="auth-form">
-                <h2>Login to your account</h2>
-                <form>
-                    <div class="form-group">
-                        <label for="login-email">Email</label>
-                        <input type="email" id="login-email" placeholder="your@example.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="login-password">Password</label>
-                        <input type="password" id="login-password" placeholder="••••••••" required>
-                    </div>
-                    <button type="submit" class="auth-button">Login</button>
-                </form>
-                <div class="social-login">
-                    <div class="gis-slot" data-gis-text="signin_with"></div>
-                    <button class="google-button">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_of_Google__G_Suite.svg" alt="Google icon" width="20" height="20">
-                        Sign in with Google
-                    </button>
-                </div>
-            </div>
-
-            <div id="register-form" class="auth-form hidden">
-                <h2>Create a new account</h2>
-                <form>
-                    <div class="form-group">
-                        <label for="register-username">Username</label>
-                        <input type="text" id="register-username" placeholder="yourusername" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="register-email">Email</label>
-                        <input type="email" id="register-email" placeholder="your@example.com" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="register-password">Password</label>
-                        <input type="password" id="register-password" placeholder="••••••••" required>
-                    </div>
-                    <button type="submit" class="auth-button">Register</button>
-                </form>
-                <div class="social-login">
-                    <div class="gis-slot" data-gis-text="signup_with"></div>
-                    <button class="google-button">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Logo_of_Google__G_Suite.svg" alt="Google icon" width="20" height="20">
-                        Sign up with Google
-                    </button>
-                </div>
-            </div>
-            <div id="auth-message" class="auth-message"></div>
+<body class="auth-body">
+    <main class="auth-page">
+        <div class="theme-toggle-wrapper">
+            <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
+                <span class="material-symbols-outlined"></span>
+            </button>
         </div>
-    </div>
+
+        <section class="auth-card" aria-labelledby="auth-title">
+            <header class="auth-head">
+                <p class="auth-brand">Live Speech Translation</p>
+                <h1 id="auth-title">Sign in</h1>
+                <p class="auth-lede" id="authLede">Sign in to save your own voice. You do not need an account to translate.</p>
+            </header>
+
+            <!-- Shown when a token is stored. Sign-out clears the three stored keys. -->
+            <div id="signed-in" class="signed-in" hidden>
+                <p>Signed in as <strong id="whoami"></strong>.</p>
+                <div class="auth-actions">
+                    <a class="auth-button" href="/ui/live-speech/live.html">Open live translation</a>
+                    <button type="button" class="text-button" id="signout-btn">Sign out</button>
+                </div>
+            </div>
+
+            <div id="auth-forms">
+                <div class="auth-tabs" role="tablist" aria-label="Account">
+                    <button type="button" role="tab" id="tab-login" class="auth-tab" aria-selected="true" aria-controls="panel-login" tabindex="0">Sign in</button>
+                    <button type="button" role="tab" id="tab-register" class="auth-tab" aria-selected="false" aria-controls="panel-register" tabindex="-1">Create account</button>
+                </div>
+
+                <form id="panel-login" class="auth-form" role="tabpanel" aria-labelledby="tab-login" novalidate>
+                    <div class="field">
+                        <label for="login-email">Email</label>
+                        <input id="login-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" aria-describedby="login-email-error">
+                        <p class="field-error" id="login-email-error" hidden></p>
+                    </div>
+                    <div class="field">
+                        <label for="login-password">Password</label>
+                        <div class="password-wrap">
+                            <input id="login-password" name="password" type="password" autocomplete="current-password" aria-describedby="login-password-error">
+                            <button type="button" class="pw-toggle" aria-controls="login-password" aria-pressed="false">Show</button>
+                        </div>
+                        <p class="field-error" id="login-password-error" hidden></p>
+                    </div>
+                    <button type="submit" class="auth-button auth-submit">Sign in</button>
+                </form>
+
+                <form id="panel-register" class="auth-form" role="tabpanel" aria-labelledby="tab-register" hidden novalidate>
+                    <div class="field">
+                        <label for="register-username">Username</label>
+                        <input id="register-username" name="username" type="text" autocomplete="username" placeholder="yourname" aria-describedby="register-username-error">
+                        <p class="field-error" id="register-username-error" hidden></p>
+                    </div>
+                    <div class="field">
+                        <label for="register-email">Email</label>
+                        <input id="register-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" aria-describedby="register-email-error">
+                        <p class="field-error" id="register-email-error" hidden></p>
+                    </div>
+                    <div class="field">
+                        <label for="register-password">Password</label>
+                        <div class="password-wrap">
+                            <input id="register-password" name="password" type="password" autocomplete="new-password" aria-describedby="register-password-hint register-password-error">
+                            <button type="button" class="pw-toggle" aria-controls="register-password" aria-pressed="false">Show</button>
+                        </div>
+                        <p class="field-hint" id="register-password-hint">At least 8 characters.</p>
+                        <p class="field-error" id="register-password-error" hidden></p>
+                    </div>
+                    <button type="submit" class="auth-button auth-submit">Create account</button>
+                </form>
+
+                <div class="auth-divider" aria-hidden="true"><span>or</span></div>
+
+                <div class="google-area">
+                    <div class="gis-slot" data-gis-text="signin_with" hidden></div>
+                    <button type="button" class="google-button" id="google-btn">
+                        <svg class="google-mark" viewBox="0 0 48 48" width="18" height="18" aria-hidden="true" focusable="false">
+                            <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.5l6.7-6.7C35.6 2.4 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.8 6C12.3 13.5 17.7 9.5 24 9.5z"/>
+                            <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/>
+                            <path fill="#FBBC05" d="M10.4 28.8c-.5-1.4-.8-2.9-.8-4.8s.3-3.3.8-4.8l-7.8-6C.9 16.4 0 20.1 0 24s.9 7.6 2.6 10.8l7.8-6z"/>
+                            <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.7-4.2-13.6-10l-7.8 6C6.5 42.6 14.6 48 24 48z"/>
+                        </svg>
+                        <span id="google-btn-label">Continue with Google</span>
+                    </button>
+                    <p class="field-hint" id="google-note" hidden></p>
+                </div>
+                <button type="button" class="google-button guest-button" id="guest-btn" hidden>Try it as a guest (no account)</button>
+                <p class="field-hint" id="guest-note" hidden>Guests can translate right away but cannot record or store voices.</p>
+            </div>
+
+            <p id="auth-message" class="auth-message" role="status" aria-live="polite"></p>
+        </section>
+    </main>
+
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="/ui/theme-toggle.js"></script>
-    <script src="auth.js"></script>
-</body>
+    <script src="/ui/auth/auth.js"></script>
+    <script>
+      (function () {
+        if (new URLSearchParams(location.search).get('reason') !== 'voice') return;
+        var lede = document.getElementById('authLede');
+        if (lede) lede.textContent = 'Create a free account to save your own voice securely on the server.';
+        window.addEventListener('load', function () { var t = document.getElementById('tab-register'); if (t) t.click(); });
+      })();
+    </script>
+    <script src="/ui/i18n/i18n.js"></script>
+  </body>
 </html>

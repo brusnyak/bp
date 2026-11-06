@@ -1,0 +1,34 @@
+{
+  "source_sha256": "75ff34679d5a7c1dce00c6db8c319977bd3ec7d0bbf5bd9920371acc749a3f3f",
+  "scope": "rescored saved strings; inference not rerun; reference completeness unreviewed",
+  "rows": [
+    {
+      "name": "sk_kinit_turbo",
+      "reported_wer": 0.2143,
+      "reference_words": 11,
+      "hypothesis_words": 14,
+      "corrected_wer": 0.2727
+    },
+    {
+      "name": "sk_small_sk",
+      "reported_wer": 0.2143,
+      "reference_words": 11,
+      "hypothesis_words": 14,
+      "corrected_wer": 0.2727
+    },
+    {
+      "name": "en",
+      "reported_wer": 0.0588,
+      "reference_words": 17,
+      "hypothesis_words": 17,
+      "corrected_wer": 0.0588
+    },
+    {
+      "name": "sk",
+      "reported_wer": 0.3636,
+      "reference_words": 11,
+      "hypothesis_words": 12,
+      "corrected_wer": 0.3636
+    }
+  ]
+}

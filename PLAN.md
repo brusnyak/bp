@@ -1,5 +1,7 @@
 # BP Dev Plan — where we are, what's ahead
 
+> Current repair state (2026-11-04): start with `PRODUCT.md`, `documentation/implementation-2026-11-04/RESULTS.md` and `documentation/HANDOFF_NEXT_SESSION.md`. Earlier dated counts, readiness claims, media-access behavior and Kaggle failure explanations below are historical. Current contracts require authenticated explicit preparation, offline assets, target-language TTS, terminal Stop and reviewed full-route evidence. Full cloned-speech/LHC/commercial acceptance remains pending.
+
 Branch: `main` + `merge/windows-amd-cpu` (2026-09-28, verified: Windows CPU-setup work
 merged, `main` fast-forwards onto it). Two machines: Mac M1 Pro (reference) and the
 Windows 11 AMD CPU-only laptop. Docs: `documentation/voice_and_app_direction_2026-09.md`,
@@ -201,6 +203,11 @@ Next action items to explore and benchmark:
 
 ## Next
 
+- [x] Verify EN→SK local pipeline (RTF 0.672, first audio 0.39s) — `documentation/VERIFICATION_RESULTS_2026-11-06.md`
+- [x] Fix STT window size: `STREAMING_CHUNK_LENGTH` 0.5s → 2.0s (`BP_STREAMING_CHUNK_S` env var) in `backend/main.py:224`; fixes fragmented low-accuracy "word-at-a-time" translation seen in UI log
+- [x] Verify CS→EN local pipeline (functional but STT quality degraded on CPU; needs Kaggle T4 GPU) — `documentation/VERIFICATION_RESULTS_2026-11-06.md`
+- [x] Verify CS→EN on Kaggle T4 GPU (p50 1.86s < 2s target, p95 4.22s) — route_receipt.json from `yegorby/bp-production-ws-cs-en-default-vs-low-latency`
+- [x] Kaggle access confirmed: `KAGGLE_API_TOKEN` in `~/.env`, kaggle CLI authenticated as `yegorby`
 - [ ] Land the Windows branch when it arrives (`win/*` → gates → ff `main`; protocol in
       `AGENTS.md`), then execute the footprint diet — ranked cut list with measured savings
       in `documentation/footprint_audit_2026-09-28.md` (biggest: core/extras requirements
@@ -213,6 +220,8 @@ Next action items to explore and benchmark:
 - [ ] Delete `test/full_pipeline_test.py` (dead F5 leftover, breaks `pytest test/` collection)
 - [ ] Env raw-test on clean checkout (this Mac + Windows laptop) — Windows half now done via
       `SETUP_WINDOWS.md`; Mac half parked until the project is complete
+- [ ] **XTTS voice cloning on Kaggle T4** — kernel `yegorby/bp-xtts-voice-clone-t4` v3 pushed with Python 3.10 standalone; status RUNNING; download `xtts_clone_{en,sk,cs}.wav` when complete
+- [ ] **Piper fine-tuning alternative** — Kaggle piper-train failed (no train.py, TF version mismatch); evaluate XTTS results first, then decide on local Piper fine-tune or OmniVoice bulk generation
 
 ## Run things
 
@@ -221,7 +230,7 @@ Next action items to explore and benchmark:
 | `make lab` | Voice Lab review page, static only (no login/upload — those need `make run`) |
 | `make run` | Full backend (https://localhost:8000) |
 | `make demo-check` | Demo pre-flight (assets + live server; `scripts/demo_preflight.py --server`) |
-| `make test` | Backend suite: piper pipeline + VAD + hardware + auth + API tests (20 pass, 2026-09-28) |
+| `make test` | Backend suite: 87 pass (verified 2026-11-06, M1 Pro) |
 | `.venv/bin/python test/interrupt_smoke_test.py` | Live WS rehearsal over `/ws` (needs `make run`) |
 | `python3 scripts/update_voice_lab_library.py --no-test` | Refresh Voice Lab manifest |
 | `.venv/bin/python scripts/voice_similarity_qc.py --synthesize-only` | Synthesize QC candidates |
@@ -234,8 +243,6 @@ Next action items to explore and benchmark:
 
 - `documentation/compute_capacity_report_2026-09.md` — Mac vs NVIDIA laptop vs
   university server, every figure labelled `MEASURED` / `PROJECTED`.
-- `documentation/handler_update_2026-09.md` — the covering note; its
-  "Hardware ask" section quotes only the measured rows.
 - To add before sending: the completed 2500-step result, the ear-QC verdict for
   `me_omni_piper_sk`, and a sweep of new STT/MT/TTS releases.
 

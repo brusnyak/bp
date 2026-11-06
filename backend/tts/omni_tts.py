@@ -98,8 +98,8 @@ class OmniVoiceTTS:
 
     def synthesize_stream(self, text: str, language: str = "sk", speaker_wav_path: Optional[str] = None, **kwargs):
         """One chunk per clause-level phrase so the first audio leaves after the first clause."""
-        from backend.tts.text_chunking import chunk_audio_by_duration, split_into_phrases
+        from backend.tts.text_chunking import split_into_phrases
         for phrase in split_into_phrases(text):
             wav, sr, _ = self.synthesize(phrase, language=language, speaker_wav_path=speaker_wav_path)
             if wav is not None and len(wav) > 0:
-                yield from chunk_audio_by_duration(wav, sr)
+                yield wav

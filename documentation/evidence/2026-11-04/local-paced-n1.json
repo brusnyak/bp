@@ -1,0 +1,541 @@
+{
+ "audio": "speaker_voices/me_en_script.m4a",
+ "seconds": 40.0,
+ "src": "en",
+ "tgt": "sk",
+ "tts": "piper",
+ "input_end_s": 40.0,
+ "rates": {
+  "1.0": {
+   "segments": 14,
+   "with_audio": 14,
+   "first_audio_after_source_end_s": [
+    0.54,
+    0.605,
+    0.676,
+    0.642,
+    0.618,
+    0.471,
+    0.424,
+    4.406,
+    0.964,
+    0.529,
+    0.587,
+    0.503,
+    0.7,
+    0.545
+   ],
+   "lag_s": [
+    0.54,
+    2.692,
+    0.813,
+    2.672,
+    2.082,
+    4.925,
+    4.88,
+    4.882,
+    6.495,
+    9.472,
+    8.214,
+    9.368,
+    7.564,
+    9.222
+   ],
+   "lag_max_s": 9.472,
+   "first_word_lag_s": [
+    5.507,
+    5.033,
+    5.038,
+    4.807,
+    6.34,
+    6.064,
+    5.9,
+    6.029,
+    10.78,
+    11.069,
+    12.224,
+    11.569,
+    11.528,
+    11.28
+   ],
+   "first_word_lag_max_s": 12.224,
+   "segment_s": [
+    4.97,
+    2.34,
+    4.22,
+    2.13,
+    4.26,
+    1.14,
+    1.02,
+    1.15,
+    4.29,
+    1.6,
+    4.01,
+    2.2,
+    3.96,
+    2.06
+   ],
+   "lag_growth_s": 8.681999999999999,
+   "last_listen_end_vs_input_end_s": 11.66
+  }
+ },
+ "tts_messages": 20,
+ "events": [
+  {
+   "t": 5.348004416009644,
+   "type": "transcription_result",
+   "text": " Good morning, and welcome to this live demonstration of...",
+   "stt_time": 0.38063266599783674,
+   "span": null
+  },
+  {
+   "t": 5.4491073329991195,
+   "type": "translation_result",
+   "text": "Dobr\u00e9 r\u00e1no, a vitajte na tejto \u017eivej demon\u0161tr\u00e1cii...",
+   "mt_time": 0.10080312500940636
+  },
+  {
+   "t": 5.506898916006321,
+   "type": "tts_audio",
+   "bytes": 60460,
+   "seconds": 1.3699773242630386
+  },
+  {
+   "t": 5.611479707993567,
+   "type": "tts_audio",
+   "bytes": 137772,
+   "seconds": 3.1230839002267574
+  },
+  {
+   "t": 5.611555540992413,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 0.38063266599783674,
+    "mt_time": 0.10080312500940636,
+    "tts_time": 0.16210041698650457,
+    "input_to_stt_latency": 0.3834859580092598,
+    "total_latency": 0.6435362079937477
+   }
+  },
+  {
+   "t": 7.748897832992952,
+   "type": "transcription_result",
+   "text": " of real-time speech translation.",
+   "stt_time": 0.44143295899266377,
+   "span": null
+  },
+  {
+   "t": 7.8336739579972345,
+   "type": "translation_result",
+   "text": "prekladu re\u010d\u00ed v re\u00e1lnom \u010dase.",
+   "mt_time": 0.08463979201042093
+  },
+  {
+   "t": 7.912797875003889,
+   "type": "tts_audio",
+   "bytes": 103468,
+   "seconds": 2.345215419501134
+  },
+  {
+   "t": 7.912883957993472,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 0.44143295899266377,
+    "mt_time": 0.08463979201042093,
+    "tts_time": 0.07860495799104683,
+    "input_to_stt_latency": 0.70490266699926,
+    "total_latency": 0.6046777089941315
+   }
+  },
+  {
+   "t": 12.004897333012195,
+   "type": "transcription_result",
+   "text": " I'm speaking English and you will hear my own voice.",
+   "stt_time": 0.4725192499754485,
+   "span": null
+  },
+  {
+   "t": 12.07902820801246,
+   "type": "translation_result",
+   "text": "Hovor\u00edm po anglicky a budete po\u010du\u0165 m\u00f4j vlastn\u00fd hlas.",
+   "mt_time": 0.07402549998369068
+  },
+  {
+   "t": 12.208782791014528,
+   "type": "tts_audio",
+   "bytes": 176172,
+   "seconds": 3.9938321995464854
+  },
+  {
+   "t": 12.208867333014496,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 0.4725192499754485,
+    "mt_time": 0.07402549998369068,
+    "tts_time": 0.12912620799033903,
+    "input_to_stt_latency": 0.4737887499795761,
+    "total_latency": 0.6756709579494782
+   }
+  },
+  {
+   "t": 14.107382124988362,
+   "type": "transcription_result",
+   "text": " You speak in Slovak within seconds.",
+   "stt_time": 0.44007699997746386,
+   "span": null
+  },
+  {
+   "t": 14.187926165992394,
+   "type": "translation_result",
+   "text": "Hovor\u00edte slovensky v priebehu nieko\u013ek\u00fdch sek\u00fand.",
+   "mt_time": 0.0804126660223119
+  },
+  {
+   "t": 14.309552582999459,
+   "type": "tts_audio",
+   "bytes": 161836,
+   "seconds": 3.6687528344671203
+  },
+  {
+   "t": 14.309637333004503,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 0.44007699997746386,
+    "mt_time": 0.0804126660223119,
+    "tts_time": 0.12107062499853782,
+    "input_to_stt_latency": 0.7035465829831082,
+    "total_latency": 0.6415602909983136
+   }
+  },
+  {
+   "t": 18.372694374993443,
+   "type": "transcription_result",
+   "text": " The system listens through the microphone and detects when...",
+   "stt_time": 0.44660308299353346,
+   "span": null
+  },
+  {
+   "t": 18.44989954101038,
+   "type": "translation_result",
+   "text": "Syst\u00e9m po\u010d\u00fava mikrof\u00f3nom a detekuje, kedy...",
+   "mt_time": 0.07702816699747927
+  },
+  {
+   "t": 18.543667624995578,
+   "type": "tts_audio",
+   "bytes": 124972,
+   "seconds": 2.8328344671201813
+  },
+  {
+   "t": 18.57829475001199,
+   "type": "tts_audio",
+   "bytes": 50732,
+   "seconds": 1.1493877551020408
+  },
+  {
+   "t": 18.578372124989983,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 0.44660308299353346,
+    "mt_time": 0.07702816699747927,
+    "tts_time": 0.12817891698796302,
+    "input_to_stt_latency": 0.4485457499977201,
+    "total_latency": 0.6518101669789758
+   }
+  },
+  {
+   "t": 19.42505204101326,
+   "type": "transcription_result",
+   "text": " speech beans.",
+   "stt_time": 0.3600769169861451,
+   "span": null
+  },
+  {
+   "t": 19.499830582994036,
+   "type": "translation_result",
+   "text": "Fazu\u013eky.",
+   "mt_time": 0.07449112500762567
+  },
+  {
+   "t": 19.535597375012003,
+   "type": "tts_audio",
+   "bytes": 43052,
+   "seconds": 0.9752380952380952
+  },
+  {
+   "t": 19.535675999999512,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 0.3600769169861451,
+    "mt_time": 0.07449112500762567,
+    "tts_time": 0.035550708998925984,
+    "input_to_stt_latency": 0.6209937089879531,
+    "total_latency": 0.47011875099269673
+   }
+  },
+  {
+   "t": 20.42375816599815,
+   "type": "transcription_result",
+   "text": " and end.",
+   "stt_time": 0.338400582986651,
+   "span": null
+  },
+  {
+   "t": 20.46897070799605,
+   "type": "translation_result",
+   "text": "a koniec.",
+   "mt_time": 0.04495170898735523
+  },
+  {
+   "t": 20.50977208299446,
+   "type": "tts_audio",
+   "bytes": 50732,
+   "seconds": 1.1493877551020408
+  },
+  {
+   "t": 20.50983791600447,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 0.338400582986651,
+    "mt_time": 0.04495170898735523,
+    "tts_time": 0.04056341701652855,
+    "input_to_stt_latency": 0.600316208001459,
+    "total_latency": 0.42391570899053477
+   }
+  },
+  {
+   "t": 25.385025541007053,
+   "type": "transcription_result",
+   "text": " You're the only one who's the rightful, and the only one who's the rightful.",
+   "stt_time": 4.15276191700832,
+   "span": null
+  },
+  {
+   "t": 25.517326500004856,
+   "type": "translation_result",
+   "text": "Si jedin\u00fd, kto je pr\u00e1voplatn\u00fd a jedin\u00fd, kto je pr\u00e1voplatn\u00fd.",
+   "mt_time": 0.13231516699306667
+  },
+  {
+   "t": 25.638206458010245,
+   "type": "tts_audio",
+   "bytes": 52780,
+   "seconds": 1.195827664399093
+  },
+  {
+   "t": 25.868417165998835,
+   "type": "tts_audio",
+   "bytes": 118316,
+   "seconds": 2.681904761904762
+  },
+  {
+   "t": 25.980068708013278,
+   "type": "tts_audio",
+   "bytes": 89132,
+   "seconds": 2.020136054421769
+  },
+  {
+   "t": 25.98011483301525,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 4.15276191700832,
+    "mt_time": 0.13231516699306667,
+    "tts_time": 0.46117200001026504,
+    "input_to_stt_latency": 4.420032166992314,
+    "total_latency": 4.746249084011652
+   }
+  },
+  {
+   "t": 26.20069970798795,
+   "type": "transcription_result",
+   "text": " First the speech is transcribed in the text, then tr-",
+   "stt_time": 0.6828667079971638,
+   "span": null
+  },
+  {
+   "t": 26.362599749991205,
+   "type": "translation_result",
+   "text": "Najsk\u00f4r je re\u010d prep\u00edsan\u00e1 v texte, potom tr-",
+   "mt_time": 0.16201112500857562
+  },
+  {
+   "t": 26.481731290987227,
+   "type": "tts_audio",
+   "bytes": 129580,
+   "seconds": 2.9373242630385485
+  },
+  {
+   "t": 26.532883540989133,
+   "type": "tts_audio",
+   "bytes": 72236,
+   "seconds": 1.6370068027210884
+  },
+  {
+   "t": 26.532955750008114,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 0.6828667079971638,
+    "mt_time": 0.16201112500857562,
+    "tts_time": 0.1700745830021333,
+    "input_to_stt_latency": 1.4775457080104388,
+    "total_latency": 1.0149524160078727
+   }
+  },
+  {
+   "t": 27.48255270801019,
+   "type": "transcription_result",
+   "text": " translated then spoken again.",
+   "stt_time": 0.3680586249975022,
+   "span": null
+  },
+  {
+   "t": 27.546770000015385,
+   "type": "translation_result",
+   "text": "prelo\u017een\u00e9 a potom znovu prelo\u017een\u00e9.",
+   "mt_time": 0.06404987498535775
+  },
+  {
+   "t": 27.643411041004583,
+   "type": "tts_audio",
+   "bytes": 121388,
+   "seconds": 2.75156462585034
+  },
+  {
+   "t": 27.643483916006517,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 0.3680586249975022,
+    "mt_time": 0.06404987498535775,
+    "tts_time": 0.09615608298918232,
+    "input_to_stt_latency": 0.6275829169899225,
+    "total_latency": 0.5282645829720423
+   }
+  },
+  {
+   "t": 31.529055624996545,
+   "type": "transcription_result",
+   "text": " every step runs locally on this computer with no-",
+   "stt_time": 0.404557959001977,
+   "span": null
+  },
+  {
+   "t": 31.60270266601583,
+   "type": "translation_result",
+   "text": "ka\u017ed\u00fd krok be\u017e\u00ed lok\u00e1lne na tomto po\u010d\u00edta\u010di bez-",
+   "mt_time": 0.07370583401643671
+  },
+  {
+   "t": 31.711342666007113,
+   "type": "tts_audio",
+   "bytes": 148012,
+   "seconds": 3.355283446712018
+  },
+  {
+   "t": 31.711410916002933,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 0.404557959001977,
+    "mt_time": 0.07370583401643671,
+    "tts_time": 0.10811566701158881,
+    "input_to_stt_latency": 0.40555354199022986,
+    "total_latency": 0.5863794600300025
+   }
+  },
+  {
+   "t": 33.67944899998838,
+   "type": "transcription_result",
+   "text": " cloud and no waiting room.",
+   "stt_time": 0.3540985409927089,
+   "span": null
+  },
+  {
+   "t": 33.7553275829996,
+   "type": "translation_result",
+   "text": "mrak a \u017eiadna \u010dak\u00e1re\u0148.",
+   "mt_time": 0.07577687501907349
+  },
+  {
+   "t": 33.82837245799601,
+   "type": "tts_audio",
+   "bytes": 95276,
+   "seconds": 2.159455782312925
+  },
+  {
+   "t": 33.82844779099105,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 0.3540985409927089,
+    "mt_time": 0.07577687501907349,
+    "tts_time": 0.07265304200700484,
+    "input_to_stt_latency": 0.6149009999935515,
+    "total_latency": 0.5025284580187872
+   }
+  },
+  {
+   "t": 37.76863649999723,
+   "type": "transcription_result",
+   "text": " a latency is the time between my words and",
+   "stt_time": 0.4798597909975797,
+   "span": null
+  },
+  {
+   "t": 37.86572679100209,
+   "type": "translation_result",
+   "text": "Latency je \u010das medzi mojimi slovami a",
+   "mt_time": 0.09689158300170675
+  },
+  {
+   "t": 37.98911283299094,
+   "type": "tts_audio",
+   "bytes": 163884,
+   "seconds": 3.7151927437641725
+  },
+  {
+   "t": 37.98918804101413,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 0.4798597909975797,
+    "mt_time": 0.09689158300170675,
+    "tts_time": 0.12276141601614654,
+    "input_to_stt_latency": 0.4814500409993343,
+    "total_latency": 0.699512790015433
+   }
+  },
+  {
+   "t": 39.75486295801238,
+   "type": "transcription_result",
+   "text": " and the translated voice you hear.",
+   "stt_time": 0.40836270901490934,
+   "span": null
+  },
+  {
+   "t": 39.8326059159881,
+   "type": "translation_result",
+   "text": "a prelo\u017een\u00fd hlas, ktor\u00fd po\u010duje\u0161.",
+   "mt_time": 0.07781991598312743
+  },
+  {
+   "t": 39.89154949999647,
+   "type": "tts_audio",
+   "bytes": 76844,
+   "seconds": 1.7414965986394557
+  },
+  {
+   "t": 39.93704183300724,
+   "type": "tts_audio",
+   "bytes": 59436,
+   "seconds": 1.3467573696145125
+  },
+  {
+   "t": 39.93711508301203,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 0.40836270901490934,
+    "mt_time": 0.07781991598312743,
+    "tts_time": 0.10421187500469387,
+    "input_to_stt_latency": 0.6716435840062331,
+    "total_latency": 0.5903945000027306
+   }
+  }
+ ]
+}

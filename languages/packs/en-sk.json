@@ -2,11 +2,28 @@
   "pair": "en-sk",
   "source": "en",
   "target": "sk",
-  "stt": { "engine": "faster_whisper", "model": "base", "language": "en" },
-  "mt": { "engine": "opus-mt", "model": "Helsinki-NLP--opus-mt-en-sk" },
-  "tts": { "engine": "piper", "voice": "sk_SK-personal-male-medium", "fallback": "sk_SK-lili-medium" },
+  "stt": {
+    "engine": "parakeet",
+    "model": "parakeet-tdt-0.6b-v3",
+    "language": "en",
+    "initial_prompt": "Good morning, welcome, demonstration, real time, speech translation, English, Slovak, microphone, transcribed, translated, spoken, locally, computer, latency, voice, cloning, quiet room, steady pace, pauses, sentences, numbers, names, technical terms, subtitle, partial results, floating window, virtual microphone, participants, audience, questions, opposite direction, thank you"
+  },
+  "mt": {
+    "engine": "opus-mt",
+    "model": "Helsinki-NLP--opus-mt-en-sk"
+  },
+  "tts": {
+    "engine": "piper",
+    "voice": "sk_SK-personal-male-medium",
+    "fallback": "sk_SK-lili-medium"
+  },
   "clip": "speaker_voices/me_en_script.m4a",
   "reference": null,
-  "license": "commercial-ok",
+  "license": "voice-unverified: default personal voice was fine-tuned from a non-commercial base; fallback sk_SK-lili is CC0",
+  "vad": {
+    "end_of_sentence_gating": true,
+    "silence_timeout_s": 0.25,
+    "max_segment_s": 3.0
+  },
   "notes": "Reference pair. EN in, SK out; SK voice is the owner's fine-tune with a generic fallback."
 }

@@ -2,7 +2,6 @@ import logging
 import sys
 import asyncio
 import threading
-import websockets
 import json
 import numpy as np
 import base64
@@ -11,14 +10,22 @@ import soundfile as sf
 import time
 import os
 from typing import Dict, Any, Optional, Tuple, List, Callable
-from fastapi import FastAPI, Depends, Request # Import Depends, Request
+from fastapi import FastAPI, Depends, Request, WebSocket, WebSocketDisconnect, APIRouter, UploadFile, File, Form, HTTPException # Import Depends, Request
 from pydantic import BaseModel, Field # Import Field
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, OAuth2PasswordRequestForm # Import security components
 import uuid
-from slowapi import Limiter
-from slowapi.util import get_remote_address
+
+# Rate limiter import is optional: rate limiting only enabled via BP_ENABLE_RATE_LIMIT=1.
+try:
+    from slowapi import Limiter
+    from slowapi.util import get_remote_address
+    _SLOWAPI_AVAILABLE = True
+except ImportError:
+    Limiter = None
+    get_remote_address = None
+    _SLOWAPI_AVAILABLE = False
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
@@ -59,13 +66,9 @@ class DeleteVoiceRequest(BaseModel):
 
 # New Pydantic Models for User Authentication
 class UserCreate(BaseModel):
-    username: str = Field(..., min_length=1) # Added username field with min_length validation
-    email: str
-    password: str
-
-class TranslatePhraseRequest(BaseModel): # Moved here from above
-    phrase: str
-    target_lang: str
+    username: str = Field(..., min_length=1, max_length=64)
+    email: str = Field(..., max_length=254, pattern=r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
+    password: str = Field(..., min_length=8, max_length=256)
 
 class UserLogin(BaseModel):
     email: str
@@ -86,10 +89,8 @@ security = HTTPBearer()
 
 # Rate limiter (P1) -- protect auth & upload endpoints
 # ONLY enable if explicitly requested via BP_ENABLE_RATE_LIMIT=1
-import os
-if os.environ.get("BP_ENABLE_RATE_LIMIT") == "1":
-    from slowapi import Limiter
-    from slowapi.util import get_remote_address
+from backend.utils.auth import rate_limit_enabled
+if rate_limit_enabled() and Limiter is not None:
     limiter = Limiter(key_func=get_remote_address)
 else:
     limiter = None
@@ -104,7 +105,7 @@ def rate_limit(limit: str):
     return limiter.limit(limit)
 
 # Engine registry (T010) -- selection + licence gate + instantiation
-from backend.registry import instantiate, select, license_ok, engines as reg_engines
+from backend.registry import instantiate, select, license_ok, engines as reg_engines, target_tts_engine
 
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db_dependency)):
     from backend.utils.auth import decode_access_token
@@ -120,23 +121,6 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
 # os.environ["TORCH_USE_EXTERNAL_FFMPEG"] = "1"
 # logging.info("Backend: TORCH_USE_LIBAV set to 0. TORCH_USE_EXTERNAL_FFMPEG set to 1.")
 
-# Removed explicit FFmpeg environment variable settings as soundfile is now used for audio I/O
-# and torchaudio is no longer a core dependency for the pipeline.
-# os.environ["TORCH_USE_LIBAV"] = "0"
-# os.environ["TORCH_USE_EXTERNAL_FFMPEG"] = "1"
-# logging.info("Backend: TORCH_USE_LIBAV set to 0. TORCH_USE_EXTERNAL_FFMPEG set to 1.")
-
-from fastapi import (
-    WebSocket,
-    WebSocketDisconnect,
-    APIRouter,
-    UploadFile,
-    File,
-    Form,
-    HTTPException,
-    Body,
-    Depends # Import Depends for dependency injection
-)
 from fastapi.responses import FileResponse
 from starlette.responses import JSONResponse
 try:
@@ -164,17 +148,57 @@ DEFAULT_TTS_MODEL = "piper"
 AUDIO_SAMPLE_RATE = 16000 # Standard sample rate for VAD and STT (Reverted to 16000 Hz for VAD/STT compatibility)
 MAX_VOICE_UPLOAD_BYTES = 50 * 1024 * 1024 # /voices/upload had no size cap - unbounded file.read() into memory
 
+# Machine-aware device selection so the pipeline runs anywhere
+# (Mac M1 Pro MPS, NVIDIA CUDA, CPU-only Windows, Kaggle T4).
+# Override via env: BP_DEVICE=cpu|cuda|mps|auto,
+# BP_COMPUTE_TYPE=int8|float16|float32.
+# "auto" self-verifies: probes torch for CUDA/MPS, falls back to cpu.
+def _resolve_device() -> str:
+    # faster-whisper uses CTranslate2, not Torch's MPS backend.
+    requested = os.environ.get("BP_DEVICE", "auto").lower()
+    if requested not in ("auto", "cpu", "cuda"):
+        logging.warning("Unsupported CTranslate2 device %s; using CPU", requested)
+        return "cpu"
+    if requested == "cpu":
+        return "cpu"
+    try:
+        import ctranslate2
+        cuda_available = ctranslate2.get_cuda_device_count() > 0
+    except Exception:
+        cuda_available = False
+    if requested == "cuda" and not cuda_available:
+        raise RuntimeError("BP_DEVICE=cuda requested but CTranslate2 cannot find a CUDA device")
+    return "cuda" if cuda_available else "cpu"
+
+
+BP_DEVICE = _resolve_device()
+BP_COMPUTE_TYPE = os.environ.get("BP_COMPUTE_TYPE", "int8")
+# CTranslate2 MT is CPU/CUDA only (no MPS); default cpu unless explicitly set.
+BP_MT_DEVICE = os.environ.get("BP_MT_DEVICE", "cpu")
+
 
 # Slovak-fine-tuned Whisper small (NaiveNeuron/whisper-small-sk, MIT) converted by scripts/convert_models.py.
 SK_STT_LOCAL_MODEL = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "ct2_models", "whisper-small-sk")
 
 
 def _pick_stt_model(source_lang: str, requested: str) -> str:
-    """Slovak input silently upgrades a plain base/small request to the best Slovak recognizer available.
+    """Pick the STT model for a given source language.
 
-    Order: BP_SK_STT_MODEL (model name or CT2 directory) > the local Slovak-fine-tuned small model > large-v3-turbo.
-    Measured on a 6-core CPU (documentation/model_evaluation_2026-09.md): tuned small WER 0.26 at RTF 0.33,
-    large-v3-turbo 0.44 at RTF ~1, plain small 0.62 at RTF 0.30.
+    SK source (SK→EN): whisper-small-sk is NOT a safe default — it produces
+    Czech-like hallucinations (WER 0.25–0.32 > 0.2 quality gate, measured on
+    bench/results 2026-11-02). Require an explicit quality tier via the
+    BP_SK_STT_MODEL env var (e.g. kinit/whisper-large-v3-turbo-sk, ~6–13%
+    WER per SloPal 2026, ~800 MB model). Falls back to whisper-small-sk only
+    when the tier is not set, and the caller marks the direction experimental.
+
+    EN source (EN→SK): requested size (base/small) is fine — English STT is
+    accurate and fast.
+
+    Order: BP_SK_STT_MODEL env var (model name or CT2 directory) >
+           per-pack requested model > local fine-tuned small > small-sk.
+    Set BP_SK_STT_MODEL=kinit/whisper-large-v3-turbo-sk for the quality tier.
+    Faster-whisper downloads HF model names on first use; CT2 dirs must be
+    converted with scripts/convert_models.py.
     """
     if source_lang.startswith("sk") and requested in ("base", "small", DEFAULT_STT_MODEL_SIZE):
         env = os.environ.get("BP_SK_STT_MODEL")
@@ -182,29 +206,34 @@ def _pick_stt_model(source_lang: str, requested: str) -> str:
             return env
         if os.path.exists(os.path.join(SK_STT_LOCAL_MODEL, "model.bin")):
             return SK_STT_LOCAL_MODEL
-        return "large-v3-turbo"
+        return "small-sk"
     return requested
 
 # VAD Configuration (matching BP xtts)
 VAD_FRAME_DURATION = 20 # ms - BP xtts uses 20ms frames
-VAD_AGGRESSIVENESS = 3 # Mode 3 (Most Aggressive) - Increased from 1 for noisy environments
+VAD_AGGRESSIVENESS = 2 # Mode 2 (Balanced) - sensitive enough for quiet speech, still rejects noise
 # Max open-segment bound (measured 2026-09-29): dense pause-free speech never trips
 # SILENCE_TIMEOUT, so transcripts waited for teardown (~24s). Force-close every
 # MAX_SEGMENT_S of continuous speech; next voiced frame opens a chained segment.
 # This bounds the worst case, it is not the streaming mechanism (pauses + interim
 # path give the real-time feel). 6s keeps typical sentences whole (MT quality)
 # while capping dense-speech wait at ~7s incl. STT.
-MAX_SEGMENT_S = 6.0
+MAX_SEGMENT_S = 3.0
 # MIN_SPEECH_DURATION removed - BP xtts doesn't filter by duration
-SILENCE_TIMEOUT = 0.3 # seconds (reduced from 1.0s for better responsiveness)
-STREAMING_CHUNK_LENGTH = 0.5 # seconds
+SILENCE_TIMEOUT = 0.25 # seconds (reduced from 1.0s for better responsiveness)
+# STT window for streaming chunk processing. Whisper needs sentence-level
+# context (>= ~1.5s) for accurate transcription; 0.5s chunks produce
+# fragmented, low-accuracy output (the "word at a time" effect). 2.0s keeps
+# near-real-time feel while giving Whisper enough context for coherent phrases.
+# VAD itself runs on 20ms frames; this window only gates STT input.
+STREAMING_CHUNK_LENGTH = float(os.environ.get("BP_STREAMING_CHUNK_S", "2.0"))
 
 # Pre-VAD Silence Detection Configuration
 # Threshold calibrated based on user testing:
 # - Finger clicks: ~0.015 (should block)
 # - User speech: ~0.05-0.06 (should allow)
 # - Background noise: ~0.002 (should block)
-SILENCE_RMS_THRESHOLD = 0.02  # Lowered to allow quieter speech through (was 0.04, then 0.08)
+SILENCE_RMS_THRESHOLD = float(os.environ.get("BP_SILENCE_RMS", "0.005"))  # RMS pre-filter: blocks background noise from triggering VAD/STT false positives
 PRE_VAD_BUFFER_DURATION = 0.5 # seconds, how much audio to buffer before checking RMS
 
 # Speaker Voices Directory and Metadata
@@ -342,10 +371,10 @@ def release_pooled_model(stage: str, engine: str, **config) -> bool:
         return False
     
     _model_pool[key]["ref_count"] -= 1
-    _model_pool[key]["last_used"] = time.time()
     
     if _model_pool[key]["ref_count"] <= 0:
-        # Check idle TTL
+        # Check idle TTL against last_used (do not reset it here — that would
+        # make the TTL check always ~0 and the delete dead code).
         idle_ttl = MODEL_POOL_CONFIG.get(stage, {}).get("idle_ttl_s", 300)
         if time.time() - _model_pool[key]["last_used"] >= idle_ttl:
             del _model_pool[key]
@@ -367,13 +396,13 @@ def cleanup_session_models(client_info: str):
     # Release STT
     if session_data.get("stt_model"):
         stt_size = config.get("stt_model_size", "base")
-        release_pooled_model("stt", "faster_whisper", model_size=stt_size)
+        release_pooled_model("stt", config.get("stt_engine", "faster_whisper"), **session_data.get("stt_pool_config", {"model_size": stt_size}))
     
     # Release MT models
     for mt_key, mt_model in session_data.get("mt_models", {}).items():
         if mt_model:
             src, tgt = mt_key.split("-", 1)
-            release_pooled_model("mt", "opus-mt", source=src, target=tgt)
+            release_pooled_model("mt", config.get("mt_engine", "opus-mt"), source=src, target=tgt, device=BP_MT_DEVICE)
     
     # Release TTS
     if session_data.get("tts_engine"):
@@ -436,6 +465,21 @@ def get_session_lock(client_info: str) -> asyncio.Lock:
     return _session_locks[client_info]
 
 # --- Helper Functions for Speaker Metadata ---
+def authorize_speaker_wav(path: Optional[str], user_id: int) -> Optional[str]:
+    """Client-selected voice references require ownership, not just a safe directory."""
+    if not path:
+        return None
+    safe = _safe_speaker_wav(path)
+    if not safe:
+        raise HTTPException(status_code=403, detail="Voice reference is not available")
+    name = os.path.basename(safe)
+    entry = next((v for v in _read_speaker_voices_metadata()
+                  if (v.get("filename") or os.path.basename(v.get("path", ""))) == name), None)
+    if not entry or not (entry.get("public_demo") is True or entry.get("user_id") == user_id):
+        raise HTTPException(status_code=403, detail="Voice reference is not owned by this user")
+    return safe
+
+
 def _read_speaker_voices_metadata() -> list[Dict[str, Any]]:
     """Reads the speaker voices metadata from the JSON file."""
     logging.debug(f"Backend: Checking for metadata file at: {SPEAKER_VOICES_METADATA_FILE}")
@@ -494,41 +538,43 @@ async def _convert_mt_model(model_name: str, websocket: Optional[WebSocket] = No
     
     logging.info(f"Backend: Successfully converted {model_name} to CTranslate2 format.")
 
-def _save_audio_segment_for_debug(audio_segment_np: np.ndarray, filename_prefix: str, is_final: bool):
-    """Saves an audio segment to a WAV file for debugging."""
-    output_dir = "test_output"
-    os.makedirs(output_dir, exist_ok=True)
-    timestamp = int(time.time() * 1000)
-    final_tag = "final" if is_final else "streaming"
-    filename = os.path.join(output_dir, f"{filename_prefix}_{final_tag}_{timestamp}.wav")
-    try:
-        sf.write(filename, audio_segment_np, AUDIO_SAMPLE_RATE)
-        logging.debug(f"Backend: Saved debug audio segment to {filename}")
-    except Exception as e:
-        logging.error(f"Backend: Failed to save debug audio segment to {filename}: {e}")
-
 # --- Model Initialization Functions ---
+def local_stt_source(model: str) -> str:
+    """Resolve STT model: local CT2 dir first, then HF name (for BP_SK_STT_MODEL quality tier)."""
+    from faster_whisper.utils import download_model
+    candidates = (model, os.path.join("ct2_models", f"whisper-{model}"))
+    for directory in candidates:
+        if os.path.isfile(os.path.join(directory, "model.bin")):
+            return os.path.abspath(directory)
+    # Not a local CT2 dir — treat as a HuggingFace model name (e.g. kinit/whisper-large-v3-turbo-sk)
+    try:
+        return download_model(model, local_files_only=False)
+    except Exception:
+        raise HTTPException(status_code=409, detail=f"STT assets missing for {model}. Run approved setup first; no runtime download was started.")
+
+
 async def _initialize_stt_model(session_data: Dict[str, Any], stt_model_size: str = DEFAULT_STT_MODEL_SIZE):
     """Initializes the STT model for a given session via the engine registry.
     Engine name comes from session_config['stt_engine'] or defaults to 'faster_whisper'."""
     config = session_data.get("session_config", {})
     stt_engine = config.get("stt_engine", "faster_whisper")
+    if stt_engine == "faster_whisper":
+        stt_model_size = local_stt_source(stt_model_size)
+        config["stt_model_size"] = stt_model_size
+    beam = int(config.get("beam_size", os.environ.get("BP_STT_BEAM_SIZE", "5")))
+    pool_config = {"model_size": stt_model_size, "device": config.get("stt_device", BP_DEVICE),
+                   "compute_type": config.get("stt_compute_type", BP_COMPUTE_TYPE), "beam_size": beam}
     current_stt_model = session_data.get("stt_model")
-    if current_stt_model is None or getattr(current_stt_model, "model_size", None) != stt_model_size:
+    if current_stt_model is None or session_data.get("stt_pool_config") != pool_config:
         init_start = time.perf_counter()
         logging.info(f"Backend: Session {session_data['client_info']}: Getting pooled {stt_engine} STT model '{stt_model_size}' at {time.strftime('%H:%M:%S', time.localtime(init_start))}...")
-        beam = int(os.environ.get("BP_STT_BEAM_SIZE", "5"))
-        # Allow per-pack beam_size override
-        if "beam_size" in config:
-            beam = int(config["beam_size"])
-        
         def stt_factory():
-            model = instantiate("stt", stt_engine, model_size=stt_model_size)
-            if hasattr(model, "beam_size"):
-                model.beam_size = beam
-            return model
-        
-        session_data["stt_model"], is_new = await get_pooled_model("stt", stt_engine, stt_factory, model_size=stt_model_size)
+            return instantiate("stt", stt_engine, **pool_config)
+        if session_data.get("stt_pool_config"):
+            release_pooled_model("stt", stt_engine, **session_data["stt_pool_config"])
+        session_data["stt_model"], is_new = await get_pooled_model(
+            "stt", stt_engine, stt_factory, **pool_config)
+        session_data["stt_pool_config"] = pool_config
         init_end = time.perf_counter()
         logging.info(f"Backend: Session {session_data['client_info']}: STT {'created' if is_new else 'reused'} at {time.strftime('%H:%M:%S', time.localtime(init_end))}. Duration: {init_end - init_start:.2f}s")
     else:
@@ -541,11 +587,12 @@ async def _initialize_captioner(session_data: Dict[str, Any], source_lang: str):
     break the real STT/MT/TTS pipeline, which doesn't depend on this at all."""
     if session_data.get("captioner") is not None:
         return
-    if not STREAMING_CAPTIONS_AVAILABLE:
+    if not STREAMING_CAPTIONS_AVAILABLE or os.environ.get("BP_ENABLE_STREAMING_CAPTIONS") != "1":
         return
     try:
+        base_model_dir = local_stt_source("base")
         init_start = time.perf_counter()
-        session_data["captioner"] = SessionCaptioner(source_lang=source_lang)
+        session_data["captioner"] = SessionCaptioner(source_lang=source_lang, model_dir=base_model_dir)
         logging.info(f"Backend: Session {session_data['client_info']}: SessionCaptioner initialized in {time.perf_counter() - init_start:.2f}s.")
     except Exception as e:
         logging.error(f"Backend: Session {session_data['client_info']}: SessionCaptioner init failed, captions disabled for this session: {e}")
@@ -575,20 +622,8 @@ async def _initialize_mt_model(session_data: Dict[str, Any], source_lang: str, t
             if model_key in mt_models_for_session and getattr(mt_models_for_session[model_key], "ctranslate2_model_dir", None) == mt_model_path:
                 logging.info(f"Backend: Session {session_data['client_info']}: CTranslate2MT for {model_key} already initialized by another task.")
                 return
-            if not os.path.exists(mt_model_path):
-                logging.info(f"Backend: Session {session_data['client_info']}: MT model not found locally at {mt_model_path}. Attempting dynamic conversion for {mt_model_name}...")
-                if websocket:
-                    await websocket.send_text(json.dumps({"type": "mt_conversion_status", "status": "started", "model_name": mt_model_name}))
-                try:
-                    await _convert_mt_model(mt_model_name, websocket)
-                    logging.info(f"Backend: Session {session_data['client_info']}: Dynamic conversion for {mt_model_name} completed successfully.")
-                    if websocket:
-                        await websocket.send_text(json.dumps({"type": "mt_conversion_status", "status": "completed", "model_name": mt_model_name}))
-                except Exception as e:
-                    logging.error(f"Backend: Session {session_data['client_info']}: ERROR: Dynamic conversion failed for {mt_model_name}: {e}")
-                    if websocket:
-                        await websocket.send_text(json.dumps({"type": "mt_conversion_status", "status": "failed", "model_name": mt_model_name, "error": str(e)}))
-                    raise HTTPException(status_code=500, detail=f"Failed to dynamically convert MT model {mt_model_name}: {e}")
+            if not all(os.path.isfile(os.path.join(mt_model_path, name)) for name in ("model.bin", "tokenizer_config.json")):
+                raise HTTPException(status_code=409, detail=f"MT assets missing for {model_key}. Run the approved setup/conversion before initializing; no runtime download was started.")
 
             init_start = time.time()
             logging.info(f"Backend: Session {session_data['client_info']}: Getting pooled MT for {model_key} at {time.strftime('%H:%M:%S', time.localtime(init_start))}...")
@@ -600,11 +635,11 @@ async def _initialize_mt_model(session_data: Dict[str, Any], source_lang: str, t
                 allow_unk = config.get("allow_unknown_license", False)
                 
                 def mt_factory():
-                    return instantiate("mt", mt_engine, model_path=mt_model_path, device="cpu",
+                    return instantiate("mt", mt_engine, model_path=mt_model_path, device=BP_MT_DEVICE,
                                       allow_noncommercial=allow_nc, allow_unknown=allow_unk)
                 
                 mt_models_for_session[model_key], is_new = await get_pooled_model(
-                    "mt", mt_engine, mt_factory, source=source_lang, target=target_lang
+                    "mt", mt_engine, mt_factory, source=source_lang, target=target_lang, device=BP_MT_DEVICE
                 )
                 init_end = time.time()
                 logging.info(f"Backend: Session {session_data['client_info']}: MT {'created' if is_new else 'reused'} on CPU at {time.strftime('%H:%M:%S', time.localtime(init_end))}. Duration: {init_end - init_start:.2f}s")
@@ -623,6 +658,9 @@ async def _initialize_mt_model(session_data: Dict[str, Any], source_lang: str, t
 async def _initialize_tts_models(session_data: Dict[str, Any], tts_model_choice: str, speaker_wav_path: Optional[str], speaker_text: Optional[str], speaker_lang: Optional[str]):
     """Initializes the selected TTS engine for a session via the TTS_ENGINES registry
     (backend/tts/base.py) — to add/remove an engine, edit that registry, not this function."""
+    target = (session_data.get("session_config") or {}).get("target_lang", "")
+    tts_model_choice = target_tts_engine(tts_model_choice, target)
+    session_data["session_config"]["tts_model_choice"] = tts_model_choice
     # Licence gate flags from session config
     allow_nc = session_data.get("session_config", {}).get("allow_noncommercial", False)
     allow_unk = session_data.get("session_config", {}).get("allow_unknown_license", False)
@@ -648,18 +686,6 @@ async def _initialize_tts_models(session_data: Dict[str, Any], tts_model_choice:
         session_data["tts_engine_name"] = None
         return
 
-    # Measured default (2026-09-27): SK output speaks with the user's own
-    # fine-tuned voice instead of the Czech generic base. Explicit engine
-    # choices (hybrid, xtts, ...) pass through untouched.
-    target = (session_data.get("session_config") or {}).get("target_lang", "")
-    if tts_model_choice == "piper" and target.startswith("sk"):
-        tts_model_choice = "piper_sk_personal"
-        # SANDBOX-FIX (2026-09-28): write the effective choice back, same pattern as
-        # the STT size upgrade in initialize_all_models. Without this, tts_engine_name
-        # ('piper_sk_personal') never equals session_config['tts_model_choice'] ('piper'),
-        # so every lookup reports "TTS not initialized" and no synthesis ever runs.
-        session_data["session_config"]["tts_model_choice"] = tts_model_choice
-
     if session_data.get("tts_engine") is not None and session_data.get("tts_engine_name") == tts_model_choice:
         logging.info(f"Backend: Session {session_data['client_info']}: TTS engine '{tts_model_choice}' already initialized.")
         return
@@ -674,13 +700,6 @@ async def _initialize_tts_models(session_data: Dict[str, Any], tts_model_choice:
         session_data["session_config"]["tts_model_choice"] = tts_model_choice
         init_end = time.time()
         logging.info(f"Backend: Session {session_data['client_info']}: TTS {'created' if is_new else 'reused'} at {time.strftime('%H:%M:%S', time.localtime(init_end))}. Duration: {init_end - init_start:.2f}s.")
-    except Exception as e:
-        logging.error(f"Backend: Session {session_data['client_info']}: ERROR: Failed to initialize TTS engine '{tts_model_choice}': {e}")
-        session_data["tts_engine"] = None
-        session_data["tts_engine_name"] = None
-        raise
-        init_end = time.time()
-        logging.info(f"Backend: Session {session_data['client_info']}: TTS engine '{tts_model_choice}' initialized at {time.strftime('%H:%M:%S', time.localtime(init_end))}. Duration: {init_end - init_start:.2f}s.")
     except Exception as e:
         logging.error(f"Backend: Session {session_data['client_info']}: ERROR: Failed to initialize TTS engine '{tts_model_choice}': {e}")
         session_data["tts_engine"] = None
@@ -714,6 +733,27 @@ async def initialize_all_models(client_info: str, source_lang: str, target_lang:
     """Initializes all necessary models (STT, MT, TTS, VAD) for a given session."""
     speaker_wav_path = _safe_speaker_wav(speaker_wav_path)  # shared choke point: HTTP /initialize and WebSocket
 
+    # --- Resolve language pack for per-language VAD/timing config ---
+    pack = None
+    try:
+        from scripts.language_packs import load as _load_pack
+        pack = _load_pack(f"{source_lang}-{target_lang}")   # the pack file itself: carries the `vad` block
+    except Exception:
+        pack = None  # no pack for this pair: global defaults below
+
+    from backend.latency_profiles import resolve_profile
+    pack, profile_name = resolve_profile(pack or {}, os.environ.get("BP_PROFILE", "default"))
+    profile_stt = pack.get("stt", {}) if profile_name != "default" else {}
+    stt_model_size = profile_stt.get("model", stt_model_size)
+    pack_vad = pack.get("vad", {})
+    # Precedence: env override > language pack > module default. The session usually exists already
+    # (handle_audio_stream creates it first), so these must also be applied in the .update() below.
+    vad_silence_s = float(os.environ.get("BP_VAD_SILENCE_S") or pack_vad.get("silence_timeout_s", SILENCE_TIMEOUT))
+    vad_max_segment_s = float(os.environ.get("BP_VAD_MAX_SEGMENT_S") or pack_vad.get("max_segment_s", MAX_SEGMENT_S))
+    barge_in = os.environ.get("BP_BARGE_IN") == "1"
+    # Incremental (simultaneous) mode: translate agreed words while the speaker is still talking.
+    incremental = (os.environ.get("BP_INCREMENTAL") or str(pack_vad.get("incremental", ""))).lower() in ("1", "true")
+
     session_data = active_sessions.setdefault(client_info, {
         "client_info": client_info,
         "stt_model": None,
@@ -725,6 +765,7 @@ async def initialize_all_models(client_info: str, source_lang: str, target_lang:
         "model_call_lock": asyncio.Lock(),  # T046
         "captioner": None,  # T044
         "captioner_lock": asyncio.Lock(),  # T044
+        "last_transcription_text": None,  # Last non-empty streaming transcription, promoted to final if the tail segment is too short
         "session_config": { # Store a copy of the config for easy access
             "source_lang": source_lang,
             "target_lang": target_lang,
@@ -734,8 +775,46 @@ async def initialize_all_models(client_info: str, source_lang: str, target_lang:
             "speaker_text": speaker_text,
             "speaker_lang": speaker_lang,
             "vad_enabled": vad_enabled_param,
+            # Per-language VAD/timing config (German-style end-of-sentence gating for all languages)
+            "vad_silence_timeout_s": vad_silence_s,
+            "vad_max_segment_s": vad_max_segment_s,
+            "barge_in": barge_in,
+            "incremental": incremental,
+            "vad_end_of_sentence_gating": pack_vad.get("end_of_sentence_gating", True),
+            "language_pack": pack or {},
         }
     })
+
+    session_data["session_config"].update({
+        "source_lang": source_lang,
+        "target_lang": target_lang,
+        "tts_model_choice": tts_model_choice,
+        "stt_model_size": stt_model_size,
+        "speaker_wav_path": speaker_wav_path,
+        "speaker_text": speaker_text,
+        "speaker_lang": speaker_lang,
+        "vad_enabled": vad_enabled_param,
+        "vad_silence_timeout_s": vad_silence_s,
+        "vad_max_segment_s": vad_max_segment_s,
+        "vad_end_of_sentence_gating": pack_vad.get("end_of_sentence_gating", True),
+        "barge_in": barge_in,
+        "incremental": incremental,
+        "language_pack": pack or {},
+    })
+
+    # Set and clear profile-only options even when a session already exists.
+    config = session_data["session_config"]
+    if config.get("latency_profile", "default") != "default":
+        for key in ("stt_device", "stt_compute_type", "beam_size"):
+            config.pop(key, None)
+    config["latency_profile"] = profile_name
+    for source, dest in (("device", "stt_device"), ("compute_type", "stt_compute_type"), ("beam_size", "beam_size")):
+        if source in profile_stt:
+            config[dest] = profile_stt[source]
+    # Language pack engine takes precedence over hardware-scan default:
+    # Parakeet for EN source, Whisper small-sk for SK/CS source.
+    if "engine" in profile_stt:
+        config["stt_engine"] = profile_stt["engine"]
 
     logging.info(f"Backend: Session {client_info}: Initializing models at {time.strftime('%H:%M:%S', time.localtime(time.time()))}...")
 
@@ -743,6 +822,12 @@ async def initialize_all_models(client_info: str, source_lang: str, target_lang:
     if upgraded != stt_model_size:
         stt_model_size = upgraded
         session_data["session_config"]["stt_model_size"] = stt_model_size
+
+    # A model override is not an evaluation receipt. Every route stays experimental
+    # until its full current STT/MT/TTS path has matching reviewed evidence.
+    session_data["session_config"]["stt_experimental_sk"] = source_lang.startswith("sk")
+    session_data["route_status"] = {"pair": f"{source_lang}-{target_lang}",
+        "status": "experimental", "reason": "Models may be ready; full live route quality and cloned-voice acceptance remain unverified."}
     await _initialize_stt_model(session_data, stt_model_size)
     await _initialize_mt_model(session_data, source_lang, target_lang, websocket)
     if source_lang != "en" and source_lang != target_lang: # Also initialize en-target for auto-detection fallback, but only if not already the target
@@ -752,12 +837,38 @@ async def initialize_all_models(client_info: str, source_lang: str, target_lang:
     await _initialize_captioner(session_data, source_lang)  # T044, best-effort, never blocks the above
 
     logging.info(f"Backend: Session {client_info}: All models initialized (or attempted to initialize) at {time.strftime('%H:%M:%S', time.localtime(time.time()))}.")
-    return {"status": "success", "message": "Models initialization triggered."}
+    return {"status": "success", "message": "Models initialized.", "route_status": session_data["route_status"]}
+
+@router.get("/routes", summary="Declared routes and installed assets; no model loading")
+async def route_inventory():
+    from scripts.language_packs import all_packs, resolve
+    routes = []
+    for pack in all_packs():
+        assets = resolve(pack)
+        stt_cfg = pack.get("stt", {})
+        # local_stt_source only applies to faster_whisper; Parakeet models are downloaded
+        # from HuggingFace at runtime by transformers and don't live under ct2_models/
+        if stt_cfg.get("engine") == "faster_whisper":
+            try:
+                assets["stt"] = local_stt_source(stt_cfg.get("model", ""))
+            except HTTPException as exc:
+                assets["stt"] = None
+                assets["errors"].append(exc.detail)
+        else:
+            assets["stt"] = stt_cfg.get("model")
+        assets["resolved"] = not assets["errors"]
+        routes.append({"pair": pack["pair"], "source": pack["source"], "target": pack["target"],
+            "assets": assets, "route_status": {"pair": pack["pair"], "status": "experimental",
+            "reason": "Full live route acceptance is pending."}})
+    return {"routes": routes}
+
 
 # --- Voice Management Endpoints ---
 @router.post("/register", summary="Register a new user")
 @rate_limit("5/minute")
 async def register_user(request: Request, user: UserCreate, db: Session = Depends(get_db_dependency)):
+    if user.email.strip().lower().endswith("@guest.local"):
+        raise HTTPException(status_code=400, detail="That email address is reserved.")
     db_user_email = db.query(User).filter(User.email == user.email).first()
     if db_user_email:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -805,7 +916,46 @@ async def login(request: Request, user_login: UserLogin, db: Session = Depends(g
 async def auth_config():
     """Lets the frontend decide whether to render the real Google button.
     Inert when GOOGLE_CLIENT_ID is unset — password login keeps working."""
-    return {"google_client_id": os.environ.get("GOOGLE_CLIENT_ID")}
+    return {"google_client_id": os.environ.get("GOOGLE_CLIENT_ID"), "guest_enabled": guest_enabled()}
+
+
+GUEST_EMAIL = "guest@guest.local"
+
+
+def guest_enabled() -> bool:
+    """Guest sessions let anyone try the translator without an account. On by default; BP_GUEST=0 turns them off.
+    Abuse limits: 20 guest tokens/minute per client, 2-hour tokens, at most BP_GUEST_MAX_SESSIONS live sockets."""
+    flag = (os.environ.get("BP_GUEST") or "").strip().lower()
+    return flag not in ("0", "false", "no")
+
+
+def _log_text(text) -> str:
+    """Spoken words are personal data: server logs carry lengths, not content, unless BP_LOG_SESSIONS=1."""
+    if os.environ.get("BP_LOG_SESSIONS") == "1":
+        return repr(text)
+    return f"<{len(text or '')} chars>"
+
+
+def _deny_guest(user: "User") -> None:
+    """Guests may translate but never touch stored voices (recordings belong to real accounts)."""
+    if user.email == GUEST_EMAIL:
+        raise HTTPException(status_code=403, detail="Guest sessions cannot manage voices. Create an account to prepare a personal voice.")
+
+
+@router.post("/guest", summary="Start a guest demo session (no account)")
+@rate_limit("20/minute")
+async def guest_session(request: Request, db: Session = Depends(get_db_dependency)):
+    if not guest_enabled():
+        raise HTTPException(status_code=403, detail="Guest sessions are disabled on this server.")
+    user = db.query(User).filter(User.email == GUEST_EMAIL).first()
+    if user is None:
+        # Empty password hash: password login can never match (see verify_password), so this row is token-only.
+        user = User(username="guest", email=GUEST_EMAIL, hashed_password="")
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+    from backend.utils.auth import create_access_token
+    return {"message": "Guest session", "token": create_access_token(user.email, hours=2), "username": "Guest", "email": user.email, "guest": True}
 
 @router.post("/auth/google", summary="Login with a Google ID token")
 @rate_limit("10/minute")
@@ -845,6 +995,9 @@ async def login_with_google(request: Request, body: GoogleAuthRequest, db: Sessi
             db.add(user)
             db.commit()
             db.refresh(user)
+        elif user.hashed_password and not user.google_sub:
+            # A password account created with an unverified address must not be taken over (or kept alive) by linking.
+            raise HTTPException(status_code=409, detail="An account with this email already uses a password. Sign in with email and password.")
         else:
             user.google_sub = sub
             db.commit()
@@ -868,6 +1021,7 @@ async def upload_voice(
     """
     Uploads a new speaker voice file and saves its metadata.
     """
+    _deny_guest(current_user)
     if not voice_name:
         raise HTTPException(status_code=400, detail="Voice name cannot be empty.")
 
@@ -892,12 +1046,16 @@ async def upload_voice(
     file_path = os.path.join(SPEAKER_VOICES_DIR, filename)
 
     try:
-        contents = await file.read()
-        if len(contents) > MAX_VOICE_UPLOAD_BYTES:
-            raise HTTPException(
-                status_code=413,
-                detail=f"Voice upload too large ({len(contents) / 1_000_000:.1f}MB > {MAX_VOICE_UPLOAD_BYTES / 1_000_000:.0f}MB limit).",
-            )
+        chunks, total = [], 0
+        while True:
+            chunk = await file.read(1024 * 1024)
+            if not chunk:
+                break
+            total += len(chunk)
+            if total > MAX_VOICE_UPLOAD_BYTES:   # stop reading at the cap instead of buffering the whole body
+                raise HTTPException(status_code=413, detail=f"Voice upload too large (limit {MAX_VOICE_UPLOAD_BYTES / 1_000_000:.0f} MB).")
+            chunks.append(chunk)
+        contents = b"".join(chunks)
 
         # Use a BytesIO object for the input to ffmpeg
         input_audio_buffer = io.BytesIO(contents)
@@ -916,6 +1074,7 @@ async def upload_voice(
                 "-acodec", "pcm_s16le", # PCM 16-bit little-endian
                 "-ar", str(AUDIO_SAMPLE_RATE), # Sample rate
                 "-ac", "1", # Mono audio
+                "-t", "120", # cap decoded length (seconds)
                 "pipe:1" # Output to stdout
             ]
 
@@ -932,7 +1091,11 @@ async def upload_voice(
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE
             )
-            stdout, stderr = await process.communicate(input=input_audio_buffer.getvalue())
+            try:
+                stdout, stderr = await asyncio.wait_for(process.communicate(input=input_audio_buffer.getvalue()), timeout=60)
+            except asyncio.TimeoutError:
+                process.kill()
+                raise RuntimeError("FFmpeg conversion timed out")
 
             if process.returncode != 0:
                 error_message = f"FFmpeg conversion failed. STDOUT: {stdout.decode().strip()}, STDERR: {stderr.decode().strip()}" # type: ignore
@@ -954,7 +1117,7 @@ async def upload_voice(
 
         except Exception as e:
             logging.error(f"Backend: Error during FFmpeg conversion or audio processing for voice '{voice_name}': {e}") # type: ignore
-            raise HTTPException(status_code=500, detail=f"Failed to process uploaded audio: {e}") # type: ignore
+            raise HTTPException(status_code=500, detail="Failed to process the uploaded audio. Use a clear WAV, MP3, M4A or WebM recording.") # type: ignore
 
         # Update metadata
         new_voice_entry = {
@@ -1014,7 +1177,6 @@ async def process_session(
         base = os.path.basename(entry["path"])
         root, _ = os.path.splitext(base)
         out_wav = os.path.join(out_dir, root + "_22k.wav")
-        import soundfile as sf
         sf.write(out_wav, wav, 22050)
         entries.append({"id": entry["name"], "language": body.speaker_lang,
                         "name": entry["name"], "path": os.path.basename(out_wav),
@@ -1034,6 +1196,7 @@ async def rename_voice(
     """
     Renames an existing speaker voice file and updates its metadata.
     """
+    _deny_guest(current_user)
     metadata = _read_speaker_voices_metadata()
     
     # 1. Find all voices with the requested name
@@ -1085,6 +1248,7 @@ async def delete_voice(
     """
     Deletes a speaker voice file and removes its metadata.
     """
+    _deny_guest(current_user)
     metadata = _read_speaker_voices_metadata()
     updated_metadata = []
     voice_deleted = False
@@ -1137,14 +1301,14 @@ async def get_voices(
         # Authenticated: return default voices + user's voices
         user_voices = [
             {"id": v.get("id", str(uuid.uuid4())), "name": v["name"], "filename": v.get("filename") or os.path.basename(v.get("path", "")) or "unknown_filename.wav", "path": v.get("path", "unknown_path"), "language": v.get("language", "unknown"), "upload_time": v.get("upload_time", 0)}
-            for v in metadata if v.get("user_id") is None or v.get("user_id") == current_user.id
+            for v in metadata if v.get("public_demo") is True or v.get("user_id") == current_user.id
         ]
         logging.info(f"Backend: Retrieved {len(user_voices)} voices for authenticated user {current_user.id}")
     else:
         # Unauthenticated: return only default voices
         user_voices = [
             {"id": v.get("id", str(uuid.uuid4())), "name": v["name"], "filename": v.get("filename") or os.path.basename(v.get("path", "")) or "unknown_filename.wav", "path": v.get("path", "unknown_path"), "language": v.get("language", "unknown"), "upload_time": v.get("upload_time", 0)}
-            for v in metadata if v.get("user_id") is None
+            for v in metadata if v.get("public_demo") is True
         ]
         logging.info(f"Backend: Retrieved {len(user_voices)} default voices for unauthenticated user")
     
@@ -1170,7 +1334,7 @@ async def get_voice_file(
     entry = next((v for v in metadata if v.get("filename") == filename), None)
     if entry is None:
         raise HTTPException(status_code=404, detail="Voice not found.")
-    if entry.get("user_id") is not None and (current_user is None or entry.get("user_id") != current_user.id):
+    if entry.get("public_demo") is not True and (current_user is None or entry.get("user_id") != current_user.id):
         raise HTTPException(status_code=403, detail="Not your voice.")
     path = _voice_path(filename)
     if not os.path.isfile(path):
@@ -1215,6 +1379,7 @@ async def post_rating(body: RatingIn, current_user: User = Depends(get_current_u
     """Merge one Lab verdict into processed/ear_grades.json. The item must
     already exist in the store (run scripts/grade_library.py first); the note
     is capped, defect values are validated. Returns the stored ear slot."""
+    _deny_guest(current_user)
     store = _read_ear_grades()
     grades = store.get("grades", [])
     entry = next((g for g in grades if g.get("name") == body.name), None)
@@ -1410,7 +1575,10 @@ _session_log_files: Dict[str, Any] = {}
 def _log_session_event(client_info: str, event: Dict[str, Any]):
     """Append-only JSONL log per WebSocket session (transcripts, translations,
     captions, latencies) for later accuracy review. Never raises — logging must
-    not break the pipeline. Files: processed/sessions/<stamp>_<client>.jsonl"""
+    not break the pipeline. Files: processed/sessions/<stamp>_<client>.jsonl
+    Opt-in (BP_LOG_SESSIONS=1): transcripts of meetings are personal data, so nothing is written by default."""
+    if os.environ.get("BP_LOG_SESSIONS") != "1":
+        return
     try:
         f = _session_log_files.get(client_info)
         if f is None or f.closed:
@@ -1424,9 +1592,30 @@ def _log_session_event(client_info: str, event: Dict[str, Any]):
     except Exception as e:
         logging.warning(f"Backend: session log write failed (non-fatal): {e}")
 
+def _queue_pre_vad_audio(audio, queue, pending, threshold_met):
+    """Admit each sample once; a disabled RMS gate must not add latency."""
+    if threshold_met or SILENCE_RMS_THRESHOLD <= 0:
+        queue.extend(audio)
+        return True
+    pending.extend(audio)
+    if len(pending) < int(AUDIO_SAMPLE_RATE * PRE_VAD_BUFFER_DURATION):
+        return False
+    buffered = np.nan_to_num(np.asarray(pending, dtype=np.float32),
+                             nan=0.0, posinf=0.0, neginf=0.0)
+    admitted = bool(np.sqrt(np.mean(buffered ** 2)) > SILENCE_RMS_THRESHOLD)
+    if admitted:
+        queue.extend(buffered)
+    pending.clear()
+    return admitted
+
+
 async def _process_speech_segment_pipeline(
     websocket: WebSocket, audio_segment_np: np.ndarray, segment_start_time: float, is_final: bool = True,
-    session_config: Dict[str, Any] = None # Add session_config parameter
+    session_config: Dict[str, Any] = None, # Add session_config parameter
+    tts_seq: Optional[int] = None,  # emission order: TTS of segment N may not start before segment N-1 finished
+    pretranscribed: Optional[str] = None,  # incremental mode: text already agreed by the streaming transcriber, skip STT
+    source_span: Optional[tuple] = None,  # stream-clock (start_s, end_s) of the source words, reported to clients
+    source_onset_time: Optional[float] = None  # server-clock first source sample of this utterance
 ):
     """Processes a detected speech segment: STT -> MT -> TTS -> Send audio."""
     if session_config is None:
@@ -1463,8 +1652,16 @@ async def _process_speech_segment_pipeline(
         # Do not send message if session is not found, as websocket might be closed
         return
 
+    capture_generation = session_data.get("capture_generation", 0)
+
+    first_audio_sent_time = None
+
     # Helper to safely send messages
     async def safe_send(message_type: str, payload: Dict[str, Any], is_bytes: bool = False):
+        nonlocal first_audio_sent_time
+        if (not session_data.get("capture_active", True)
+                or session_data.get("capture_generation", 0) != capture_generation):
+            return
         # Check if the WebSocket is still connected before sending
         if websocket.client_state == WebSocketState.DISCONNECTED:
             logging.debug(f"Backend: WebSocket for {websocket.scope['client'][0]}:{websocket.scope['client'][1]} is disconnected. Skipping send of {message_type}.")
@@ -1472,6 +1669,8 @@ async def _process_speech_segment_pipeline(
         try:
             if is_bytes:
                 await websocket.send_bytes(payload)
+                if first_audio_sent_time is None:
+                    first_audio_sent_time = time.perf_counter()
                 _log_session_event(client_info, {"type": message_type, "dir": "out",
                     "bytes": len(payload) if hasattr(payload, "__len__") else -1})
             else:
@@ -1494,20 +1693,31 @@ async def _process_speech_segment_pipeline(
     # The lock also prevents two tasks from concurrently calling the same per-session model
     # instance from different executor threads, which create_task (T043) makes possible for the
     # first time in this codebase — untested for thread-safety, so serialize rather than assume.
-    async with session_data["model_call_lock"]:
+    # Fragments from the incremental transcriber only need MT: a separate lock keeps them from queueing
+    # behind the next incremental STT step (which shares the STT model and runs every ~0.7 s).
+    pipeline_lock = session_data.setdefault("mt_call_lock", asyncio.Lock()) if pretranscribed is not None else session_data["model_call_lock"]
+    async with pipeline_lock:
         # --- STT ---
         websocket.timestamps["stt_start"].append(time.perf_counter())
         stt_start_time = time.perf_counter()
         # Use the session-specific STT model
-        transcribed_segments, stt_time, detected_source_lang = await loop.run_in_executor(
-            None,
-            lambda: stt_model_instance.transcribe_audio(
-                audio_segment_np,
-                AUDIO_SAMPLE_RATE,
-                language=None if source_lang == "auto" else source_lang,
-                vad_filter=False if vad_enabled else True # Disable FasterWhisper's VAD if WebRTC VAD is enabled
-            ),
-        )
+        if pretranscribed is not None:
+            transcribed_segments, stt_time, detected_source_lang = [], 0.0, None
+        else:
+            # Short segments (< 1.5s): Whisper's VAD tends to kill them as silence.
+            # Use vad_filter=False for short segments, True for long ones.
+            segment_dur_s = audio_segment_np.size / AUDIO_SAMPLE_RATE
+            use_vad_filter = segment_dur_s >= 1.5
+            transcribed_segments, stt_time, detected_source_lang = await loop.run_in_executor(
+                None,
+                lambda: stt_model_instance.transcribe_audio(
+                    audio_segment_np,
+                    AUDIO_SAMPLE_RATE,
+                    language=None if source_lang == "auto" else source_lang,
+                    vad_filter=use_vad_filter,
+                    initial_prompt=(session_data.get("language_pack", {}).get("stt", {}).get("initial_prompt") or None),
+                ),
+            )
         if source_lang == "auto" and detected_source_lang:
             session_config["source_lang"] = detected_source_lang # Update session config with detected language
             logging.info(f"Backend: Session {client_info}: Source language detected as: {session_config['source_lang']}")
@@ -1516,9 +1726,9 @@ async def _process_speech_segment_pipeline(
         stt_total_time = stt_end_time - stt_start_time
         input_to_stt_latency = stt_end_time - segment_start_time # Calculate input->STT latency
         transcribed_text = " ".join([s.text for s in transcribed_segments]) if transcribed_segments else ""
-        logging.debug(f"Backend: Session {client_info}: STT raw segments: {transcribed_segments}")
-        logging.debug(f"Backend: Session {client_info}: Concatenated transcribed_text: '{transcribed_text}'")
-        logging.info(f"Backend: Session {client_info}: STT completed. Transcribed: '{transcribed_text}' (Detected Lang: {detected_source_lang}). Time: {stt_total_time:.2f}s. Input->STT Latency: {input_to_stt_latency:.2f}s")
+        if pretranscribed is not None:
+            transcribed_text = pretranscribed
+        logging.info(f"Backend: Session {client_info}: STT completed. Transcribed: {_log_text(transcribed_text)} (Detected Lang: {detected_source_lang}). Time: {stt_total_time:.2f}s. Input->STT Latency: {input_to_stt_latency:.2f}s")
 
         # Filter out transcriptions that are just periods/punctuation (background noise artifacts)
         cleaned_text = transcribed_text.strip().replace('.', '').replace(',', '').replace('!', '').replace('?', '').strip()
@@ -1526,11 +1736,14 @@ async def _process_speech_segment_pipeline(
             logging.info(f"Backend: Session {client_info}: Transcription contains only punctuation (likely background noise). Skipping translation and TTS.")
             return
 
+        # Track last non-empty transcription for promoting to final if the tail segment is too short
+        session_data["last_transcription_text"] = transcribed_text
+
         if not transcribed_text.strip():
             logging.warning(f"Backend: Session {client_info}: STT produced no meaningful text for segment (Final: {is_final}). Skipping translation and TTS.")
             await safe_send("transcription_result", {"type": "transcription_result", "transcribed": "", "is_final": is_final, "metrics": {"stt_time": stt_total_time}})
             return
-        await safe_send("transcription_result", {"type": "transcription_result", "transcribed": transcribed_text, "is_final": is_final, "metrics": {"stt_time": stt_total_time}})
+        await safe_send("transcription_result", {"type": "transcription_result", "transcribed": transcribed_text, "is_final": is_final, "metrics": {"stt_time": stt_total_time}, "source_span": list(source_span) if source_span else None})
 
         # --- MT ---
         translated_text = transcribed_text
@@ -1543,22 +1756,36 @@ async def _process_speech_segment_pipeline(
                 await safe_send("error", {"type": "error", "message": f"MT model for {source_lang}-{target_lang} not initialized. Skipping translation."})
                 return
             mt_start_time = time.perf_counter()
-            translated_text, _ = await loop.run_in_executor(None, lambda: main_mt_model.translate(transcribed_text, source_lang, target_lang))
+            if pretranscribed is not None:   # already inside mt_call_lock
+                translated_text, _ = await loop.run_in_executor(None, lambda: main_mt_model.translate(transcribed_text, source_lang, target_lang))
+            else:   # one translator instance: never two executor threads at once
+                async with session_data.setdefault("mt_call_lock", asyncio.Lock()):
+                    translated_text, _ = await loop.run_in_executor(None, lambda: main_mt_model.translate(transcribed_text, source_lang, target_lang))
             mt_total_time = time.perf_counter() - mt_start_time
             websocket.timestamps["mt_end"].append(time.perf_counter())
         else:
             logging.info(f"Backend: Session {client_info}: Source and target languages are the same ({source_lang}). Skipping machine translation.")
-        logging.info(f"Backend: Session {client_info}: MT completed for {source_lang}-{target_lang}. Translated: '{translated_text}'. Time: {mt_total_time:.2f}s")
+        logging.info(f"Backend: Session {client_info}: MT completed for {source_lang}-{target_lang}. Translated: {_log_text(translated_text)}. Time: {mt_total_time:.2f}s")
 
         if not translated_text:
-            logging.warning(f"Backend: Session {client_info}: MT produced no translated text for '{transcribed_text}' (Final: {is_final}). Skipping TTS.")
+            logging.warning(f"Backend: Session {client_info}: MT produced no translated text for {_log_text(transcribed_text)} (Final: {is_final}). Skipping TTS.")
             await safe_send("translation_result", {"type": "translation_result", "translated": "", "is_final": is_final, "metrics": {"mt_time": mt_total_time}})
             return
 
         # Send translation result to frontend
         await safe_send("translation_result", {"type": "translation_result", "translated": translated_text, "is_final": is_final, "metrics": {"mt_time": mt_total_time}})
-        logging.debug(f"Backend: Session {client_info}: Sent translation_result: '{translated_text}'")
     # model_call_lock released here — TTS below runs unlocked, is the only phase barge-in cancels.
+
+    # Emit in segment order: STT/MT are FIFO under model_call_lock, but TTS runs unlocked, so a short
+    # later segment could otherwise interleave its audio ahead of a longer earlier one.
+    if tts_seq:
+        events = session_data.setdefault("tts_events", {})
+        previous = events.setdefault(tts_seq - 1, asyncio.Event())
+        try:
+            await asyncio.wait_for(previous.wait(), timeout=20.0)   # a hung earlier segment must not mute the session
+        except asyncio.TimeoutError:
+            logging.warning(f"Backend: Session {client_info}: segment {tts_seq - 1} did not finish in 20 s; not waiting further.")
+        events.pop(tts_seq - 1, None)
 
     # --- TTS ---
     # Standard non-streaming synthesis (Piper or fallback)
@@ -1641,7 +1868,6 @@ async def _process_speech_segment_pipeline(
         if torch is not None and isinstance(audio_wav, torch.Tensor):
             audio_wav = audio_wav.cpu().numpy()
         
-        _save_audio_segment_for_debug(audio_wav, "tts_output", is_final)
         audio_buffer = io.BytesIO()
         # Use soundfile to write the audio to a WAV buffer
         await loop.run_in_executor(None, lambda: sf.write(audio_buffer, audio_wav, sample_rate, format="WAV"))
@@ -1654,13 +1880,18 @@ async def _process_speech_segment_pipeline(
         # flag the dispatch above already uses, instead of a second hardcoded engine-name check
         # that silently drifts out of sync with it (confirmed live: the old check fired a false
         # "TTS model not ready" error on every successful piper/hybrid streaming synthesis).
-        logging.warning(f"Backend: Session {client_info}: {tts_model_choice} TTS model not initialized or produced no audio. No TTS will be performed for '{translated_text}'.")
+        logging.warning(f"Backend: Session {client_info}: {tts_model_choice} TTS model not initialized or produced no audio. No TTS will be performed for {_log_text(translated_text)}.")
         await safe_send("error", {"type": "error", "message": f"{tts_model_choice} TTS model not ready or invalid. No TTS output."})
         return
     websocket.timestamps["tts_end"].append(time.perf_counter()) # Corrected to log end time
     logging.info(f"Backend: Session {client_info}: TTS completed. Time: {tts_total_time:.2f}s")
 
     metrics_payload = {"stt_time": stt_total_time, "mt_time": mt_total_time, "tts_time": tts_total_time, "input_to_stt_latency": input_to_stt_latency}
+    metrics_payload["onset_to_first_audio_s"] = (
+        first_audio_sent_time - source_onset_time
+        if first_audio_sent_time is not None and source_onset_time is not None else None)
+    metrics_payload["source_onset_time"] = source_onset_time
+    metrics_payload["first_audio_sent_time"] = first_audio_sent_time
     if is_final:
         metrics_payload["total_latency"] = stt_total_time + mt_total_time + tts_total_time
         logging.info(f"Backend: Sending final_metrics: {metrics_payload}")
@@ -1675,26 +1906,136 @@ async def _process_speech_segment_pipeline(
 # does not preempt that specific blocking call — asyncio defers the CancelledError until that
 # call returns, then stops before the next stage/send. Worst-case barge-in lag is bounded by
 # whichever single stage is in flight, not the whole pipeline. Real numbers in the doc above.
-async def _run_pipeline_task(websocket, audio_segment_np, segment_start_time, is_final, session_config, client_info):
+async def _run_pipeline_task(websocket, audio_segment_np, segment_start_time, is_final, session_config, client_info, pretranscribed=None, source_span=None, source_onset_time=None):
     # T044: every real (SILENCE_TIMEOUT-triggered) segment resets the captioner's buffer, so its
     # partials don't bleed across utterance boundaries. All call sites now funnel through here,
     # so one reset call covers every trigger point instead of duplicating it at each of them.
     session_data = active_sessions.get(client_info)
-    if session_data is not None and session_data.get("captioner") is not None:
+    if session_data is None or not session_data.get("capture_active", True):
+        return
+    generation = session_data.get("capture_generation", 0)
+    task = asyncio.current_task()
+    tasks = session_data.setdefault("pipeline_tasks", set())
+    tasks.add(task)
+    seq = session_data.get("tts_next_seq", 0)
+    session_data["tts_next_seq"] = seq + 1
+    if session_data.get("captioner") is not None:
         try:
             session_data["captioner"].reset()
         except Exception as e:
             logging.error(f"Backend: Session {client_info}: captioner reset error (non-fatal): {e}")
     try:
-        await _process_speech_segment_pipeline(websocket, audio_segment_np, segment_start_time, is_final=is_final, session_config=session_config)
+        if session_data.get("capture_generation", 0) != generation:
+            return
+        await _process_speech_segment_pipeline(websocket, audio_segment_np, segment_start_time, is_final=is_final, session_config=session_config, tts_seq=seq, pretranscribed=pretranscribed, source_span=source_span, source_onset_time=source_onset_time)
     except asyncio.CancelledError:
         logging.info(f"Backend: Session {client_info}: Pipeline task cancelled (superseded by new speech).")
     except Exception as e:
         logging.error(f"Backend: Session {client_info}: Unhandled error in pipeline task: {e}")
+    finally:
+        tasks.discard(task)
+        session_data.setdefault("tts_events", {}).setdefault(seq, asyncio.Event()).set()
 
 # T044: fire-and-forget per audio chunk. Bounded to one in-flight feed() at a time via
 # captioner_lock — a chunk is dropped, never queued, if the previous call hasn't returned yet, so
 # this can never build backlog the way the old always-full-pipeline streaming path did.
+# ---- Incremental (simultaneous) mode ------------------------------------------------------------
+from backend.stt.incremental import Agreement, Fragmenter
+
+INCREMENTAL_STEP_S = float(os.environ.get("BP_INCR_STEP_S", "0.7"))      # min new audio between hypotheses
+INCREMENTAL_MIN_AUDIO_S = 1.0
+
+
+class _Frames(list):
+    """VAD speech frames plus the stream-clock time (s) at which each frame ended."""
+    def __init__(self):
+        super().__init__()
+        self.t = []
+
+    def add(self, frame, t):
+        self.append(frame)
+        self.t.append(t)
+
+    def clear(self):
+        super().clear()
+        self.t.clear()
+
+    def trim(self, k):
+        del self[:k]
+        del self.t[:k]
+
+
+class _IncState:
+    def __init__(self, source_onset_time=None):
+        self.source_onset_time = source_onset_time
+        self.agree = Agreement()
+        self.frag = Fragmenter(min_words=int(os.environ.get("BP_INCR_MIN_WORDS", "4")),
+                               max_words=int(os.environ.get("BP_INCR_MAX_WORDS", "9")),
+                               max_wait_s=float(os.environ.get("BP_INCR_MAX_WAIT_S", "1.6")))
+        self.busy = False
+        self.closed = False
+        self.last_step = 0.0
+        self.committed = 0
+        self.context = ""
+
+
+async def _emit_fragment(websocket, session_config, client_info, session_data, text, span, source_onset_time=None):
+    """Translate + voice one agreed fragment; ordered with all other segments by _run_pipeline_task."""
+    task = asyncio.create_task(_run_pipeline_task(
+        websocket, np.zeros(1, dtype=np.float32), time.perf_counter(), True, session_config, client_info,
+        pretranscribed=text, source_span=span, source_onset_time=source_onset_time))
+    session_data["active_pipeline_task"] = task
+
+
+async def _incremental_step(websocket, session_data, session_config, client_info, frames, inc):
+    loop = asyncio.get_event_loop()
+    try:
+        n = len(frames)
+        if n == 0 or inc.closed:
+            return
+        audio = np.concatenate(frames[:n])
+        times = list(frames.t[:n])
+        stt = session_data.get("stt_model")
+        src = session_config.get("source_lang")
+        async with session_data["model_call_lock"]:
+            if inc.closed:
+                return
+            segs, _, _ = await loop.run_in_executor(None, lambda: stt.transcribe_audio(
+                audio, AUDIO_SAMPLE_RATE, language=None if src == "auto" else src, vad_filter=False,
+                initial_prompt=(inc.context[-200:] or None), word_timestamps=True))
+        if inc.closed:
+            return
+        words = [(w.word.strip(), w.start, w.end) for sgm in segs for w in (getattr(sgm, "words", None) or []) if w.word.strip()]
+        committed = inc.agree.update(words)
+        logging.info(f"INCR step: audio={n*VAD_FRAME_DURATION/1000:.1f}s words={len(words)} committed={len(committed)} pending={len(inc.frag.pending)} hyp='{' '.join(w[0] for w in words)[:90]}'")
+        if committed:
+            frame_s = VAD_FRAME_DURATION / 1000.0
+            def abs_t(rel):   # word time inside the snapshot -> stream clock
+                i = min(max(int(rel / frame_s), 0), n - 1)
+                return times[i]
+            inc.frag.push([(w[0], abs_t(w[1]), abs_t(w[2])) for w in committed], time.perf_counter())
+            inc.committed += len(committed)
+            inc.context += " " + " ".join(w[0] for w in committed)
+            frames.trim(min(n, int(committed[-1][2] / frame_s) + 1))   # audio before the last agreed word is done
+        text = inc.frag.pop(time.perf_counter())
+        if text:
+            await _emit_fragment(websocket, session_config, client_info, session_data, text, inc.frag.span, inc.source_onset_time)
+    except Exception as e:
+        logging.error(f"Backend: Session {client_info}: incremental step error (non-fatal): {e}")
+    finally:
+        inc.busy = False
+        inc.last_step = time.perf_counter()
+
+
+async def _incremental_close(websocket, session_config, client_info, session_data, frames, inc):
+    """Segment ended: voice any agreed-but-unflushed words first; return True if the remainder is too short to transcribe."""
+    inc.closed = True
+    text = inc.frag.pop(time.perf_counter(), final=True)
+    if text:
+        await _emit_fragment(websocket, session_config, client_info, session_data, text, inc.frag.span, inc.source_onset_time)
+    return inc.committed > 0 and len(frames) * (VAD_FRAME_DURATION / 1000.0) < 0.3
+
+
 async def _feed_captioner_task(websocket, session_data, client_info, audio_chunk):
     captioner = session_data.get("captioner")
     lock = session_data.get("captioner_lock")
@@ -1712,11 +2053,35 @@ async def _feed_captioner_task(websocket, session_data, client_info, audio_chunk
             logging.error(f"Backend: Session {client_info}: captioner feed error (non-fatal): {e}")
 
 # --- WebSocket Handler ---
-async def handle_audio_stream(websocket: WebSocket):
-    # Use websocket.scope["client"] to get client host and port
+async def handle_audio_stream(websocket: WebSocket, token: Optional[str] = None):
+    # JWT auth: require a valid bearer token passed as ?token=<jwt> query param.
+    # Without this, anyone on the network could open the WebSocket and use the
+    # translation pipeline (the pre-hardening state).
+    if not token:
+        await websocket.close(code=4003, reason="Authentication required: pass ?token=<jwt>")
+        return
+    try:
+        from backend.utils.auth import decode_access_token
+        email = decode_access_token(token)
+    except Exception:
+        await websocket.close(code=4003, reason="Invalid or expired token")
+        return
+    db = SessionLocal()
+    try:
+        user = db.query(User).filter(User.email == email).first()
+    finally:
+        db.close()
+    if user is None:
+        await websocket.close(code=4003, reason="User not found")
+        return
+
+    # Use websocket.scope["client"] to get client host and port.
+    # NOTE: app.py's websocket_endpoint (app.py:331) initializes the session under the
+    # plain "host:port" key and all active_sessions lookups use client_info as that key,
+    # so client_info MUST stay "host:port" (email is only for display/logging).
     client_host, client_port = websocket.scope["client"]
     client_info = f"{client_host}:{client_port}"
-    logging.info(f"Client connected from {client_info}")
+    logging.info(f"Client connected from {client_info} (user={email})")
     
     # Initialize timestamps attribute for this WebSocket connection
     websocket.timestamps = {
@@ -1727,7 +2092,8 @@ async def handle_audio_stream(websocket: WebSocket):
         "tts_audio_sent": []
     }
 
-    # Retrieve or initialize session data
+    # Retrieve or initialize session data. client_info is "host:port", matching the key
+    # app.py's websocket_endpoint initialized the session under (app.py:331).
     session_data = active_sessions.setdefault(client_info, {
         "client_info": client_info,
         "stt_model": None,
@@ -1739,6 +2105,7 @@ async def handle_audio_stream(websocket: WebSocket):
         "model_call_lock": asyncio.Lock(),  # T046: serializes STT+MT calls on this session's shared model instances; NOT held during TTS, which is the only phase barge-in is allowed to cancel
         "captioner": None,  # T044
         "captioner_lock": asyncio.Lock(),  # T044: bounds captioner.feed() to one in-flight call at a time; a chunk is dropped (not queued) if the previous feed hasn't finished — best-effort, never adds backlog
+        "last_transcription_text": None,  # Last non-empty streaming transcription, promoted to final if the tail segment is too short
         "session_config": { # Default config, will be updated by client
             "source_lang": "en",
             "target_lang": "sk",
@@ -1748,12 +2115,23 @@ async def handle_audio_stream(websocket: WebSocket):
             "speaker_text": None,
             "speaker_lang": None,
             "vad_enabled": True,
+            "vad_silence_timeout_s": SILENCE_TIMEOUT,
+            "vad_max_segment_s": MAX_SEGMENT_S,
+            "vad_end_of_sentence_gating": True,
+            "barge_in": False,  # one-way interpretation: the speaker talking on must not cancel the translation still being voiced
+            "language_pack": {},
         }
     })
+    session_data["capture_active"] = False
+    session_data["capture_generation"] = 0
     session_config = session_data["session_config"] # Reference to the session's config
 
     audio_queue = deque()
-    speech_frames = [] # This will accumulate all VAD-detected speech frames for the entire utterance
+    speech_frames = _Frames() # VAD-detected speech frames of the open utterance (+ stream-clock end time per frame)
+    received_samples = 0
+    source_clock_origin = None
+    utterance_onset_time = None
+    inc = None  # _IncState while an utterance is open in incremental mode
     last_speech_time = time.perf_counter()
     in_speech_segment = False
     last_streaming_process_time = time.perf_counter() # Track last time a streaming chunk was processed
@@ -1761,7 +2139,6 @@ async def handle_audio_stream(websocket: WebSocket):
     # New variables for pre-VAD silence detection
     frame_size_samples = int(AUDIO_SAMPLE_RATE * VAD_FRAME_DURATION / 1000)
     streaming_chunk_samples = int(AUDIO_SAMPLE_RATE * STREAMING_CHUNK_LENGTH)
-    pre_vad_buffer_samples = int(AUDIO_SAMPLE_RATE * PRE_VAD_BUFFER_DURATION)
 
     # New variables for pre-VAD silence detection
     pre_vad_buffer = deque()
@@ -1781,31 +2158,43 @@ async def handle_audio_stream(websocket: WebSocket):
                 logging.info(f"Client {client_info} disconnected (code {message.get('code')}).")
                 break
             if message["type"] == "websocket.receive": # Check for the correct message type
-                # TEMP-DIAG3 2026-09-29: message arrival trace (removed after root-cause).
-                if "bytes" in message:
-                    logging.warning(f"DIAG3 bytes msg len={len(message['bytes'])} q={len(audio_queue)} in_seg={in_speech_segment}")
                 if "text" in message:
                     data = json.loads(message["text"])
                     if data["type"] == "start":
+                        session_data["capture_active"] = True
+                        session_data["capture_generation"] += 1
                         logging.info("Received 'start' command. Beginning transcription.")
                         audio_queue.clear()
                         speech_frames.clear()
+                        received_samples = 0
+                        source_clock_origin = None
+                        utterance_onset_time = None
                         pre_vad_buffer.clear() # Clear pre-VAD buffer on start
                         pre_vad_threshold_met = False # Reset threshold flag
                         in_speech_segment = False
+                        if inc is not None:
+                            inc.closed = True
+                            inc = None
                         last_speech_time = time.time()
                         last_streaming_process_time = time.perf_counter()
                     elif data["type"] == "stop":
-                        logging.info("Received 'stop' command. Stopping transcription.")
-                        if speech_frames:
-                            # 'stop' is a terminal action for this segment (no more audio expected until next 'start') — still task-tracked for consistency, but awaited since nothing else runs concurrently after it.
-                            task = asyncio.create_task(_run_pipeline_task(websocket, np.concatenate(speech_frames), last_speech_time, True, session_config, client_info))
-                            session_data["active_pipeline_task"] = task
-                            await task
-                            speech_frames.clear()
+                        session_data["capture_active"] = False
+                        session_data["capture_generation"] += 1
+                        tasks = set(session_data.get("pipeline_tasks", set()))
+                        if session_data.get("active_pipeline_task"):
+                            tasks.add(session_data["active_pipeline_task"])
+                        for task in tasks:
+                            if not task.done():
+                                task.cancel()
+                        audio_queue.clear()
+                        speech_frames.clear()
                         in_speech_segment = False
-                        pre_vad_buffer.clear() # Clear pre-VAD buffer on stop
-                        pre_vad_threshold_met = False # Reset threshold flag
+                        if inc is not None:
+                            inc.closed = True   # an in-flight incremental step must not voice anything after Stop
+                            inc = None
+                        pre_vad_buffer.clear()
+                        pre_vad_threshold_met = False
+                        await websocket.send_text(json.dumps({"type": "session_stopped"}))
                     elif data["type"] == "config_update":
                         # THESIS NOTE: Use session lock to prevent race conditions when
                         # multiple config updates arrive concurrently for the same session
@@ -1814,7 +2203,7 @@ async def handle_audio_stream(websocket: WebSocket):
                             new_source_lang = data.get("source_lang", session_config["source_lang"])
                             new_target_lang = data.get("target_lang", session_config["target_lang"])
                             new_tts_model_choice = data.get("tts_model_choice", session_config["tts_model_choice"])
-                            new_speaker_wav_path = _safe_speaker_wav(data.get("speaker_wav_path", session_config["speaker_wav_path"]))
+                            new_speaker_wav_path = authorize_speaker_wav(data.get("speaker_wav_path", session_config["speaker_wav_path"]), user.id)
                             new_speaker_text = data.get("speaker_text", session_config["speaker_text"])
                             new_speaker_lang = data.get("speaker_lang", session_config["speaker_lang"])
                             new_vad_enabled = data.get("vad_enabled", session_config["vad_enabled"]) # Get new VAD enabled state
@@ -1830,7 +2219,7 @@ async def handle_audio_stream(websocket: WebSocket):
                                 new_vad_enabled != session_config["vad_enabled"]
                             )
 
-                            if config_changed:
+                            if config_changed or session_data.get("stt_model") is None:
                                 logging.info(f"Backend: Configuration changed. Re-initializing models with: Source={new_source_lang}, Target={new_target_lang}, TTS={new_tts_model_choice}, SpeakerWav={new_speaker_wav_path}, VAD_Enabled={new_vad_enabled}")
                                 # Direction must land in session_config BEFORE init: the
                                 # piper->piper_sk_personal remap reads target_lang from here,
@@ -1841,7 +2230,7 @@ async def handle_audio_stream(websocket: WebSocket):
                                 session_config["target_lang"] = new_target_lang
                                 await initialize_all_models(                                    client_info,
                                     new_source_lang, new_target_lang, new_tts_model_choice,
-                                    stt_model_size=session_config["stt_model_size"], # STT model size is not updated via config_update, keep current
+                                    stt_model_size=data.get("stt_model_size", DEFAULT_STT_MODEL_SIZE if new_source_lang != old_source_lang else session_config["stt_model_size"]),
                                     speaker_wav_path=new_speaker_wav_path, speaker_text=new_speaker_text,
                                     speaker_lang=new_speaker_lang, vad_enabled_param=new_vad_enabled, websocket=websocket
                                 )
@@ -1891,11 +2280,13 @@ async def handle_audio_stream(websocket: WebSocket):
                                 session_config["vad_enabled"] = new_vad_enabled # Update session VAD state
                                 
                                 await websocket.send_text(json.dumps({"type": "status", "message": "Configuration updated and models re-initialized."}))
-                                await websocket.send_text(json.dumps({"type": "models_loading_status", "fully_loaded": True}))
+                                await websocket.send_text(json.dumps({"type": "models_loading_status", "fully_loaded": True, "route_status": session_data.get("route_status")}))
                             else:
                                 logging.info(f"Backend: Session {client_info}: Configuration updated, but no model re-initialization needed.")
                                 await websocket.send_text(json.dumps({"type": "status", "message": "Configuration updated."}))
                 elif "bytes" in message:
+                    if not session_data.get("capture_active"):
+                        continue
                     stt_model_instance = session_data.get("stt_model")
                     vad_instance_session = session_data.get("vad_instance") # Get session-specific VAD instance
 
@@ -1944,34 +2335,13 @@ async def handle_audio_stream(websocket: WebSocket):
                     
                     await websocket.send_text(json.dumps({"type": "audio_level", "level": float(rms)}))
 
-                    # Pre-VAD silence detection logic
-                    if not pre_vad_threshold_met:
-                        pre_vad_buffer.extend(audio_np)
-                        if len(pre_vad_buffer) >= pre_vad_buffer_samples:
-                            current_pre_vad_buffer_np = np.array(list(pre_vad_buffer), dtype=np.float32)
-                            
-                            # Sanitize pre-VAD buffer: replace NaN/Inf with 0
-                            if np.isnan(current_pre_vad_buffer_np).any() or np.isinf(current_pre_vad_buffer_np).any():
-                                logging.warning("Backend: Detected NaN or Inf in pre-VAD buffer. Sanitizing to 0.")
-                                current_pre_vad_buffer_np = np.nan_to_num(current_pre_vad_buffer_np, nan=0.0, posinf=0.0, neginf=0.0)
-
-                            buffer_rms = np.sqrt(np.mean(current_pre_vad_buffer_np**2))
-                            
-                            # Ensure buffer_rms is a valid number
-                            if np.isnan(buffer_rms) or np.isinf(buffer_rms):
-                                logging.warning(f"Backend: Calculated buffer_rms is NaN or Inf ({buffer_rms}). Treating as 0.0.")
-                                buffer_rms = 0.0
-
-                            logging.info(f"Backend: Pre-VAD buffer RMS: {buffer_rms:.4f} (Threshold: {SILENCE_RMS_THRESHOLD})")
-                            if buffer_rms > SILENCE_RMS_THRESHOLD:
-                                logging.info(f"Backend: Pre-VAD silence threshold met. Starting VAD processing.")
-                                pre_vad_threshold_met = True
-                                # Add the buffered audio to the main audio_queue for VAD processing
-                                audio_queue.extend(pre_vad_buffer)
-                            pre_vad_buffer.clear() # Clear buffer after check
-                    
-                    if pre_vad_threshold_met: # Only process with VAD if threshold met
-                        audio_queue.extend(audio_np)
+                    # Anchor the sample clock at packet arrival minus packet duration.
+                    # Browser capture/network delay is outside this server-side metric.
+                    if source_clock_origin is None:
+                        source_clock_origin = time.perf_counter() - len(audio_np) / AUDIO_SAMPLE_RATE
+                    received_samples += len(audio_np)
+                    pre_vad_threshold_met = _queue_pre_vad_audio(
+                        audio_np, audio_queue, pre_vad_buffer, pre_vad_threshold_met)
 
                     if session_config["vad_enabled"] and pre_vad_threshold_met: # Only run VAD if enabled and threshold met
                         if vad_instance_session is None:
@@ -1983,7 +2353,7 @@ async def handle_audio_stream(websocket: WebSocket):
                                 if np.isnan(chunk_to_process).any() or np.isinf(chunk_to_process).any():
                                     logging.warning("Backend: Detected NaN or Inf in chunk_to_process (VAD disabled fallback). Sanitizing to 0.")
                                     chunk_to_process = np.nan_to_num(chunk_to_process, nan=0.0, posinf=0.0, neginf=0.0)
-                                task = asyncio.create_task(_run_pipeline_task(websocket, chunk_to_process, time.perf_counter(), False, session_config, client_info))
+                                task = asyncio.create_task(_run_pipeline_task(websocket, chunk_to_process, time.perf_counter(), False, session_config, client_info, source_onset_time=source_clock_origin + (received_samples - len(chunk_to_process)) / AUDIO_SAMPLE_RATE))
                                 session_data["active_pipeline_task"] = task
                                 audio_queue.clear()
                             continue
@@ -2001,7 +2371,7 @@ async def handle_audio_stream(websocket: WebSocket):
                             logging.debug(f"Backend: VAD frame_float33 shape: {frame_float33.shape}, dtype: {frame_float33.dtype}")
                             # Add a check for all zeros
                             if not frame_float33.any():
-                                logging.warning("Backend: VAD received an all-zero audio frame.")
+                                logging.debug("Backend: VAD received an all-zero audio frame.")
 
                             # DO NOT Normalize frame_float33 to [-1.0, 1.0] range individually!
                             # This destroys relative volume information and makes noise look like speech.
@@ -2026,10 +2396,13 @@ async def handle_audio_stream(websocket: WebSocket):
                             logging.debug(f"Backend: Session {client_info}: VAD is_speech: {is_speech}. Frame RMS (float32): {frame_rms_float:.4f}")
 
                             if is_speech:
-                                speech_frames.append(frame_float33)
+                                speech_frames.add(frame_float33, (received_samples - len(audio_queue)) / AUDIO_SAMPLE_RATE)
                                 if not in_speech_segment:
                                     logging.info(f"Backend: Speech segment STARTED at {time.perf_counter():.3f}s")
                                     in_speech_segment = True
+                                    utterance_onset_time = source_clock_origin + (
+                                        received_samples - len(audio_queue) - frame_size_samples) / AUDIO_SAMPLE_RATE
+                                    inc = _IncState(utterance_onset_time) if session_config.get("incremental") else None
                                     # T046 barge-in: only cancel a previous task if it's past STT+MT (lock released) —
                                     # i.e. it's in/about to enter TTS (the only phase where "two voices at once" is a
                                     # real problem) or already finished. If it's still inside STT/MT, let it finish:
@@ -2037,61 +2410,99 @@ async def handle_audio_stream(websocket: WebSocket):
                                     # silently drops most sentences in ordinary back-to-back continuous speech, since
                                     # natural inter-sentence pauses are shorter than one STT+MT round trip.
                                     prev_task = session_data.get("active_pipeline_task")
-                                    if prev_task is not None and not prev_task.done() and not session_data["model_call_lock"].locked():
+                                    if (session_config.get("barge_in", False) and prev_task is not None and not prev_task.done()
+                                            and not session_data["model_call_lock"].locked()):
                                         logging.info(f"Backend: Session {client_info}: New speech started during TTS/idle — cancelling in-flight pipeline task (barge-in).")
                                         prev_task.cancel()
                                 last_speech_time = time.perf_counter()
 
-                                # Safety Valve (MAX_SEGMENT_S bound): force-close long open segments
+                                # Safety Valve (vad_max_segment_s bound): force-close long open segments
                                 # even without silence — dense speech otherwise waits for teardown.
                                 # Next voiced frame opens a chained segment; nothing is dropped.
                                 current_speech_duration = len(speech_frames) * (VAD_FRAME_DURATION / 1000.0)
-                                if current_speech_duration > MAX_SEGMENT_S:
-                                    logging.warning(f"Backend: Speech segment exceeded {MAX_SEGMENT_S:.0f}s ({current_speech_duration:.2f}s). Forcing processing.")
-                                    final_speech_segment_np = np.concatenate(speech_frames)
-                                    task = asyncio.create_task(_run_pipeline_task(websocket, final_speech_segment_np, last_speech_time, True, session_config, client_info))
-                                    session_data["active_pipeline_task"] = task
+                                max_segment_s = session_config.get("vad_max_segment_s", MAX_SEGMENT_S)
+                                if inc is not None:
+                                    max_segment_s = max(max_segment_s, 20.0)   # fragments flush as words agree; the valve is a last resort
+                                    if (not inc.busy and time.perf_counter() - inc.last_step >= INCREMENTAL_STEP_S
+                                            and len(speech_frames) * (VAD_FRAME_DURATION / 1000.0) >= INCREMENTAL_MIN_AUDIO_S
+                                            and session_data.get("stt_model") is not None):
+                                        inc.busy = True
+                                        asyncio.create_task(_incremental_step(websocket, session_data, session_config, client_info, speech_frames, inc))
+                                if current_speech_duration > max_segment_s:
+                                    logging.warning(f"Backend: Speech segment exceeded {max_segment_s:.0f}s ({current_speech_duration:.2f}s). Forcing processing.")
+                                    skip_final = inc is not None and await _incremental_close(websocket, session_config, client_info, session_data, speech_frames, inc)
+                                    inc = None
+                                    if not skip_final and len(speech_frames):
+                                        final_speech_segment_np = np.concatenate(speech_frames)
+                                        task = asyncio.create_task(_run_pipeline_task(websocket, final_speech_segment_np, last_speech_time, True, session_config, client_info, source_onset_time=utterance_onset_time))
+                                        session_data["active_pipeline_task"] = task
                                     speech_frames.clear()
                                     in_speech_segment = False
                                     # Reset buffers
-                                    audio_queue.clear()
                                     pre_vad_buffer.clear()
                                     pre_vad_threshold_met = False
                                     last_speech_time = 0 # Reset
 
-                                
-                                # DISABLED: Streaming chunk processing causes Whisper hallucinations on short non-speech sounds
-                                # Only process after silence timeout (matching BP xtts behavior)
-                                # # Check if enough speech has accumulated for a streaming chunk
-                                # if in_speech_segment and (time.perf_counter() - last_streaming_process_time) >= STREAMING_CHUNK_LENGTH:
-                                #     # Process the current speech_frames for streaming
-                                #     streaming_segment_np = np.concatenate(speech_frames)
-                                #     # Sanitize streaming_segment_np before pipeline
-                                #     if np.isnan(streaming_segment_np).any() or np.isinf(streaming_segment_np).any():
-                                #         logging.warning("Backend: Detected NaN or Inf in streaming_segment_np. Sanitizing to 0.")
-                                #         streaming_segment_np = np.nan_to_num(streaming_segment_np, nan=0.0, posinf=0.0, neginf=0.0)
-                                #     await _process_speech_segment_pipeline(websocket, streaming_segment_np, last_speech_time, is_final=False, session_config=session_config)
-                                #     last_streaming_process_time = time.perf_counter()
-                                #     # CRITICAL FIX: Clear speech_frames after processing to prevent accumulation
-                                #     speech_frames.clear()
-                                #     logging.debug(f"Backend: Cleared speech_frames after streaming chunk to prevent accumulation")
+                                # Streaming chunk processing: process STREAMING_CHUNK_LENGTH (0.5s)
+                                # audio chunks during speech so STT starts mid-utterance instead of
+                                # waiting for segment close. RMS pre-filter blocks background noise.
+                                now = time.perf_counter()
+                                if (now - last_streaming_process_time >= STREAMING_CHUNK_LENGTH
+                                        and len(speech_frames) > 0):
+                                    # Collect streaming_chunk_samples worth of audio from speech_frames
+                                    needed = streaming_chunk_samples
+                                    collected = 0
+                                    chunk_parts = []
+                                    while collected < needed and speech_frames:
+                                        frame = speech_frames[0]
+                                        frame_len = len(frame)
+                                        if collected + frame_len <= needed:
+                                            chunk_parts.append(speech_frames.pop(0))
+                                            collected += frame_len
+                                        else:
+                                            chunk_parts.append(frame[needed - collected:])
+                                            speech_frames[0] = frame[:needed - collected]
+                                            collected = needed
+                                    if chunk_parts and collected > 0:
+                                        streaming_segment_np = np.concatenate(chunk_parts)
+                                        # RMS pre-filter: skip noise-only chunks (prevents "I'm sorry" loop)
+                                        chunk_rms = float(np.sqrt(np.mean(np.clip(streaming_segment_np, -1.0, 1.0) ** 2)))
+                                        if chunk_rms >= SILENCE_RMS_THRESHOLD:
+                                            chunk_onset = source_clock_origin + (
+                                                received_samples - len(audio_queue) - collected) / AUDIO_SAMPLE_RATE
+                                            asyncio.create_task(_process_speech_segment_pipeline(
+                                                websocket, streaming_segment_np, chunk_onset,
+                                                is_final=False, session_config=session_config))
+                                        last_streaming_process_time = now
 
                             elif in_speech_segment:
                                 # Silence detected after speech, or speech ended
-                                if time.perf_counter() - last_speech_time > SILENCE_TIMEOUT:
-                                    if speech_frames:
-                                        final_speech_segment_np = np.concatenate(speech_frames)
-                                        # Sanitize final_speech_segment_np before pipeline
-                                        if np.isnan(final_speech_segment_np).any() or np.isinf(final_speech_segment_np).any():
-                                            logging.warning("Backend: Detected NaN or Inf in final_speech_segment_np. Sanitizing to 0.")
-                                            final_speech_segment_np = np.nan_to_num(final_speech_segment_np, nan=0.0, posinf=0.0, neginf=0.0)
-                                        logging.info(f"Backend: Final speech segment ENDED at {time.perf_counter():.3f}s. Duration: {len(final_speech_segment_np) / AUDIO_SAMPLE_RATE:.3f}s")
-                                        task = asyncio.create_task(_run_pipeline_task(websocket, final_speech_segment_np, last_speech_time, True, session_config, client_info))
-                                        session_data["active_pipeline_task"] = task
-                                        speech_frames.clear()
+                                if time.perf_counter() - last_speech_time > session_config.get("vad_silence_timeout_s", SILENCE_TIMEOUT):
+                                    skip_final = inc is not None and await _incremental_close(websocket, session_config, client_info, session_data, speech_frames, inc)
+                                    inc = None
+                                    if speech_frames and not skip_final:
+                                        final_dur_s = len(speech_frames) * (VAD_FRAME_DURATION / 1000.0)
+                                        # Final segment too short (< 1.0s): Whisper can't transcribe it reliably.
+                                        # The last streaming transcription serves as the final result.
+                                        if final_dur_s < 1.0:
+                                            logging.info(f"Backend: Session {client_info}: Final segment {final_dur_s:.2f}s too short, skipping — last streaming transcription stands as final.")
+                                            # Promote last streaming transcription to final so the frontend knows the utterance is done
+                                            last_text = session_data.get("last_transcription_text")
+                                            if last_text:
+                                                await websocket.send_text(json.dumps({"type": "transcription_result", "transcribed": last_text, "is_final": True, "metrics": {"stt_time": 0.0}}))
+                                            speech_frames.clear()
+                                        else:
+                                            final_speech_segment_np = np.concatenate(speech_frames)
+                                            # Sanitize final_speech_segment_np before pipeline
+                                            if np.isnan(final_speech_segment_np).any() or np.isinf(final_speech_segment_np).any():
+                                                logging.warning("Backend: Detected NaN or Inf in final_speech_segment_np. Sanitizing to 0.")
+                                                final_speech_segment_np = np.nan_to_num(final_speech_segment_np, nan=0.0, posinf=0.0, neginf=0.0)
+                                            logging.info(f"Backend: Final speech segment ENDED at {time.perf_counter():.3f}s. Duration: {final_dur_s:.3f}s")
+                                            task = asyncio.create_task(_run_pipeline_task(websocket, final_speech_segment_np, last_speech_time, True, session_config, client_info, source_onset_time=utterance_onset_time))
+                                            session_data["active_pipeline_task"] = task
+                                            speech_frames.clear()
                                     in_speech_segment = False
-                                    # Ensure all buffers are cleared after a full speech segment ends
-                                    audio_queue.clear()
+                                    # Keep queued source frames for the next segment; reset speech state.
                                     speech_frames.clear() # Redundant but safe
                                     pre_vad_buffer.clear()
                                     pre_vad_threshold_met = False
@@ -2105,21 +2516,12 @@ async def handle_audio_stream(websocket: WebSocket):
                             if np.isnan(chunk_to_process).any() or np.isinf(chunk_to_process).any():
                                 logging.warning("Backend: Detected NaN or Inf in chunk_to_process (VAD disabled). Sanitizing to 0.")
                                 chunk_to_process = np.nan_to_num(chunk_to_process, nan=0.0, posinf=0.0, neginf=0.0)
-                            task = asyncio.create_task(_run_pipeline_task(websocket, chunk_to_process, time.perf_counter(), False, session_config, client_info))
+                            task = asyncio.create_task(_run_pipeline_task(websocket, chunk_to_process, time.perf_counter(), False, session_config, client_info, source_onset_time=source_clock_origin + (received_samples - len(chunk_to_process)) / AUDIO_SAMPLE_RATE))
                             session_data["active_pipeline_task"] = task
                             audio_queue.clear()
 
     except WebSocketDisconnect:
         logging.info(f"Client {client_info} disconnected normally. Final speech_frames size: {len(speech_frames)}")
-        if speech_frames:
-            try:
-                final_speech_segment_np = np.concatenate(speech_frames)
-                # Teardown path — await directly so cleanup (below) doesn't race a still-running task.
-                await _run_pipeline_task(websocket, final_speech_segment_np, last_speech_time, True, session_config, client_info)
-            except websockets.exceptions.ConnectionClosedOK:
-                logging.info(f"Backend: WebSocket connection already closed for {client_info}. Skipping final segment processing.")
-            except Exception as e:
-                logging.warning(f"Backend: Error processing final speech segment on disconnect for {client_info}: {e}")
     except websockets.exceptions.ConnectionClosed as e: # Catch specific websockets connection closed errors
         logging.info(f"Backend: WebSocket connection closed unexpectedly for {client_info}: {e}")
         # No need to send message back, connection is already closed
@@ -2140,6 +2542,7 @@ async def handle_audio_stream(websocket: WebSocket):
         # 3. Clean up session lock to prevent lock dictionary growth
         
         if client_info in active_sessions:
+            cleanup_session_models(client_info)
             session_data = active_sessions.pop(client_info)
 
             # T043: cancel any pipeline task orphaned by an error/disconnect path that didn't
@@ -2181,5 +2584,8 @@ async def handle_audio_stream(websocket: WebSocket):
         audio_queue.clear()
         speech_frames.clear()
         pre_vad_buffer.clear()
+        log_handle = _session_log_files.pop(client_info, None)
+        if log_handle and not log_handle.closed:
+            log_handle.close()
         
         logging.info(f"Backend: Cleanup complete for client {client_info}.")

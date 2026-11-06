@@ -4,7 +4,11 @@ Question: can one GPU run the whole cascade (STT → MT → OmniVoice zero-shot 
 simultaneous speakers can it carry? Harness: `scripts/gpu_bench/load_bench.py` (kernel `scripts/gpu_bench/kaggle_load/`).
 Raw data: `processed/gpu_bench/load_T4/load_bench.json` (+ kernel log). Hardware: **Kaggle Tesla T4, 15.6 GB** (the session had 2×T4;
 only one was used). Models: faster-whisper `base` (EN) / `whisper-small-sk` (SK), Opus-MT CT2 float16, **OmniVoice (zero-shot clone
-of the owner's reference clip, num_step=16)**. All stages on the GPU, TTS serialised by a lock (one TTS worker, like the app).
+of the owner's reference clip, num_step=16)**.
+
+**Engine split for production (decision, 2026-11-04):** OmniVoice is kept for **bulk corpus generation + QC only** (RTF 0.40–0.65 on short phrases on T4 — not real-time). The live path is **Piper SK/EN on CPU** (RTF ~0.04) for the baseline, with **Kokoro EN TTS on GPU** (RTF 0.03, 1.33 GB VRAM on T4, declared in `backend/registry.py`, ear-grading pending) as the optional EN GPU engine. No Kokoro/Piper load test has been run yet — the numbers below are OmniVoice-only and apply to the batch/QC path, not the live path.
+
+All stages on the GPU, TTS serialised by a lock (one TTS worker, like the app).
 
 ## Inputs and what the numbers mean
 
@@ -134,7 +138,6 @@ level, so n_utts per cell is small (2-55); treat single cells as indicative.
 
 ## What this changes
 
-- A cloned-voice cascade is **faster than real time on a free T4** (RTF 0.2–0.3) and holds a 3-minute presentation with no processing
-  backlog. Better compute is needed for *concurrency* (several simultaneous cloned voices), not for a single presenter.
+- A cloned-voice cascade is **faster than real time on a free T4** (RTF 0.2–0.3) and holds a 3-minute presentation with no processing backlog — **but only for the OmniVoice batch/QC path**, not the live path. Better compute is needed for *concurrency* (several simultaneous cloned voices), not for a single presenter. For the live path, use Piper SK/EN on CPU (RTF ~0.04) or Kokoro EN on GPU (RTF 0.03).
 - The remaining presentation risk is playback pacing, which needs a duration-cap/backlog policy rather than hardware.
-- Next measurement: ear check of 12 vs 16 steps, a faster GPU, then a live run with the microphone on the presentation machine.
+- Next measurement: Kokoro EN + Piper SK load test on T4 (pending), ear check of 12 vs 16 steps, a faster GPU, then a live run with the microphone on the presentation machine.

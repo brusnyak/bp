@@ -1,0 +1,46 @@
+{
+  "hardware": {
+    "os": "Darwin",
+    "arch": "arm64",
+    "cpu_cores": 8,
+    "ram_gb": 8.0,
+    "gpu": "cpu",
+    "gpu_name": null,
+    "vram_gb": null,
+    "has_ctranslate2": true,
+    "has_faster_whisper": true,
+    "has_piper": true,
+    "has_torch": false
+  },
+  "stt": {
+    "device": "cpu",
+    "compute_type": "int8",
+    "model_size": "base",
+    "engine": "faster_whisper",
+    "notes": "CPU-only: base model int8"
+  },
+  "mt": {
+    "device": "cpu",
+    "compute_type": "int8",
+    "model_size": "base",
+    "engine": "opus-mt",
+    "notes": "CPU: MT on CPU int8"
+  },
+  "tts": {
+    "device": "cpu",
+    "compute_type": "int8",
+    "model_size": "piper",
+    "engine": "piper",
+    "notes": "CPU baseline: Piper streaming"
+  },
+  "vad": {
+    "device": "cpu",
+    "compute_type": "int8",
+    "model_size": "webrtcvad",
+    "engine": "webrtcvad",
+    "notes": "WebRTC VAD, always CPU"
+  },
+  "streaming": true,
+  "max_concurrent_sessions": 2,
+  "notes": []
+}

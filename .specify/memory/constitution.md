@@ -8,8 +8,8 @@ Every required-path dependency MUST run on Windows, macOS, and Linux without per
 ### II. Evidence-First, No Re-Litigating Settled Decisions
 A claim about performance, latency, memory, or capability MUST be backed by a measurement recorded in the project's own docs (`documentation/PERFORMANCE_TEST_RESULTS.md`, `documentation/s2s_translation_research_2026-08.md`, etc.) before it drives a decision. Once a decision has evidence behind it (e.g. "S2S models are ruled out for this project"), do not reopen it without new evidence — extend the record instead of repeating the investigation.
 
-### III. Slovak Is Non-Negotiable
-English↔Slovak is a hard requirement, not a stretch goal. Any architecture change, model swap, or dependency upgrade MUST preserve working Slovak support before it ships. If a candidate technology doesn't support Slovak, it is out of scope for the core pipeline, however good it is for other languages.
+### III. Default Pair Is Czech↔English
+English↔Czech is the default and primary route. Slovak remains an optional, experimental direction; it ships only when its own STT/MT/TTS route passes the quality gate. Any architecture change MUST preserve working Czech↔English support before it ships. If a candidate technology doesn't support Czech or English, it is out of scope for the core pipeline, however good it is for other languages.
 
 ### IV. Real-Time Is the Product
 The system's value proposition is near-real-time (or faster) translation on commodity hardware, no dedicated GPU assumed as the baseline. Any change MUST be evaluated against end-to-end latency and memory footprint on the reference machine (M1 Pro, 16GB, the current dev/test box) before being accepted, not just on isolated component benchmarks.
@@ -28,4 +28,4 @@ Decide and execute well-evidenced, reversible steps directly rather than re-liti
 
 This constitution supersedes ad hoc scope discussions for this project. Amendments require updating this file with a reason and a version bump — not a new conversation that quietly overrides it. Feature specs, plans, and tasks under `specs/` MUST be checked against these principles before implementation; violations require explicit justification in the relevant plan's Complexity Tracking section.
 
-**Version**: 1.0.0 | **Ratified**: 2026-08-19 | **Last Amended**: 2026-08-19
+**Version**: 1.1.0 | **Ratified**: 2026-08-19 | **Last Amended**: 2026-11-05 — Slovak demoted from mandatory to experimental; Czech↔English is the default pair.

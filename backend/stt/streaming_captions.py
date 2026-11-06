@@ -32,17 +32,25 @@ class SessionCaptioner:
     per-session-memory-multiplication caveat already flagged for every engine in this project
     (T018, deferred). Not fixed here — out of scope for T044."""
 
-    def __init__(self, source_lang: str = "en"):
+    def __init__(self, source_lang: str = "en", model_dir: str | None = None):
         if not STREAMING_CAPTIONS_AVAILABLE:
             raise ImportError("whisper_streaming_vendor not available")
         lan = "auto" if not source_lang or source_lang == "auto" else source_lang
-        self._asr = FasterWhisperASR(lan=lan, modelsize="base")
+        if not model_dir or not os.path.isfile(os.path.join(model_dir, "model.bin")):
+            raise FileNotFoundError("Streaming caption STT must be preinstalled locally")
+        vad_dir = os.environ.get("BP_SILERO_VAD_DIR", "")
+        if not os.path.isfile(os.path.join(vad_dir, "hubconf.py")):
+            raise FileNotFoundError("Set BP_SILERO_VAD_DIR to a preinstalled local Silero repository")
+        import torch
+        vad_model, _ = torch.hub.load(repo_or_dir=vad_dir, model="silero_vad", source="local")
+        self._asr = FasterWhisperASR(lan=lan, model_dir=model_dir)
         self._online = VACOnlineASRProcessor(
             1.0,  # min-chunk-size / online_chunk_size, matches benchmark default
             self._asr,
             None,  # tokenizer — None is correct for buffer_trimming="segment"
             buffer_trimming=("segment", 15),
             logfile=_DEVNULL,
+            vad_model=vad_model,
         )
 
     def feed(self, audio_chunk_f32_16k) -> str:

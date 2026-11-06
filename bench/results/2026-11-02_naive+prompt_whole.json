@@ -1,0 +1,64 @@
+{
+ "model": "ct2_models/whisper-small-sk",
+ "model_tag": "naive+prompt",
+ "mode": "whole",
+ "cap": null,
+ "beam": 5,
+ "temperature": 0.0,
+ "language": "sk",
+ "compute_type": "int8",
+ "device": "cpu",
+ "variant": "prompt",
+ "transcribe_options": {
+  "initial_prompt": "<initial_prompt from languages/packs/sk-en.json>"
+ },
+ "faster_whisper": "1.2.0",
+ "utc": "2026-11-02T12:59:27+00:00",
+ "clips": [
+  {
+   "clip": "me_sk_script",
+   "wer": 0.2604,
+   "cer": 0.0941,
+   "hypothesis": ". Dobré ráno a viete v tejto šivej okážky a pre kultúru reči v reálnom čase. Hovorím, pán Hlický a môj hlas budete počuť hovoriť po slovensky do niekoľkých sekúnd. Systém počúva mikrofónom a dedokujú, keď je reč začína a končí. Najprv je reč pripísaná do textu, potom preložená a potom opäť preverená. Každý krok beží v lokalnom ení tento počtači bez obluku a bez čakárne. V latencii je čas medzi mojimi slovami a predloženými hlasom, ktorý počuješ. Naším cieľom je zdržanie len pár sekúnd, dosť v krátke na prerodzený rozhovor. Hlasové klónovanie znamená, že slovenský výstup znie ako ja, nie ako cudzinec. A som učil systém mojom hlasom, zaznamenávam pár minút čistej reči. Na týchme mestností záleží viac ako na drahom mikrofóne. Prosím, hovorte stále tempo s krátkymi prestávkami medzi vetvami. Čísla, názvy a technické výrazy si vyžadujú mimoriadnu starostlivosť vo dvoch jazykoch. je častočné výsledky, zatiaľ čo ja som ešte hovorím. Tidielky môžete presunúť do plaváčeho okna nad akoukoľvek aplikáciou. Praložný hlas je presmerovaný na zhromaždenie ako vertálne mikrofón. Ostatní účestníci počúvajú slovenčinu, zatiaľ čočenčinu, hovorím enhlícky. Otázky publika bude predložená opačným smerom. Ďakujem vám za vypočutie a teším sa na vaše otázky.",
+   "audio_seconds": 134.3,
+   "wall_seconds": 239.77,
+   "rtf": 1.785,
+   "vad_kept_seconds": 134.3,
+   "vad_total_seconds": 134.3,
+   "hyp_words": 194,
+   "loops": 0,
+   "czech_like_words": 0,
+   "n_segments": null
+  },
+  {
+   "clip": "me_sk_trhove",
+   "wer": 0.3508,
+   "cer": 0.1523,
+   "hypothesis": ". Včera ráno som išiel na trh kúpiť čerstvý chlieb a mleko. Stretol som tam z trho priateľa Ľuba, ktorý jej predoval med a syry. „Ahoj, kdesi sa tu lehol celé mesiace,“ spýtal som vás, „ospievam.“ Porozprával som mu o svojej práci a dlhý cestí vlákom cez hore Adlini, až ma volil každý kĺbu. „Pochmili sme si sadli a lavičku pod veľkú vŕbu a dali sme si kávu.“ „Môžem prísť aj zajtra?“ spýtal som sa. Okolo nás prebiehali tete a hádzali si jej farobnú loptu. Jedno tevčet koniesla džban plný malín a smialo sa na celé kolo. Von nečerstvého pečiva sa niesla vzduchom a ja som si spomínal len tectvo u starých rodičov.“ y električky. Ľubom mi potom ukázal fotografie zo svojej záhrady. Medzirátke medzi búlie a Česňoku rástli lálie, vyvónky a neskutočné veľké tikvice. „Pozri, táto váži vyše deväť kíl,“ pochválil sa. „Nevedel som vlastným otčom.“ „Môž som už ísť, ale v piatku prídem zas.“ „Povedal som a poprali sme sa domov.“ y. „Ešte dnes citujem chuť dlho chleba s maslom a medom.“ „Bolo to jednoznačné krašie chráň tento jesného mesiaca.“ „Koľko takých tnín nám ešte život prinesie?“",
+   "audio_seconds": 103.57,
+   "wall_seconds": 193.3,
+   "rtf": 1.866,
+   "vad_kept_seconds": 103.57,
+   "vad_total_seconds": 103.57,
+   "hyp_words": 188,
+   "loops": 0,
+   "czech_like_words": 0,
+   "n_segments": null
+  },
+  {
+   "clip": "me_sk_trhove_b",
+   "wer": 0.3089,
+   "cer": 0.1216,
+   "hypothesis": ". Včera ráno som išiel na trh kúpiť čerstvý chlieb a mleko. Stretol som tam starého priateľa Ľuba, ktorý predoval MED a Sýrii. „Ahoj, kdesi ste tu o celom mesete?“ Spýtal som ma so smemom. Prosprával som mu o svojej práci a o dlhý cesty vlakom cez Chory a do línie. Až ma povedal každý kĺb. . Po chvíli sme si sadli na výčku pod veľkú vŕbu a dali sme si kávu. „Môžem prísť aj zajtra?“ Spýtal som sa. Okolo nás pobehovali deti a hádzali si farovnú loptu. Jedno dievčetko neslo už pán plný malín a smiehalo sa na celé kolo. Von čerstvého pečova sa niesla vzduchom a jase si spomeno len detvo u starých rodičov.“ ky a vzchrali jej mzdy a električky. Ľubom mi potom ukázal fotografie zo svojej záchrany. „Medzirátke medzi búlie a česnokú rastie lália. Vy voní ani skutočne veľké tikvice.“ „Pozri, táto váži vyše deväť kíl?“ „Pochválil sa.“ „Neveril som vlastným otčom. Musím už ísť, ale v piatok prí prídem zas.“ ky. „Povedal som a popralo sme sa domov.“ „Ešte dnes cítim chuť toho chleba s maslom a medom.“ „Bolo to jedna z najkratších rán, táhto jesenného mesiaca.“ „Koľko takýchto dní nám ešte život prinesie?“",
+   "audio_seconds": 109.03,
+   "wall_seconds": 192.0,
+   "rtf": 1.761,
+   "vad_kept_seconds": 109.03,
+   "vad_total_seconds": 109.03,
+   "hyp_words": 197,
+   "loops": 0,
+   "czech_like_words": 0,
+   "n_segments": null
+  }
+ ]
+}

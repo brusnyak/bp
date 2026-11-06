@@ -1,0 +1,34 @@
+# Independent frontend implementation review — 2026-11-04
+
+Scope: current working-tree frontend source and relevant product claims. Read `session-playback.js`, changed live script/HTML, auth, enrollment, home diff, README and Kaggle report limitations. No browser tab used, no models/network/install, no code edits. Backend worker changes were excluded from acceptance. Source reading plus a local Node object-URL probe; not a full integration test.
+
+Verdict: substantive progress, but **REWORK** before accepting the browser lifecycle repair. Full cloned-speech specification and target-compute dependency remain explicit in README lines 3–5; no scope downgrade found there. Sequential sink-aware playback is a useful improvement, but sound-check code can re-enable it after Stop.
+
+## Actionable findings
+
+1. **P1 — Stop can be undone by the sound-check continuation.** `ui/live-speech/live-script.js:292` checks capture generation, then awaits `enumerateAudioOutputDevices()` at 293. There is no generation check after that await, before `playback.start()` at 295. Stop or device-change during device enumeration increments the generation and stops playback, but the old continuation then starts playback again and enqueues the recorded phrase. Recheck generation and original device fingerprint after every asynchronous boundary before changing playback/readiness state. Acceptance: suspend enumeration, invoke Stop/device change, resolve enumeration; zero playback starts and `checkedDevices` remains invalid.
+
+2. **P1 — Stored-voice preview creates an invalid object URL.** `ui/live-speech/live-script.js:1127–1134` already fetches the authenticated file into a Blob and creates its object URL, then appends `?token=...` to that opaque URL. This no longer identifies the registered Blob. Use the exact created URL; credentials belong to the existing fetch, not the Blob URL. Revoke on playback failure as well as end. Local Node probe returned `["voice","fetch failed"]` when fetching the original object URL and the same URL with `?token=test`, respectively. Browser audio behavior was not executed.
+
+3. **P1 — Enrollment can assign another language/transcript set to recorded takes.** `ui/enroll/enroll.js:38` continues mutating global `lang` after `startSession()` creates takes from `scripts[lang]` at 46. Upload and process use that mutable value at 126 and 134; the selector remains enabled during upload. Changing EN→SK after recording, or during a request, can label EN audio as SK and send a different reference script/count to processing. Snapshot session language/scripts when starting the set, use them throughout render/upload/process, and require a confirmed new set to change them. Acceptance: changing selector during an existing/uploading set cannot change audio language, item count or submitted reference texts.
+
+4. **P2 — Sound-check setup failure can retain an open microphone.** After assigning `soundCheckStream` at `live-script.js:279`, `new MediaRecorder`, `start()` or recording steps can throw. Catch at 298 only changes text; finally only enables the button. The acquired stream is stopped on the success path at 290 or a later explicit Stop, not on this failure. Clean recorder/stream in a generation-aware finally. Acceptance: inject MediaRecorder constructor/start failure and assert every acquired track has stopped.
+
+5. **P2 — Google sign-in breaks the newly promised enrollment return path.** Password login handles the allowlisted `next` destination at `ui/auth/auth.js:49–51`, but Google callback still always redirects to live at 135. Enrollment now links to sign-in-and-return, which is false for Google users. Share the allowlisted destination helper across both successful auth paths; test both methods with allowed and rejected destinations.
+
+## Retained limitations, not implementation acceptance
+
+- `SessionPlayback` bounds queued item count, not queued audio duration, listener delay or actual backend GPU work. Twenty long chunks can still mean substantial delay; claim bounded item count only until duration/queue metrics exist.
+- README lines 42/46 still call chrF++ ~52 “below commercial bar” and RTF 0.40–0.65 “not real-time,” while its own line 90 rejects arbitrary universal thresholds. These old table interpretations should match the new qualified evidence wording. This is a factual presentation inconsistency, not evidence that the models pass.
+- Kaggle report explicitly labels synthetic text-ready arrivals, mathematical Stop and `route_unverified`; those limits correctly avoid calling a TTS replay the full meeting route.
+- No visual/rendered/accessibility or real hardware sound-check pass is claimed by this review. Source fixes do not prove continuous cloned translation or LHC acceptance.
+
+Commands: `git diff --stat -- ui`; `git diff -- ui/live-speech/live-script.js ui/live-speech/live.html ui/auth/auth.js ui/enroll/enroll.js`; `nl -ba <file> | sed -n '<range>p'`; targeted `rg`; `node -e` using local `Blob`, `URL.createObjectURL` and `fetch` for the object-URL probe. No existing files were modified by this reviewer.
+
+Weakest point: main capture has generation guards while the sound-check branch still crosses an unguarded await. Cheapest failure: Stop followed by delayed recorded playback. Smallest fix: apply the same generation ownership to all sound-check continuations and cleanup, then run the suspended-promise regression.
+
+## Final bounded delta disposition
+
+Re-read current source after parent repairs; this section supersedes the open disposition above for the five enumerated findings. **All five resolved at source level:** post-enumeration generation/fingerprint guard now precedes playback (`live-script.js:300–306`); finally stops acquired sound-check tracks (`309–314`); preview uses the shared playback owner and checks capture generation after its authenticated fetch instead of modifying a Blob URL; `recordingLang` snapshots the enrollment set and is used for rendering, upload and processing; Google and password login both enforce the same allowlisted return destinations. README stack table now labels Canary/full-route and OmniVoice/native-streaming uncertainty without the rejected universal metric interpretation. No regression found in this bounded delta check.
+
+Verification here: `nl -ba` of sound-check/preview/enrollment sections and `rg -n` of `recordingLang` and both auth redirects; README stack table read. Parent reports a separate browser delayed-enumeration probe with zero plays/two track stops and an isolated login returning to enrollment; this reviewer did not execute or independently inspect those browser receipts. Full live route, real devices, clone quality and LHC acceptance remain outside this disposition. Queue-duration limits noted above remain an explicit qualification limitation, not a newly found blocker.

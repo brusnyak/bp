@@ -1,0 +1,121 @@
+## Product Designer Judgment
+
+### Bounded Implementation Direction
+
+**Scope:** Update homepage, live session, and enrollment as a single linear journey. No visual rebrand. Preserve Playfair Display (headings), Montserrat (body), berry `#C41E3A`, dark navy `#0A1C4F`, plain HTML/CSS/JS.
+
+**Primary CTA:** "Start Speech Translation" (one per page, hero position).
+
+**Journey Phases:**
+1. **Prep:** Route status, privacy/storage wording, clone readiness badge.
+2. **Sound Check:** Mic test, device selector, engine/language controls.
+3. **Start:** Capture begins, route status updates to active.
+4. **Captions:** Live subtitles, Picture-in-Picture toggle.
+5. **Recover:** Error states (JWT mismatch, virtual input rejected, mic paused).
+6. **Safe Stop:** Capture ends, metrics snapshot, data handling confirmation.
+
+**Separation:** Research lab/advanced engines moved to a distinct `/lab` section, visually separated from the main meeting flow.
+
+**Truthfulness:** Persistent route status indicator (qualified/unqualified), no exaggerated production claims, no private voice evidence public.
+
+---
+
+### Roast
+
+The current homepage is a thesis graveyard: walls of text, exaggerated production claims, and a live page that feels like a debug console. You’re asking users to trust a speech translation system with JWT mismatches, resuming stops, and rejected virtual inputs while advertising cloned voices that don’t exist yet. The mic pauses during playback—imagine trying to speak while the system talks over you. Async sink routing is broken, and private voice evidence is somehow public. This isn’t a product; it’s a liability with a berry-colored button. Fix the plumbing before you paint the walls.
+
+---
+
+### Assumptions
+
+- No commercial proof or third-party endorsements exist.
+- Generic TTS is the only baseline; cloned voice and EN↔SK plus Czech are future requirements.
+- Hardware/route quality is currently unqualified.
+- No third-party names, contacts, private audio, or credentials are supplied.
+- Plain HTML/CSS/JS only; no build tools or frameworks.
+
+---
+
+### Concrete Copy
+
+**Homepage Hero**
+> **Heading (Playfair Display):** Local Speech Translation for Hybrid University Meetings  
+> **Body (Montserrat):** Real-time captions and translation for EN, SK, and Czech. Generic TTS baseline. Voice cloning readiness subject to hardware and route qualification.  
+> **CTA (Berry #C41E3A):** Start Speech Translation  
+> **Secondary:** View Research Lab →
+
+**Route Status Bar (Persistent)**
+> Status: Route Unqualified | Mic: Not Tested | Clone: Not Ready | Privacy: Local Processing Only
+
+**Sound Check**
+> **Heading:** Sound Check  
+> **Body:** Select your input device and run a 5-second test. Captions will appear below.  
+> **Controls:** Device Selector, Test Mic, Engine (Generic TTS), Language (EN↔SK, Czech)
+
+**Live Session**
+> **Heading:** Live Translation  
+> **Body:** Captions update in real time. Toggle Picture-in-Picture for floating captions.  
+> **Metrics:** Latency, Audio Level, Route Quality  
+> **CTA (Berry #C41E3A):** Safe Stop
+
+**Recovery States**
+- JWT Mismatch: "Session expired. Please restart."
+- Stop Capture Resumes: "Capture stopped. Click Start to resume."
+- Virtual Input Rejected: "Virtual audio device not supported. Select physical mic."
+- Mic Paused During Playback: "Mic paused while system speaks. Resume when ready."
+- Async Sink Routing: "Audio routing unstable. Refresh and retry."
+
+**Enrollment / Clone Readiness**
+> **Heading:** Voice Clone Enrollment  
+> **Body:** Cloned voice is not yet available. Generic TTS is the baseline. Enrollment registers interest only; no audio is stored or processed.  
+> **CTA:** Register Interest (Disabled until route qualified)
+
+**Research Lab**
+> **Heading:** Research Lab — Advanced Engines  
+> **Body:** Experimental engines and cloned voice prototypes. Not for production meeting use. Route quality unqualified.
+
+---
+
+### Layout
+
+**Homepage (`/`)**
+- Hero section: Dark navy `#0A1C4F` background, Playfair Display heading in white, Montserrat body in white, berry `#C41E3A` primary CTA button.
+- Route status bar: Full-width, light gray background, dark text, persistent across all pages.
+- Features grid: 3 columns, Montserrat body, no exaggerated claims.
+- Lab link: Text link to `/lab`, visually distinct (gray, smaller).
+
+**Live Session (`/live`)**
+- Top: Route status bar (persistent).
+- Center: Captions area (large, Montserrat, high contrast), PiP toggle button.
+- Right sidebar: Metrics (latency, audio level, route quality), device selector, language/engine controls.
+- Bottom: Berry `#C41E3A` "Safe Stop" button, recovery message area (red text if error).
+
+**Enrollment (`/enroll`)**
+- Form: Name, email (optional), consent checkbox (local processing only, no audio stored).
+- Clone readiness badge: Gray, "Not Ready" until route qualified.
+- CTA: Disabled until route status changes to qualified.
+
+**Research Lab (`/lab`)**
+- Separate navigation, distinct heading style, warning banner: "Experimental. Not for production."
+
+---
+
+### Acceptance Checks
+
+1. **Visual Tokens:** Playfair Display headings, Montserrat body, berry `#C41E3A` primary CTA, dark navy `#0A1C4F` hero, plain HTML/CSS/JS only.
+2. **Single CTA:** One primary CTA per page, hero position, berry color.
+3. **Journey Flow:** Prep → Sound Check → Start → Captions → Recover → Safe Stop, linear and unbroken.
+4. **Route Status:** Persistent, truthful, displays "Qualified" or "Unqualified" only.
+5. **Privacy Wording:** Explicit "Local Processing Only," "No Audio Stored," "No Private Voice Evidence Public."
+6. **Clone Readiness:** Badge shows "Not Ready" by default, CTA disabled until qualified.
+7. **Recovery States:** All five core failures have visible, actionable messages.
+8. **Lab Separation:** `/lab` visually and navigationally separated from main meeting flow.
+9. **No Exaggerated Claims:** No production metrics, no "enterprise-grade," no "99% accuracy."
+10. **No Third-Party References:** No names, contacts, credentials, or private audio.
+
+---
+
+### Implementation Notes
+
+- Use CSS custom properties for tokens: `--berry: #C41E3A; --navy: #0A1C4F;`
+- Font stack: `font

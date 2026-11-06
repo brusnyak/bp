@@ -1,0 +1,13 @@
+{
+  "id": "yegorby/bp-canary-sk-cs-validation",
+  "title": "BP Canary SK CS validation",
+  "code_file": "validate.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": ["yegorby/bp-gpu-bench-refs"],
+  "competition_sources": [],
+  "kernel_sources": []
+}

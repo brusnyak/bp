@@ -1,5 +1,55 @@
-.lab-hero-inner .pill { margin-left: 0.5rem; }
-#sentList .lab-card h4 { font-weight: 500; line-height: 1.45; }
-#sentList .btn-small { margin-right: 0.25rem; }
-#sessionInput { margin-left: 0.5rem; }
-#langSelect { margin-right: 0.25rem; }
+/* Voice preparation page. Self-contained: the voice-lab stylesheet is not loaded here. */
+body { margin: 0; min-height: 100vh; background: linear-gradient(135deg, var(--background-color-start) 0%, var(--background-color-end) 100%); color: var(--text-color); font-family: inherit; line-height: 1.55; }
+:root { --enroll-on-primary: #FFFFFF; --enroll-focus: #C41E3A; --enroll-ok: #2E7D32; --enroll-bad: #B00020; }
+:root[data-theme="dark"], :root:not([data-theme="light"]) { --enroll-on-primary: #1A1A2E; --enroll-focus: #FF4081; --enroll-ok: #81C784; --enroll-bad: #FF8A9A; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --enroll-on-primary: #1A1A2E; --enroll-focus: #FF4081; --enroll-ok: #81C784; --enroll-bad: #FF8A9A; } }
+:root[data-theme="light"] { --enroll-on-primary: #FFFFFF; --enroll-focus: #C41E3A; --enroll-ok: #2E7D32; --enroll-bad: #B00020; }
+
+.lab-hero { border-bottom: 1px solid var(--border-color); background: var(--surface-color); }
+.lab-hero-inner { max-width: 960px; margin: 0 auto; padding: 2rem 1rem 1.25rem; display: flex; flex-wrap: wrap; gap: 1rem 2rem; justify-content: space-between; align-items: flex-end; box-sizing: border-box; }
+.lab-hero h1 { margin: 0 0 0.4rem; font-size: clamp(1.6rem, 4vw, 2.2rem); color: var(--text-color); }
+.lab-sub { margin: 0; max-width: 60ch; color: var(--secondary-color); }
+.lab-stats { margin-top: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.lab-nav a { color: var(--primary-color); font-weight: 600; text-decoration: none; white-space: nowrap; }
+.lab-nav a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.theme-toggle-wrapper { position: absolute; top: 1rem; right: 1rem; }
+.lab-hero { position: relative; }
+.theme-toggle-btn { width: 2.5rem; height: 2.5rem; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--border-color); border-radius: 50%; background: var(--surface-color); color: var(--text-color); cursor: pointer; }
+
+.lab-container { max-width: 960px; margin: 0 auto; padding: 1.5rem 1rem 3rem; box-sizing: border-box; }
+.lab-container > section { background: var(--surface-color); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.25rem 1.25rem 1.4rem; margin-bottom: 1.25rem; box-shadow: 0 6px 18px var(--shadow-color); }
+.lab-container h2 { margin: 0 0 0.6rem; font-size: 1.15rem; display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; color: var(--text-color); }
+.lab-hint { color: var(--secondary-color); font-size: 0.95rem; margin: 0.5rem 0; }
+.lab-hint select, .lab-hint input, #setupSection select, #setupSection input { min-height: 2.5rem; padding: 0.45rem 0.7rem; margin: 0.25rem 0.4rem 0.25rem 0; font: inherit; font-size: 0.95rem; color: var(--text-color); background: var(--background-color-start); border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; max-width: 100%; }
+.lab-hint select { appearance: none; -webkit-appearance: none; padding-right: 2rem; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23808080' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 0.7rem; }
+.lab-hint label { font-weight: 600; color: var(--text-color); margin-right: 0.25rem; }
+select:focus-visible, input:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid var(--enroll-focus); outline-offset: 2px; }
+
+.btn-small { display: inline-flex; align-items: center; justify-content: center; min-height: 2.6rem; padding: 0.5rem 1.1rem; border: 0; border-radius: 10px; background: var(--primary-color); color: var(--enroll-on-primary); font: inherit; font-weight: 700; cursor: pointer; }
+.btn-small:hover:not(:disabled) { filter: brightness(1.06); }
+.btn-small:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-small.secondary, .btn-small[data-variant="ghost"] { background: transparent; color: var(--primary-color); border: 1px solid var(--primary-color); }
+
+.pill { display: inline-block; padding: 0.15rem 0.6rem; border-radius: 999px; font-size: 0.8rem; font-weight: 700; border: 1px solid var(--border-color); color: var(--secondary-color); }
+.pill.pass { color: var(--enroll-ok); border-color: var(--enroll-ok); }
+.pill.fail { color: var(--enroll-bad); border-color: var(--enroll-bad); }
+.pill.idle { color: var(--secondary-color); }
+
+.lab-card { background: var(--background-color-start); border: 1px solid var(--border-color); border-radius: 12px; padding: 0.9rem 1rem; margin: 0.6rem 0; }
+.lab-card h4 { margin: 0 0 0.35rem; font-size: 1.02rem; font-weight: 500; line-height: 1.45; color: var(--text-color); }
+.lab-meta { font-size: 0.85rem; color: var(--secondary-color); margin: 0.35rem 0 0.5rem; }
+.lab-card audio { width: 100%; max-width: 100%; }
+
+.lab-plan { white-space: pre-wrap; overflow-wrap: anywhere; background: var(--background-color-start); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.9rem; font-size: 0.88rem; color: var(--text-color); }
+.hidden { display: none !important; }
+
+@media (max-width: 600px) {
+  .lab-hero-inner { padding-top: 3.5rem; }
+  .lab-container > section { padding: 1rem; }
+  .lab-hint select, .lab-hint input, #setupSection select, #setupSection input { width: 100%; margin-right: 0; }
+  .lab-hint label { display: block; margin-top: 0.5rem; }
+}
+
+/* Links in the gate and body copy use the brand colour; the toggle sits above the header. */
+a { color: var(--primary-color); text-underline-offset: 3px; }
+.theme-toggle-wrapper { z-index: 2; }

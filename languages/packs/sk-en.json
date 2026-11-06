@@ -9,9 +9,14 @@
     "initial_prompt": "Slovenská transkripcia s diakritikou: á, ä, č, ď, é, í, ĺ, ľ, ň, ó, ô, ŕ, š, ť, ú, ý, ž."
   },
   "mt": { "engine": "opus-mt", "model": "Helsinki-NLP--opus-mt-sk-en" },
-  "tts": { "engine": "piper", "voice": "en_US-ryan-medium" },
+  "tts": { "engine": "piper", "voice": "en_US-john-medium" },
   "clip": "speaker_voices/me_sk_script.m4a",
   "reference": null,
-  "license": "commercial-ok",
+  "license": "commercial-ok (attribution: Opus-MT CC-BY-4.0; voice dataset public domain/CC0)",
+  "vad": {
+    "end_of_sentence_gating": true,
+    "silence_timeout_s": 0.3,
+    "max_segment_s": 3.0
+  },
   "notes": "Reference pair, slower direction (SK STT is the latency bottleneck ~1.3 s)."
 }

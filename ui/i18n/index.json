@@ -1,0 +1,114 @@
+{
+ "locales": [
+  {
+   "code": "en",
+   "coverage": 1.0,
+   "dir": "ltr",
+   "drafts": 0,
+   "machine_draft": false,
+   "preview": false,
+   "raw": 0,
+   "reviewed": 1.0,
+   "strings": 398
+  },
+  {
+   "code": "cs",
+   "coverage": 0.99,
+   "dir": "ltr",
+   "drafts": 396,
+   "machine_draft": true,
+   "preview": false,
+   "raw": 0,
+   "reviewed": 0.0,
+   "strings": 396
+  },
+  {
+   "code": "de",
+   "coverage": 0.99,
+   "dir": "ltr",
+   "drafts": 74,
+   "machine_draft": false,
+   "preview": false,
+   "raw": 0,
+   "reviewed": 0.81,
+   "strings": 396
+  },
+  {
+   "code": "es",
+   "coverage": 0.99,
+   "dir": "ltr",
+   "drafts": 396,
+   "machine_draft": true,
+   "preview": false,
+   "raw": 0,
+   "reviewed": 0.0,
+   "strings": 396
+  },
+  {
+   "code": "fr",
+   "coverage": 0.99,
+   "dir": "ltr",
+   "drafts": 396,
+   "machine_draft": true,
+   "preview": false,
+   "raw": 0,
+   "reviewed": 0.0,
+   "strings": 396
+  },
+  {
+   "code": "hu",
+   "coverage": 0.99,
+   "dir": "ltr",
+   "drafts": 396,
+   "machine_draft": true,
+   "preview": false,
+   "raw": 0,
+   "reviewed": 0.0,
+   "strings": 396
+  },
+  {
+   "code": "pl",
+   "coverage": 0.99,
+   "dir": "ltr",
+   "drafts": 396,
+   "machine_draft": true,
+   "preview": false,
+   "raw": 0,
+   "reviewed": 0.0,
+   "strings": 396
+  },
+  {
+   "code": "ro",
+   "coverage": 0.99,
+   "dir": "ltr",
+   "drafts": 396,
+   "machine_draft": true,
+   "preview": false,
+   "raw": 0,
+   "reviewed": 0.0,
+   "strings": 396
+  },
+  {
+   "code": "sk",
+   "coverage": 0.99,
+   "dir": "ltr",
+   "drafts": 74,
+   "machine_draft": false,
+   "preview": false,
+   "raw": 0,
+   "reviewed": 0.81,
+   "strings": 396
+  },
+  {
+   "code": "uk",
+   "coverage": 0.99,
+   "dir": "ltr",
+   "drafts": 395,
+   "machine_draft": true,
+   "preview": false,
+   "raw": 0,
+   "reviewed": 0.0,
+   "strings": 396
+  }
+ ]
+}

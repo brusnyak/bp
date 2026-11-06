@@ -1,7 +1,7 @@
 // STT Test Page JavaScript
 // Isolated testing for Speech-to-Text functionality
 
-const WS_URL = `wss://${window.location.host}/ws`;
+const WS_URL = `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`;
 let websocket = null;
 let audioContext = null;
 let audioStream = null;

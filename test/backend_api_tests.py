@@ -109,7 +109,7 @@ async def test_initialize_full_pipeline_live():
     assert response.status_code == 200
     assert response.json()["status"] == "success"
     from backend.main import active_sessions
-    session = active_sessions.get("http_init_client")
+    session = active_sessions.get("http_init_user_1")
     assert session is not None
     assert session["stt_model"] is not None
     assert session["tts_engine"] is not None

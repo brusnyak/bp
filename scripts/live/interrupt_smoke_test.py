@@ -1,13 +1,51 @@
 #!/usr/bin/env python3
 """T043/T046 ad-hoc verification: does a new utterance cancel a still-in-flight pipeline task
 instead of both running to completion? Not a permanent test-suite addition — a one-off probe,
-kept for reproducibility. Mirrors the wire protocol used by test/concurrent_performance_test.py."""
-import asyncio, websockets, json, ssl, time, soundfile as sf, numpy as np
+kept for reproducibility. Mirrors the wire protocol used by test/concurrent_performance_test.py.
 
-WS_URL = "wss://localhost:8000/ws"
+WS now requires ?token=<jwt> (UPDATES.md batch). We log in via /login (JSON) first, mirroring
+the frontend flow in ui/live-speech/live-script.js:246-248."""
+import asyncio, websockets, json, ssl, time, soundfile as sf, numpy as np, urllib.request, os
+
+BASE = os.environ.get("BP_TEST_BASE_URL", "http://localhost:8000").rstrip("/")
 CERT_PATH = "certs/cert.pem"
 AUDIO_SAMPLE_RATE = 16000
 CHUNK_SEC = 0.02
+
+# Test account: same email/password the frontend demo uses. Create via /api/users if missing.
+LOGIN_EMAIL = "demo@bp.local"
+LOGIN_PASSWORD = "demo1234"
+
+
+def get_jwt():
+    """POST /register (ignore if exists) then POST /login JSON -> returns {"token": ...}."""
+    ctx = ssl.create_default_context()
+    ctx.load_verify_locations(CERT_PATH)
+    ctx.check_hostname = False
+    reg_body = json.dumps({"username": "demo", "email": LOGIN_EMAIL, "password": LOGIN_PASSWORD}).encode()
+    login_body = json.dumps({"email": LOGIN_EMAIL, "password": LOGIN_PASSWORD}).encode()
+    headers = {"Content-Type": "application/json"}
+
+    def post(path, payload):
+        req = urllib.request.Request(f"{BASE}{path}", data=payload, headers=headers)
+        try:
+            with urllib.request.urlopen(req, context=ctx, timeout=15) as r:
+                return r.status, json.loads(r.read())
+        except urllib.error.HTTPError as e:
+            return e.code, json.loads(e.read().decode() or "{}")
+
+    # Register (harmless if user already exists).
+    post("/api/register", reg_body)
+    status, data = post("/api/login", login_body)
+    if status != 200:
+        raise RuntimeError(f"Login failed ({status}): {data}")
+    token = data.get("token") or data.get("access_token")
+    if not token:
+        raise RuntimeError(f"No token in login response: {data}")
+    return token
+
+
+WS_URL = BASE.replace("https://", "wss://").replace("http://", "ws://") + "/ws"
 
 
 def load_chunks(path):
@@ -22,6 +60,7 @@ def load_chunks(path):
 
 
 async def main():
+    token = get_jwt()
     ctx = ssl.create_default_context()
     ctx.load_verify_locations(CERT_PATH)
     ctx.check_hostname = False
@@ -49,9 +88,14 @@ async def main():
                 events.append((time.perf_counter(), "recv_error", str(e)))
                 break
 
-    async with websockets.connect(WS_URL, ssl=ctx) as ws:
+    async with websockets.connect(f"{WS_URL}?token={token}", ssl=ctx if WS_URL.startswith("wss:") else None) as ws:
         await ws.send(json.dumps({"type": "config_update", "source_lang": "en", "target_lang": "sk", "tts_model_choice": "piper"}))
-        await asyncio.wait_for(ws.recv(), timeout=10)
+        while True:
+            message = json.loads(await asyncio.wait_for(ws.recv(), timeout=30))
+            if message.get("type") == "error":
+                raise RuntimeError(message.get("message", "Preparation failed"))
+            if message.get("type") == "models_loading_status" and message.get("fully_loaded"):
+                break
         await ws.send(json.dumps({"type": "start"}))
 
         recv_task = asyncio.create_task(recv_loop(ws))
@@ -85,9 +129,14 @@ async def main():
 
         await asyncio.sleep(6)  # let everything settle
         await ws.send(json.dumps({"type": "stop"}))
+        stopped_at = time.perf_counter()
         await asyncio.sleep(2)
         recv_task.cancel()
 
+    assert any(kind == "translation_result" for _, kind, _ in events), "No translation received"
+    assert any(kind == "tts_audio" for _, kind, _ in events), "No speech audio received"
+    assert not any(t > stopped_at + 0.25 and kind in ("translation_result", "tts_audio") for t, kind, _ in events), "Late output after Stop"
+    print("PASS: real WS translation/audio; no late output during 2-second post-Stop window (not proof of model interruption)")
     print("\n--- Events received (relative to utterance-1 start) ---")
     for t, typ, data in events:
         print(f"[t={t - t_u1_start:6.2f}s] {typ}: {data}")

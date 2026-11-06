@@ -157,11 +157,11 @@ class PiperTTS:
         individual blocking call to one phrase, which is what barge-in cancellation (T046)
         actually needs (cancellation can't preempt a call already in flight, so keeping each
         call short bounds the worst case)."""
-        from backend.tts.text_chunking import split_into_phrases, chunk_audio_by_duration
+        from backend.tts.text_chunking import split_into_phrases
         phrases = split_into_phrases(text)
         if not phrases:
             return
         for phrase in phrases:
             wav, sr, _ = self.synthesize(phrase, language=language, speaker_wav_path=speaker_wav_path)
             if wav is not None and len(wav) > 0:
-                yield from chunk_audio_by_duration(wav, sr)
+                yield wav

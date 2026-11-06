@@ -1,0 +1,35 @@
+Good morning, and welcome to this live demonstration of real-time speech translation.
+
+I am speaking English, and you will hear my own voice speaking Slovak within a few seconds.
+
+The system listens through the microphone and detects when speech begins and ends.
+
+First the speech is transcribed into text, then translated, then spoken again.
+
+Every step runs locally on this computer, with no cloud and no waiting room.
+
+Latency is the time between my words and the translated voice you hear.
+
+Our goal is a delay of only a few seconds, short enough for natural conversation.
+
+Voice cloning means the Slovak output sounds like me, not like a stranger.
+
+To teach the system my voice, I record a few minutes of clean speech.
+
+A quiet room matters more than an expensive microphone.
+
+Please speak at a steady pace, with short pauses between sentences.
+
+Numbers, names, and technical terms need extra care in both languages.
+
+The subtitle line shows partial results while I am still speaking.
+
+You can pop the subtitles out into a floating window above any application.
+
+The translated voice is routed into the meeting as a virtual microphone.
+
+Other participants hear Slovak, while I keep speaking English.
+
+Questions from the audience will be translated in the opposite direction.
+
+Thank you for listening, and I look forward to your questions.

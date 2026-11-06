@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Function to set the theme
   const setTheme = (theme) => {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
+    try { localStorage.setItem('theme', theme); } catch (e) { /* storage blocked */ }
     updateToggleIcon(theme);
   };
 
@@ -21,7 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // Initialize theme from localStorage or default to light
-  const savedTheme = localStorage.getItem('theme') || 'light';
+  let savedTheme = null;
+  try { savedTheme = localStorage.getItem('theme'); } catch (e) { /* storage blocked */ }
+  if (!savedTheme) savedTheme = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';   // follow the system until the visitor chooses
   setTheme(savedTheme);
 
   // Event listener for desktop theme toggle
