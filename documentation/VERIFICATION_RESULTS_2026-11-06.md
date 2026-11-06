@@ -128,3 +128,45 @@ Per `PRODUCT.md` acceptance and `RESULTS.md` commercial gates:
 | SK→EN | ❌ No | `whisper-small-sk` WER 0.25–0.32 > 0.2 gate; experimental only | Not in scope for this session |
 
 **Last line:** 🟢 EN→SK local verified (RTF 0.672, first audio 0.39s) | 🟢 CS→EN Kaggle T4 verified (p50 1.86s) | 🟡 CS→EN local CPU not trusted | 🔴 WebSocket browser E2E not yet verified
+
+---
+
+## 7. Previous Session Measurements (2026-11-0X session)
+
+Soak test and component benchmarks from the prior session run:
+
+| Metric | Result | Target |
+|---|---|---|
+| Total phrases | 2206 | — |
+| Phrases/min | 73.5 | — |
+| STT avg | 108ms | — |
+| MT avg | 61ms | — |
+| TTS avg | 80ms | — |
+| Latency growth | -19.7% | < 20% ✅ |
+| Queue stability | STABLE | ✅ |
+
+**Soak test log:** `scripts/test_soak.py` (30-min run), raw log at `/tmp/bp_soak_test.log` (3303 lines, not committed — local only).
+
+**XTTS voice cloning on Kaggle — DEAD END:**
+- Python 3.13 (Kaggle default) vs Coqui TTS requires Python <3.12
+- Python 3.10 standalone works, but `torch==2.x+cu124` under Python 3.10 on Kaggle fails with `ResolutionImpossible` dependency conflicts
+- 4+ attempts failed; kernel `scripts/gpu_bench/kaggle_xtts_clone/job.py` v5 ERROR
+- Decision: do NOT pursue XTTS on Kaggle further
+
+**OmniVoice voice cloning — COMPLETE:**
+- WAVs downloaded at `/tmp/bp_omni_v7/omnivoice_clone_{en,sk,cs}.wav` (not committed — local `/tmp` only)
+- RTF: SK/CS ~0.46, EN ~4.2 (cold start)
+- Pipeline path: batch/QC only, NOT live route
+
+**Component benchmarks (per-phrase):**
+| Component | Range |
+|---|---|
+| MT (Opus-MT CT2) | 30–80ms per phrase |
+| TTS (Piper CPU) | 40–150ms per phrase |
+
+**Not working:**
+- Piper fine-tuning — no training scripts in Piper repo
+
+**Route quality gate:**
+- SK→EN experimental only — `whisper-small-sk` WER 0.25–0.32 > 0.2 gate, Czech-like hallucinations
+- Thesis numbers to update: STT ~100–150ms (Parakeet EN), MT ~30–80ms, TTS ~40–150ms (Piper), total ~200–350ms
