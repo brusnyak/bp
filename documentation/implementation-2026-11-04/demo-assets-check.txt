@@ -1,0 +1,25 @@
+Demo pre-flight -- repo: /Users/yegor/Documents/STU/BP
+
+REQUIRED (demo cannot start without these)
+  PASS  certs/cert.pem  --  HTTPS/WSS certificate (else: make certs)
+  PASS  certs/key.pem  --  HTTPS/WSS key (else: make certs)
+  PASS  .env  --  secrets file: GOOGLE_CLIENT_ID + JWT_SECRET (see documentation/amd_fetch_checklist.md)
+  PASS  backend/tts/piper_models/sk_SK-personal-male-medium.onnx  --  shipped personal SK voice (the demo voice)
+  PASS  backend/tts/piper_models/sk_SK-personal-male-medium.onnx.json  --  Piper sidecar config for the demo voice (without it TTS init fails and the WS never acks — hit on Linux 2026-09-28)
+  PASS  backend/tts/piper_models/cs_CZ-jirka-medium.onnx  --  Piper base for SK text
+  PASS  ct2_models/Helsinki-NLP--opus-mt-en-sk/model.bin  --  Opus-MT EN->SK
+  PASS  ct2_models/Helsinki-NLP--opus-mt-sk-en/model.bin  --  Opus-MT SK->EN
+  PASS  speaker_voices/speaker_voices.json  --  speaker voice registry
+  PASS  .env:GOOGLE_CLIENT_ID  --  needed for Google login / token signing
+  PASS  .env:JWT_SECRET  --  needed for Google login / token signing
+
+OPTIONAL (fallbacks / non-default paths)
+  PASS  processed/e2e_ensk_sk.wav  --  fallback take 3: pre-rendered EN->SK proof clip
+  PASS  ui/voice-lab/lab.html  --  Voice Lab review page (fallback take 2)
+  PASS  ui/live-speech/live.html  --  live control room page
+  WARN  models/openvoice_v2/checkpoints_v2/converter/config.json  --  OpenVoice converter (only needed for the hybrid clone path, not for Piper SK)
+  PASS  backend/tts/piper_models/en_US-personal-v2.onnx  --  personal EN voice
+
+SERVER  skipped -- re-run with --server while `make run` is up
+
+ALL REQUIRED CHECKS PASSED  (optional fallbacks missing -- demo still runs)

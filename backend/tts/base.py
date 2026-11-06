@@ -67,13 +67,13 @@ def _piper_personal_factory() -> PiperTTS:
     # was trained on EN-only recordings, so this is not a generic-language voice like the other
     # Piper entries; no SUPPORTS_CLONING flag exists for "clones one specific pre-baked speaker",
     # it's just a different fixed voice.
-    return _piper("en_US-personal-medium", "en_US-ryan-medium")
+    return _piper("en_US-personal-medium", "en_US-john-medium")
 
 
 def _piper_personal_v2_factory() -> PiperTTS:
     # Second EN fine-tune (scripts/finetune_personal_voice.py, real-audio-only).
     # Ear verdict 2026-09-27 pending between v1/v2 (v1: F0 100Hz HNR -3.9; v2: 111Hz -5.9).
-    return _piper("en_US-personal-v2", "en_US-ryan-medium")
+    return _piper("en_US-personal-v2", "en_US-john-medium")
 
 
 def _piper_sk_personal_factory() -> PiperTTS:
@@ -96,8 +96,18 @@ def _piper_generic_sk_factory() -> PiperTTS:
 
 
 def _piper_generic_en_factory() -> PiperTTS:
-    # Generic EN base voice (ryan), no fine-tune. Same purpose as above.
-    return PiperTTS(model_id="en_US-ryan-medium", device=hardware.detect_backend("tts_baseline"))
+    # Generic EN base voice (john, public-domain LibriVox data; ryan is CC BY-NC-SA), no fine-tune. Same purpose as above.
+    return PiperTTS(model_id="en_US-john-medium", device=hardware.detect_backend("tts_baseline"))
+
+
+def _piper_generic_de_factory() -> PiperTTS:
+    # Generic DE base voice (karlsson-low, downloaded from rhasspy/piper-voices), no fine-tune.
+    return PiperTTS(model_id="de_DE-karlsson-low", device=hardware.detect_backend("tts_baseline"))
+
+
+def _piper_generic_fr_factory() -> PiperTTS:
+    # Generic FR base voice (siwis-medium, downloaded from rhasspy/piper-voices), no fine-tune.
+    return PiperTTS(model_id="fr_FR-siwis-medium", device=hardware.detect_backend("tts_baseline"))
 
 
 def _xtts_factory():
@@ -122,6 +132,8 @@ TTS_ENGINES: Dict[str, Callable[[], object]] = {
     "piper_sk_omni": _piper_sk_omni_factory,
     "piper_generic_sk": _piper_generic_sk_factory,
     "piper_generic_en": _piper_generic_en_factory,
+    "piper_generic_de": _piper_generic_de_factory,
+    "piper_generic_fr": _piper_generic_fr_factory,
 }
 
 if HybridTTS is not None:

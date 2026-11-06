@@ -1,0 +1,64 @@
+{
+ "model": "/Users/yegor/bp-review-2026-11-02/ct2/kinit-whisper-small-sk",
+ "model_tag": "kinit+prompt",
+ "mode": "whole",
+ "cap": null,
+ "beam": 5,
+ "temperature": 0.0,
+ "language": "sk",
+ "compute_type": "int8",
+ "device": "cpu",
+ "variant": "prompt",
+ "transcribe_options": {
+  "initial_prompt": "<initial_prompt from languages/packs/sk-en.json>"
+ },
+ "faster_whisper": "1.2.0",
+ "utc": "2026-11-02T12:48:29+00:00",
+ "clips": [
+  {
+   "clip": "me_sk_script",
+   "wer": 1.1354,
+   "cer": 0.7551,
+   "hypothesis": "Dobré ráno a vyjdete do šibieho kašky a prekvap toho reči ju v reálnom čase. Hovorím po anglicky a môj chlas budete počuť hovoriť po slovensky do niekoľkých sekúnd. Systém počúva mikrofónom a dedukujú, keď je reč sečená a končí. Najprv je reč prepísaná do textu, potom preložená a potom opäť preverená. Každý krok beží lokálne je tento počítačí. Bez obluku a bez čakárne. V letencii je časť medzi mnec medzi mne, medzi menecmi, medzi mne, medzi menecmi, medzi menecmi, medzi menecmi, medzi menecmi, medzi menecmi, medzi menecmi, medzi menecmi, medzi menecmi, medzi menecmi, medzi menecmi, medzi menecmi, medzi menecmi, medzi menecmi, medzi menecmi, medzi menecmi, medzi menecmi, medzi menecmi, medzi menecmi, medzi menecmi, medzi menecmi, menecmi, medzi menecmi, medzi menecmi, medzi menecmi, medzi menecmi som učil systému mojím hlasom, zaznamenávam pár minút čistej reči. Na tých jej miestností závky záš viac ako na tých miestností. Na tých miestností miestností miestností. Na tých miestností miestností miestností. Na tých miestností miestností. Na tých miestností miestností. Na tých miestností miestností miestností. Na tých miestností miestníkmi. Na tých miestníctvoch mestskou mestskou mestskou mestskou mestskou mestskou mestskou mestskou mestskou mestskou mestskou mestskou mestskou mestskou mestskou mestskou mestskou m Častočne častočné častočné častočné vyslky, častoče častočného vyslky, čovala čovala čo, čovala čo čo čo, čo čo čo čo čo čo, čo čo čo čo, čo čo čo čo čo, čo čo čo čo čo čo, čo čo čo čo čo čo, čo čo čo čo, čo čo čo čo čo, čo, čo čo čo čo, čo, čo čo čo, čo čo, čo čo, čo čo, čo, čo čo, čo čo čo, čo, čo, čo čo, čo čo, čo čo, čo, čo, čo, čo . Otázky, otázky, otázky, otázky,",
+   "audio_seconds": 134.3,
+   "wall_seconds": 306.23,
+   "rtf": 2.28,
+   "vad_kept_seconds": 134.3,
+   "vad_total_seconds": 134.3,
+   "hyp_words": 282,
+   "loops": 13,
+   "czech_like_words": 0,
+   "n_segments": null
+  },
+  {
+   "clip": "me_sk_trhove",
+   "wer": 0.7906,
+   "cer": 0.5584,
+   "hypothesis": "Včera ráno som išiel na trh kúpiť čerstvý chlieb a mleko. Stretol som tam starého priateľa Ľuba, ktorý predával med Asýrii. „Ahoj, kde si sa tulel celé mesiace?” spýtal sa ma s úsmevom. Porozprával som mu o svojej práci a dlhy cesty vlákom cez hore Adelini, až ma bol každý klub. Pochmeli sme si sadli levičku, pod veľkú vŕbu a dali sme si kávu. „Môžem prísť aj zajtra?” spýtal som sa. Okolo nás, prebiehali deti a hádzali si farbnú. Okolo sa jej farabný farabnú. Jedno. Jedno je farabný. Jedno devčiat konniesla džban, džban plný. A smial sa na džban plným. A smial sa na džban plni malín a smial sa na džban plněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněně ty električky. Ľubu mi potom ukázal fotografie zo svojej záhrady. Medzi riadke medzi Bůlie a Čestňaku rastlie Lálie, Vyvonky a neskvětčne veľké týkvce. Pozri, táto váš je vyšě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě devě dev . Ešte dě dnes citě dnes citě dě dě dě dě dě dě dě dě dě dě dě dě dě dě",
+   "audio_seconds": 103.57,
+   "wall_seconds": 265.74,
+   "rtf": 2.566,
+   "vad_kept_seconds": 103.57,
+   "vad_total_seconds": 103.57,
+   "hyp_words": 228,
+   "loops": 6,
+   "czech_like_words": 87,
+   "n_segments": null
+  },
+  {
+   "clip": "me_sk_trhove_b",
+   "wer": 0.7696,
+   "cer": 0.7136,
+   "hypothesis": "Včera ráno som išiel na trh kúpiť čerstvý chlieb a mlieko. Stretol som tam starého priateľa Ľuba, ktorý predoval med a syry. „Ahoj, kde ste sedelo celé mesiace?” spýtal si ma so smävom. „Prozprával som mu o svojej práci a o dlhých ceste vlakom cez hory a doliny. Až ma povedal každý kĺb. Po chvíli sme si sadli na lovičku pod veľkú frbu a dali sme si kávu. Môžem prísť aj zajtra?” spýtal som sa. Okolo nás, pobehol si farbnú, pobehol si farbnú, pobehol si farbný farbný loptu a hádný farbu. Jednot je včkovný. Jednot je včkovný. Jednot je všpan je všan. Jednot je všpan je všpan plněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněněně Vďálky a vzchráli je mzdy a električky. Ľubo mi potom ukázal fotografie zo svojejho záchrady. Medzi rádke medzi bůlie a čestné kůrasti ládia, vyvvony a neskutočné veľké těkvit se. Pozří. Pozří. Pozří. Poch výří. Poch. Pochříří, pochříří, pochříří, pochříří, pochří, pochříříří, poch, pochříříříříří, poch, pochříříříříříříříříří, poch, pochříříříříříříříříříříříř Povedal som a pochral som a povával som a povil mi se domovanie. Povedel som si mi seba. Povedel, pochával som, pochával som, pochával som, pochal, povával som, pochal som, pochal, pochal som, pochol, pochal, pochol, pochol, pochol, pochol, pochol, pochol, pochol, pochol, pochol som. Povedal, pochol, pochol, pochol som. Povedal. Povedal. Povedal. Povedal. Povedal. Povedal. Povedal som. Povedal som. Povedal. Povedal som. Povedal. Povedal. Povedal. Povedal som. Povedal. Povedal.",
+   "audio_seconds": 109.03,
+   "wall_seconds": 274.95,
+   "rtf": 2.522,
+   "vad_kept_seconds": 109.03,
+   "vad_total_seconds": 109.03,
+   "hyp_words": 225,
+   "loops": 10,
+   "czech_like_words": 17,
+   "n_segments": null
+  }
+ ]
+}

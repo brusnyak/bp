@@ -1,7 +1,11 @@
 # BP Pipeline SDK — REST/WS Contract & Python Facade
 
-**Version**: 0.1.0 (2026-10-21)  
-**Status**: Experimental — API may change before 1.0
+**Version**: 0.1.0 (contract clarified 2026-11-04)
+**Status**: Experimental — API may change before 1.0. Full university/commercial route acceptance is pending.
+
+**November 4 runtime contract:** authenticate `/ws?token=<JWT>` before any session/model loading; connection alone does not prepare models. Send `config_update`, wait for `models_loading_status` and its `route_status`, then `start`. `stop` cancels session work and suppresses late output; subsequent bytes are ignored until a new `start`. Already-running native worker inference may finish but its stale output is not sent. Missing runtime models/tokenizers fail with setup-required errors rather than downloading. `/api/routes` reports declared routes and installed assets without inference. Private research media/library paths are denied; speaker assets require ownership or an explicit public-demo receipt. Optional streaming captions require an explicitly provisioned local profile.
+
+`Pipeline(PipelineConfig(...))` is the facade constructor; `create_pipeline()` is the async convenience factory. Automatic Piper selects the target-language engine. Neither example nor loaded model proves route quality. The complete product includes cloned speech, qualified on target compute; see [PRODUCT.md](../PRODUCT.md).
 
 ---
 
@@ -76,7 +80,7 @@ async def translate_file():
     await pipe.close()
 ```
 
-### Real-time Streaming
+### Sequential chunk processing (not native model streaming)
 
 ```python
 async def streaming_example():
@@ -181,7 +185,7 @@ Base URL: `https://localhost:8000` (self-signed cert in `certs/`)
 
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | `/initialize` | Initialize session models (STT, MT, TTS, VAD). Returns session config. |
+| POST | `/initialize` | Authenticated user-scoped model preparation; Authorization Bearer required. Does not initialize a separate WS session. |
 | POST | `/voices/upload` | Upload speaker voice (webm/wav/mp3) → converted to 16kHz WAV. |
 | POST | `/voices/process` | Segment enrollment session into training corpus (approval-gated). |
 | GET | `/voices/list` | List user's uploaded voices. |
@@ -291,7 +295,7 @@ bp language remove pl-en --yes
 
 ### Status Levels
 
-- **verified**: All components resolve + passing eval record (WER < 0.2)
+- **verified**: Current assets/configuration fingerprint + reviewed STT, MT meaning, TTS intelligibility, live latency and runtime policy + matching output checksum
 - **experimental**: Missing component, no eval, or WER ≥ 0.2
 
 ---
@@ -321,7 +325,7 @@ Opus-MT models must be converted to CTranslate2 format:
 # Convert a single pair
 python backend/mt/convert_opus_mt_to_ct2.py --model_name Helsinki-NLP/opus-mt-en-sk
 
-# Or use the language pack resolver (auto-converts on first use)
+# Evaluate installed assets; this does not convert or download models
 bp language test en-sk
 ```
 
@@ -340,13 +344,17 @@ Fine-tuned Piper voices in `backend/tts/piper_models/`:
 
 Training: `scripts/finetune_personal_voice.py` (separate venv, ~hours on GPU).
 
-### OmniVoice (GPU, high quality)
+### Optional GPU TTS engines (declared in `backend/registry.py`, fail-closed)
 
-```python
-# Requires GPU, ~5.8GB VRAM
-pipe = await create_pipeline("en", "sk", tts_engine="omnivoice", 
-                             allow_unknown_license=True)
-```
+| Engine | License | VRAM (T4) | Best for | Slovak? |
+|--------|---------|-----------|----------|---------|
+| `kokoro` | Apache-2.0 | ~1.33 GB | EN output, RTF 0.03 | ❌ EN only |
+| `qwen3-tts` | Apache-2.0 | 4-8 GB | EN zero-shot cloning, 3s ref | ❌ EN only |
+| `chatterbox` | MIT | 4-8 GB | EN zero-shot cloning, 5-7s ref | ❌ EN only |
+| `omnivoice` | unknown | ~5.8 GB @12 steps | Cross-lingual cloning | ⚠️ proxy only |
+| `seamless-m4t-v2` | CC-BY-NC | ~6 GB | S2S quality reference | ✅ slk S2S |
+
+All are declared-only (factory is `None`) until validated on T4. Use `allow_unknown_license=True`/`allow_noncommercial=True` for internal runs only — never in a shipped profile.
 
 ### RVC-MLX / RVC-ONNX (Voice conversion layer)
 
@@ -363,8 +371,8 @@ Engine-agnostic: train once, apply to any TTS output.
 | `PermissionError` | Licence gate blocked engine | Add `allow_noncommercial=True` or `allow_unknown_license=True` (internal only) |
 | `KeyError` | Unknown engine name | Check `bp engine list` or `engines(stage)` |
 | `RuntimeError` | Engine not installed here | Install deps (e.g., `pip install coqui-tts` for XTTS) |
-| `HTTPException 403` | MT licence gate on WS | Session config `allow_noncommercial: true` |
-| `FileNotFoundError` | Model/voice not found | Run `bp language test <pair>` to auto-convert |
+| `HTTPException 403` | Policy gate | Choose a permitted installed engine; do not bypass policy for a release |
+| `FileNotFoundError` | Model/voice not found | Run the explicit setup/conversion command after reviewing its downloads; runtime stays local-only |
 
 ---
 

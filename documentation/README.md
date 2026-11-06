@@ -1,145 +1,126 @@
-# Live Speech Translation System - Bachelor's Thesis Project
+# Live Speech Translation — Project Overview
 
-## Project Overview
+> Current repair state (2026-11-04): start with `PRODUCT.md`, `documentation/implementation-2026-11-04/RESULTS.md` and `documentation/HANDOFF_NEXT_SESSION.md`. Earlier dated counts, readiness claims, media-access behavior and Kaggle failure explanations below are historical. Current contracts require authenticated explicit preparation, offline assets, target-language TTS, terminal Stop and reviewed full-route evidence. Full cloned-speech/LHC/commercial acceptance remains pending.
 
-This project implements a real-time live speech translation system designed for conference environments. It leverages state-of-the-art open-source models for Speech-to-Text (STT), Machine Translation (MT), and Text-to-Speech (TTS) to provide low-latency, high-quality translation. The system is optimized for Apple Silicon (M1/M2/M3) hardware and features a modern web-based user interface.
+Real-time, local-first speech translation for online conferences. Captures microphone
+audio, transcribes (STT), translates (MT), synthesizes the translated speech (TTS), and
+plays it back — with subtitles, latency charts, and optional voice cloning. Built as a
+bachelor thesis (STU FEI, EN↔SK focus) and designed to be swap-any-engine and
+configurable so it can run on a laptop or a T4-class GPU server.
 
-**Key Features:**
-*   **Real-time Performance:** Optimized for minimal end-to-end latency, targeting 2-3 seconds for standard TTS and 2.5-3.5 seconds for voice cloning.
-*   **Modular Architecture:** Built with FastAPI for the backend and a responsive web UI (HTML, CSS, JavaScript) for easy interaction.
-*   **Speech-to-Text (STT):** Utilizes `faster-whisper` for efficient and accurate transcription.
-*   **Machine Translation (MT):** Employs `SeamlessM4T v2` for high-quality, multilingual translation.
-*   **Text-to-Speech (TTS):** Integrates `Piper TTS` for fast, natural-sounding speech synthesis, and `F5-TTS` for real-time voice cloning.
-*   **Voice Activity Detection (VAD):** Incorporates `webrtcvad` for robust speech segment detection, crucial for streaming performance.
-*   **Dynamic Language Switching:** Supports on-the-fly switching of input and output languages.
-*   **Latency Visualization:** The UI includes a real-time timeline chart to visualize pipeline latency.
-*   **Speaker Voice Management:** Frontend and backend support for recording, uploading, and managing speaker voice profiles for cloning.
+## What the project is (and isn't)
 
-## Architecture
+- ✅ **Local-first pipeline:** WebRTC VAD → faster-whisper STT → CTranslate2 Opus-MT MT →
+  Piper TTS → browser playback. No cloud in the pipeline.
+- ✅ **Cross-platform:** one-command setup (`python3.11 scripts/setup.py --dev`) on macOS,
+  Windows (CPU-only) and Linux. No GPU required for the baseline.
+- ✅ **Swap-any-engine:** every pipeline stage is behind the engine registry
+  (`backend/registry.py`), so STT/MT/TTS/VAD can be swapped by config without code changes.
+- ✅ **Language packs:** declarative packs in `languages/packs/*.json` (en-sk, sk-en,
+  en-cs, en-zh, en-hi, …). Add a pair with `bp language add <pair>`.
+- ✅ **Observability:** `/health` (public) and `/metrics` (auth) HTTP routes; `bp selftest`
+  and `make test` (38 tests).
+- ⚠️ **SK→EN is experimental:** the best open Slovak Whisper fine-tune scores WER ~0.21 on
+  clean audio (above the 0.2 quality gate) and worse on a real mic. Do not ship SK→EN as
+  production quality yet. See `documentation/research_findings_2026-11-03.md`.
+- ❌ **Not "your own voice" in Slovak yet:** no open zero-shot voice-cloning TTS supports
+  Slovak output (XTTS, Chatterbox, Qwen3-TTS, Kokoro all exclude SK). The only SK voice
+  path is a Piper fine-tune. See §Voice cloning below.
+- ❌ **Not a managed SaaS:** Teams (~9 languages, no SK) and Google Meet (~6 EN-anchored
+  pairs, no SK) do not cover Slovak. KUDO AI (77 langs, incl. SK) and DeepL Voice (40+,
+  incl. EU) do — but they are paid cloud services (~$0.07-1.25/min). This project is the
+  local, free, Slovak-capable alternative.
 
-The system follows a client-server architecture:
+## The stack (what actually runs)
 
-1.  **Frontend (UI):** A web application built with HTML, CSS, and JavaScript. It captures microphone audio, sends it to the backend via WebSockets, displays real-time transcriptions and translations, and plays back synthesized audio. It also manages language selection and speaker voice profiles.
-2.  **Backend (FastAPI):** A Python application using FastAPI. It handles WebSocket connections, orchestrates the STT, MT, and TTS models, performs VAD, and streams results back to the frontend.
+| Stage | Default engine | License | Optional / GPU engines |
+|-------|---------------|---------|------------------------|
+| VAD | WebRTC VAD | BSD-3 | Silero VAD (torch) |
+| STT (EN) | faster-whisper `base` int8 | MIT | Parakeet EN, Qwen3-ASR |
+| STT (SK) | faster-whisper `small-sk` int8 | MIT | Canary AST (STT+MT collapse, untested on SK) |
+| MT | Opus-MT CT2 int8 per pair | CC-BY-4.0 | MADLAD-3B (CUDA), NLLB (CC-BY-NC, blocked) |
+| TTS (SK) | Piper (owner fine-tune / generic) | MIT | SeamlessM4T v2 S2S (prosody, CC-BY-NC) |
+| TTS (EN) | Piper | MIT | Kokoro 82M (RTF 0.03, 1.33 GB VRAM on T4) |
 
-**Pipeline Flow:**
-Audio Stream (Frontend) -> VAD -> STT (FasterWhisper) -> MT (SeamlessM4T v2) -> TTS (Piper/F5-TTS) -> Audio Playback (Frontend)
+All default engines are commercial-safe (MIT/BSD/Apache-2.0/CC-BY-4.0). Non-commercial
+engines (XTTS CPML, NLLB CC-BY-NC, SeamlessM4T CC-BY-NC) are **fail-closed** behind the
+licence gate — they cannot be selected in the default profile without explicit override.
 
-## Setup and Installation
+## Measured baseline (CPU, M1 Pro / Ryzen 8645HS)
 
-### Prerequisites
+| Direction | STT | MT | TTS | End-to-end turn |
+|-----------|-----|-----|-----|-----------------|
+| EN→SK | whisper-base ~0.55 s | Opus-MT ~0.08 s | Piper ~0.17 s | ~0.78–1.3 s |
+| SK→EN | whisper-small-sk ~1.3 s | Opus-MT ~0.08 s | Piper ~0.07 s | ~1.27–1.64 s (STT-bound) |
 
-*   **Python 3.9+**
-*   **pip** (Python package installer)
-*   **Git**
-*   **FFmpeg** (for audio processing, usually pre-installed or easily installed via Homebrew on macOS: `brew install ffmpeg`)
-*   **BlackHole 2ch** (or similar virtual audio device for macOS, recommended for routing audio output for testing: `brew install blackhole-2ch`)
+SK→EN is the bottleneck and the weak direction — honest about it in the thesis.
 
-### Steps
+## Quick start (zero-knowledge user)
 
-1.  **Clone the Repository:**
-    ```bash
-    git clone https://github.com/brusnyak/bp.git
-    cd bp
-    ```
-
-2.  **Create and Activate a Virtual Environment:**
-    It's highly recommended to use a virtual environment to manage dependencies.
-    ```bash
-    python3 -m venv venv
-    source .venv/bin/activate
-    ```
-
-3.  **Install Dependencies:**
-    Install the required Python packages. The `requirements.txt` file is optimized for Apple Silicon.
-    ```bash
-    pip install -r requirements.txt
-    ```
-    *Note: If you encounter issues with `torch` or `torchaudio` on Apple Silicon, refer to the official PyTorch installation guide for specific commands for your macOS version and chip.*
-
-4.  **Download Models:**
-    *   **Piper TTS Models:** The system will attempt to download Piper TTS models on first initialization if they are not found locally. However, you can manually download them using the provided script:
-        ```bash
-        python backend/tts/download_piper_models.py en_US-ryan-medium
-        python backend/tts/download_piper_models.py sk_SK-lili-medium
-        python backend/tts/download_piper_models.py cs_CZ-jirka-medium
-        # Download other languages as needed from PIPER_MODEL_MAPPING in backend/main.py
-        ```
-    *   **CTranslate2 MT Models:** You need to convert Opus-MT models to CTranslate2 format.
-        ```bash
-        python backend/mt/convert_opus_mt_to_ct2.py --model_name Helsinki-NLP/opus-mt-en-sk
-        python backend/mt/convert_opus_mt_to_ct2.py --model_name Helsinki-NLP/opus-mt-sk-en
-        python backend/mt/convert_opus-mt-to-ct2.py --model_name Helsinki-NLP/opus-mt-en-cs
-        # Convert other language pairs as needed
-        ```
-    *   **FasterWhisper STT Model:** The `FasterWhisperSTT` model (`large-v3`) will be downloaded automatically on first use.
-    *   **F5-TTS (for Voice Cloning):** This model will be downloaded automatically on first use if selected.
-
-5.  **Generate SSL Certificates (for HTTPS):**
-    The FastAPI server runs with HTTPS. Generate self-signed certificates:
-    ```bash
-    openssl req -x509 -newkey rsa:4096 -nodes -out certs/cert.pem -keyout certs/key.pem -days 365 -subj "/CN=localhost"
-    ```
-
-6.  **Run the Application:**
-    ```bash
-    python app.py
-    ```
-    The application will start on `https://localhost:8000`. You might need to accept the self-signed certificate in your browser.
-
-## Usage
-
-1.  **Open in Browser:** Navigate to `https://localhost:8000` in your web browser.
-2.  **Initialize Pipeline:** Click the "Initialize Pipeline" button. This will load all necessary models. The first load may take some time.
-3.  **Select Languages:** Choose your desired input and output languages from the dropdowns.
-4.  **Record Voice (Optional for F5-TTS):** If you plan to use F5-TTS for voice cloning, select "F5" as the TTS model, then click the "Record Voice" button. Follow the prompts to record a short audio sample of your voice or upload an existing WAV file. This voice profile will be used for synthesis.
-5.  **Start Speaking:** Once initialized, the system will automatically start listening for speech. Speak into your microphone.
-6.  **Real-time Translation:** Observe the transcription and translation appearing in real-time. The translated speech will be played back through your selected audio output.
-7.  **Monitor Latency:** The "Latency Breakdown" section and the timeline chart will show real-time performance metrics.
-
-## Testing
-
-A comprehensive testing framework is provided in the `test/` directory.
-
-To run the streaming pipeline tests:
 ```bash
-python test/streaming_pipeline_tests.py
+git clone <repo>
+cd BP
+python3.11 scripts/setup.py --dev   # ~90 s warm Mac; creates .venv + .env + certs + models
+make run                            # https://localhost:8000 (self-signed cert)
+# Open the UI, click Initialize Pipeline, select languages, speak
 ```
 
-**Note on Test Audio:**
-For full testing, you will need to provide actual `.wav` audio files for the following paths:
-*   `test/My test speech_xtts_speaker_clean.wav` (English speech for general testing)
-*   `test/slovak_test_speech.wav` (Slovak speech for multi-language testing)
-*   `test/Voice-Training.wav` (Speaker reference audio for XTTS voice cloning)
+- `make test` → 38/38 pass
+- `.venv/bin/python scripts/bp.py selftest` → full verification
+- `make demo-check` → demo pre-flight (assets + live server)
+- `make lab` → Voice Lab static page (no backend)
 
-Ensure these files are placed in the `test/` directory. The corresponding `_transcript.txt` and `_translation.txt` files should contain the accurate text references for evaluation.
+## Voice cloning — the hard part
 
-## Future Enhancements
+"Live translation in your own voice" means speaking the translated output in the speaker's
+voice. For Slovak output, **no open zero-shot voice-cloning TTS supports Slovak** — XTTS
+(17 langs, no SK), Chatterbox (23 langs, no SK), Qwen3-TTS (10 langs, no SK), Kokoro (EN
+only) all exclude it. The only SK path is a Piper fine-tune trained on the speaker's voice
+(~4-8 h on Mac CPU, RTF 0.04 at inference). Personal voice models are local-only and never
+committed to git.
 
-*   **Multi-speaker Support:** Extend the system to handle multiple speakers in a conference setting.
-*   **Production Optimization:** Explore model quantization, `whisper.cpp` or `mlx-whisper` for STT, and cloud deployment options.
-*   **`pip` Packaging:** Simplify installation by packaging the project as a Python library.
+For EN output, zero-shot cloning works with Chatterbox / Qwen3-TTS / XTTS on a GPU.
 
-## Thesis Suggestions
+## Enterprise comparison (paid cloud)
 
-Refer to `documentation/thesis_suggestions.txt` for detailed content suggestions for your bachelor's thesis, covering introduction, literature review, methodology, implementation details, results, and future work.
+| Service | Slovak speech translation? | Approx. cost |
+|---------|---------------------------|--------------|
+| Microsoft Teams Interpreter | ❌ (~9 langs) | ~$10/user/mo (Premium) |
+| Google Meet Speech Translation | ❌ (~6 EN-anchored pairs) | Workspace / Google AI plan |
+| KUDO AI Speech Translator | ✅ (77 langs, incl. SK) | ~$0.80-1.25/min |
+| DeepL Voice-to-Voice | ✅ likely (40+ EU, incl. SK) | ~$0.07-0.20/min |
+| **BP local** | ✅ EN↔SK (SK→EN experimental) | Free (hardware + electricity only) |
 
----
+Local wins on cost and privacy (GDPR-friendly, no audio leaves the machine); loses on
+SK→EN quality until a challenger crosses the 0.2 WER gate.
 
-**Current Development Status: F5-TTS Integration & Frontend/Backend Stability**
+## Project structure
 
-**Objective:** Successfully integrate F5-TTS for real-time voice cloning and resolve critical frontend and backend issues.
+| Path | Purpose |
+|------|---------|
+| `app.py` | FastAPI app, WebSocket server, UI mounting |
+| `backend/` | STT/MT/TTS/VAD engines, model pooling, registry, pipeline facade |
+| `backend/registry.py` | Engine registry + capability manifests + fail-closed licence gate |
+| `backend/pipeline.py` | Public `Pipeline` facade (translate(audio, src, tgt)) |
+| `languages/packs/*.json` | Declarative language packs |
+| `ui/` | Browser interface (plain HTML/CSS/JS, PWA, PiP) |
+| `scripts/` | `setup.py`, `bp.py` CLI, bench, conversion, evaluation tooling |
+| `scripts/bp.py` | Single CLI entry: `bp language|engine|stt|e2e|selftest` |
+| `test/` | pytest suites (38 tests) |
+| `documentation/` | Thesis draft, findings, research, runbooks |
+| `specs/003-end-to-end-completion/` | Feature spec: any-language, swap-any-engine, plug-and-play |
 
-**Completed Actions:**
-*   **Frontend JavaScript Errors Resolved:**
-    *   Fixed `ReferenceError: loadF5Voices is not defined` in `ui/js/main.js` by correctly calling `fetchStoredVoices(populateF5VoiceSelect)`.
-    *   Resolved `TypeError: Cannot read properties of undefined (reading 'inputSampleRate')` in `ui/audio-processor.js` by passing `processorOptions` to `AudioWorkletNode` in `ui/js/audio_processing.js`.
-    *   Improved F5-TTS UI logic in `ui/index.html` and `ui/js/main.js` for better display of voice selection and record button.
-*   **Backend FFmpeg Integration Improved:**
-    *   Replaced `torchaudio.save` with `soundfile.write` in `backend/tts/f5_tts.py` to bypass `torchaudio`'s problematic FFmpeg integration, ensuring consistent audio handling with `soundfile`.
-*   **F5-TTS Integration:** F5-TTS is now integrated as a selectable TTS model with voice cloning capabilities.
+## Key documents
 
-**Next Steps:**
-*   **Implement UI Error Handling and Feedback:** Enhance the frontend to provide clear user feedback for backend initialization failures (e.g., F5-TTS without a voice).
-*   **Run Performance Tests:** Execute `test/tts_performance_test.py` to gather data on Piper vs F5-TTS performance and quality.
-*   **Update Documentation:** Ensure all documentation, including `documentation/thesis.docx`, reflects the current state of the project.
+- `documentation/research_findings_2026-11-03.md` — enterprise S2S, voice cloning, Qwen/
+  Canary/Parakeet landscape, Slovak relevance, T4 VRAM fit
+- `documentation/model_landscape_2026-10.md` — per-component model verdicts (STT/MT/TTS/S2S)
+- `documentation/project_status_2026-10-20.md` — verified status, swap ladder, CLI reference
+- `documentation/demo_runbook_2026-09-28.md` — stage demo pre-flight, script, fallback ladder
+- `PLAN.md` — live development plan and next steps
+- `AGENTS.md` — project memory for agents (read before changing anything)
+
+## Licence
+
+MIT (see `LICENSE`). Third-party non-commercial traps (XTTS CPML, NLLB CC-BY-NC,
+SeamlessM4T CC-BY-NC) are documented and enforced fail-closed by the licence gate.

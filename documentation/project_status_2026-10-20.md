@@ -13,6 +13,7 @@
 | en-cs | EN→CS | `whisper-base` (int8) | opus-mt-en-cs | `cs_CZ-jirka-medium` (Piper) | ~0.8 s | **verified** |
 | en-zh | EN→ZH | `whisper-base` (int8) | opus-mt-en-zh | `zh_CN-chaowen-medium` (Piper) | ~0.8 s | **verified** |
 | en-hi | EN→HI | `whisper-base` (int8) | opus-mt-en-hi | `hi_IN-pratham-medium` (Piper) | ~0.8 s | **verified** |
+| cs-en | CS→EN | `whisper-small-sk` (int8, `language=cs`) | opus-mt-cs-en **(not converted)** | `cs_CZ-jirka-medium` (Piper) | — | **experimental** |
 
 \* SK→EN latency bottleneck is STT (see § Known Limitations).
 
@@ -51,7 +52,7 @@ bp grades --import voice-ratings.json # Voice Lab ear grades
 | SK→EN quality | WER 0.27 (exp.) | `whisper-small-sk` fine-tune produces Czech-like hallucinations; marked experimental; see § SK→EN Deep Dive |
 | **ja TTS** | **unsupported** | Piper voice uses unsupported `japanese` phoneme_type; MT works, TTS fails |
 | RVC-MLX voice conversion | registered, no model | Train once on GPU (Applio), then any TTS → your voice |
-| OmniVoice TTS | registered, GPU-only | RTF 0.14–0.17 on T4, first audio ~1.1s |
+| OmniVoice TTS | registered, GPU-only, **batch/QC only** | RTF 0.14–0.17 on T4 (long text), 0.40–0.65 short phrase — **not real-time**; not the live TTS engine. Live path = Piper CPU (RTF ~0.04) or optional Kokoro EN GPU (RTF 0.03). |
 | Unified S2S (Qwen3-Omni) | declared only | Apache 2.0, not implemented |
 | Linux x86_64 | untested | Only aarch64 Colima tested; CI not wired |
 | `/health` + `/metrics` HTTP | **added** | Pool stats, engine versions, session details |
@@ -77,7 +78,8 @@ bp language list
 # en-cs  verified   (Czech)  
 # en-zh  verified   (Chinese)
 # en-hi  verified   (Hindi)
-# sk-en  experimental (Czech hallucinations in STT)
+# sk-en  experimental (Czech hallucinations in STT; Canary AST improves STT WER but chrF++ ~52 below commercial bar)
+# cs-en  experimental (MT opus-mt-cs-en not yet CTranslate2-converted)
 ```
 
 ### Engines (swap STT/MT/TTS/VAD)
@@ -102,7 +104,7 @@ BP_STT_BEAM_SIZE=1 bp selftest    # greedy: ~2x faster, WER +0.1 on SK
 # In language pack:
 # "tts": { "engine": "piper", "voice": "sk_SK-lili-medium", "fallback": "sk_SK-personal-male-medium" }
 
-# Or at runtime via UI dropdown (piper / piper_sk_personal / omnivoice / hybrid / xtts)
+# Or at runtime via UI dropdown (piper / piper_sk_personal — omnivoice, hybrid, xtts are NOT on the live path; omnivoice is batch/QC only)
 ```
 
 ---
@@ -114,7 +116,7 @@ BP_STT_BEAM_SIZE=1 bp selftest    # greedy: ~2x faster, WER +0.1 on SK
 | VAD | WebRTC VAD (mode 3) | Silero VAD, VAC iterator, AlignAtt policy | Latency + WER unchanged | Silero needs torch |
 | STT | faster-whisper `small-sk` / `base` | Voxtral Realtime, Qwen3-ASR-causal, Parakeet-TDT-v3 (EN), large-v3-turbo | WER on spontaneous SK + RTF | `small-sk` has Czech hallucination bug; `large-v3-turbo` too slow on CPU (RTF 0.6) |
 | MT | Opus-MT int8 per pair | NLLW / EuroLLM / small LLM translate | chrF/BLEU + latency + licence | NLLB is CC-BY-NC (blocked by licence gate) |
-| TTS | Piper (CPU, CoreML on Mac) | OmniVoice, CosyVoice3, Qwen3-TTS, Voxtral TTS | RTF + similarity + licence | Piper RTF 0.03 on CoreML — not the bottleneck |
+| TTS | Piper (CPU, CoreML on Mac) | OmniVoice (batch/QC only, not live), Kokoro EN GPU (optional, declared), Qwen3-TTS EN GPU (declared) | RTF + similarity + licence | Piper RTF 0.03 on CoreML — not the bottleneck |
 | Whole | cascade | Qwen3-Omni local, Gemini Live Translate adapter | Only if thesis framing absorbs it | Unified = lower latency, prosody preserved |
 
 ---
@@ -135,9 +137,11 @@ BP_STT_BEAM_SIZE=1 bp selftest    # greedy: ~2x faster, WER +0.1 on SK
 | base | 1 | ✓ | 0.755 | 4.7s | 0.04 |
 | large-v3-turbo | 1 | ✓ | 0.828 | 80.8s (30s chunks) | 0.60 |
 
-**Conclusion**: On CPU, `small-sk` with `beam_size=1` + `initial_prompt` is the best trade-off (WER 0.32, RTF 0.12). The fine-tune is fundamentally flawed — it overfits to Czech-like output. A proper Slovak model needs GPU (Parakeet / Voxtral / fine-tuned large-v3-turbo).
+**Conclusion**: On CPU, `small-sk` with `beam_size=5` + `initial_prompt` is the best trade-off (WER 0.255). The fine-tune is fundamentally flawed — it overfits to Czech-like output. A proper Slovak model needs GPU.
 
-**Recommendation for thesis**: Document honestly. Use `beam_size=5` for quality (WER 0.23) in demo, offer `beam_size=1` as "fast mode". Note that SK→EN is the weak direction and why.
+**Canary AST (Kaggle T4, 2026-11-03)**: SK ASR WER 0.0477 (<0.2 ✅) but SK→EN AST chrF++ ~52 mean (below commercial bar). Canary = speed path (collapses STT+MT), not quality path. Cascade (Whisper→Opus-MT) remains the quality path. **Not promoted to live route.**
+
+**Recommendation for thesis**: Document honestly. Use `beam_size=5` for quality (WER 0.23–0.26) in demo, offer `beam_size=1` as "fast mode". Note that SK→EN is the weak direction and why — and that Canary AST improves STT WER but not translation quality enough for commercial use.
 
 ---
 

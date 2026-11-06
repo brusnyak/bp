@@ -36,7 +36,7 @@ def _segment_text(segments: list[object]) -> str:
 
 def _voice_model(source: str, target: str, voice: str) -> str:
     if voice == "generic":
-        return "sk_SK-lili-medium" if target == "sk" else "en_US-ryan-medium"
+        return "sk_SK-lili-medium" if target == "sk" else "en_US-john-medium"
     # The fixed personal Piper models are separate per target language. This is
     # not zero-shot cloning; it is the real current default behaviour.
     return "sk_SK-personal-male-medium" if target == "sk" else "en_US-personal-v2"

@@ -1,0 +1,18 @@
+{
+ "en_US-ryan-medium": {
+  "wer_mean": 0.0,
+  "rtf_mean": 0.033
+ },
+ "en_US-john-medium": {
+  "wer_mean": 0.044,
+  "rtf_mean": 0.03
+ },
+ "en_US-kristin-medium": {
+  "wer_mean": 0.075,
+  "rtf_mean": 0.031
+ },
+ "en_US-norman-medium": {
+  "wer_mean": 0.08,
+  "rtf_mean": 0.031
+ }
+}

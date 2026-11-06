@@ -1,0 +1,132 @@
+"""
+TTS engine registry — the single place to add, remove, or swap a synthesis engine.
+
+Why this exists: main.py used to have the same 4-way if/elif chain hardcoded in
+three separate places (session init, session lookup, WebSocket dispatch), each
+one duplicating device-selection logic and each easy to update inconsistently
+(hybrid/omnivoice had already fallen out of sync in two of the three spots).
+Every engine now goes through this registry instead, so main.py never needs to
+know engine names or count.
+
+To add a new engine (e.g. if a faster/better model replaces one of these):
+  1. Write a class with:
+       .synthesize(text: str, language: str, speaker_wav_path: Optional[str] = None)
+           -> (wav: np.ndarray, sample_rate: int, latency_seconds: float)
+     (mirror an existing backend/tts/*.py engine for the shape.)
+  2. Optionally set class attributes read by main.py's dispatcher:
+       SUPPORTS_CLONING: bool        (default False)
+       REQUIRES_SPEAKER_WAV: bool    (default False — clone-capable but has a generic fallback)
+       SUPPORTS_STREAMING: bool      (default False — if True, also implement .synthesize_stream(...))
+       LANGUAGE_OVERRIDES: dict      (default {} — e.g. {"sk": "cs"} to proxy an unsupported language)
+       sample_rate: int              (used for streamed WAV framing; defaults to 24000 if absent)
+  3. Add a one-line factory below and register it in TTS_ENGINES.
+
+Nothing in main.py changes when you do this.
+"""
+import os
+from typing import Callable, Dict
+
+from backend import hardware
+from backend.tts.piper_tts import PiperTTS
+try:
+    from backend.tts.coqui_tts import CoquiTTS
+except ImportError:
+    # SANDBOX-NOTE (2026-09-28): Coqui TTS ships Linux-only wheels; on stock Windows
+    # the package is uninstallable without an MSVC toolchain. Same guarded pattern
+    # omni_tts.py / hybrid_tts.py already use -- the "xtts" engine just stays
+    # unregistered instead of breaking every import of this module.
+    CoquiTTS = None
+# Lite install has no torch: both engines import it at module level, so guard like CoquiTTS.
+try:
+    from backend.tts.hybrid_tts import HybridTTS
+except ImportError:
+    HybridTTS = None
+try:
+    from backend.tts.omni_tts import OmniVoiceTTS
+except ImportError:
+    OmniVoiceTTS = None
+
+
+def _piper_factory() -> PiperTTS:
+    return PiperTTS(model_id="cs_CZ-jirka-medium", device=hardware.detect_backend("tts_baseline"))
+
+
+_PIPER_DIR = os.path.join("backend", "tts", "piper_models")
+
+
+def _piper(preferred: str, fallback: str) -> PiperTTS:
+    """Personal fine-tuned voices are local-only (never committed); a fresh clone falls back to the
+    public Piper voice that scripts/setup.py downloads."""
+    have = os.path.exists(os.path.join(_PIPER_DIR, f"{preferred}.onnx"))
+    return PiperTTS(model_id=preferred if have else fallback, device=hardware.detect_backend("tts_baseline"))
+
+
+def _piper_personal_factory() -> PiperTTS:
+    # The user's own fine-tuned voice (backend/tts/piper_models/en_US-personal-medium.onnx,
+    # RTF 0.056 per documentation/personal_voice_bootstrap_2026-08-19.md). EN-only — the fine-tune
+    # was trained on EN-only recordings, so this is not a generic-language voice like the other
+    # Piper entries; no SUPPORTS_CLONING flag exists for "clones one specific pre-baked speaker",
+    # it's just a different fixed voice.
+    return _piper("en_US-personal-medium", "en_US-john-medium")
+
+
+def _piper_personal_v2_factory() -> PiperTTS:
+    # Second EN fine-tune (scripts/finetune_personal_voice.py, real-audio-only).
+    # Ear verdict 2026-09-27 pending between v1/v2 (v1: F0 100Hz HNR -3.9; v2: 111Hz -5.9).
+    return _piper("en_US-personal-v2", "en_US-john-medium")
+
+
+def _piper_sk_personal_factory() -> PiperTTS:
+    # User's SK voice: jirka-male warmstart, 2500 steps on 18 segmented clips
+    # (2026-09-27). Default SK output voice — replaces the Czech generic base.
+    return _piper("sk_SK-personal-male-medium", "sk_SK-lili-medium")
+
+
+def _piper_sk_omni_factory() -> PiperTTS:
+    # SK voice fine-tuned on the OmniVoice HQ corpus (2026-09-30, 2500 steps,
+    # small-sk WER 0.19 vs 0.54 for sk_personal). Ear verdict pending — not
+    # the default until the owner picks it in the Voice Lab.
+    return _piper("me_omni_piper_sk", "sk_SK-lili-medium")
+
+
+def _piper_generic_sk_factory() -> PiperTTS:
+    # Generic SK base voice (lili), no fine-tune. Reference point for
+    # generic-vs-cloned comparisons (added 2026-09-29 for the live meeting A/B).
+    return PiperTTS(model_id="sk_SK-lili-medium", device=hardware.detect_backend("tts_baseline"))
+
+
+def _piper_generic_en_factory() -> PiperTTS:
+    # Generic EN base voice (john, public-domain LibriVox data; ryan is CC BY-NC-SA), no fine-tune. Same purpose as above.
+    return PiperTTS(model_id="en_US-john-medium", device=hardware.detect_backend("tts_baseline"))
+
+
+def _xtts_factory():
+    if CoquiTTS is None:
+        raise RuntimeError("CoquiTTS (XTTS) is not installed on this machine.")
+    return CoquiTTS(device=hardware.detect_backend("tts_clone"))
+
+
+def _hybrid_factory() -> HybridTTS:
+    return HybridTTS(device=hardware.detect_backend("tts_clone"))
+
+
+def _omnivoice_factory() -> OmniVoiceTTS:
+    return OmniVoiceTTS(device=hardware.detect_backend("tts_clone"))
+
+
+TTS_ENGINES: Dict[str, Callable[[], object]] = {
+    "piper": _piper_factory,
+    "piper_personal": _piper_personal_factory,
+    "piper_personal_v2": _piper_personal_v2_factory,
+    "piper_sk_personal": _piper_sk_personal_factory,
+    "piper_sk_omni": _piper_sk_omni_factory,
+    "piper_generic_sk": _piper_generic_sk_factory,
+    "piper_generic_en": _piper_generic_en_factory,
+}
+
+if HybridTTS is not None:
+    TTS_ENGINES["hybrid"] = _hybrid_factory
+if OmniVoiceTTS is not None:
+    TTS_ENGINES["omnivoice"] = _omnivoice_factory
+if CoquiTTS is not None:
+    TTS_ENGINES["xtts"] = _xtts_factory

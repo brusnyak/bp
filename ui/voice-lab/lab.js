@@ -900,6 +900,7 @@
     document.getElementById("statStrip").appendChild(dl);
     try {
       const r = await fetch("library.json", { cache: "no-store" });
+      if (!r.ok) throw new Error("Research library is private; public demo evidence must be approved separately (HTTP " + r.status + ")");
       if (!r.ok) throw new Error("HTTP " + r.status);
       renderLibrary(await r.json());
     } catch (e) {

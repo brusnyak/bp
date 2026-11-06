@@ -1,0 +1,109 @@
+{
+ "routes": [
+  {
+   "license": "commercial-ok (attribution: Opus-MT CC-BY-4.0; voice dataset public domain/CC0)",
+   "pair": "cs-en",
+   "source": "cs",
+   "target": "en",
+   "tts": "en_US-john-medium"
+  },
+  {
+   "license": "commercial-ok (attribution: Opus-MT CC-BY-4.0; voice dataset public domain/CC0)",
+   "pair": "de-en",
+   "source": "de",
+   "target": "en",
+   "tts": "en_US-john-medium"
+  },
+  {
+   "license": "commercial-ok (attribution: Opus-MT CC-BY-4.0; voice dataset public domain/CC0)",
+   "pair": "en-cs",
+   "source": "en",
+   "target": "cs",
+   "tts": "cs_CZ-jirka-medium"
+  },
+  {
+   "license": "commercial-ok (attribution: Opus-MT CC-BY-4.0; voice dataset public domain/CC0)",
+   "pair": "en-de",
+   "source": "en",
+   "target": "de",
+   "tts": "de_DE-karlsson-low"
+  },
+  {
+   "license": "commercial-ok (attribution: Opus-MT CC-BY-4.0; voice dataset public domain/CC0)",
+   "pair": "en-fr",
+   "source": "en",
+   "target": "fr",
+   "tts": "fr_FR-siwis-medium"
+  },
+  {
+   "license": "unverified",
+   "pair": "en-hi",
+   "source": "en",
+   "target": "hi",
+   "tts": "hi_IN-pratham-medium"
+  },
+  {
+   "license": "unverified",
+   "pair": "en-pl",
+   "source": "en",
+   "target": "pl",
+   "tts": "pl_XX-unknown-medium"
+  },
+  {
+   "license": "voice-unverified: default personal voice was fine-tuned from a non-commercial base; fallback sk_SK-lili is CC0",
+   "pair": "en-sk",
+   "source": "en",
+   "target": "sk",
+   "tts": "sk_SK-personal-male-medium"
+  },
+  {
+   "license": "unverified",
+   "pair": "en-zh",
+   "source": "en",
+   "target": "zh",
+   "tts": "zh_CN-chaowen-medium"
+  },
+  {
+   "license": "commercial-ok (attribution: Opus-MT CC-BY-4.0; voice dataset public domain/CC0)",
+   "pair": "fr-en",
+   "source": "fr",
+   "target": "en",
+   "tts": "en_US-john-medium"
+  },
+  {
+   "license": "commercial-ok (attribution: Opus-MT CC-BY-4.0; voice dataset public domain/CC0)",
+   "pair": "hi-en",
+   "source": "hi",
+   "target": "en",
+   "tts": "en_US-john-medium"
+  },
+  {
+   "license": "commercial-ok (attribution: Opus-MT CC-BY-4.0; voice dataset public domain/CC0)",
+   "pair": "ja-en",
+   "source": "ja",
+   "target": "en",
+   "tts": "en_US-john-medium"
+  },
+  {
+   "license": "commercial-ok (attribution: Opus-MT CC-BY-4.0; voice dataset public domain/CC0)",
+   "pair": "pl-en",
+   "source": "pl",
+   "target": "en",
+   "tts": "en_US-john-medium"
+  },
+  {
+   "license": "commercial-ok (attribution: Opus-MT CC-BY-4.0; voice dataset public domain/CC0)",
+   "pair": "sk-en",
+   "source": "sk",
+   "target": "en",
+   "tts": "en_US-john-medium"
+  },
+  {
+   "license": "commercial-ok (attribution: Opus-MT CC-BY-4.0; voice dataset public domain/CC0)",
+   "pair": "zh-en",
+   "source": "zh",
+   "target": "en",
+   "tts": "en_US-john-medium"
+  }
+ ]
+}

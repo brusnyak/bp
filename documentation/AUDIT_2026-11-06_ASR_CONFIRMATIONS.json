@@ -1,0 +1,54 @@
+[
+  {
+    "receipt": "/Users/yegor/bp-benchmark-2026-11-04/confirm-whisper-v1/results/ct2-cs-b5-float16-full.json",
+    "sha256": "f17ae2c77ee71c602f6feb7ba52a1bbba31e7b1bed63baab010d1713c07ff656",
+    "n": 80,
+    "micro_wer": 0.3852140077821012,
+    "word_errors": 594,
+    "reference_words": 1542,
+    "model": "Systran/faster-whisper-small",
+    "revision": "536b0662742c02347bc0e980a01041f333bce120",
+    "source": "cs",
+    "aggregate_rtf": 0.02349154523591632,
+    "scope": "stored text rescored; corpus ID/reference/audio-hash join; no audio listening, no new inference"
+  },
+  {
+    "receipt": "/Users/yegor/bp-benchmark-2026-11-04/confirm-whisper-v1/results/ct2-sk-b5-float16-full.json",
+    "sha256": "78d2ca8b493ae2f42bc6b0e444ca966c12109427723d5dbe2888c7daa5007c21",
+    "n": 80,
+    "micro_wer": 0.30838709677419357,
+    "word_errors": 478,
+    "reference_words": 1550,
+    "model": "Systran/faster-whisper-small",
+    "revision": "536b0662742c02347bc0e980a01041f333bce120",
+    "source": "sk",
+    "aggregate_rtf": 0.02339958560323251,
+    "scope": "stored text rescored; corpus ID/reference/audio-hash join; no audio listening, no new inference"
+  },
+  {
+    "receipt": "/Users/yegor/bp-benchmark-2026-11-04/confirm-whisper-v1/results/ct2-turbo-cs-full.json",
+    "sha256": "4c6900ce58b5ddd9420bb47874becf3c65ac36bd733294a0eeb25c49c15958ae",
+    "n": 80,
+    "micro_wer": 0.12710765239948119,
+    "word_errors": 196,
+    "reference_words": 1542,
+    "model": "mobiuslabsgmbh/faster-whisper-large-v3-turbo",
+    "revision": "0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf",
+    "source": "cs",
+    "aggregate_rtf": 0.03524418209322289,
+    "scope": "stored text rescored; corpus ID/reference/audio-hash join; no audio listening, no new inference"
+  },
+  {
+    "receipt": "/Users/yegor/bp-benchmark-2026-11-04/confirm-whisper-v1/results/ct2-turbo-sk-full.json",
+    "sha256": "6e9425eed4126b9c956135edf8e1c7f85fd7c207ca7220ebf77eea89c2e228e5",
+    "n": 80,
+    "micro_wer": 0.09806451612903226,
+    "word_errors": 152,
+    "reference_words": 1550,
+    "model": "mobiuslabsgmbh/faster-whisper-large-v3-turbo",
+    "revision": "0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf",
+    "source": "sk",
+    "aggregate_rtf": 0.0362897369880872,
+    "scope": "stored text rescored; corpus ID/reference/audio-hash join; no audio listening, no new inference"
+  }
+]

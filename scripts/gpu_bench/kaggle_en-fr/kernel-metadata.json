@@ -1,0 +1,17 @@
+{
+  "id": "yegorby/bp-t4-kaggle-enfr-v2",
+  "title": "BP T4 EN-FR route benchmark v2",
+  "code_file": "job.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [
+    "yegorby/bp-t4-assets-20261105"
+  ],
+  "competition_sources": [],
+  "model_sources": [],
+  "category_ids": [],
+  "keywords": []
+}

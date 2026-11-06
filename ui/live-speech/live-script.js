@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.getElementById('sidebar');
     const closeSidebarBtn = document.getElementById('closeSidebarBtn');
     const ttsModelSelect = document.getElementById('ttsModelSelect');
+    const inputLanguageSelect = document.getElementById('inputLanguageSelect');
     const voiceSelectionGroup = document.getElementById('voice-selection-group');
     const speakerVoiceSelect = document.getElementById('speakerVoiceSelect');
     const mainControlsTopRow = document.querySelector('.main-controls .top-row');
@@ -21,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeNamingModalBtn = document.getElementById('closeNamingModalBtn');
     const saveVoiceNameBtn = document.getElementById('saveVoiceNameBtn');
     const cancelVoiceNameBtn = document.getElementById('cancelVoiceNameBtn');
-    const deleteConfirmationModal = document = document.getElementById('deleteConfirmationModal');
+    const deleteConfirmationModal = document.getElementById('deleteConfirmationModal');
     const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
     const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
@@ -46,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let mainMicrophone = null;
     let mainGainNode = null; // Declare mainGainNode globally
     let mainAudioWorkletNode = null; // Replaced ScriptProcessorNode
-    let savedAudioConstraints = null; // Store constraints for stream restart
+    let monitorSink = null;
 
     // --- Input level smoothing state (matching BP xtts) ---
     let emaLevel = 0.0; // exponential moving average for smoothing
@@ -54,17 +55,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const NUM_LEVEL_SEGMENTS = 10; // Number of mic level segments
     let mainAudioStream = null; // To store the microphone stream for the main pipeline
     let chartIdleInterval = null; // Interval for updating chart during idle state
-    let isTTSPlaying = false; // Flag to track if TTS is currently playing
     let sessionStartTime = 0; // Track session start time for relative chart timing
 
     // --- Throttle state for debug logs (avoid spamming console) ---
     let lastLogAt = 0;
     const LOG_THROTTLE_MS = 1000; // log at most once per second
 
-    // Custom Notification Function
-    function showNotification(message, type = 'info') {
-        // Implementation for notifications
-    }
 
     // Activity Log Helper Function with colored event types
     function logActivity(message, type = 'info') {
@@ -88,6 +84,13 @@ document.addEventListener('DOMContentLoaded', () => {
     async function enumerateAudioOutputDevices() {
         try {
             const devices = await navigator.mediaDevices.enumerateDevices();
+            const inputSelect = document.getElementById('audioInputSelect');
+            const previousInput = inputSelect.value;
+            inputSelect.replaceChildren(new Option('System default input', ''));
+            for (const input of devices.filter(device => device.kind === 'audioinput')) {
+                inputSelect.add(new Option(input.label || 'Audio input', input.deviceId));
+            }
+            if ([...inputSelect.options].some(option => option.value === previousInput)) inputSelect.value = previousInput;
             const audioOutputs = devices.filter(device => device.kind === 'audiooutput');
 
             // Rebuild the list without silently moving playback to a virtual cable.
@@ -122,9 +125,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (virtualDeviceFound) {
                 virtualMicHint.textContent = `Virtual output available: ${virtualDeviceName}. Choose it only when sending translated audio into a meeting.`;
                 virtualMicHint.style.color = 'var(--log-success-color)';
-                showNotification(`Audio will route to: ${virtualDeviceName}`, 'success');
+                // Availability is not a successful routing check.
+            } else if (audioOutputs.length && audioOutputs.every(d => !d.label)) {
+                virtualMicHint.textContent = 'Device names are hidden until the browser has microphone permission. Run the sound check above to detect a virtual cable.';
+                virtualMicHint.style.color = 'var(--secondary-color)';
             } else {
-                virtualMicHint.textContent = 'Playback stays on speakers/headphones. Install BlackHole or VB-Cable only to route into a meeting.';
+                virtualMicHint.textContent = 'Playback stays on speakers/headphones. A virtual cable (BlackHole, VB-Cable) is needed only to send audio into a meeting; see the steps below.';
                 virtualMicHint.style.color = 'var(--secondary-color)'; // informational, not a warning (orange failed contrast)
                 console.warn('Frontend: No virtual audio device detected. Translation will play through default output.');
             }
@@ -163,12 +169,10 @@ document.addEventListener('DOMContentLoaded', () => {
     enumerateAudioOutputDevices();
 
     // Re-enumerate when devices change (e.g., virtual device installed/removed)
-    navigator.mediaDevices.addEventListener('devicechange', () => {
-        console.log('Frontend: Audio devices changed, re-enumerating...');
-        enumerateAudioOutputDevices();
-    });
+
 
     function showNotification(message, type = 'info') {
+        if (type === 'error' || type === 'warning') setRouteStatus(message);
         const notificationBar = document.getElementById('notificationBar');
         if (!notificationBar) {
             console.warn('Notification bar element not found.');
@@ -242,13 +246,146 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const routeStatus = document.getElementById('routeStatus');
+    let reconnectTimer = null;
+    let modelsReady = false;
+    let captureGeneration = 0;
+    let soundCheckStream = null;
+    let soundCheckRecorder = null;
+    let checkedDevices = null;
+    let starting = false;
+    const playback = new SessionPlayback({ onError: error => {
+        stopRealtimeAudioStreaming();
+        checkedDevices = null;
+        updateStartAvailability();
+        showNotification(error.message, 'error');
+    }});
+    const rateSelect = document.getElementById('playbackRateSelect');
+    if (rateSelect) {
+        try { rateSelect.value = localStorage.getItem('bp.playbackRate') || 'auto'; } catch { /* storage unavailable */ }
+        const applyRate = () => {
+            playback.adaptive = rateSelect.value === 'auto';
+            playback.playbackRate = Number(rateSelect.value) || 1;
+            try { localStorage.setItem('bp.playbackRate', rateSelect.value); } catch { /* storage unavailable */ }
+        };
+        rateSelect.addEventListener('change', applyRate);
+        applyRate();
+    }
+    const setRouteStatus = text => { if (routeStatus) routeStatus.textContent = text; };
+    const deviceFingerprint = () => `${document.getElementById('audioInputSelect').value}|${selectedAudioOutputDeviceId || ''}`;
+    // Read by live-flow.js (the guided button). Called wherever streaming or preparation state changes.
+    const publishLive = () => {
+        window.__live = { isStreaming, starting, modelsReady, soundChecked: checkedDevices === deviceFingerprint(), isolated: document.getElementById('isolationConfirmed').checked };
+        document.dispatchEvent(new Event('livestate'));
+    };
+    const updateStartAvailability = () => {
+        const soundChecked = checkedDevices === deviceFingerprint();
+        const isolated = document.getElementById('isolationConfirmed').checked;
+        startStopBtn.disabled = !(isStreaming || starting || (modelsReady && soundChecked && isolated));
+        publishLive();
+        const reason = document.getElementById('startReason');
+        if (reason) {
+            reason.textContent = isStreaming ? 'Running. Stop ends capture and discards queued audio.'
+                : starting ? 'Starting...'
+                : !modelsReady ? 'Next: prepare the route.'
+                : !soundChecked ? 'Next: run the microphone and playback check.'
+                : !isolated ? 'Next: confirm headphones or isolated meeting audio.'
+                : 'Ready. Press Start.';
+        }
+    };
+    document.getElementById('isolationConfirmed').addEventListener('change', updateStartAvailability);
+    for (const id of ['audioInputSelect', 'audioOutputSelect']) document.getElementById(id).addEventListener('change', () => {
+        stopRealtimeAudioStreaming(); checkedDevices = null;
+        document.getElementById('isolationConfirmed').checked = false;
+        document.getElementById('soundCheckStatus').textContent = 'Devices changed. Run the sound check again.';
+    });
+    document.getElementById('soundCheckBtn').addEventListener('click', async () => {
+        stopRealtimeAudioStreaming();
+        const generation = captureGeneration;
+        const button = document.getElementById('soundCheckBtn');
+        const status = document.getElementById('soundCheckStatus');
+        const fingerprint = deviceFingerprint();
+        checkedDevices = null;
+        document.getElementById('isolationConfirmed').checked = false;
+        button.disabled = true;
+        let checkedStream = null;
+        let recorder = null;
+        try {
+            const input = document.getElementById('audioInputSelect').value;
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: input ? { deviceId: { exact: input }, echoCancellation: true } : true });
+            if (generation !== captureGeneration) { stream.getTracks().forEach(track => track.stop()); return; }
+            checkedStream = stream;
+            soundCheckStream = stream;
+            recorder = new MediaRecorder(stream);
+            soundCheckRecorder = recorder;
+            const chunks = [];
+            recorder.ondataavailable = event => { if (event.data.size) chunks.push(event.data); };
+            const recorded = new Promise((resolve, reject) => { recorder.onstop = resolve; recorder.onerror = event => reject(event.error || new Error('Recording failed')); });
+            recorder.start();
+            status.textContent = 'Say a short phrase. Recording locally for two seconds…';
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            if (recorder.state !== 'inactive') recorder.stop();
+            await recorded;
+            stream.getTracks().forEach(track => track.stop());
+            soundCheckStream = null;
+            if (generation !== captureGeneration || fingerprint !== deviceFingerprint()) return;
+            await enumerateAudioOutputDevices();
+            if (generation !== captureGeneration || fingerprint !== deviceFingerprint()) return;
+            checkedDevices = deviceFingerprint();
+            updateStartAvailability();
+            playback.start();
+            playback.enqueue(new Blob(chunks, { type: recorder.mimeType }), selectedAudioOutputDeviceId || '');
+            status.textContent = 'Check that you hear your phrase on the intended output, then confirm isolation below. This checks devices, not translation quality.';
+        } catch (error) { status.textContent = `Sound check failed: ${error.message}`; checkedDevices = null; }
+        finally {
+            if (recorder && recorder.state !== 'inactive') recorder.stop();
+            if (checkedStream) checkedStream.getTracks().forEach(track => track.stop());
+            if (soundCheckStream === checkedStream) soundCheckStream = null;
+            button.disabled = false;
+            updateStartAvailability();
+        }
+    });
+    navigator.mediaDevices?.addEventListener('devicechange', () => {
+        stopRealtimeAudioStreaming(); checkedDevices = null;
+        document.getElementById('isolationConfirmed').checked = false;
+        enumerateAudioOutputDevices();
+        setRouteStatus('Audio devices changed. Check input/output and run the sound check again.');
+    });
+    // Guest demo session: no account, no voice management. Server decides (GET /api/auth/config guest_enabled).
+    let guestRetried = false;
+    async function startGuestSession() {
+        try {
+            const cfg = await (await fetch('/api/auth/config')).json();
+            if (!cfg.guest_enabled) return false;
+            const r = await fetch('/api/guest', { method: 'POST' });
+            if (!r.ok) return false;
+            const d = await r.json();
+            localStorage.setItem('userToken', d.token);
+            localStorage.setItem('userName', d.username || 'Guest');
+            localStorage.setItem('userEmail', d.email || '');
+            localStorage.setItem('userGuest', '1');
+            return true;
+        } catch (e) { return false; }
+    }
     // WebSocket setup
     function setupWebSocket() {
-        const WS_URL = `wss://${window.location.host}/ws`; // Adjust if your backend is on a different host/port
+        clearTimeout(reconnectTimer);
+        const token = localStorage.getItem('userToken');
+        if (!token) {
+            setRouteStatus('Starting a guest session...');
+            startGuestSession().then(ok => {
+                if (ok) setupWebSocket();
+                else setRouteStatus('Sign in to prepare a session. No microphone capture is active.');
+            });
+            return;
+        }
+        const scheme = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const WS_URL = `${scheme}//${window.location.host}/ws?token=${encodeURIComponent(token)}`;
         websocket = new WebSocket(WS_URL);
 
         websocket.onopen = (event) => {
-            console.log('WebSocket opened:', event);
+            modelsReady = false;
+            initBtn.disabled = false;
             showNotification('Connected to translation service.', 'success');
         };
 
@@ -261,27 +398,35 @@ document.addEventListener('DOMContentLoaded', () => {
                     const rms = message.level || 0;
                     updateMainMicLevel(rms);
                 } else if (message.type === 'models_loading_status') {
+                    if (message.route_status) setRouteStatus(`${message.route_status.pair || 'Route'}: ${message.route_status.status}. ${message.route_status.reason || ''}`);
+                    modelsReady = Boolean(message.fully_loaded);
                     if (message.fully_loaded) {
                         initBtn.disabled = true; // Disable initialize button
                         initBtn.classList.remove('btn-active'); // Dim initialize button
-                        startStopBtn.disabled = false; // Enable start button
+                        updateStartAvailability(); // Models alone do not complete preparation
                         startStopBtn.classList.add('btn-active'); // Light up start button
-                        statusLabel.textContent = 'Ready';
+                        statusLabel.textContent = 'Initialized — sound check before Start';
                         statusIndicator.classList.remove('off');
                         statusIndicator.classList.add('on');
-                        showNotification('Models are fully loaded and ready!', 'success');
+                        showNotification('Models loaded. Route quality and cloned speech still need qualification.', 'info');
                         logActivity('All models initialized successfully', 'success');
                     } else {
                         initBtn.disabled = false; // Enable initialize button
                         initBtn.classList.add('btn-active'); // Light up initialize button (if it was dimmed)
                         startStopBtn.disabled = true; // Disable start button
                         startStopBtn.classList.remove('btn-active'); // Dim start button
-                        statusLabel.textContent = 'Error';
+                        statusLabel.textContent = 'Select a direction, then Initialize';
                         statusIndicator.classList.remove('on');
                         statusIndicator.classList.add('off');
-                        showNotification('Model loading failed or is incomplete.', 'error');
+                        // A fresh connection is intentionally not initialized.
                         logActivity('Model initialization failed', 'error');
                     }
+                } else if (message.type === 'error') {
+                    modelsReady = false;
+                    stopRealtimeAudioStreaming();
+                    initBtn.disabled = false;
+                    startStopBtn.disabled = true;
+                    showNotification(message.message || 'Route preparation failed. Check installed assets and prepare again.', 'error');
                 } else if (message.type === 'caption_partial') {
                     // T044 backend now has a face: streaming LocalAgreement caption,
                     // shown ~2s ahead of the final transcript on the subtitle strip.
@@ -401,68 +546,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         showNotification(`MT model conversion for ${message.model_name} failed: ${message.error}`, 'error');
                     }
                 }
-            } else if (event.data instanceof Blob) {
-                // Handle Blob (audio data)
-                const audioBlob = event.data;
-                const audioUrl = URL.createObjectURL(audioBlob);
-                const audio = new Audio(audioUrl);
-
-                // Auto-route to BlackHole/VB-Cable if detected
-                if (selectedAudioOutputDeviceId && typeof audio.setSinkId === 'function') {
-                    audio.setSinkId(selectedAudioOutputDeviceId)
-                        .then(() => {
-                            if (audio.sinkId !== selectedAudioOutputDeviceId) {
-                                console.warn(`Frontend: sinkId mismatch (want ${selectedAudioOutputDeviceId}, got ${audio.sinkId}); falling back to default output.`);
-                                showNotification('Selected output refused the stream — playing on default speakers instead.', 'error');
-                                return audio.setSinkId('');
-                            }
-                            console.log('Frontend: Audio routed to virtual device');
-                        })
-                        .catch(err => {
-                            console.error('Frontend: Error setting audio output device:', err);
-                            showNotification('Could not route to the selected output — playing on default speakers. (' + err.message + ')', 'error');
-                        });
-                } else {
-                    console.log('Frontend: TTS audio playing through DEFAULT speakers (BlackHole routing disabled or not supported)');
-                }
-
-                // Play audio
-                console.log('Frontend: Starting TTS playback. Stopping audio capture...');
-                isTTSPlaying = true; // Set flag
-
-                // CRITICAL: Completely stop audio capture to prevent browser from capturing TTS
-                pauseAudioCapture();
-
-                audio.play()
-                    .then(() => {
-                        console.log('Frontend: Audio playback started.');
-                    })
-                    .catch(err => {
-                        console.error('Frontend: Audio playback error:', err);
-                        showNotification('Translation audio blocked: click anywhere on the page once, then speak again. (' + err.message + ')', 'error');
-                        isTTSPlaying = false;
-                        // Resume capture even if playback fails
-                        resumeAudioCapture();
-                    });
-
-                audio.onended = () => {
-                    console.log('Frontend: TTS playback finished. Restarting audio capture...');
-                    isTTSPlaying = false;
-                    URL.revokeObjectURL(audioUrl);
-
-                    // Restart audio capture after TTS finishes
-                    resumeAudioCapture();
-                };
-                console.log('Frontend: Received and playing translated audio blob.');
-            } else if (event.data instanceof ArrayBuffer) {
-                // Handle ArrayBuffer if the backend sends it directly
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const audioBuffer = await audioContext.decodeAudioData(event.data);
-                const source = audioContext.createBufferSource();
-                source.buffer = audioBuffer;
-                source.connect(audioContext.destination);
-                source.start();
-                console.log('Frontend: Received and playing audio ArrayBuffer.');
+            } else if (event.data instanceof Blob || event.data instanceof ArrayBuffer) {
+                if (isStreaming) playback.enqueue(new Blob([event.data], { type: 'audio/wav' }), selectedAudioOutputDeviceId || '');
             }
         };
 
@@ -472,15 +557,30 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         websocket.onclose = (event) => {
-            console.log('WebSocket closed:', event);
+            modelsReady = false;
+            stopRealtimeAudioStreaming();
+            startStopBtn.disabled = true;
+            initBtn.disabled = true;
+            if ([1008, 4003, 4401, 4403].includes(event.code)) {
+                const wasGuest = localStorage.getItem('userGuest') === '1';
+                localStorage.removeItem('userToken');
+                if (wasGuest && !guestRetried) { guestRetried = true; setupWebSocket(); return; }
+                setRouteStatus('Sign-in expired or rejected. Sign in again to prepare a session.');
+                return;
+            }
             showNotification('Disconnected from translation service.', 'warning');
             // Attempt to reconnect after a delay
-            setTimeout(setupWebSocket, 5000);
+            setRouteStatus('Connection lost. Capture stopped. Reconnecting; prepare again before Start.');
+            reconnectTimer = setTimeout(setupWebSocket, 5000);
         };
     }
 
     // Call setupWebSocket on page load
     setupWebSocket();
+    window.addEventListener('pagehide', () => {
+        stopRealtimeAudioStreaming(); clearTimeout(reconnectTimer);
+        if (websocket) { websocket.onclose = null; websocket.close(); }
+    });
 
     const startStopBtn = document.getElementById('startStopBtn');
     const statusLabel = document.getElementById('statusLabel');
@@ -502,60 +602,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to start real-time audio streaming
     async function startRealtimeAudioStreaming() {
         console.log('Frontend: Attempting to start real-time audio streaming...'); // Added log
+        const generation = captureGeneration;
         try {
             console.log('Frontend: Calling navigator.mediaDevices.getUserMedia...'); // Added log before getUserMedia
 
 
-            // CRITICAL FIX: Enumerate devices and explicitly exclude BlackHole/VB-CABLE from mic input
-            const devices = await navigator.mediaDevices.enumerateDevices();
-            const audioInputs = devices.filter(d => d.kind === 'audioinput');
-
-            // Find a non-virtual-device microphone (exclude BlackHole and VB-CABLE)
-            let selectedMicId = null;
-            for (const device of audioInputs) {
-                const label = device.label.toLowerCase();
-                const isVirtualDevice = label.includes('blackhole') || label.includes('cable') || label.includes('vb-audio');
-                console.log(`Frontend: Found audio input: ${device.label} (Virtual Device: ${isVirtualDevice})`);
-
-                if (!isVirtualDevice && !selectedMicId) {
-                    selectedMicId = device.deviceId;
-                    console.log(`Frontend: Selected mic: ${device.label}`);
-                }
-            }
-
-            // If no specific device found, use default (but warn if it's BlackHole)
-            const audioConstraints = selectedMicId
-                ? {
-                    audio: {
-                        deviceId: { exact: selectedMicId },
-                        echoCancellation: false,  // CRITICAL: Disable to prevent capturing TTS from BlackHole
-                        noiseSuppression: false,  // Disable to prevent audio artifacts
-                        autoGainControl: true     // Keep AGC for consistent mic levels
-                    }
-                }
-                : {
-                    audio: {
-                        echoCancellation: false,
-                        noiseSuppression: false,
-                        autoGainControl: true
-                    }
-                };
-
-            // Save constraints for stream restart after TTS
-            savedAudioConstraints = audioConstraints;
-
-            mainAudioStream = await navigator.mediaDevices.getUserMedia(audioConstraints);
-
-            // Verify we're not using a virtual device (BlackHole or VB-CABLE)
-            const track = mainAudioStream.getAudioTracks()[0];
-            const trackLabel = track.label.toLowerCase();
-            if (trackLabel.includes('blackhole') || trackLabel.includes('cable') || trackLabel.includes('vb-audio')) {
-                console.error('Frontend: CRITICAL ERROR - Microphone input is a virtual device! This will cause feedback loop!');
-                showNotification('ERROR: Microphone input is a virtual device (BlackHole/VB-CABLE)! This will cause feedback. Please change your system audio settings.', 'error');
-                stopRealtimeAudioStreaming();
-                return;
-            }
-
+            if (!modelsReady || !websocket || websocket.readyState !== WebSocket.OPEN) throw new Error('Initialize the selected route before Start.');
+            if (checkedDevices !== deviceFingerprint()) throw new Error('Run the sound check for these devices before Start.');
+            if (!document.getElementById('isolationConfirmed').checked) throw new Error('Confirm headphones or isolated input/output before Start.');
+            const deviceId = document.getElementById('audioInputSelect').value;
+            const audioConstraints = { audio: {
+                ...(deviceId ? { deviceId: { exact: deviceId } } : {}),
+                echoCancellation: true, noiseSuppression: true, autoGainControl: true
+            }};
+            const capturedStream = await navigator.mediaDevices.getUserMedia(audioConstraints);
+            if (generation !== captureGeneration) { capturedStream.getTracks().forEach(track => track.stop()); return; }
+            mainAudioStream = capturedStream;
+            mainAudioStream.getAudioTracks().forEach(track => track.addEventListener('ended', () => {
+                if (isStreaming) { stopRealtimeAudioStreaming(); showNotification('Audio input disconnected. Select a device and prepare again.', 'error'); }
+            }));
             console.log('Frontend: MediaStream obtained. Active:', mainAudioStream.active, 'Tracks:', mainAudioStream.getAudioTracks());
             // Mic permission unlocks real device labels/ids: re-enumerate outputs so the
             // playback dropdown carries usable deviceIds (pre-permission they are empty).
@@ -573,11 +638,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 await mainAudioContext.resume();
                 console.log('Frontend: AudioContext resumed to state:', mainAudioContext.state);
             }
-            await mainAudioContext.audioWorklet.addModule('/ui/live-speech/audio-processor.js'); // Load AudioWorklet module
+            await mainAudioContext.audioWorklet.addModule('/ui/live-speech/audio-processor.js');
+            if (generation !== captureGeneration) return;
+            if (mainAudioContext.sampleRate !== 16000) throw new Error('This browser did not provide 16 kHz capture. Use a supported browser.');
             mainMicrophone = mainAudioContext.createMediaStreamSource(mainAudioStream);
             mainAnalyser = mainAudioContext.createAnalyser();
             mainGainNode = mainAudioContext.createGain(); // Assign to global mainGainNode
-            mainGainNode.gain.value = 4.0; // Increased gain for better mic pickup (was 2.0 = 6dB, now 4.0 = 12dB boost)
+            mainGainNode.gain.value = 1.0; // Increased gain for better mic pickup (was 2.0 = 6dB, now 4.0 = 12dB boost)
             console.log('Frontend: Added GainNode with initial gain:', mainGainNode.gain.value);
 
             mainAudioWorkletNode = new AudioWorkletNode(mainAudioContext, 'audio-processor'); // Create AudioWorkletNode
@@ -600,13 +667,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // We still send silence to backend so VAD can detect silence
                 }
 
-                // MUTE LOGIC: If TTS is playing, do not send audio to backend
-                if (isTTSPlaying) {
-                    // Optional: Send silence instead of nothing to keep VAD state consistent?
-                    // For now, let's just drop the packets to mimic "blocking"
-                    // console.log('Frontend: Mic muted during TTS playback.');
-                    return;
-                }
+                if (!isStreaming) return;
 
                 // The AudioWorkletNode already outputs Float32Array, which is what the backend expects.
                 // Sending the raw Float32Array buffer directly.
@@ -618,7 +679,11 @@ document.addEventListener('DOMContentLoaded', () => {
             mainMicrophone.connect(mainGainNode); // Connect microphone to GainNode
             mainGainNode.connect(mainAnalyser); // Connect GainNode to Analyser
             mainAnalyser.connect(mainAudioWorkletNode); // Connect analyser to AudioWorkletNode
-            // mainAudioWorkletNode.connect(mainAudioContext.destination); // Disconnect AudioWorkletNode from destination to prevent mic loopback
+            // Keep the worklet pulled without audible microphone monitoring.
+            monitorSink = mainAudioContext.createGain();
+            monitorSink.gain.value = 0;
+            mainAudioWorkletNode.connect(monitorSink);
+            monitorSink.connect(mainAudioContext.destination);
 
             // Set session start time for chart
             if (typeof window.updateLatencyChart === 'function') {
@@ -631,7 +696,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log('Frontend: Sent "start" command to backend');
             }
 
-            isStreaming = true;
+            isStreaming = true; publishLive();
+            playback.start();
             startStopBtn.textContent = 'Stop';
             statusLabel.textContent = 'Listening...';
             statusIndicator.classList.remove('off');
@@ -639,85 +705,23 @@ document.addEventListener('DOMContentLoaded', () => {
             showNotification('Real-time streaming started.', 'success');
             logActivity('Session started - real-time streaming active', 'success');
         } catch (err) {
+            if (generation !== captureGeneration) return;
             console.error('Error starting real-time audio streaming:', err);
-            showNotification('Failed to start real-time audio streaming. Check microphone access.', 'error');
+            showNotification(err.message || 'Microphone access failed. Check permissions and prepare again.', 'error');
             stopRealtimeAudioStreaming(); // Ensure cleanup on error
-        }
-    }
-
-    // Helper function to pause audio capture (stop stream during TTS)
-    async function pauseAudioCapture() {
-        console.log('Frontend: Pausing audio capture for TTS playback...');
-
-        // Disconnect and stop everything
-        if (mainAudioWorkletNode) {
-            mainAudioWorkletNode.disconnect();
-            mainAudioWorkletNode = null;
-        }
-        if (mainAnalyser) {
-            mainAnalyser.disconnect();
-        }
-        if (mainGainNode) {
-            mainGainNode.disconnect();
-        }
-        if (mainMicrophone) {
-            mainMicrophone.disconnect();
-        }
-        if (mainAudioStream) {
-            mainAudioStream.getTracks().forEach(track => track.stop());
-            mainAudioStream = null;
-        }
-
-        console.log('Frontend: Audio capture paused.');
-    }
-
-    // Helper function to resume audio capture (restart stream after TTS)
-    async function resumeAudioCapture() {
-        console.log('Frontend: Resuming audio capture after TTS playback...');
-
-        try {
-            // Restart the stream with saved constraints
-            if (!savedAudioConstraints) {
-                console.error('Frontend: No saved audio constraints to resume!');
-                return;
-            }
-
-            mainAudioStream = await navigator.mediaDevices.getUserMedia(savedAudioConstraints);
-            console.log('Frontend: MediaStream restarted.');
-
-            // Recreate the audio processing chain
-            mainMicrophone = mainAudioContext.createMediaStreamSource(mainAudioStream);
-
-            // Reconnect GainNode
-            mainMicrophone.connect(mainGainNode);
-            mainGainNode.connect(mainAnalyser);
-
-            // Recreate AudioWorkletNode
-            mainAudioWorkletNode = new AudioWorkletNode(mainAudioContext, 'audio-processor');
-
-            mainAudioWorkletNode.port.onmessage = (event) => {
-                const audioData = event.data;
-                if (isTTSPlaying) {
-                    return; // Extra safety check
-                }
-
-                const audioDataFloat32 = new Float32Array(audioData);
-                if (websocket && websocket.readyState === WebSocket.OPEN) {
-                    websocket.send(audioDataFloat32.buffer);
-                }
-            };
-
-            mainAnalyser.connect(mainAudioWorkletNode);
-
-            console.log('Frontend: Audio capture resumed successfully.');
-        } catch (err) {
-            console.error('Frontend: Error resuming audio capture:', err);
-            showNotification('Failed to resume audio capture. Please restart streaming.', 'error');
         }
     }
 
     // Function to stop real-time audio streaming
     function stopRealtimeAudioStreaming() {
+        captureGeneration++;
+        starting = false;
+        isStreaming = false; publishLive();
+        playback.stop();
+        if (soundCheckRecorder && soundCheckRecorder.state !== 'inactive') soundCheckRecorder.stop();
+        if (soundCheckStream) { soundCheckStream.getTracks().forEach(track => track.stop()); soundCheckStream = null; }
+        if (monitorSink) { monitorSink.disconnect(); monitorSink = null; }
+        if (websocket && websocket.readyState === WebSocket.OPEN) websocket.send(JSON.stringify({ type: 'stop' }));
         if (mainAudioStream) {
             mainAudioStream.getTracks().forEach(track => track.stop());
             mainAudioStream = null;
@@ -753,14 +757,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // Reset EMA level
         emaLevel = 0;
 
-        isStreaming = false;
+        isStreaming = false; publishLive();
         startStopBtn.textContent = 'Start';
-        statusLabel.textContent = 'Ready';
+        statusLabel.textContent = modelsReady ? 'Stopped — ready to start' : 'Not initialized';
         statusIndicator.classList.remove('on');
         statusIndicator.classList.add('off');
         showNotification('Real-time streaming stopped.', 'info');
         logActivity('Session ended - streaming stopped', 'info');
         updateMainMicLevel(0); // Reset mic level display
+        updateStartAvailability();
 
         // Reset chart if it exists
         if (typeof window.resetLatencyChart === 'function') {
@@ -774,10 +779,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (startStopBtn) {
         startStopBtn.addEventListener('click', () => {
             console.log('Frontend: Start/Stop button clicked. isStreaming:', isStreaming); // Added log
-            if (isStreaming) {
+            if (isStreaming || starting) {
                 stopRealtimeAudioStreaming();
             } else {
-                startRealtimeAudioStreaming();
+                starting = true; publishLive();
+                startRealtimeAudioStreaming().finally(() => { starting = false; publishLive(); });
             }
         });
     }
@@ -940,15 +946,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Function to send configuration update via WebSocket
-    function sendConfigUpdate() {
+    async function sendConfigUpdate() {
         if (!websocket || websocket.readyState !== WebSocket.OPEN) {
             console.warn('Frontend: WebSocket not ready. Cannot send config update.');
             showNotification('WebSocket not connected. Cannot update configuration.', 'error');
-            return;
+            initBtn.disabled = false;
+            return false;
         }
 
         const sourceLang = inputLanguageSelect.value;
         const targetLang = document.getElementById('outputLanguageSelect').value;
+        stopRealtimeAudioStreaming();
+        const generation = captureGeneration;
+        modelsReady = false;
+        startStopBtn.disabled = true;
+        initBtn.disabled = true;
+        try {
+            const response = await fetch('/api/routes', { cache: 'no-store' });
+            if (!response.ok) throw new Error('Cannot check installed route assets. Retry preparation.');
+            const inventory = await response.json();
+            if (generation !== captureGeneration) return false;
+            const route = inventory.routes.find(route => route.source === sourceLang && route.target === targetLang);
+            if (!route) throw new Error('Choose an explicitly declared input and target language pair. Automatic or undeclared routes need evaluation first.');
+            if (!route.assets.resolved) throw new Error('Setup required before this route can run: ' + route.assets.errors.join('; '));
+        } catch (error) {
+            if (generation === captureGeneration) {
+                showNotification(error.message, 'error'); initBtn.disabled = false;
+            }
+            return false;
+        }
         const ttsModelChoice = ttsModelSelect.value;
         const vadEnabled = true; // Always enabled for now
         
@@ -981,7 +1007,7 @@ document.addEventListener('DOMContentLoaded', () => {
             silence_rms_threshold: silenceRmsThreshold
         };
 
-        console.log('Frontend: Sending config_update:', configMessage);
+        if (generation !== captureGeneration || websocket.readyState !== WebSocket.OPEN) { initBtn.disabled = false; return false; }
         websocket.send(JSON.stringify(configMessage));
         
         // Update UI to loading state
@@ -990,15 +1016,21 @@ document.addEventListener('DOMContentLoaded', () => {
         statusLabel.textContent = 'Loading...';
         statusIndicator.classList.remove('on');
         statusIndicator.classList.add('off');
+        return true;
     }
 
-    // Add event listeners for immediate updates
+    const invalidatePreparation = () => {
+        stopRealtimeAudioStreaming(); modelsReady = false;
+        startStopBtn.disabled = true; initBtn.disabled = false;
+        setRouteStatus('Direction or voice changed. Initialize the selected route before Start.');
+    };
+    // Selection never silently starts model loading.
     if (inputLanguageSelect) {
-        inputLanguageSelect.addEventListener('change', sendConfigUpdate);
+        inputLanguageSelect.addEventListener('change', invalidatePreparation);
     }
     const outputLanguageSelect = document.getElementById('outputLanguageSelect');
     if (outputLanguageSelect) {
-        outputLanguageSelect.addEventListener('change', sendConfigUpdate);
+        outputLanguageSelect.addEventListener('change', invalidatePreparation);
     }
 
     // Keep the EN/SK badges beside the column titles in sync with the selects (they were static markup: "CS" showed for Slovak)
@@ -1015,9 +1047,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     syncLanguageBadges();
 
+    // Direction label and swap: one click turns English -> Slovak into Slovak -> English (and back).
+    const swapBtn = document.getElementById('swapLangBtn');
+    const dirLabel = document.getElementById('directionLabel');
+    const outSel = document.getElementById('outputLanguageSelect');
+    const T = (x) => (window.i18n ? window.i18n.t(x) : x);
+    const langName = (sel) => sel.value === 'auto' ? T('Auto-detect') : T(sel.options[sel.selectedIndex].text.split(' (')[0]);
+    const syncDirection = () => { if (dirLabel && inputLanguageSelect && outSel) dirLabel.textContent = `${langName(inputLanguageSelect)} → ${langName(outSel)}`; };
+    const hasOption = (sel, v) => [...sel.options].some((o) => o.value === v);
+    if (swapBtn && inputLanguageSelect && outSel) {
+        swapBtn.addEventListener('click', () => {
+            const a = inputLanguageSelect.value, b = outSel.value;
+            const newIn = b;
+            const newOut = a === 'auto' ? (b === 'en' ? 'sk' : 'en') : a;
+            if (!hasOption(inputLanguageSelect, newIn) || !hasOption(outSel, newOut)) return;
+            inputLanguageSelect.value = newIn;
+            outSel.value = newOut;
+            inputLanguageSelect.dispatchEvent(new Event('change'));
+            outSel.dispatchEvent(new Event('change'));
+        });
+    }
+    [inputLanguageSelect, outSel].forEach((sel) => sel && sel.addEventListener('change', syncDirection));
+    document.addEventListener('languagechange', syncDirection);
+    syncDirection();
+
     // Event listener for the Initialize Pipeline button
     if (initBtn) {
-        initBtn.addEventListener('click', () => {
+        initBtn.addEventListener('click', async () => {
             showNotification('Initializing models...', 'info');
             
             const userToken = localStorage.getItem('userToken');
@@ -1027,10 +1083,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Send config update to trigger initialization via WebSocket
-            sendConfigUpdate();
+            const sent = await sendConfigUpdate();
 
-            // UI feedback (optimistic, actual status comes from WebSocket)
-            initBtn.disabled = true;
+            initBtn.disabled = Boolean(sent);
             initBtn.classList.remove('btn-active');
         });
     }
@@ -1049,9 +1104,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Trigger re-initialization when TTS model changes
             const ttsModelName = ttsModelSelect.options[ttsModelSelect.selectedIndex].text;
-            showNotification('TTS model changed. Re-initializing models...', 'info');
+            showNotification('Voice profile changed. Initialize the selected route.', 'info');
             logActivity(`TTS model changed to: ${ttsModelName}`, 'info');
-            sendConfigUpdate();
+            invalidatePreparation();
         };
 
         ttsModelSelect.addEventListener('change', updateVoiceSelectionVisibilityAndReinitialize);
@@ -1060,9 +1115,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (speakerVoiceSelect) {
             speakerVoiceSelect.addEventListener('change', () => {
                 const voiceName = speakerVoiceSelect.options[speakerVoiceSelect.selectedIndex].text;
-                showNotification('Voice changed. Re-initializing...', 'info');
+                showNotification('Voice changed. Initialize the selected route.', 'info');
                 logActivity(`Voice changed to: ${voiceName}`, 'info');
-                sendConfigUpdate();
+                invalidatePreparation();
             });
         }
 
@@ -1186,6 +1241,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         const btn = event.target;
                         btn.disabled = true;
                         btn.textContent = '…';
+                        stopRealtimeAudioStreaming();
+                        const generation = captureGeneration;
                         const userToken = localStorage.getItem('userToken');
                         fetch(`/api/voices/file?filename=${encodeURIComponent(filename)}`, {
                             headers: userToken ? { Authorization: `Bearer ${userToken}` } : {},
@@ -1193,10 +1250,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (!r.ok) throw new Error(`HTTP ${r.status}`);
                             return r.blob();
                         }).then((blob) => {
-                            const url = URL.createObjectURL(blob);
-                            const preview = new Audio(url);
-                            preview.onended = () => URL.revokeObjectURL(url);
-                            return preview.play();
+                            if (generation !== captureGeneration) return;
+                            playback.start();
+                            playback.enqueue(blob, selectedAudioOutputDeviceId || '');
                         }).catch((err) => {
                             console.error('Frontend: Voice preview failed:', err);
                             showNotification('Could not play this voice: ' + err.message, 'error');
@@ -1358,81 +1414,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Toggle visibility of speaker voice selection based on TTS model and re-initialize
-    if (ttsModelSelect && mainControlsTopRow) {
-        const updateVoiceSelectionVisibilityAndReinitialize = async () => {
-            const currentTtsModelChoice = ttsModelSelect.value;
-            if (currentTtsModelChoice === 'xtts') { // Show for XTTS
-                voiceSelectionGroup.classList.remove('hidden');
-                mainControlsTopRow.classList.add('expanded');
-            } else {
-                voiceSelectionGroup.classList.add('hidden');
-                mainControlsTopRow.classList.remove('expanded');
-            }
-
-            // Trigger re-initialization when TTS model changes
-            showNotification('TTS model changed. Re-initializing models...', 'info');
-            const userToken = localStorage.getItem('userToken');
-            if (!userToken) {
-                showNotification('You must be logged in to re-initialize models.', 'error');
-                return;
-            }
-
-            const sourceLang = inputLanguageSelect.value;
-            const targetLang = document.getElementById('outputLanguageSelect').value;
-            const ttsModelChoice = ttsModelSelect.value;
-            const sttModelSize = "tiny"; // Default STT model size
-            const vadEnabled = true; // Default VAD enabled state
-
-            let speakerWavPath = null;
-            let speakerText = null;
-            let speakerLang = null;
-
-            if (ttsModelChoice === 'xtts') { // Check for XTTS
-                const selectedVoiceOption = speakerVoiceSelect.options[speakerVoiceSelect.selectedIndex];
-                if (selectedVoiceOption && selectedVoiceOption.value) {
-                    speakerWavPath = selectedVoiceOption.value;
-                    speakerLang = selectedVoiceOption.dataset.voiceLang || 'en';
-                } else {
-                    showNotification(`Please select a voice for XTTS.`, 'warning');
-                    // Do not return here, allow initialization with null speaker if XTTS is selected but no voice
-                }
-            }
-
-            if (websocket && websocket.readyState === WebSocket.OPEN) {
-                const configMessage = {
-                    type: 'config',
-                    source_lang: sourceLang,
-                    target_lang: targetLang,
-                    tts_model_choice: ttsModelChoice,
-                    stt_model_size: sttModelSize,
-                    vad_enabled: vadEnabled,
-                    speaker_wav_path: speakerWavPath,
-                    speaker_text: speakerText,
-                    speaker_lang: speakerLang
-                };
-                websocket.send(JSON.stringify(configMessage));
-                
-                // Update UI to loading state
-                startStopBtn.disabled = true;
-                startStopBtn.classList.remove('btn-active');
-                statusLabel.textContent = 'Loading...';
-                statusIndicator.classList.remove('on');
-                statusIndicator.classList.add('off');
-            } else {
-                showNotification('WebSocket not connected. Cannot re-initialize.', 'error');
-            }
-        };
-
-        ttsModelSelect.addEventListener('change', updateVoiceSelectionVisibilityAndReinitialize);
-        // Set initial state
-        updateVoiceSelectionVisibilityAndReinitialize();
-    }
-
     if (recordVoiceBtn) {
         recordVoiceBtn.addEventListener('click', () => {
+            // Voices are stored on the server under an account, never in the browser: guests are asked to create one.
+            let guest = true;
+            try { guest = !localStorage.getItem('userToken') || localStorage.getItem('userGuest') === '1'; } catch (e) { /* storage blocked */ }
+            const dlg = document.getElementById('voiceAccountDialog');
+            if (guest && dlg && dlg.showModal) { dlg.showModal(); return; }
             voiceConfigModal.classList.add('open');
         });
+        document.getElementById('vadClose')?.addEventListener('click', () => document.getElementById('voiceAccountDialog').close());
     }
 
     if (closeModalBtn) {
@@ -2090,3 +2081,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Log initial page load
     logActivity('Application loaded', 'success');
 });
+
+
+// Charts need a real size: nudge them when the collapsed diagnostics panel is opened.
+(() => { const d = document.getElementById('diagnostics'); if (d) d.addEventListener('toggle', () => window.dispatchEvent(new Event('resize'))); })();

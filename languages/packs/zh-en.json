@@ -13,10 +13,15 @@
   },
   "tts": {
     "engine": "piper",
-    "voice": "en_US-ryan-medium"
+    "voice": "en_US-john-medium"
   },
   "clip": null,
   "reference": null,
-  "license": "commercial-ok",
-  "notes": "scaffolded by bp language add — fill clip/reference, then run: bp language test zh-en"
+  "license": "commercial-ok (attribution: Opus-MT CC-BY-4.0; voice dataset public domain/CC0)",
+  "notes": "scaffolded by bp language add — fill clip/reference, then run: bp language test zh-en",
+  "vad": {
+    "end_of_sentence_gating": true,
+    "silence_timeout_s": 0.3,
+    "max_segment_s": 3.0
+  }
 }

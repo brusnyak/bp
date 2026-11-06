@@ -1,289 +1,118 @@
-# Real-Time Speech Translation System
+# Live Speech Translation
 
-[![Python](https://img.shields.io/badge/Python-3.10--3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-WebSocket-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-[![Whisper](https://img.shields.io/badge/STT-Faster--Whisper-7C3AED)](https://github.com/SYSTRAN/faster-whisper)
-[![CTranslate2](https://img.shields.io/badge/MT-CTranslate2-0F766E)](https://opennmt.net/CTranslate2/)
-[![Piper TTS](https://img.shields.io/badge/TTS-Piper-2563EB)](https://github.com/rhasspy/piper)
-[![CPU first](https://img.shields.io/badge/Runs-CPU_only-111827)](#quick-start)
+Real-time speech translation that runs on your own machine: speak English, hear Slovak or Czech a moment later, with live captions on both sides. Built as a Bachelor's thesis project (STU FEI) and developed towards a commercial product.
 
-Real-time speech translation system for online conference scenarios. The project captures live speech, detects speech segments, transcribes them, translates the text, synthesizes translated audio, and displays latency metrics through a browser-based interface.
+[![Watch the demo](https://img.youtube.com/vi/_-jwEyGxDYs/maxresdefault.jpg)](https://www.youtube.com/watch?v=_-jwEyGxDYs)
 
-Bachelor thesis context: real-time / near-real-time speech translation during online conferences.
+*Click the image to watch the demo on YouTube.*
 
-## Overview
+## What it does
 
-This project implements a modular speech translation pipeline:
+Microphone → voice-activity detection → speech recognition (STT) → machine translation (MT) → speech synthesis (TTS) → browser playback and captions. Everything runs locally; no audio leaves the machine unless you choose a cloud route.
 
-```text
-Audio input -> VAD -> STT -> MT -> TTS -> translated audio + subtitles
-```
+| Direction | Status |
+|-----------|--------|
+| English → Slovak | Works; the demo route |
+| English → Czech | Works |
+| Slovak / Czech → English | Experimental: recognition errors are still common on Slovak and Czech speech |
+| Other packs (`languages/packs/`) | Declared; need installed models and a test before use |
 
-The system is designed around open-source models and local execution. It is CPU-first: the default install needs no GPU and no PyTorch (about 0.7 GB of Python packages); NVIDIA, Apple Silicon (MLX) and voice-cloning engines are optional experiments. It uses FastAPI and WebSockets for the backend streaming layer, a browser UI for interaction and visualization, and swappable model backends for transcription, translation, and speech synthesis.
-
-## Demo
-
-[![Real-Time Speech Translation Demo](https://img.youtube.com/vi/_-jwEyGxDYs/maxresdefault.jpg)](https://www.youtube.com/watch?v=_-jwEyGxDYs)
-
-## Features
-
-| Feature | Details |
-| --- | --- |
-| Live audio pipeline | Captures microphone audio, processes speech segments, and streams translation results. |
-| Speech-to-text | Uses Faster-Whisper for transcription. |
-| Machine translation | Uses CTranslate2-optimized Opus-MT models, with NLLB-200 as a fallback path. |
-| Text-to-speech | Piper TTS by default; XTTS, OmniVoice and MLX-Audio/Qwen3-TTS voice-cloning experiments are optional (they need PyTorch and are not part of the default install). |
-| Voice activity detection | Uses WebRTC VAD and RMS pre-filtering to reduce unnecessary STT calls. |
-| Dynamic language switching | Allows changing source and target languages from the UI. |
-| Speaker voice profiles | Supports recording, uploading, renaming, deleting, and using speaker reference audio. |
-| Latency visualization | Displays latency breakdown and timeline charts in the browser UI. |
-| Local-first research setup | Focuses on open-source models and local hardware constraints. |
-
-## System design
-
-```mermaid
-flowchart TB
-    Speaker([Speaker]) --> Browser[Browser UI]
-    Browser --> WebSocket[WebSocket Audio Stream]
-
-    WebSocket --> Backend[FastAPI Backend]
-    Backend --> VAD[Voice Activity Detection]
-    VAD --> STT[Faster-Whisper STT]
-    STT --> MT[CTranslate2 / NLLB Translation]
-    MT --> TTS[Piper / XTTS / OmniVoice / MLX TTS]
-
-    TTS --> Playback[Translated Audio Playback]
-    MT --> Subtitles[Translated Text + Subtitles]
-    Backend --> Metrics[Latency Metrics]
-    Browser --> Voices[Speaker Voice Profiles]
-    Voices --> TTS
-
-    Backend --> DB[(SQLite / Local Metadata)]
-    Metrics --> Browser
-    Playback --> Browser
-    Subtitles --> Browser
-
-    classDef actor fill:#DBEAFE,stroke:#2563EB,color:#0F172A,stroke-width:1px
-    classDef client fill:#EDE9FE,stroke:#7C3AED,color:#0F172A,stroke-width:1px
-    classDef transport fill:#CCFBF1,stroke:#0F766E,color:#0F172A,stroke-width:1px
-    classDef model fill:#FEF3C7,stroke:#D97706,color:#0F172A,stroke-width:1px
-    classDef output fill:#DCFCE7,stroke:#16A34A,color:#0F172A,stroke-width:1px
-    classDef data fill:#FCE7F3,stroke:#DB2777,color:#0F172A,stroke-width:1px
-
-    class Speaker actor
-    class Browser,Voices client
-    class WebSocket,Backend,VAD transport
-    class STT,MT,TTS model
-    class Playback,Subtitles,Metrics output
-    class DB data
-```
-
-### Runtime flow
-
-| Step | Component | Responsibility |
-| --- | --- | --- |
-| 1 | Browser UI | Captures microphone audio and sends chunks over WebSocket. |
-| 2 | FastAPI backend | Manages sessions, model initialization, WebSocket connections, and API routes. |
-| 3 | VAD layer | Filters silence and detects valid speech segments. |
-| 4 | STT layer | Transcribes speech with Faster-Whisper. |
-| 5 | MT layer | Translates recognized text using CTranslate2 Opus-MT or fallback translation models. |
-| 6 | TTS layer | Synthesizes translated speech through the selected TTS backend. |
-| 7 | UI output | Plays translated audio, displays transcription/translation, and visualizes latency. |
-
-## Tech stack
-
-| Layer | Choice | Notes |
-| --- | --- | --- |
-| Backend | FastAPI, Uvicorn, WebSockets | Streaming API and browser communication. |
-| Frontend | HTML, CSS, JavaScript | Browser UI for capture, playback, language selection, and metrics. |
-| STT | Faster-Whisper | Efficient Whisper inference for transcription. |
-| MT | CTranslate2 Opus-MT, NLLB-200 | Local machine translation with multilingual fallback. |
-| TTS | Piper TTS, XTTS, OmniVoice, MLX-Audio/Qwen3-TTS | Fast synthesis and voice cloning experiments. |
-| VAD | WebRTC VAD | Speech segment detection. |
-| Audio processing | soundfile, librosa, pydub, FFmpeg | Audio loading, conversion, and processing utilities. |
-| Metrics | Chart.js | Latency visualization in the browser. |
-| Database/auth | SQLAlchemy (SQLite), argon2, PyJWT | Local metadata, user handling, session tokens. |
-| Testing | pytest, pytest-asyncio, httpx | Backend, VAD, MT and security regression tests. |
-
-## Model backends
-
-| Stage | Backend | Purpose |
-| --- | --- | --- |
-| STT | Faster-Whisper | Transcribes source speech into text. |
-| MT | CTranslate2 Opus-MT | Fast translation for supported language pairs. |
-| MT fallback | NLLB-200 | Optional (needs PyTorch): fallback for lower-resource or unsupported language pairs. |
-| TTS | Piper | Fast non-cloning speech synthesis. |
-| TTS | XTTS | Optional: CPU-based zero-shot voice cloning (Linux/macOS + PyTorch; no Windows wheels). |
-| TTS | OmniVoice | Optional: higher-quality voice cloning; real-time mainly with NVIDIA GPU. |
-| TTS | MLX-Audio/Qwen3-TTS | Apple Silicon voice cloning research path. |
-
-## Performance
-
-Measured on a Ryzen 5 8645HS laptop (6 cores, 14 GB RAM, no GPU, Windows 11, Python 3.11), CPU only, int8. Details and methodology: [`documentation/model_evaluation_2026-09.md`](documentation/model_evaluation_2026-09.md).
-
-| Stage | Result |
-| --- | --- |
-| STT, English, `base` | 0.7-0.8 s per short phrase |
-| STT, Slovak (18 sentences, one speaker), WER at time per 7 s clip | Slovak-tuned `small` **0.26 at 2.4 s** (default) · `large-v3-turbo` 0.44 at 7.3 s · `medium` 0.46 at 7.2 s · plain `small` 0.62 at 2.2 s · Parakeet v3 0.58 at 0.9 s |
-| STT, Slovak, public FLEURS test clips (60 utterances) | Slovak-tuned `small` 0.13 · `large-v3-turbo` 0.12 · Parakeet v3 (int8) 0.20 · plain `small` 0.38 (matches published numbers) |
-| MT (Opus-MT, CTranslate2 int8) | about 0.05-0.1 s per sentence |
-| TTS (Piper, warm) | 0.2-0.3 s per sentence (first call about 2.6 s) |
-| EN -> SK end to end | roughly 1-1.5 s per sentence |
-
-Slovak speech recognition is the hard part. Off-the-shelf Whisper is either fast and poor (`small`) or accurate and slow (`large-v3-turbo`, about real time on this CPU). The default is therefore a Slovak-fine-tuned Whisper `small` ([NaiveNeuron/whisper-small-sk](https://huggingface.co/NaiveNeuron/whisper-small-sk), MIT, trained on 2,806 h of Slovak speech, see [arXiv 2509.19270](https://arxiv.org/abs/2509.19270)), converted to CTranslate2 int8 by `scripts/setup.py`: it is as fast as `small` and close to `large-v3-turbo` in accuracy. Override with `BP_SK_STT_MODEL` (a model name or a CTranslate2 directory). Voice cloning engines (XTTS, OmniVoice, MLX) are slower and hardware-dependent; see the roadmap.
+**Speed (measured 2026-11-06, M-series Mac M1):** about 0.2–0.4 s per speech phrase end to end (STT ~0.1–0.4 s, translation ~0.03–0.08 s, synthesis ~0.04–0.15 s). Continuous streaming — audio is processed as it arrives, not batched into 3 s segments. A listener hears the translation roughly 0.3–0.5 s behind a continuous speaker. Parakeet TDT v3 on GPU/MPS for English STT; Whisper small-sk for Slovak/Czech STT. Raw data: `documentation/evidence/2026-11-04/` and `documentation/implementation-2026-11-04/`.
 
 ## Quick start
-
-Works the same on Windows, macOS and Linux (CPU only, no admin rights, nothing installed globally).
-
-**You need:** Python 3.10-3.12, Git, and FFmpeg (only for voice upload/recording; `brew install ffmpeg` / `apt install ffmpeg` / `winget install Gyan.FFmpeg`). Node.js is optional (UI chart assets).
 
 ```bash
 git clone https://github.com/brusnyak/bp.git
 cd bp
-python scripts/setup.py        # add --dev for the test dependencies
+python3.11 scripts/setup.py --dev   # venv, dependencies, .env, voices, translation models (needs Python 3.11 or 3.12 and ffmpeg)
+make run                            # http://localhost:8000
 ```
 
-`scripts/setup.py` is idempotent and does everything: virtual environment (`.venv`), dependencies (uses `uv` if installed, `pip` otherwise), a random `JWT_SECRET` in `.env`, a self-signed localhost certificate, the three Piper voices, and the one-time CTranslate2 conversion of the Opus-MT translation models and the Slovak-tuned Whisper (done in a throwaway venv, so the running app never needs PyTorch; about 1.5 GB of downloads). Use `--skip-models` to skip the conversion.
+Open **http://localhost:8000** in Chrome or Edge (plain HTTP on `localhost` counts as a secure page, so the microphone works and there is no certificate warning). Press **Try it as a guest** (or create an account), pick the direction, press **Initialize**, run the sound check, then **Start**.
 
-Start it:
+- Use headphones, or route playback to a virtual cable (BlackHole on macOS, VB-Cable on Windows), so the translation does not feed back into the microphone. The app detects a virtual cable and offers it as an output.
+- Another device on the network (phone, second laptop) needs HTTPS: run `BP_HTTPS=1 BP_HOST=0.0.0.0 make run`. This uses the self-signed certificate in `certs/`, which browsers warn about once.
+- Safari and Firefox cannot choose the audio output device.
 
-```bash
-.venv/bin/python app.py          # Windows: .venv\Scripts\python.exe app.py
-```
+### Useful commands
 
-Open `https://localhost:8000` (accept the self-signed certificate).
+| Command | Purpose |
+|---------|---------|
+| `make test` | Backend regression suite (offline) |
+| `make demo-check` | Pre-flight for a live demo: assets and the running server |
+| `.venv/bin/python scripts/bp.py selftest` | Asset and configuration checks |
+| `python3 scripts/live/paced_replay.py <audio> --src en --tgt sk` | Replay a recording through the real WebSocket route at real time; reports per-segment lag |
 
-The server listens on `127.0.0.1` only. For a conference/LAN demo opt in explicitly with `BP_HOST=0.0.0.0` (anyone on the network can then register and use the WebSocket, so only do this on a trusted network).
+### Configuration (environment variables)
 
-### Configuration
+| Variable | Default | Effect |
+|----------|---------|--------|
+| `BP_GUEST` | on for loopback | `1` allows no-account guest sessions on a network-exposed server, `0` disables them. Guests cannot manage voices |
+| `BP_PORT` / `BP_HOST` | `8000` / `localhost` | Listen address. Anything other than loopback exposes open registration: use only on a trusted network |
+| `BP_HTTPS` | off | `1` serves HTTPS with `certs/` |
+| `BP_VAD_MAX_SEGMENT_S`, `BP_VAD_SILENCE_S` | `3.0`, `0.25` | Longest segment and pause that closes it. Shorter = lower delay, choppier translation |
+| `BP_SILENCE_RMS` | `0` (off) | Pre-VAD volume gate. The old default `0.02` dropped quiet speech |
+| `BP_STT_STEP_S` | `0.5` | STT step interval (seconds) — how often to run STT on the audio buffer |
+| `BP_STT_WINDOW_S` | `2.0` | STT audio window size (seconds) |
+| `BP_SILENCE_GAP_S` | `0.3` | Gap between words that starts a new phrase (seconds) |
+| `BP_UTTERANCE_SILENCE_S` | `0.8` | Silence that ends an utterance (seconds) |
+| `BP_MIN_UTTERANCE_S` | `1.0` | Minimum utterance length for STT (seconds) |
+| `BP_ENABLE_RATE_LIMIT` | off on loopback, on otherwise | Limits registration, login and uploads. `0` disables, `1` forces on |
+| `BP_LOG_SESSIONS` | off | `1` writes transcripts and translations to `processed/sessions/` (personal data; tell participants) |
+| `BP_INCREMENTAL` | off | Deprecated — use continuous streaming mode instead |
+| `BP_SK_STT_MODEL` | built-in | Slovak recognition model name or CTranslate2 directory |
+| `BP_DEVICE`, `BP_MT_DEVICE` | auto | `cpu` or `cuda` for STT and MT |
 
-| Variable | Default | Purpose |
-| --- | --- | --- |
-| `BP_HOST` / `BP_PORT` | `127.0.0.1` / `8000` | Bind address and port. |
-| `JWT_SECRET` | random per process | Signs session tokens. `scripts/setup.py` writes one to `.env`. |
-| `BP_SK_STT_MODEL` | local Slovak-tuned `small` (`ct2_models/whisper-small-sk`), else `large-v3-turbo` | Whisper model used when the source language is Slovak: a model name or a CTranslate2 directory. |
-| `GOOGLE_CLIENT_ID` | unset | Enables Google login. |
-| `BP_DEMO_USER` | unset | Set to `1` to create a `test@example.com` demo account (development only). |
-| `HF_HOME` | `~/.cache/huggingface` | Where Whisper models are cached. |
+## The stack
 
-All variables can live in `.env` (see [`.env.example`](.env.example)).
-
-## Model setup
-
-`scripts/setup.py` handles all of this; the manual equivalents are:
-
-```bash
-python backend/tts/download_piper_models.py en_US-ryan-medium     # Piper voices
-python backend/tts/download_piper_models.py sk_SK-lili-medium
-python backend/tts/download_piper_models.py cs_CZ-jirka-medium
-python scripts/convert_models.py                                  # Opus-MT -> CTranslate2 int8, tokenizers saved alongside
-```
-
-Faster-Whisper models download on first use (`hf_xet` makes this fast). Personal/fine-tuned Piper voices are local-only: drop `<name>.onnx` + `<name>.onnx.json` into `backend/tts/piper_models/` and the `piper_personal*` engines pick them up; without them the public voices above are used. XTTS, OmniVoice and OpenVoice need PyTorch and are not part of the default install (the `xtts`, `hybrid` and `omnivoice` engines are simply not advertised).
-
-## Usage
-
-1. Open `https://localhost:8000`.
-2. Initialize the pipeline.
-3. Select source and target languages.
-4. Choose the TTS backend.
-5. Optionally upload or record a speaker voice sample for voice cloning.
-6. Speak into the microphone.
-7. Monitor transcription, translation, playback, and latency charts.
-
-## Testing
-
-```bash
-python scripts/setup.py --dev
-.venv/bin/python -m pytest test/hardware_test.py test/vad_tests.py test/mt_model_tests.py test/backend_api_tests.py test/backend_auth_tests.py test/security_tests.py test/config_tests.py -q
-```
-
-`documentation/ci.yml.example` is a ready GitHub Actions workflow that runs setup + these tests from a clean checkout on Ubuntu, macOS and Windows; copy it to `.github/workflows/ci.yml` (pushing workflow files needs a token with the `workflow` scope). The first VAD test loads Faster-Whisper `base`, so the first run downloads about 140 MB.
-
-## Demo: a two-sided conversation, measured
-
-```bash
-python scripts/demo_conversation.py                                              # the default Slovak recognizer
-python scripts/demo_conversation.py --sk-stt "tuned=ct2_models/whisper-small-sk,turbo=large-v3-turbo,parakeet"
-# parakeet needs: pip install "onnx-asr[cpu,hub]"
-```
-
-Plays a six-turn dialogue (Person A speaks English, Person B answers in Slovak) through the real speech-to-text, translation and text-to-speech backends and writes `processed/demo/conversation_demo.html`: a timeline chart per conversation, a "where the time goes" breakdown, a comparison of Slovak recognizers, and a table with the recognized text, the translation, every stage time and the translated audio. Add `--inputs both --en-dir ... --sk-dir ...` to also use your own recordings. Measured results, charts and the per-turn table are in [`documentation/demo_report_2026-09.md`](documentation/demo_report_2026-09.md); the model comparison is in [`documentation/model_evaluation_2026-09.md`](documentation/model_evaluation_2026-09.md).
-
-To evaluate on a fresh recording: `python scripts/build_recording_set.py`, then `python scripts/record_reading.py`, then `scripts/eval_stt.py` (see the evaluation document).
+| Stage | Default engine | Licence | Optional |
+|-------|---------------|---------|----------|
+| VAD | WebRTC VAD | BSD-3 | Silero VAD |
+| STT (EN) | Parakeet TDT v3 | CC-BY-4.0 | `whisper-small` (CPU fallback) |
+| STT (SK/CZ) | Whisper `small-sk`/`small` int8 | MIT | `large-v3-turbo`, fine-tuned Slovak models (untested here) |
+| MT | Opus-MT, CTranslate2 int8 | CC-BY-4.0 | MADLAD-3B (CUDA) |
+| TTS | Piper | GPL-3.0-or-later runtime; each voice has its own licence | Kokoro 82M (English), OmniVoice cloning (GPU, research) |
 
 ## Project structure
 
-```text
-bp/
-├── app.py               # FastAPI app, WebSocket server, UI mounting
-├── backend/
-│   ├── main.py          # Model orchestration, routes, sessions, pipeline config
-│   ├── stt/             # Faster-Whisper wrapper
-│   ├── mt/              # Translation backends and model conversion scripts
-│   ├── tts/             # Piper, XTTS, OmniVoice, and hybrid TTS modules
-│   └── utils/           # Audio, auth, and database utilities
-├── ui/                  # Browser interface
-├── scripts/             # setup.py (one-command install), convert_models.py, gen_cert.py, evaluation scripts
-├── test/                # hardware, VAD, MT, API, auth and security tests
-├── documentation/       # Thesis notes, security audit, model evaluation
-├── requirements.txt     # runtime deps (no torch); -dev and -convert variants alongside
-```
+| Path | Purpose |
+|------|---------|
+| `app.py` | FastAPI app, WebSocket server, serves the UI |
+| `backend/` | STT/MT/TTS/VAD engines, model pooling, registry, pipeline |
+| `languages/packs/*.json` | Language packs: models, voice, segmentation per direction |
+| `ui/` | Browser interface (plain HTML/CSS/JS, installable PWA) |
+| `scripts/` | Setup, CLI (`bp.py`), benchmarks, Kaggle jobs (`scripts/gpu_bench/`) |
+| `test/` | pytest suites; Node playback tests: `node --test test/session_playback_test.cjs` |
+| `documentation/` | Thesis draft, findings, research, runbooks |
 
-## Current development status
+More: `PRODUCT.md` (positioning), `PLAN.md` (development plan), `AGENTS.md` (project memory), `documentation/implementation-2026-11-04/` (latest measurements).
 
-| Area | Status |
-| --- | --- |
-| Setup | One command (`scripts/setup.py`), verified on Windows 11 / Python 3.11. macOS and Linux: workflow template provided (`documentation/ci.yml.example`), not yet run. |
-| Piper TTS | Default synthesis backend; public voices download automatically, personal voices are optional local files. |
-| XTTS / OmniVoice / OpenVoice | Optional, need PyTorch; not installed by default. |
-| MLX-Audio/Qwen3-TTS | Apple Silicon research path, not part of the default install. |
-| MT | CTranslate2 Opus-MT (default); NLLB-200 fallback is optional. |
-| Security | Audited 2026-09, see [`documentation/security_audit_2026-09.md`](documentation/security_audit_2026-09.md); regression tests in `test/security_tests.py`. |
-| Thesis alignment | Conference use case and latency benchmarking remain the key academic framing. |
+## Integration (conference rooms, LHC)
 
-## Security notes
+| Mode | Status | How |
+|------|--------|-----|
+| One person, one direction, into Teams/Zoom | Works | Browser session plus a virtual audio cable (BlackHole, VB-Cable) as playback device and meeting microphone |
+| Captions only | Works | Live page subtitle strip and pop-out window |
+| Per-seat broadcast (one speaker, many listeners, each with own language and earbuds) | Designed, not built | One recognition pass, one translation and voice per language, one WebSocket per seat; see `documentation/HANDOFF_2026-11-04_session2_spec_plan.md` section 2.2 and 6.3 |
+| Multi-speaker meeting with overlap | Not built | One stream per participant is the cheapest route; speaker separation is future work |
 
-- The server listens on loopback only unless you set `BP_HOST`; registration is open and the WebSocket is unauthenticated, so do not expose it to untrusted networks.
-- Set a `JWT_SECRET` (setup does this). No default accounts exist unless `BP_DEMO_USER=1`.
-- Uploaded voices are personal data: they live in `speaker_voices/`, which is git-ignored.
-- Known open items and accepted risks are listed in the audit document.
+Interface contract: `POST /api/guest` or `/api/login` returns a token; open `ws://HOST/ws?token=TOKEN`, send the config message, stream 16 kHz audio; read `transcription_result`, `translation_result` and binary WAV `tts_audio` messages. Capacity measured on one T4 (English to Slovak, continuous speech): about 4 simultaneous sessions with median lag under 1.5 s, 8 sessions 3.7 s.
 
-## Troubleshooting
+## Privacy
 
-| Symptom | Fix |
-| --- | --- |
-| Setup fails with "Python 3.10-3.12 required" | Install a supported Python; 3.13+ has no wheels for the pinned numpy/numba. |
-| `OSError ... WinError 1314` while downloading a model | Windows blocks symlinks in the Hugging Face cache (no Developer Mode). `scripts/setup.py` fetches the models it needs into plain `ct2_models/` folders; for other Whisper sizes enable Developer Mode. |
-| Model downloads look stuck | Hugging Face downloads use `hf_xet`, which writes in the background: the progress bar and cache size can sit still until each file completes. |
-| `Address already in use` | Set `BP_PORT` to a free port. |
-| Voice upload returns 500 | FFmpeg is missing from `PATH`. |
-| Browser warns about the certificate | Expected: it is a self-signed localhost certificate generated by `scripts/gen_cert.py`. |
-| Slovak transcription is slow | See `BP_SK_STT_MODEL` above. |
+Recognition, translation and synthesis run locally. Session logs are off by default. Sign-in uses a local database; Google sign-in is optional and talks to Google. Voice recordings you upload stay on the machine, are tied to your account and are not used outside it. A shared deployment needs its own retention and access policy.
 
-## Repository map
+## Status and licence
 
-| Path | What it is |
-| --- | --- |
-| `app.py`, `backend/`, `ui/` | Application code and browser UI. |
-| `scripts/` | `setup.py`, `convert_models.py`, `gen_cert.py`, evaluation and voice-corpus tooling. |
-| `test/` | pytest suites (see Testing). |
-| `documentation/` | Thesis draft, findings, security audit, model evaluation. |
-| `PLAN.md` | Live development plan (also rendered in the Voice Lab page, so it stays at the root). |
-| `DESIGN.md` | UI visual language / style tokens. |
-| `guide.md`, `VAD_TUNING_GUIDE.md` | Technical overview and VAD tuning notes. |
-| `benchmark_*.py`, `test_*.py`, `transcribe.py` | Standalone benchmark and pipeline scripts referenced by the thesis documents (run directly, not collected by the pytest command above). |
-| `specs/`, `.specify/`, `.claude/skills/` | Spec-driven-development assets. |
+**Not yet a commercial release.** Remaining gates before selling it:
 
-## Roadmap
+| Gate | Remaining proof |
+|------|-----------------|
+| Slovak / Czech recognition | A stronger model and a scored test (WER) per direction |
+| Cloned voice | Listener review of meaning, intelligibility and identity on the exact models and hardware |
+| Real meeting | Run with a physical microphone, speakers and a virtual cable; record first-audio p50/p95 and queue growth |
+| Clean install | Test on a fresh machine per supported OS |
+| Licences | Defaults are now CC0/public-domain voices (see `documentation/licences.md`); the owner's personal fine-tunes, OmniVoice and the Slovak STT fine-tune still need clearance |
+| Shared operation | Capacity, retention, monitoring and a support owner |
 
-- Replace or supplement OmniVoice with MLX-Audio for Mac builds.
-- Benchmark Qwen3-TTS on M1 Pro hardware for real-time voice cloning.
-- Improve multi-speaker handling for conference scenarios.
-- Expand evaluation with consistent Slovak/English test audio.
-- Refine thesis documentation around methodology, measurements, and limitations.
-
-## License
-
-No license file has been added yet, so by default all rights are reserved by the author. Add a `LICENSE` before accepting outside contributions.
+Repository licence: see `LICENSE`. Engine, checkpoint and voice licences are separate; the registry gate (`backend/registry.py`) blocks unlicensed engines but is not a completed commercial audit.

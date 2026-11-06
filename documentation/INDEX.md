@@ -1,5 +1,7 @@
 # Documentation index
 
+> Current repair state (2026-11-04): start with `PRODUCT.md`, `documentation/implementation-2026-11-04/RESULTS.md` and `documentation/HANDOFF_NEXT_SESSION.md`. Earlier dated counts, readiness claims, media-access behavior and Kaggle failure explanations below are historical. Current contracts require authenticated explicit preparation, offline assets, target-language TTS, terminal Stop and reviewed full-route evidence. Full cloned-speech/LHC/commercial acceptance remains pending.
+
 26 files (2026-10-01). Start with the first group; the rest is lookup by task.
 `documentation/README.md` is a stale overview (names SeamlessM4T/F5-TTS as live
 components — both retired); trust PLAN.md + the files below over it.
@@ -8,7 +10,6 @@ components — both retired); trust PLAN.md + the files below over it.
 
 | File | What |
 |---|---|
-| `handler_update_2026-09.md` | Covering note for the handler, quotes only measured rows |
 | `compute_capacity_report_2026-09.md` | Mac vs NVIDIA laptop vs university server, MEASURED / PROJECTED labelled |
 | `demo_runbook_2026-09-28.md` | Stage demo pre-flight, script, fallback ladder |
 | `monday_test_checklist.md` | Dry-run checklist |
@@ -51,7 +52,7 @@ Unwrapped on purpose: one-shot setup (`setup.py`, `convert_*`, `fetch_whisper.py
 `scripts/archive/`), retired spikes (`stt_parakeet_spike.py`,
 `eval_*.py`, `benchmark_*.py` — numbers already in PLAN.md / landscape report).
 
-| `README.md` | STALE overview (names retired components) — read this index instead |
+| `README.md` | Current overview — accurate stack, quick start, enterprise comparison, voice-cloning limits |
 | `fundamentals_deep.md` | Companion to fundamentals: verifiable numbers, system python only |
 | `reading_script_bilingual.md` | Recording source text; parsed by `bp stt` for STT refs — do not reformat |
 | `voice_and_app_direction_2026-09.md` | Owner requirements (one voice, multilingual, any OS) |

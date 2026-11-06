@@ -2,8 +2,7 @@
 
 Purpose: one page to run the thesis demo from, on either laptop, without re-deriving
 anything. Companion files: `documentation/monday_test_checklist.md` (the longer
-pass/fail matrix), `documentation/handler_update_2026-09.md` (the message + the
-numbers), `PLAN.md` (what is done vs open).
+pass/fail matrix), `PLAN.md` (what is done vs open).
 
 Evidence this runbook is based on: live WS rehearsal on the M1 Pro, 2026-09-28
 (`test/interrupt_smoke_test.py` → 9 translations, 5 partial captions, 222 TTS audio
@@ -23,7 +22,7 @@ secrets, SK voice, MT models, registry, live server). Fallback assets are warnin
 | FAIL you might see | Fix |
 |---|---|
 | `certs/*.pem` | `make certs` |
-| `.env` / `GOOGLE_CLIENT_ID` / `JWT_SECRET` | copy from the Mac by hand (never in git) — `documentation/amd_fetch_checklist.md` |
+| `.env` / `GOOGLE_CLIENT_ID` / `JWT_SECRET` | copy from the Mac by hand (never in git) — `setup.py` creates `.env` with a random `JWT_SECRET`; add `GOOGLE_CLIENT_ID` locally |
 | `sk_SK-personal-male-medium.onnx` | `git checkout` it (shipped binary) — do not retrain |
 | `ct2_models/...` | `make install` (or run the three `convert_opus_mt_to_ct2` commands) |
 | server checks | `make run` first, then re-run; `lsof -nP -iTCP:8000 -sTCP:LISTEN` |
@@ -54,7 +53,7 @@ is ~0.8s of compute instead of ~20s of model loading.
 | 3 | Open `lab.html` | "these are the voice candidates I compared, with numbers" | personal male SK vs generic lili |
 | 4 | Play 1 lab A/B pair | "same sentence: generic Czech-base voice vs my fine-tuned SK voice" | timbre difference is audible |
 | 5 | Show `PLAN.md` + `documentation/thesis_draft.md` | "what is measured, what is still open" | — |
-| 6 | Close with the honest gap (below) | "SK→EN speech recognition is the binding constraint" | — |
+| 6 | Close with the honest gap (below) | "SK→EN speech recognition is the binding constraint; CZ is the cleaner second direction" | — |
 
 ## 4. Numbers to quote (measured, one file each)
 
@@ -70,7 +69,7 @@ is ~0.8s of compute instead of ~20s of model loading.
 | OmniVoice bulk corpus | 15 clips, ~6 min, mean QC WER 0.05 (round 2 in progress) | `processed/bulk_hq/manifest.json` |
 | Live turn, EN→SK (measured /ws) | first TTS audio ~2.5–5s into 6s turn (streaming) | `processed/meeting/live_dump_*_en-sk.json` |
 | Live turn, SK→EN (measured /ws) | first TTS audio ~2.5–7s (correct `piper_personal_v2` voice) | `processed/meeting/live_dump_*_sk-en.json` |
-| Windows 11, CPU-only | e2e ≈ 3.6s (no XTTS: Coqui has no Windows wheels) | `79a8476`, `SETUP_WINDOWS.md` |
+| Windows 11, CPU-only | e2e ≈ 3.6s (no XTTS: Coqui has no Windows wheels) | `79a8476` |
 
 ## 5. Fallback ladder — if audio dies on stage
 
@@ -95,11 +94,11 @@ browser lands in `processed/sessions/` automatically.
 
 ## 7. Rough edges — state them before they are noticed
 
-- SK STT is the weak stage (0.41 / 0.63 plain); it is the honest bottleneck, not a bug.
+- SK STT is the weak stage (WER 0.2143 clean / ~0.32 mic, above the 0.2 quality gate). It is the honest bottleneck, not a bug. SK→EN is flagged `experimental` in the UI and language packs. **Canary AST measured 2026-11-03 on Kaggle T4: SK ASR WER 0.0477 (<0.2 ✅) but SK→EN AST chrF++ ~52 (below commercial bar) — speed path, not quality path. Cascade (Whisper→Opus-MT) remains the quality path.**
+- CZ is the cleaner second direction: Whisper supports CZ natively, Opus-MT CZ↔EN chrF ~0.72 (stronger than SK↔EN ~0.66), Piper `cs_CZ-jirka-medium` already in `piper_models/`. `cs-en` MT model still needs CTranslate2 conversion (`cs-en` added to `scripts/convert_models.py` PAIRS).
 - SK MT reads literally on misheard words (rehearsal produced "do pomalého wacku" for
   "into Slovak") — expected behaviour of Opus-MT on a bad transcript.
-- Two machines, two capability profiles: Mac has XTTS/Hybrid (Coqui installed), the
-  Windows AMD laptop is CPU-only Piper. Say which one is on screen.
+- Two machines, two capability profiles: Mac (MPS/CPU), Windows AMD (CPU-only Piper). The registry fail-closed gate keeps XTTS/Hybrid/OmniVoice off CPU-only machines. Say which one is on screen. OmniVoice is batch/QC only (RTF 0.40–0.65 on short phrases on T4 — not real-time); the live TTS path is Piper on CPU (RTF ~0.04).
 - Self-signed cert: the browser warns once — click through before the audience is watching.
 
 ## 8. Teardown

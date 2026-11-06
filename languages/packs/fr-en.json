@@ -2,21 +2,12 @@
   "pair": "fr-en",
   "source": "fr",
   "target": "en",
-  "stt": {
-    "engine": "faster_whisper",
-    "model": "base",
-    "language": "fr"
-  },
-  "mt": {
-    "engine": "opus-mt",
-    "model": "Helsinki-NLP--opus-mt-fr-en"
-  },
-  "tts": {
-    "engine": "piper",
-    "voice": "en_US-personal-medium"
-  },
+  "stt": { "engine": "faster_whisper", "model": "base", "language": "fr" },
+  "mt": { "engine": "opus-mt", "model": "Helsinki-NLP/opus-mt-fr-en" },
+  "tts": { "engine": "piper", "voice": "en_US-john-medium" },
   "clip": null,
   "reference": null,
-  "license": "commercial-ok",
-  "notes": "scaffolded by bp language add — fill clip/reference, then run: bp language test fr-en"
+  "license": "commercial-ok (attribution: Opus-MT CC-BY-4.0; voice dataset public domain/CC0)",
+  "vad": { "end_of_sentence_gating": true, "silence_timeout_s": 0.3, "max_segment_s": 3.0 },
+  "notes": "scaffolded — add clip, convert MT, then: bp language test fr-en"
 }

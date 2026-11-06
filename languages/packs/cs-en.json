@@ -2,11 +2,42 @@
   "pair": "cs-en",
   "source": "cs",
   "target": "en",
-  "stt": { "engine": "faster_whisper", "model": "small-sk", "language": "cs" },
-  "mt": { "engine": "opus-mt", "model": "Helsinki-NLP/opus-mt-cs-en" },
-  "tts": { "engine": "piper", "voice": "en_US-ryan-medium" },
+  "stt": {
+    "engine": "faster_whisper",
+    "model": "small",
+    "language": "cs"
+  },
+  "mt": {
+    "engine": "opus-mt",
+    "model": "Helsinki-NLP/opus-mt-cs-en"
+  },
+  "tts": {
+    "engine": "piper",
+    "voice": "en_US-john-medium"
+  },
   "clip": "speaker_voices/me_cs_staromestske.m4a",
   "reference": null,
-  "license": "commercial-ok",
-  "notes": "MT direction not converted yet. The cs STT uses the multilingual SK-tuned model with language=cs (Czech-as-proxy, see PLAN.md STT matrix)."
+  "license": "commercial-ok (attribution: Opus-MT CC-BY-4.0; voice dataset public domain/CC0)",
+  "vad": {
+    "end_of_sentence_gating": true,
+    "silence_timeout_s": 0.3,
+    "max_segment_s": 3.0
+  },
+  "notes": "Experimental CS→EN route. Convert opus-mt-cs-en before use; English output requires the English Piper voice. STT/MT/TTS and live quality remain to be evaluated. German-style end-of-sentence gating applied.",
+  "profiles": {
+    "low_latency": {
+      "stt": {
+        "model": "base",
+        "device": "cpu",
+        "compute_type": "int8",
+        "beam_size": 5
+      },
+      "vad": {
+        "silence_timeout_s": 0.3,
+        "max_segment_s": 3.0,
+        "incremental": false
+      },
+      "notes": "Historical M1 base/int8/beam5/Piper diagnostic setup; retain current 3s safety cap. Historical 0.78s was stage-sum, not onset-to-audio. No speed or quality acceptance."
+    }
+  }
 }

@@ -37,7 +37,8 @@ def test_gate_fails_closed_on_unknown_licence():
 
 def test_gate_allows_commercial_engines():
     cap = reg.select("tts", "piper")
-    assert cap.license == "commercial-ok"
+    assert cap.license == "gpl-3.0"          # runtime is GPL-3.0-or-later: allowed locally, never labelled commercial-ok
+    assert reg.select("vad", "webrtcvad").license == "commercial-ok"
 
 
 def test_declared_only_engine_is_not_available():

@@ -1,11 +1,11 @@
 import backend.main as bm
 
 
-def test_slovak_prefers_local_tuned_model_then_turbo(monkeypatch, tmp_path):
+def test_slovak_prefers_local_tuned_model_then_small(monkeypatch, tmp_path):
     monkeypatch.delenv("BP_SK_STT_MODEL", raising=False)
     monkeypatch.setattr(bm, "SK_STT_LOCAL_MODEL", str(tmp_path / "missing"))
     for requested in ("base", "small"):
-        assert bm._pick_stt_model("sk", requested) == "large-v3-turbo"  # fallback when the tuned model is not converted
+        assert bm._pick_stt_model("sk", requested) == "small-sk"  # fallback when tuned model is not converted
     local = tmp_path / "whisper-small-sk"; local.mkdir(); (local / "model.bin").write_bytes(b"x")
     monkeypatch.setattr(bm, "SK_STT_LOCAL_MODEL", str(local))
     assert bm._pick_stt_model("sk", "base") == str(local)

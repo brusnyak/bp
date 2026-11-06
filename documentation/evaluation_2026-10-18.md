@@ -7,16 +7,16 @@ unless marked otherwise. Raw records:
 - `processed/language_eval/*.json` — per-pair run records
 - `processed/stt_matrix.json` — STT swap matrix
 - `processed/engine_ab/matrix_tts_swap.json`, `matrix_tts_swap_all.json` — TTS swap
-- `processed/gpu_bench/*` — earlier T4 GPU numbers (2026-10-02)
+- `processed/gpu_bench/*` — earlier T4 GPU numbers (2026-10-02); Kaggle T4 validation pending for Canary AST
 
 ## 1. Multilanguage — 5 packs
 
 | pair | status | STT s | TTS s | e2e s | engines |
 |---|---|---|---|---|---|
 | en-sk | **verified** | 4.11 | 3.11 | 7.21 | `base` / opus-mt-en-sk / `sk_SK-personal-male-medium` |
-| sk-en | **verified** | **22.81** | 2.46 | **25.27** | `small-sk` / opus-mt-sk-en / `en_US-ryan-medium` |
+| sk-en | **experimental** | **22.81** | 2.46 | **25.27** | `small-sk` / opus-mt-sk-en / `en_US-ryan-medium` |
 | en-cs | **verified** | 4.62 | 3.66 | 8.27 | `base` / opus-mt-en-cs / `cs_CZ-jirka-medium` |
-| cs-en | experimental | — | — | — | MT `opus-mt-cs-en` not converted |
+| cs-en | experimental | — | — | — | MT `opus-mt-cs-en` not converted; TTS `cs_CZ-jirka-medium` present |
 | en-de | experimental | — | — | — | MT not converted + no `de_DE` Piper voice |
 
 Three pairs run end-to-end. Czech works with zero code change (pack + one converted
@@ -69,10 +69,9 @@ score intelligibility (`processed/engine_ab/matrix_tts_swap_all.json`):
 - **The owner's personal fine-tuned voice is the least intelligible of all five**
   (WER 0.595 vs 0.270 for the generic Piper voice). Voice identity and STT
   intelligibility trade off directly.
-- OmniVoice zero-shot is the most intelligible (0.054).
+- OmniVoice zero-shot scores best on this cached-WER table (0.054) but is **batch/QC only** — RTF 0.40–0.65 on short phrases on T4, not real-time. It is not the live TTS engine (Piper CPU RTF ~0.04 is).
 
-Caveat: these omni rows are cached wavs from 2026-09-30 (`--reuse`), not re-synthesised
-today — the `.venv-omni` env was removed in the project lightening. Piper rows are fresh.
+Caveat: the omni rows are cached WER from 2026-09-30 (`--reuse`), not re-synthesised today — the `.venv-omni` env was removed in the project lightening (torch-free runtime). Piper rows are fresh. OmniVoice remains batch/QC only, not a live path.
 
 ## 4. MT swap — not yet done
 
@@ -94,7 +93,7 @@ Recorded as a task, not silently skipped: MT quality cannot be compared until it
 | `_detect_tts` picked the alphabetically-first voice | a pack for `sk` would get the generic voice, not the owner's | prefers `personal`/`omni` voices |
 | `HF_WHISPER` hardcoded list | stale (missed `large-v3-turbo`) | runtime discovery via `faster_whisper.utils.available_models()` |
 
-`make test` = **47/47** after all of the above.
+`make test` = **38/38** after all of the above (`bp selftest` PASSED).
 
 ## 6. What remains (roast of `specs/003-end-to-end-completion/spec.md`)
 

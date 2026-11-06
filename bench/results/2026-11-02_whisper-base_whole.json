@@ -1,0 +1,55 @@
+{
+ "model": "ct2_models/whisper-base",
+ "model_tag": "whisper-base",
+ "mode": "whole",
+ "cap": null,
+ "beam": 5,
+ "temperature": 0.0,
+ "language": "sk",
+ "compute_type": "int8",
+ "device": "cpu",
+ "machine": "arm64 CPU int8",
+ "python": "3.11.15",
+ "faster_whisper": "1.2.0",
+ "ctranslate2": "4.8.4",
+ "git_head": "faf68ff6977906415ec3a0ec5ffa090d74041ac7",
+ "utc": "2026-11-02T11:08:15+00:00",
+ "clips": [
+  {
+   "clip": "me_sk_script",
+   "wer": 0.724,
+   "cer": 0.2336,
+   "hypothesis": "Dobrý rano, a víteť se v této šivio kažký preklutú rečiu v realnam časim. Hoverím po angličský a môjchlaz budete počúť hovoríť poslovenský do nekolkých sekund. System počová mikrofonom a dedekujú, keď reč sačina a končí. Najprovi je reč pre písnane do tekstu, potom proložná a potom v 5 prevélyná. Každý krok pěš lokaliny ne temto počtačí, bez obluku a bez čakárné. Latenci je čas medzímojmi slomí a preložnými chlasom, ktorý počujš. Nasom cienlom je stržané len par sekund do skratké na priročný rozhovor. Lásové klanovania s nemená šestlovenský výstupu sné ako já, nie ako cudzínice. Aby som učil system môjm chlasom, zaznamenová par minu čisté reči. Na týché mesnosti založiviať ako nedráho mikrofoné. Prostím hovoríť stálem tempo, skratkými pre stavkami medzi vytvimi. Čisla, nazvy a technický výrazi si vyžudujeme rádný s terslývy s v boh jazyko. Linka titlkov ukážuje časťčne vyslitky zaťal če som eščého vrým. Titlky možete prysuné do plavačšu okna na takokolvek aplikacijom. Proložný chlas je prismerovaný na srošm chromaždénie ako výrteľné mikrofonu. Ostatný učasný cí počovajo Slovenčinu zaťal čeho stáleho vrým anglítský. Otázky publika bude proložný opačným smerom. Děkajom au vám sa vypočutie a teším se na vašia otázky.",
+   "reference_path": "bench/refs/me_sk_script.txt",
+   "audio_seconds": 134.3,
+   "wall_seconds": 7.3,
+   "rtf": 0.054,
+   "n_segments": null,
+   "segment_bounds": null
+  },
+  {
+   "clip": "me_sk_trhove",
+   "wer": 0.6597,
+   "cer": 0.2328,
+   "hypothesis": "Čerá ráno som išel na trch kúpit čestvých chleb, amleko. Strätal som tam starého prijecelé lúba, ktorý predaval meď a syrí. Ahoj! Gdy si se tulaľ celé mesece, spítal sa más ospevam. Prospralo som mu o svoj práci, a odľký cesty v lakomce z hory a dolini, až ma bol každý kulp. Pochmili sme si sa tlené hlavíčku pod velku vôrbu a dali sme si kávo. Možem priste aj zajtra, spítal som sa. Ahoj, nás prvěgal tete a hádzaly si farabnú loptu. Jedno tevčetko nesla držban plný malin a smialo sa na celé kolom. V ona čerstvaho pečšiva sa nesla vzdúchom a jasom si spomenolnej tětstvo u starych rodyču. Ďalke v skrále pstí električky. Lúbumy vodom okazov fotografii za svojej zahrady. Mieti radka mieti búli a česnaku, rastlí lálie, pivonky a neskutečne velké tykvice. Pozriej, tato vážie fíše 9 kil pochvalil sa. Nevraly som vlastným očem. Musíme šký ist, ale v fětyku prýdem zás. Povidal som a pobrále sme se domo. Eščetné s cítim chú dôho chleba smaslom a medom. Vôto je jedno zne krásšich rán tento jesnáho mesica. Kolko takéch tnínam ešče život v renesie?",
+   "reference_path": "bench/refs/me_sk_trhove.txt",
+   "audio_seconds": 103.57,
+   "wall_seconds": 6.1,
+   "rtf": 0.059,
+   "n_segments": null,
+   "segment_bounds": null
+  },
+  {
+   "clip": "me_sk_trhove_b",
+   "wer": 0.6754,
+   "cer": 0.2557,
+   "hypothesis": "Včera ráno som inšaná trchkupit čerstvých leb, am leko. Stretov som tam starého priječile Luba, ktorý predaval meď a Syri. Ahoj, kde si se tu oho celém mesece, spítov sem másu s mevom. Prospralo som mu o svojej práci a od túlky cestivlákom cestvorí a dolini. Až ma poľa každý kulp. Pochvili sme si sad lénal vičkup pod velkvrpo a deli sme si kávo. Mážom prijst aj zajtra, spítal som sa. Okolo nás, poběhovali děti a hátzel si farbno loptu. Jednoť je včetku neslodž pan, polný malin a smíjala sa na cela kolom. Fona časťho pečevo sa nesla v stúchom a ja sa si spomenol na dětto u starých rodičov. Tálky a vzchrali ste električky. Lubom mi po tomu kázal fotografie sa svojej zanchraty. Medi radka mi si búli a časné kúrastí lália, bivoni a neskutečne velké tykvice. Pozrie, tato važi više 9 kil pochvalil sa. Neveril som vlastným odšel. Musímeš íst, ale v pětak v pridim sez. Povidal som a pobrhalas mi sa domal. Esčetné s citim hultuho chleba s maslom a medom. Bolo ty jedne zne krásšich rán, takto je sa noho mesica. Kolka takých to dní nám esčežívat pre nese.",
+   "reference_path": "bench/refs/me_sk_trhove_b.txt",
+   "audio_seconds": 109.03,
+   "wall_seconds": 5.91,
+   "rtf": 0.054,
+   "n_segments": null,
+   "segment_bounds": null
+  }
+ ]
+}

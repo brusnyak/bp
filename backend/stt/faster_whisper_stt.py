@@ -30,7 +30,7 @@ class FasterWhisperSTT:
         )
 
     def transcribe_audio(
-        self, audio_data: np.ndarray, sample_rate: int, language: Optional[str] = None, vad_filter: bool = True, initial_prompt: Optional[str] = None
+        self, audio_data: np.ndarray, sample_rate: int, language: Optional[str] = None, vad_filter: bool = True, initial_prompt: Optional[str] = None, word_timestamps: bool = False
     ) -> Tuple[list, float, Optional[str]]: # Changed return type to list of segments, transcription time, and detected language
         """
         Transcribes audio data using Faster-Whisper.
@@ -67,8 +67,12 @@ class FasterWhisperSTT:
         }
         if initial_prompt:
             transcribe_options["initial_prompt"] = initial_prompt
-        if not vad_filter: # If external VAD is enabled (and FasterWhisper's is disabled)
-            transcribe_options["no_speech_threshold"] = None # Disable FasterWhisper's internal no-speech detection
+        if word_timestamps:
+            transcribe_options["word_timestamps"] = True
+        # Lenient no-speech threshold: Whisper VAD rejects obvious silence but
+        # doesn't kill short speech segments (default 0.6 is too aggressive for
+        # sub-second final segments).
+        transcribe_options["no_speech_threshold"] = 0.3
 
         segments, info = self.model.transcribe(audio_data, **transcribe_options)
         # transcribe() returns a lazy generator: the decoding happens while it is consumed, so the

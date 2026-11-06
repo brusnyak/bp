@@ -65,7 +65,7 @@ class CTranslate2MT:
         # fall back to the Hugging Face ID for models converted before that change.
         local_tok = os.path.exists(os.path.join(self.ctranslate2_model_dir, "tokenizer_config.json"))
         self.tokenizer = AutoTokenizer.from_pretrained(
-            self.ctranslate2_model_dir if local_tok else self.hf_model_id
+            self.ctranslate2_model_dir if local_tok else self.hf_model_id, local_files_only=True
         )
         print(
             f"CTranslate2MT initialized with model_path={self.ctranslate2_model_dir}, device={self.device}"

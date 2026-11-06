@@ -1,0 +1,74 @@
+# BP — Docker Compose for server deployment
+#
+# Single-server deployment (one machine, N speakers + M listeners):
+#   docker compose up -d
+#
+# Multi-server (load balancer + N BP workers):
+#   Deploy this compose on each worker behind a reverse proxy (nginx/Traefik)
+#   that terminates TLS and forwards WebSocket connections.
+#
+# Environment overrides: copy .env.example to .env and edit, or set
+# variables directly in the environment before `docker compose up`.
+
+services:
+  bp:
+    build: .
+    container_name: bp-server
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - BP_HOST=0.0.0.0
+      - BP_PORT=8000
+      - BP_DEVICE=auto
+      - BP_COMPUTE_TYPE=int8
+      - BP_MT_DEVICE=cpu
+      - BP_HTTPS=0
+      - BP_DISABLE_RATE_LIMIT=0
+      - BP_LOG_SESSIONS=0
+      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
+    volumes:
+      # Persist speaker voices and session data across restarts
+      - ./speaker_voices:/app/speaker_voices:rw
+      - ./processed:/app/processed:rw
+      - ./certs:/app/certs:ro
+      # Optional: mount pre-converted CT2 models to skip conversion on startup
+      - ./ct2_models:/app/ct2_models:ro
+    # For NVIDIA GPU servers, uncomment the deploy section and install
+    # the NVIDIA Container Toolkit on the host:
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+    # Set BP_DEVICE=cuda and BP_COMPUTE_TYPE=float16 above for GPU.
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/hardware"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+# Optional reverse proxy with TLS termination (for LAN/internet exposure)
+# Uncomment and configure if you want HTTPS + WSS on the wire:
+#
+#  traefik:
+#    image: traefik:v2.11
+#    container_name: bp-traefik
+#    command:
+#      - "--api.insecure=true"
+#      - "--providers.docker=true"
+#      - "--entrypoints.web.address=:80"
+#      - "--entrypoints.websecure.address=:443"
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock:ro
+#      - ./certs:/etc/traefik/certs:ro
+#    depends_on:
+#      - bp

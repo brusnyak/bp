@@ -1,0 +1,15 @@
+{
+ "id": "yegorby/bp-lang-t4-20261104",
+ "title": "BP lang T4 20261104",
+ "code_file": "job.py",
+ "language": "python",
+ "kernel_type": "script",
+ "is_private": true,
+ "enable_gpu": true,
+ "enable_internet": true,
+ "dataset_sources": [
+  "yegorby/bp-lang-code-20261104"
+ ],
+ "competition_sources": [],
+ "kernel_sources": []
+}

@@ -85,8 +85,8 @@ def test_rename_cannot_escape_voices_dir(test_client: TestClient, app_with_test_
     monkeypatch.setattr(bm, "SPEAKER_VOICES_METADATA_FILE", str(voices / "speaker_voices.json"))
 
     email = f"sec_{uuid.uuid4().hex[:8]}@x.com"
-    test_client.post(f"{API}/register", json={"username": email.split("@")[0], "email": email, "password": "pass"})
-    token = test_client.post(f"{API}/login", json={"email": email, "password": "pass"}).json()["token"]
+    test_client.post(f"{API}/register", json={"username": email.split("@")[0], "email": email, "password": "passpass1"})
+    token = test_client.post(f"{API}/login", json={"email": email, "password": "passpass1"}).json()["token"]
     uid = _user_id(app_with_test_db, email)
 
     fname = f"{uid}_mine.wav"

@@ -549,7 +549,7 @@ def main():
     p.add_argument("--pull", action="store_true",
                    help="pull ear verdicts from a running backend (/api/ratings) into processed/ear_grades.json")
     p.add_argument("--token", default=None, help="login token for --pull (or BP_TOKEN env)")
-    p.add_argument("--server", default="https://localhost:8000",
+    p.add_argument("--server", default="http://localhost:8000",
                    help="backend base URL for --pull")
 
     p = sub.add_parser("bench", help="new-model bench on fixed owner clips")
@@ -557,6 +557,18 @@ def main():
                    help="nemotron (pure-C runtime) or bench_new_models.py engine")
     p.add_argument("--clips", default="me_sk_trhove_b",
                    help="comma list for bench_new_models.py engines")
+
+    p = sub.add_parser("model-harness", help="8 GB VRAM bounded model test harness (T4)")
+    p.add_argument("--stage", required=True, choices=["stt", "mt", "tts", "s2s"])
+    p.add_argument("--model", required=True, help="engine/registry name or model path")
+    p.add_argument("--device", default="cuda", choices=["cuda", "cpu", "mps", "auto"])
+    p.add_argument("--vram-limit", type=float, default=8.0)
+    p.add_argument("--clip", default=None)
+    p.add_argument("--lang", default=None)
+    p.add_argument("--ref", default=None)
+    p.add_argument("--text", default=None)
+    p.add_argument("--src", default="en")
+    p.add_argument("--tgt", default="sk")
 
     p = sub.add_parser("engine", help="engine registry + capability manifests + licence gate")
     p.add_argument("action", choices=["list", "check", "gate"])
@@ -576,7 +588,7 @@ def main():
     p.add_argument("--clip", default=None, help="override clip path for test")
     p.add_argument("--ref", default=None, help="override reference text for test")
     p.add_argument("--yes", action="store_true", help="confirm removal")
-    p.add_argument("--license", default=None, choices=["commercial-ok", "non-commercial", "unknown"])
+    p.add_argument("--license", default=None, choices=["commercial-ok", "gpl-3.0", "non-commercial", "unknown"])
 
     args = parser.parse_args()
     if args.cmd == "stt":
@@ -602,6 +614,18 @@ def main():
             ["--license", args.license] if args.license else []
         )
         runpy.run_path(os.path.join(REPO_ROOT, "scripts", "language_packs.py"),
+                       run_name="__main__")
+    elif args.cmd == "model-harness":
+        # build argv from namespace
+        new_argv = ["run.py"]
+        for k, v in vars(args).items():
+            if v is None:
+                continue
+            flag = f"--{k.replace('_', '-')}"
+            new_argv.append(flag)
+            new_argv.append(str(v))
+        sys.argv = new_argv
+        runpy.run_path(os.path.join(REPO_ROOT, "scripts", "model_harness", "run.py"),
                        run_name="__main__")
     else:
         sys.argv = [WRAPPED[args.cmd]] + (args.rest[1:] if args.rest[:1] == ["--"] else args.rest)

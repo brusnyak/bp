@@ -1,0 +1,48 @@
+{
+  "hardware": {
+    "os": "Darwin",
+    "arch": "arm64",
+    "cpu_cores": 8,
+    "ram_gb": 8.0,
+    "gpu": "mps",
+    "gpu_name": "Apple Silicon MPS",
+    "vram_gb": null,
+    "has_ctranslate2": true,
+    "has_faster_whisper": true,
+    "has_piper": true,
+    "has_torch": true
+  },
+  "stt": {
+    "device": "mps",
+    "compute_type": "float16",
+    "model_size": "parakeet-tdt-0.6b-v3",
+    "engine": "parakeet",
+    "notes": "Parakeet TDT v3 on MPS — fast + accurate STT"
+  },
+  "mt": {
+    "device": "cpu",
+    "compute_type": "int8",
+    "model_size": "base",
+    "engine": "opus-mt",
+    "notes": "CPU: MT on CPU int8"
+  },
+  "tts": {
+    "device": "cpu",
+    "compute_type": "int8",
+    "model_size": "piper",
+    "engine": "piper",
+    "notes": "CPU baseline: Piper streaming"
+  },
+  "vad": {
+    "device": "cpu",
+    "compute_type": "int8",
+    "model_size": "webrtcvad",
+    "engine": "webrtcvad",
+    "notes": "WebRTC VAD, always CPU"
+  },
+  "streaming": true,
+  "max_concurrent_sessions": 2,
+  "notes": [
+    "Apple Silicon — faster-whisper runs on CPU via CT2; MPS not used for STT."
+  ]
+}

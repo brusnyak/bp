@@ -1,0 +1,68 @@
+{
+  "en-sk": {
+    "sha256": "877c14f6e705e62cffe21530fff5f74a3d97d5afdf2d466d6845d5aa0dbb4403",
+    "input_s": 90.0,
+    "tts": "omnivoice",
+    "audio_total_s": 101.48,
+    "errors": 0,
+    "results": [
+      {
+        "rate": 1.0,
+        "segments": 17,
+        "voiced": 16,
+        "first_after_estimated_end_p50": 1.38,
+        "first_after_estimated_end_p95": 2.89525,
+        "modeled_listener_lag_p50": 11.427,
+        "modeled_listener_lag_p95": 17.825
+      },
+      {
+        "rate": 1.25,
+        "segments": 17,
+        "voiced": 16,
+        "first_after_estimated_end_p50": 1.38,
+        "first_after_estimated_end_p95": 2.89525,
+        "modeled_listener_lag_p50": 3.308,
+        "modeled_listener_lag_p95": 9.6065
+      }
+    ],
+    "limits": [
+      "source end inferred from transcription arrival minus STT",
+      "listener scheduling modeled, not measured browser",
+      "no output WAV hashes or bilingual grades",
+      "throwaway Kaggle code altered licence gate and dependency pins"
+    ]
+  },
+  "en-cs": {
+    "sha256": "b5fd7bb61eda210cfe88d063089a2c80a2e014a1cb42e2ddf284a3544083839f",
+    "input_s": 90.0,
+    "tts": "omnivoice",
+    "audio_total_s": 87.87,
+    "errors": 0,
+    "results": [
+      {
+        "rate": 1.0,
+        "segments": 16,
+        "voiced": 16,
+        "first_after_estimated_end_p50": 1.4215,
+        "first_after_estimated_end_p95": 1.64275,
+        "modeled_listener_lag_p50": 3.0165,
+        "modeled_listener_lag_p95": 5.12425
+      },
+      {
+        "rate": 1.25,
+        "segments": 16,
+        "voiced": 16,
+        "first_after_estimated_end_p50": 1.4215,
+        "first_after_estimated_end_p95": 1.64275,
+        "modeled_listener_lag_p50": 1.6005,
+        "modeled_listener_lag_p95": 3.1455
+      }
+    ],
+    "limits": [
+      "source end inferred from transcription arrival minus STT",
+      "listener scheduling modeled, not measured browser",
+      "no output WAV hashes or bilingual grades",
+      "throwaway Kaggle code altered licence gate and dependency pins"
+    ]
+  }
+}

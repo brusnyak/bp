@@ -4,19 +4,28 @@ from dotenv import load_dotenv
 load_dotenv()  # local .env (GOOGLE_CLIENT_ID etc.) — untracked, never committed
 
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Request
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.base import BaseHTTPMiddleware
+from urllib.parse import urlsplit
+import posixpath
+
+# Rate limiter import is optional: rate limiting only enabled via BP_ENABLE_RATE_LIMIT=1.
+try:
+    from slowapi import Limiter, _rate_limit_exceeded_handler
+    from slowapi.util import get_remote_address
+    from slowapi.errors import RateLimitExceeded
+    _SLOWAPI_AVAILABLE = True
+except ImportError:
+    Limiter = _rate_limit_exceeded_handler = get_remote_address = RateLimitExceeded = None
+    _SLOWAPI_AVAILABLE = False
 import asyncio
 import json
 import os
 import sys # Import sys
+import uuid
+import numpy as np # type: ignore
 
 # Slovak/Czech text in log lines raises UnicodeEncodeError on consoles that default to cp1252 (stock Windows),
 # which used to kill the pipeline task. Make the streams UTF-8 so no PYTHONIOENCODING is needed.
@@ -33,12 +42,19 @@ import threading
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "backend"))
 
 import logging # Import logging
-from backend.main import initialize_all_models, handle_audio_stream, get_initialized_models, router as backend_router
+from backend.main import initialize_all_models, handle_audio_stream, get_initialized_models, AUDIO_SAMPLE_RATE, router as backend_router
 import backend.main as backend_main # Import backend.main as an alias
 from backend.main import User, get_password_hash # Import User and get_password_hash for default user creation
 from sqlalchemy.orm import Session # Import Session
 from backend.utils.db_manager import get_db_session_and_engine, SQLALCHEMY_DATABASE_URL, get_db, init_db # Import init_db
-from fastapi import UploadFile, File, Depends # Import Depends
+from fastapi import UploadFile, File, Depends, Query # Import Depends, Query
+from backend.hardware_scan import autoconfigure, get_config, AutoConfig # type: ignore
+from backend.session_manager import ( # type: ignore
+    get_or_create_room, remove_room, list_rooms, get_auto_config,
+    MeetingRoom, SpeakerIdentity, ListenerIdentity, TranslationResult,
+)
+from backend.streaming.pipeline import ContinuousStreamingPipeline # type: ignore
+import backend.session_manager as _session_manager
 
 class _AudioOnlyStatic(StaticFiles):
     """Serve voice clips but never speaker_voices.json (it lists every user's uploads and file paths)."""
@@ -140,13 +156,14 @@ def create_app(db_session_local_override=None) -> FastAPI:
 
     # Rate limiting (P1) -- protect auth & upload endpoints
     # ONLY enable if explicitly requested via BP_ENABLE_RATE_LIMIT=1
-    if os.environ.get("BP_ENABLE_RATE_LIMIT") == "1":
+    from backend.utils.auth import rate_limit_enabled
+    if rate_limit_enabled() and _SLOWAPI_AVAILABLE:
         limiter = Limiter(key_func=get_remote_address)
         _app.state.limiter = limiter
         _app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
         print("DEBUG: Rate limiter ENABLED")
     else:
-        print("DEBUG: Rate limiter DISABLED (default)")
+        print("DEBUG: Rate limiter DISABLED (loopback default; BP_ENABLE_RATE_LIMIT=1 or a non-loopback BP_HOST enables it)")
 
     # Dependency to get the database session for the app
     def get_db_dependency_for_app():
@@ -168,7 +185,8 @@ def create_app(db_session_local_override=None) -> FastAPI:
             self.active_connections.append(websocket)
 
         def disconnect(self, websocket: WebSocket):
-            self.active_connections.remove(websocket)
+            if websocket in self.active_connections:
+                self.active_connections.remove(websocket)
 
         async def send_personal_message(self, message: str, websocket: WebSocket):
             await websocket.send_text(message)
@@ -188,6 +206,56 @@ def create_app(db_session_local_override=None) -> FastAPI:
                 self.active_connections.remove(connection)
 
     manager = ConnectionManager()
+
+    def authenticated_user(token):
+        if not token:
+            return None
+        try:
+            from backend.utils.auth import decode_access_token
+            email = decode_access_token(token)
+            factory = db_session_local_override or _default_SessionLocal
+            with factory() as db:
+                return db.query(User).filter(User.email == email).first()
+        except Exception:
+            return None
+
+    @_app.middleware("http")
+    async def security_headers(request: Request, call_next):
+        response = await call_next(request)
+        response.headers.setdefault("X-Content-Type-Options", "nosniff")
+        response.headers.setdefault("Referrer-Policy", "no-referrer")
+        response.headers.setdefault("X-Frame-Options", "DENY")
+        response.headers.setdefault("Permissions-Policy", "microphone=(self), camera=(), geolocation=()")
+        return response
+
+    guest_sockets: set = set()  # live guest WebSockets; capped so an open demo cannot exhaust the machine
+
+    @_app.middleware("http")
+    async def protect_research_media(request: Request, call_next):
+        path = posixpath.normpath(request.url.path.replace("\\", "/"))
+        # The Voice Lab is a private research room: development only (BP_LAB=1), never on a shared server.
+        if path.startswith("/ui/voice-lab") and os.environ.get("BP_LAB") != "1":
+            return JSONResponse(status_code=404, content={"detail": "Not found"})
+        # A generated research manifest is not a public-demo consent receipt.
+        if path == "/ui/voice-lab/library.json" or path.startswith(("/voice_qc/", "/processed/")):
+            return JSONResponse(status_code=403, content={"detail": "Research media is private; use an approved public demo export."})
+        if path.startswith("/speaker_voices/"):
+            filename = path.removeprefix("/speaker_voices/")
+            if not filename.lower().endswith((".wav", ".m4a", ".mp3", ".webm", ".ogg")):
+                return JSONResponse(status_code=404, content={"detail": "Not found"})
+            entry = next((v for v in backend_main._read_speaker_voices_metadata()
+                          if v.get("filename") == filename), None)
+            auth = request.headers.get("authorization", "")
+            token = auth[7:] if auth.lower().startswith("bearer ") else request.query_params.get("token")
+            user = authenticated_user(token)
+            public = bool(entry and entry.get("public_demo") is True)
+            owned = bool(entry and user and entry.get("user_id") == user.id)
+            if not (public or owned):
+                return JSONResponse(status_code=403, content={"detail": "Private voice media."})
+        response = await call_next(request)
+        if path.startswith("/speaker_voices/"):
+            response.headers["Cache-Control"] = "private, no-store"
+        return response
 
     # Mount static files for the UI
     # makedirs here (not only in __main__): StaticFiles raises at mount time on a
@@ -227,13 +295,16 @@ def create_app(db_session_local_override=None) -> FastAPI:
         vad_enabled_param: bool = True, # Add vad_enabled_param with default
         speaker_wav_path: Optional[str] = None,
         speaker_text: Optional[str] = None,
-        speaker_lang: Optional[str] = None
+        speaker_lang: Optional[str] = None,
+        current_user: User = Depends(backend_main.get_current_user),
     ):
         init_start_time = time.time()
         print(f"APP: Received initialization request at {time.strftime('%H:%M:%S', time.localtime(init_start_time))}: source_lang={source_lang}, target_lang={target_lang}, tts_model_choice={tts_model_choice}, stt_model_size={stt_model_size}, vad_enabled_param={vad_enabled_param}, speaker_wav_path={speaker_wav_path}, speaker_text={speaker_text}, speaker_lang={speaker_lang}")
         
-        # For the /initialize endpoint, we use a dummy client_info as it's not a WebSocket
-        dummy_client_info = "http_init_client" 
+        speaker_wav_path = backend_main.authorize_speaker_wav(speaker_wav_path, current_user.id)
+
+        # HTTP preparation is scoped to the authenticated user.
+        dummy_client_info = f"http_init_user_{current_user.id}"
         
         # This will trigger the model loading in the background
         result = await initialize_all_models(
@@ -251,171 +322,241 @@ def create_app(db_session_local_override=None) -> FastAPI:
         init_models_end_time = time.time()
         print(f"APP: initialize_all_models completed at {time.strftime('%H:%M:%S', time.localtime(init_models_end_time))}. Duration: {init_models_end_time - init_start_time:.2f}s")
 
-        # After models are initialized, broadcast a status update to all connected websockets
-        # This ensures that any client that connects after initialization, or is already connected,
-        # receives the correct status.
-        
-        # Status check must use the STORED session_config, not the request params:
-        # initialize_all_models may remap choices to measured defaults (e.g. STT
-        # size upgrade, piper->piper_sk_personal) and writes them back into the
-        # session. Checking against the raw request would report "not loaded"
-        # for a correctly initialized engine. SANDBOX-FIX (2026-09-28).
-        stored_session = backend_main.active_sessions.get(dummy_client_info, {})
-        dummy_session_config = dict(stored_session.get("session_config") or {
-            "source_lang": source_lang,
-            "target_lang": target_lang,
-            "tts_model_choice": tts_model_choice,
-            "stt_model_size": stt_model_size,
-            "speaker_wav_path": speaker_wav_path,
-            "speaker_text": speaker_text,
-            "speaker_lang": speaker_lang,
-            "vad_enabled": vad_enabled_param,
-        })
-        (
-            current_stt_model,
-            current_main_mt_model,
-            current_tts_model_instance, # This will be either CoquiTTS or PiperTTS
-            current_vad_instance,
-            current_tts_choice_from_main,
-        ) = get_initialized_models(dummy_client_info, dummy_session_config) # Pass dummy client_info
-        
-        status_check_time = time.time()
-        print(f"APP: Model status check initiated at {time.strftime('%H:%M:%S', time.localtime(status_check_time))}")
-
-        if (
-            current_stt_model is not None
-            and current_main_mt_model is not None
-            and current_vad_instance is not None
-            and current_tts_model_instance is not None # Check if any TTS model is initialized
-        ):
-            print(f"APP: Broadcasting models_loading_status: fully_loaded=True at {time.strftime('%H:%M:%S', time.localtime(time.time()))}")
-            await manager.broadcast(
-                json.dumps(
-                    {
-                        "type": "models_loading_status",
-                        "loading_started": True,
-                        "fully_loaded": True,
-                    }
-                )
-            )
-        else:
-            # This case should ideally not be reached if initialize_models completes successfully
-            print(
-                f"APP: Broadcasting models_loading_status: fully_loaded=False (error or incomplete initialization) at {time.strftime('%H:%M:%S', time.localtime(time.time()))}"
-            )
-            await manager.broadcast(
-                json.dumps(
-                    {
-                        "type": "models_loading_status",
-                        "loading_started": False,
-                        "fully_loaded": False,
-                    }
-                )
-            )
-        
-        init_end_time = time.time()
-        print(f"APP: Initialization endpoint finished at {time.strftime('%H:%M:%S', time.localtime(init_end_time))}. Total endpoint duration: {init_end_time - init_start_time:.2f}s")
-
+        # HTTP initialization belongs to this authenticated user, never broadcast it.
+        stored = backend_main.active_sessions.get(dummy_client_info, {})
+        result["fully_loaded"] = all(stored.get(k) is not None for k in
+                                    ("stt_model", "tts_engine", "vad_instance"))
         return result
 
 
+    # ------------------------------------------------------------------ hardware
+    @_app.get("/api/hardware", summary="Detected hardware + auto-selected pipeline config")
+    async def hardware_config():
+        cfg = await get_auto_config()
+        return {
+            "hardware": {
+                "os": cfg.hardware.os,
+                "arch": cfg.hardware.arch,
+                "cpu_cores": cfg.hardware.cpu_cores,
+                "ram_gb": cfg.hardware.ram_gb,
+                "gpu": cfg.hardware.gpu,
+                "gpu_name": cfg.hardware.gpu_name,
+                "vram_gb": cfg.hardware.vram_gb,
+            },
+            "stt": {"device": cfg.stt.device, "compute_type": cfg.stt.compute_type,
+                    "model_size": cfg.stt.model_size, "engine": cfg.stt.engine,
+                    "notes": cfg.stt.notes},
+            "mt": {"device": cfg.mt.device, "compute_type": cfg.mt.compute_type,
+                   "model_size": cfg.mt.model_size, "engine": cfg.mt.engine,
+                   "notes": cfg.mt.notes},
+            "tts": {"device": cfg.tts.device, "compute_type": cfg.tts.compute_type,
+                    "model_size": cfg.tts.model_size, "engine": cfg.tts.engine,
+                    "notes": cfg.tts.notes},
+            "vad": {"device": cfg.vad.device, "engine": cfg.vad.engine,
+                    "notes": cfg.vad.notes},
+            "streaming": cfg.streaming,
+            "max_concurrent_sessions": cfg.max_concurrent_sessions,
+            "notes": cfg.notes,
+        }
+
+    # ------------------------------------------------------- meeting room mgmt
+    @_app.post("/api/meeting/create", summary="Create a meeting room")
+    async def meeting_create(room_id: Optional[str] = Query(None),
+                             current_user: User = Depends(backend_main.get_current_user)):
+        rid = room_id or f"room-{uuid.uuid4().hex[:8]}"
+        room = await get_or_create_room(rid)
+        return {"room_id": rid, "max_speakers": room.config.max_concurrent_sessions,
+                "config": {
+                    "stt": room.config.stt.model_size + "/" + room.config.stt.device,
+                    "tts": room.config.tts.engine,
+                }}
+
+    @_app.get("/api/meeting/list", summary="List active meeting rooms")
+    async def meeting_list():
+        return {"rooms": await list_rooms()}
+
+    @_app.delete("/api/meeting/{room_id}", summary="Close a meeting room")
+    async def meeting_close(room_id: str,
+                            current_user: User = Depends(backend_main.get_current_user)):
+        await remove_room(room_id)
+        return {"status": "closed", "room_id": room_id}
+
+    # ---------------------------------------------------------- meeting websocket
+    @_app.websocket("/ws/meeting")
+    async def meeting_websocket_endpoint(websocket: WebSocket):
+        """
+        Multi-speaker meeting WebSocket.
+
+        Client messages (JSON):
+          {"type":"join","role":"speaker|listener","name":"...",
+           "source_lang":"en","target_lang":"sk","voice":"en_US-personal-v2"}
+          {"type":"audio","data": <base64 float32 PCM16k mono>}   (speaker only)
+          {"type":"start"}                                         (speaker only)
+          {"type":"stop"}                                          (speaker only)
+          {"type":"leave"}
+
+        Server messages (JSON):
+          {"type":"joined","room_id":"...","session_id":"...","role":"speaker"}
+          {"type":"translation_result", ...}   (listener: translated text + audio bytes)
+          {"type":"transcription_result", ...} (listener: source text)
+          {"type":"error","message":"..."}
+        """
+        token = websocket.query_params.get("token")
+        user = authenticated_user(token)
+        if user is None:
+            await websocket.accept()
+            await websocket.close(code=4003, reason="Authentication required")
+            return
+
+        await websocket.accept()
+        room: Optional[MeetingRoom] = None
+        session_id = f"{user.id}-{uuid.uuid4().hex[:8]}"
+        role: Optional[str] = None
+        pipeline: Optional[ContinuousStreamingPipeline] = None
+
+        try:
+            while True:
+                message = await websocket.receive()
+                if message["type"] == "websocket.disconnect":
+                    break
+                if message["type"] != "websocket.receive":
+                    continue
+                if "text" not in message:
+                    continue
+                import json as _json
+                data = _json.loads(message["text"])
+                mtype = data.get("type")
+
+                if mtype == "join":
+                    role = data.get("role")
+                    name = data.get("name", user.email)
+                    if role == "speaker":
+                        source_lang = data.get("source_lang", "en")
+                        voice = data.get("voice")
+                        tts_engine = data.get("tts_engine", "piper")
+                        room = await get_or_create_room(data.get("room_id", "default"))
+                        await room.add_speaker(session_id, name, source_lang, voice, tts_engine)
+                        pipeline = ContinuousStreamingPipeline(
+                            speaker_id=session_id,
+                            source_lang=source_lang,
+                            target_lang=data.get("target_lang", "sk"),
+                            voice=voice or "",
+                            tts_engine=tts_engine,
+                            config=room.config,
+                        )
+                        await pipeline.initialize()
+                        await websocket.send_json({
+                            "type": "joined", "room_id": room.room_id, "session_id": session_id,
+                            "role": "speaker",
+                        })
+                    elif role == "listener":
+                        target_lang = data.get("target_lang", "sk")
+                        output_device = data.get("output_device")
+                        playback_rate = float(data.get("playback_rate", 1.0))
+                        room = await get_or_create_room(data.get("room_id", "default"))
+                        await room.add_listener(session_id, name, target_lang, output_device, playback_rate)
+                        await websocket.send_json({
+                            "type": "joined", "room_id": room.room_id, "session_id": session_id,
+                            "role": "listener",
+                        })
+                    else:
+                        await websocket.send_json({"type": "error", "message": "role must be 'speaker' or 'listener'"})
+
+                elif mtype == "start":
+                    if role != "speaker" or not room:
+                        continue
+                    session = room.speakers.get(session_id)
+                    if session:
+                        await session.start(websocket_send=None)
+
+                elif mtype == "stop":
+                    if role != "speaker" or not room:
+                        continue
+                    session = room.speakers.get(session_id)
+                    if session:
+                        await session.stop()
+
+                elif mtype == "audio":
+                    if role != "speaker" or not room or not pipeline:
+                        continue
+                    import base64 as _b64
+                    raw = _b64.b64decode(data["data"])
+                    audio_np = np.frombuffer(raw, dtype=np.float32)
+                    result = await pipeline.process_audio_chunk(audio_np, AUDIO_SAMPLE_RATE)
+                    if result:
+                        # Broadcast to listeners matching target_lang
+                        await room.broadcast_result(result)
+                        await websocket.send_json({
+                            "type": "translation_result",
+                            "speaker_id": result.speaker_id,
+                            "source_text": result.source_text,
+                            "translated_text": result.translated_text,
+                            "target_lang": result.target_lang,
+                            "sequence": result.sequence,
+                            "stt_ms": result.stt_ms, "mt_ms": result.mt_ms, "tts_ms": result.tts_ms,
+                        })
+                        # Send audio as binary message
+                        await websocket.send_bytes(result.audio)
+
+                elif mtype == "leave":
+                    break
+
+        except WebSocketDisconnect:
+            pass
+        except Exception:
+            logging.exception("Meeting WebSocket session failed")
+        finally:
+            if role == "speaker" and room:
+                await room.remove_speaker(session_id)
+            elif role == "listener" and room:
+                await room.remove_listener(session_id)
+            if pipeline:
+                await pipeline.close()
     @_app.websocket("/ws")
     async def websocket_endpoint(websocket: WebSocket):
+        # Browser sockets must originate from this host; native clients omit Origin.
+        origin = websocket.headers.get("origin")
+        if origin:
+            parsed = urlsplit(origin)
+            expected_scheme = "https" if websocket.url.scheme == "wss" else "http"
+            if parsed.netloc != websocket.headers.get("host") or parsed.scheme != expected_scheme:
+                await websocket.close(code=4003, reason="Untrusted origin")
+                return
+        token = websocket.query_params.get("token")
+        user = authenticated_user(token)
+        if user is None:
+            # Accept only to convey an actionable auth close code; no session/models exist.
+            await websocket.accept()
+            await websocket.close(code=4003, reason="Authentication required")
+            return
+        client_info = f"{websocket.client.host}:{websocket.client.port}"
+        is_guest = user.email == backend_main.GUEST_EMAIL
+        if is_guest and len(guest_sockets) >= int(os.environ.get("BP_GUEST_MAX_SESSIONS", "4")):
+            await websocket.accept()
+            await websocket.close(code=4009, reason="The demo is busy. Try again in a minute, or sign in.")
+            return
         await manager.connect(websocket)
+        if is_guest:
+            guest_sockets.add(websocket)
         try:
-            client_info = f"{websocket.client.host}:{websocket.client.port}" if websocket.client else "unknown:unknown"
-            print(
-                f"App: WebSocket accepted from {client_info}"
-            )
-            
-            # Initialize session-specific configuration for the new WebSocket
-            # This will create an entry in active_sessions if it doesn't exist
-            # and store the default session_config.
-            await initialize_all_models(
-                client_info=client_info,
-                source_lang="en", # Default values for initial connection
-                target_lang="sk",
-                tts_model_choice="piper",
-                stt_model_size="base",
-                speaker_wav_path=None,
-                speaker_text=None,
-                speaker_lang=None,
-                vad_enabled_param=True,
-                websocket=websocket # Pass websocket for MT conversion status
-            )
-
-            # Retrieve models from the newly created/updated session
-            session_data = backend_main.active_sessions.get(client_info)
-            if session_data:
-                current_stt_model = session_data.get("stt_model")
-                current_main_mt_model = session_data["mt_models"].get(f"{session_data['session_config']['source_lang']}-{session_data['session_config']['target_lang']}")
-                current_tts_model_instance = session_data.get("tts_engine")  # registry engine (backend/tts/base.py); the old piper_tts_model/coqui_tts_model keys are no longer set
-                current_vad_instance = session_data.get("vad_instance")
-                
-                if (
-                    current_stt_model is not None
-                    and current_main_mt_model is not None
-                    and current_vad_instance is not None
-                    and current_tts_model_instance is not None
-                ):
-                    print(
-                        f"App: Sending personal models_loading_status to new websocket {client_info}: fully_loaded=True"
-                    )
-                    await manager.send_personal_message(
-                        json.dumps(
-                            {
-                                "type": "models_loading_status",
-                                "loading_started": True,
-                                "fully_loaded": True,
-                            }
-                        ),
-                        websocket,
-                    )
-                else:
-                    print(
-                        f"App: Sending personal models_loading_status to new websocket {client_info}: fully_loaded=False"
-                    )
-                    await manager.send_personal_message(
-                        json.dumps(
-                            {
-                                "type": "models_loading_status",
-                                "loading_started": False,
-                                "fully_loaded": False,
-                            }
-                        ),
-                        websocket,
-                    )
-            else:
-                print(f"App: Session data not found for {client_info} after initialization attempt.")
-                await manager.send_personal_message(
-                    json.dumps(
-                        {
-                            "type": "error",
-                            "message": "Failed to initialize session models."
-                        }
-                    ),
-                    websocket,
-                )
-
-            await handle_audio_stream(websocket)
+            await websocket.send_json({"type": "models_loading_status", "fully_loaded": False,
+                "route_status": {"pair": "en-sk", "status": "experimental",
+                                 "reason": "Select a direction and initialize the installed profile."}})
+            # Connecting authenticates only. Configuration explicitly starts model loading.
+            await handle_audio_stream(websocket, token=token)
         except WebSocketDisconnect:
+            pass
+        except Exception:
+            logging.exception("WebSocket session failed")
+        finally:
             manager.disconnect(websocket)
-            # Clean up session data on disconnect
-            if client_info in backend_main.active_sessions:
-                del backend_main.active_sessions[client_info]
-                logging.info(f"Backend: Session {client_info} data cleared on disconnect.")
-            print(
-                f"App: WebSocket disconnected from {client_info}"
-            )
-        except Exception as e:
-            print(f"App: WebSocket error for {client_info}: {e}")
-            if client_info in backend_main.active_sessions:
-                del backend_main.active_sessions[client_info]
-                logging.info(f"Backend: Session {client_info} data cleared due to error.")
-    @_app.get("/test-route")
-    async def test_route():
-        return {"message": "Test route successful!"}
-
+            guest_sockets.discard(websocket)
+            session = backend_main.active_sessions.pop(client_info, None)
+            if session:
+                task = session.get("active_pipeline_task")
+                if task and not task.done():
+                    task.cancel()
+            backend_main._session_locks.pop(client_info, None)
     return _app
 
 
@@ -431,13 +572,18 @@ if __name__ == "__main__":
     host = os.environ.get("BP_HOST", "localhost")  # Google OAuth needs localhost:8000, not 127.0.0.1
     if host not in ("127.0.0.1", "localhost", "::1"):
         print(f"APP: WARNING - listening on {host}; anyone on the network can register and use /ws.")
+    # Plain HTTP on localhost is a browser "secure context": the microphone works and there is no
+    # certificate warning. HTTPS (self-signed certs/, needed for LAN/phone access) is opt-in: BP_HTTPS=1.
+    use_tls = os.environ.get("BP_HTTPS") == "1" and os.environ.get("BP_NO_SSL") != "1"
+    print(f"APP: serving {'https' if use_tls else 'http'}://{host}:{os.environ.get('BP_PORT', '8000')}")
     uvicorn.run(
-        "app:app", # Changed to reference the app object directly
+        "app:app",
         host=host,
         port=int(os.environ.get("BP_PORT", "8000")),
-        ssl_keyfile="./certs/key.pem",
-        ssl_certfile="./certs/cert.pem",
-        log_level="info", # Set log level to info for cleaner output
-        limit_concurrency=100, # Increase concurrency limit
-        backlog=1024, # Increase backlog
+        ssl_keyfile="./certs/key.pem" if use_tls else None,
+        ssl_certfile="./certs/cert.pem" if use_tls else None,
+        log_level="info",
+        access_log=False,  # /ws?token=... would write session tokens into the log
+        limit_concurrency=100,
+        backlog=1024,
     )

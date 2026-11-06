@@ -1,0 +1,55 @@
+{
+ "model": "/Users/yegor/bp-review-2026-11-02/ct2/kinit-whisper-small-sk",
+ "model_tag": "kinit-whisper-small-sk",
+ "mode": "whole",
+ "cap": null,
+ "beam": 5,
+ "temperature": 0.0,
+ "language": "sk",
+ "compute_type": "int8",
+ "device": "cpu",
+ "machine": "arm64 CPU int8",
+ "python": "3.11.15",
+ "faster_whisper": "1.2.0",
+ "ctranslate2": "4.8.4",
+ "git_head": "faf68ff6977906415ec3a0ec5ffa090d74041ac7",
+ "utc": "2026-11-02T11:38:26+00:00",
+ "clips": [
+  {
+   "clip": "me_sk_script",
+   "wer": 1.0208,
+   "cer": 0.811,
+   "hypothesis": "Dobré ráno a viete, čo je v tejto šíviho kážky a prekvotu reči ju v reálnom čase. Hovorím po anglicky a môj chlas budete počuť hovoriť po slovensky do niekoľkých sekúnd. Systém počúva mikrofónom a dedukujú, keď je reč začína a končí. Najprv je reč pripísaná do textu, potom preložená a potom opäť preverená. Každý krok beží lokalitný tento počítačí bez obluku a bez čakárne. Latencií je čas medzi mojimi slovami a preloženými hlasom, ktoré počuješ. Naším cieľom je zdržanie len pár sekúnd, dosť krátky na príročný rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozdku. Hlasového rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozho rozdza. om učil systému systému systému mojom mojom hlasom zazom zazom, zaznam zaznam zazom, zaznam zaznam zaznam znam znam znam znam znam znam znam znam znam znam zvskéhovorstvského zvského zvského zvského zvského zvského zvského zvského zvského zvského zvského zvského zvského zvského zvského zvského zvského zvského zvského zvského zvského zvského zvského zvského zvského zvského zvského zvského zvského zv , akože častočné výsledky, zatiaľ čo ja som ešte hovorím. Titulky môžete presunieť do plaváčieho okna nad akoukoľvek aplikáciou. Preložený hlas je presmerový hlas je presmerový hlas, je presmerový hlas presmer. Preložený hlas je presmer. Preložený hlas je presmer. Preloženíšelý hlasť. Preložením. Ostatný hlasť. Ostatný. Ostatný. Ostatnýmier. Ostatnýmier. Ostatnýmier. Ostatnýmier. Ostatnýmier. Ostatnýmier. Ostatným. Ostatným. Ostatným. Ostatným. Ostatným hovorím enhlavk v hl hovorím enhlícky. Otázky. Otázky. Otázky. Otázky. Otázky. Otázky. Otázky budú. Otázky. Otázky. Otázky.",
+   "reference_path": "bench/refs/me_sk_script.txt",
+   "audio_seconds": 134.3,
+   "wall_seconds": 31.18,
+   "rtf": 0.232,
+   "n_segments": null,
+   "segment_bounds": null
+  },
+  {
+   "clip": "me_sk_trhove",
+   "wer": 0.911,
+   "cer": 0.6552,
+   "hypothesis": "Včera ráno som išiel na trh kúpiť čerstvý chlieb a mleko. Stretol som tam starého priateľa Ľuba, ktorý predával med Asýrii. „Ahoj, kde si sa tulel celé mesiace?” spýtal sa ma s úspechom. Porozprával som mu o svojej práci a dlhých ceste vlákom cez hore Adelini. Až ma bol každý klub. Pochmili sme si sadli na lavičku, pod veľkú vŕbu a dali sme si kávu. „Môžem prísť aj zajtra?” spýtal som sa. Okolo nás prebiehali deti a hádzali si farabnú loptu. Jedno dievčatko niesla džbán plný malín a smialo sa na celé kolo. Vo na čerstvého pečerstvého pečia sa niesla vzduchom a ja som si spomeným vzduchom a ja som si spomeným detstvo u starých rodičov. Vďu rodičom. Vďom vzda som vzdu a ja som vzdu a ja som si spomený rodičom vzdu a ja som vzdu a ja som vzdu a ja rodičom vzdu a ja rodiu vzdu a ja vzdu a ja y električky. Ľubo mi potom ukázal fotografie zo svojho záhrady. Medzi radke medzi Bulie a Čestnoku rastrie Lárie Lárie Lárie Lárie Lálie, Vihonky a nesnky a nesnky a nesnky nesky nesky nesky nesky a nesky nesky nesky nesky nesky nesky nesky nesky nesky nesky nesky nesky nesky nesky nesky nesky nesky nesky nesky nesky nesky nesky nesky nesky . Ešte dnes cítim chú dlho chleboch, chleho chleho chleho chleho chleho chleho chleho chleho chleho chleho chleho chleho chleho chleho chleho chleho chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle chle",
+   "reference_path": "bench/refs/me_sk_trhove.txt",
+   "audio_seconds": 103.57,
+   "wall_seconds": 20.82,
+   "rtf": 0.201,
+   "n_segments": null,
+   "segment_bounds": null
+  },
+  {
+   "clip": "me_sk_trhove_b",
+   "wer": 0.6283,
+   "cer": 0.4751,
+   "hypothesis": "Včera ráno som išiel na trh kúpiť čerstvý chlieb a mlieko. Stretol som tam starého priateľa Ľuba, ktorý predoval med a syry. „Ahoj, kde ste sedelo celé mesiace?” spýtal sa ma so smerom. „Prozprával som mu o svojej práci a o dlhých ceste vlakom cez hory a doliny. Až ma povedal každý kĺb. po chvíli sme si sadli na výčku pod veľkú frbu a dali sme si kávu. Môžem prísť aj zajtra?” spýtal som sa. Okolo nás pobehovali deti a hádzali si farbnú loptu. Jedno, kde všetko niesla džbán plný malín a smie hlasen celé kolo. Von čerstvého pečia sa niesla vzdnu vzdnu vzduchu a jase si spomenú si spomenú rodičku vzdiaľky a vzdiaľky a vzdiaľky a vzčky a vzdiaľky a vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdnezdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne vzdne v povedal som a pobral som sa domov ešte dnes cítim chultu chleba s maslom a medo bolo tohovoril chlieb",
+   "reference_path": "bench/refs/me_sk_trhove_b.txt",
+   "audio_seconds": 109.03,
+   "wall_seconds": 20.28,
+   "rtf": 0.186,
+   "n_segments": null,
+   "segment_bounds": null
+  }
+ ]
+}

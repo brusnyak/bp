@@ -1,0 +1,7 @@
+/* Document pages without a table of contents, and form status. */
+.doc-single { max-width: 46rem; padding-bottom: 5rem; }
+.doc-single .faq { margin-top: 0.5rem; }
+.doc-single .prose { max-width: none; }
+.feedback-form { margin-top: 1.5rem; max-width: 34rem; }
+.form-status { margin: 1rem 0 0; font-size: 0.9rem; color: var(--secondary-color); min-height: 1.4em; }
+.form-status.error { color: var(--danger-color); }

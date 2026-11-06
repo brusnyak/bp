@@ -1,0 +1,529 @@
+{
+ "audio": "speaker_voices/me_sk_trhove.m4a",
+ "seconds": 40.0,
+ "src": "sk",
+ "tgt": "en",
+ "tts": "piper",
+ "input_end_s": 40.0,
+ "rates": {
+  "1.0": {
+   "segments": 14,
+   "with_audio": 14,
+   "first_audio_after_source_end_s": [
+    1.793,
+    1.633,
+    1.669,
+    1.088,
+    1.006,
+    1.483,
+    1.221,
+    1.498,
+    1.918,
+    1.265,
+    1.438,
+    1.454,
+    1.407,
+    1.159
+   ],
+   "lag_s": [
+    1.793,
+    1.633,
+    1.669,
+    1.877,
+    1.293,
+    1.483,
+    1.221,
+    1.498,
+    1.918,
+    2.558,
+    1.438,
+    1.454,
+    1.407,
+    1.159
+   ],
+   "lag_max_s": 2.558,
+   "first_word_lag_s": [
+    5.718,
+    4.772,
+    4.79,
+    3.248,
+    2.644,
+    4.8,
+    4.362,
+    4.679,
+    5.196,
+    4.658,
+    4.777,
+    4.716,
+    5.028,
+    3.452
+   ],
+   "first_word_lag_max_s": 5.718,
+   "segment_s": [
+    3.93,
+    3.14,
+    3.12,
+    1.37,
+    1.35,
+    3.32,
+    3.14,
+    3.18,
+    3.28,
+    2.1,
+    3.34,
+    3.26,
+    3.62,
+    2.29
+   ],
+   "lag_growth_s": -0.6339999999999999,
+   "last_listen_end_vs_input_end_s": 2.28
+  }
+ },
+ "tts_messages": 18,
+ "events": [
+  {
+   "t": 5.4822388339962345,
+   "type": "transcription_result",
+   "text": ". V\u010dera r\u00e1no som i\u0161iel na trh k\u00fapi\u0165",
+   "stt_time": 1.5571709999931045,
+   "span": null
+  },
+  {
+   "t": 5.619701833988074,
+   "type": "translation_result",
+   "text": "Yesterday morning I went to the market to buy.",
+   "mt_time": 0.1366945830231998
+  },
+  {
+   "t": 5.718268750002608,
+   "type": "tts_audio",
+   "bytes": 92716,
+   "seconds": 2.10140589569161
+  },
+  {
+   "t": 5.718437834002543,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 1.5571709999931045,
+    "mt_time": 0.1366945830231998,
+    "tts_time": 0.09821999998530373,
+    "input_to_stt_latency": 1.5588496249984019,
+    "total_latency": 1.792085583001608
+   }
+  },
+  {
+   "t": 8.51537974999519,
+   "type": "transcription_result",
+   "text": "stvy, chlieb a mleko. Stretol som tam...",
+   "stt_time": 1.4509112499945331,
+   "span": null
+  },
+  {
+   "t": 8.65258324999013,
+   "type": "translation_result",
+   "text": "Stings, bread and milk. I met there...",
+   "mt_time": 0.13687466699047945
+  },
+  {
+   "t": 8.69733762499527,
+   "type": "tts_audio",
+   "bytes": 34860,
+   "seconds": 0.7894784580498866
+  },
+  {
+   "t": 8.739317125000525,
+   "type": "tts_audio",
+   "bytes": 38956,
+   "seconds": 0.8823582766439909
+  },
+  {
+   "t": 8.770549250009935,
+   "type": "tts_audio",
+   "bytes": 27180,
+   "seconds": 0.615328798185941
+  },
+  {
+   "t": 8.77088929200545,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 1.4509112499945331,
+    "mt_time": 0.13687466699047945,
+    "tts_time": 0.11781754100229591,
+    "input_to_stt_latency": 1.4517776670109015,
+    "total_latency": 1.7056034579873085
+   }
+  },
+  {
+   "t": 11.442095792008331,
+   "type": "transcription_result",
+   "text": "starho priate\u013ea \u013duba, ktor\u00fd predval...",
+   "stt_time": 1.2571201669925358,
+   "span": null
+  },
+  {
+   "t": 11.555433500005165,
+   "type": "translation_result",
+   "text": "an old friend of Lub's who sold...",
+   "mt_time": 0.11279754198039882
+  },
+  {
+   "t": 11.854285375011386,
+   "type": "tts_audio",
+   "bytes": 69676,
+   "seconds": 1.5789569160997732
+  },
+  {
+   "t": 11.854549459007103,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 1.2571201669925358,
+    "mt_time": 0.11279754198039882,
+    "tts_time": 0.2981450829829555,
+    "input_to_stt_latency": 1.2576914590026718,
+    "total_latency": 1.6680627919558901
+   }
+  },
+  {
+   "t": 12.54646258399589,
+   "type": "transcription_result",
+   "text": " med a seri.",
+   "stt_time": 0.9906778330041561,
+   "span": null
+  },
+  {
+   "t": 12.606952667003497,
+   "type": "translation_result",
+   "text": "Honey and shit.",
+   "mt_time": 0.05984008399536833
+  },
+  {
+   "t": 12.643927917000838,
+   "type": "tts_audio",
+   "bytes": 33836,
+   "seconds": 0.7662585034013606
+  },
+  {
+   "t": 12.644047500012675,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 0.9906778330041561,
+    "mt_time": 0.05984008399536833,
+    "tts_time": 0.036851625016424805,
+    "input_to_stt_latency": 1.3234795829921495,
+    "total_latency": 1.0873695420159493
+   }
+  },
+  {
+   "t": 13.854842625005404,
+   "type": "transcription_result",
+   "text": "Ahoj!",
+   "stt_time": 0.9483881659980398,
+   "span": null
+  },
+  {
+   "t": 13.896049834002042,
+   "type": "translation_result",
+   "text": "Hi!",
+   "mt_time": 0.04102804200374521
+  },
+  {
+   "t": 13.912798250006745,
+   "type": "tts_audio",
+   "bytes": 8748,
+   "seconds": 0.19736961451247165
+  },
+  {
+   "t": 13.913006417016732,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 0.9483881659980398,
+    "mt_time": 0.04102804200374521,
+    "tts_time": 0.016630708007141948,
+    "input_to_stt_latency": 1.25198816601187,
+    "total_latency": 1.006046916008927
+   }
+  },
+  {
+   "t": 17.56653816701146,
+   "type": "transcription_result",
+   "text": "kdesi sa t\u00falou cel\u00e9 mesiace...",
+   "stt_time": 1.3422800000116695,
+   "span": null
+  },
+  {
+   "t": 17.648288541997317,
+   "type": "translation_result",
+   "text": "Somewhere wandering for months...",
+   "mt_time": 0.08144208398880437
+  },
+  {
+   "t": 17.706899792014156,
+   "type": "tts_audio",
+   "bytes": 64044,
+   "seconds": 1.4512471655328798
+  },
+  {
+   "t": 17.707113250013208,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 1.3422800000116695,
+    "mt_time": 0.08144208398880437,
+    "tts_time": 0.05831683299038559,
+    "input_to_stt_latency": 1.3429726250178646,
+    "total_latency": 1.4820389169908594
+   }
+  },
+  {
+   "t": 20.47203962499043,
+   "type": "transcription_result",
+   "text": " P\u00fdtal som v\u00e1s, uspievam.",
+   "stt_time": 1.1073152909812052,
+   "span": null
+  },
+  {
+   "t": 20.55168945901096,
+   "type": "translation_result",
+   "text": "I asked you, I'm singing.",
+   "mt_time": 0.07958225000766106
+  },
+  {
+   "t": 20.585998916998506,
+   "type": "tts_audio",
+   "bytes": 31276,
+   "seconds": 0.7082086167800453
+  },
+  {
+   "t": 20.61218829199788,
+   "type": "tts_audio",
+   "bytes": 29228,
+   "seconds": 0.6617687074829932
+  },
+  {
+   "t": 20.612316209007986,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 1.1073152909812052,
+    "mt_time": 0.07958225000766106,
+    "tts_time": 0.060120540991192684,
+    "input_to_stt_latency": 1.4098819999780972,
+    "total_latency": 1.247018081980059
+   }
+  },
+  {
+   "t": 23.87871049999376,
+   "type": "transcription_result",
+   "text": "rozpr\u00e1val som mu o svojej pr\u00e1ci a...",
+   "stt_time": 1.3323311250132974,
+   "span": null
+  },
+  {
+   "t": 23.97907979201409,
+   "type": "translation_result",
+   "text": "I told him about my job and...",
+   "mt_time": 0.1000802909838967
+  },
+  {
+   "t": 24.04403270900366,
+   "type": "tts_audio",
+   "bytes": 68140,
+   "seconds": 1.5441269841269842
+  },
+  {
+   "t": 24.044114084012108,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 1.3323311250132974,
+    "mt_time": 0.1000802909838967,
+    "tts_time": 0.06473083299351856,
+    "input_to_stt_latency": 1.334174040996004,
+    "total_latency": 1.4971422489907127
+   }
+  },
+  {
+   "t": 27.459648042015033,
+   "type": "transcription_result",
+   "text": " dlh\u00fd cest\u00ed vl\u00e1kom cez horej a dlh\u00fd.",
+   "stt_time": 1.6357291660096962,
+   "span": null
+  },
+  {
+   "t": 27.623158834001515,
+   "type": "translation_result",
+   "text": "long trails through the fibers through the mountain and long.",
+   "mt_time": 0.1629627079819329
+  },
+  {
+   "t": 27.742330167006003,
+   "type": "tts_audio",
+   "bytes": 120876,
+   "seconds": 2.7399546485260773
+  },
+  {
+   "t": 27.74245770901325,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 1.6357291660096962,
+    "mt_time": 0.1629627079819329,
+    "tts_time": 0.11876870799460448,
+    "input_to_stt_latency": 1.6364973750023637,
+    "total_latency": 1.9174605819862336
+   }
+  },
+  {
+   "t": 29.030351249995874,
+   "type": "transcription_result",
+   "text": "A\u017e ma bol ka\u017ed\u00fd k\u013abuk.",
+   "stt_time": 1.1057478750008158,
+   "span": null
+  },
+  {
+   "t": 29.13200191699434,
+   "type": "translation_result",
+   "text": "Until I was every knuckle.",
+   "mt_time": 0.10104108400992118
+  },
+  {
+   "t": 29.18986933398992,
+   "type": "tts_audio",
+   "bytes": 60972,
+   "seconds": 1.3815873015873017
+  },
+  {
+   "t": 29.1899459999986,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 1.1057478750008158,
+    "mt_time": 0.10104108400992118,
+    "tts_time": 0.05727166699944064,
+    "input_to_stt_latency": 1.42721312501817,
+    "total_latency": 1.2640606260101777
+   }
+  },
+  {
+   "t": 32.48226479199366,
+   "type": "transcription_result",
+   "text": "Pochmili sme si sadli na levi\u010dku",
+   "stt_time": 1.2190164169878699,
+   "span": null
+  },
+  {
+   "t": 32.62192283399054,
+   "type": "translation_result",
+   "text": "We've sat down on a lion's bed.",
+   "mt_time": 0.1395107920106966
+  },
+  {
+   "t": 32.70153979200404,
+   "type": "tts_audio",
+   "bytes": 81964,
+   "seconds": 1.8575963718820863
+  },
+  {
+   "t": 32.70170712500112,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 1.2190164169878699,
+    "mt_time": 0.1395107920106966,
+    "tts_time": 0.07845616698614322,
+    "input_to_stt_latency": 1.2196429999894463,
+    "total_latency": 1.4369833759847097
+   }
+  },
+  {
+   "t": 35.82141612499254,
+   "type": "transcription_result",
+   "text": "ve\u013ek\u00fa v\u0155bu a dali sme si k\u00e1vu.",
+   "stt_time": 1.2954122500086669,
+   "span": null
+  },
+  {
+   "t": 35.907074834016385,
+   "type": "translation_result",
+   "text": "a big willow and we had coffee.",
+   "mt_time": 0.08549741699243896
+  },
+  {
+   "t": 35.97966275000363,
+   "type": "tts_audio",
+   "bytes": 77868,
+   "seconds": 1.7647165532879818
+  },
+  {
+   "t": 35.97983862500405,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 1.2954122500086669,
+    "mt_time": 0.08549741699243896,
+    "tts_time": 0.07232416700571775,
+    "input_to_stt_latency": 1.296374833007576,
+    "total_latency": 1.4532338340068236
+   }
+  },
+  {
+   "t": 39.41021070900024,
+   "type": "transcription_result",
+   "text": " M\u00f4\u017eem pr\u00eds\u0165 aj zajtra, sp\u00fdtal som sa...",
+   "stt_time": 1.2633812080021016,
+   "span": null
+  },
+  {
+   "t": 39.503551959001925,
+   "type": "translation_result",
+   "text": "I can come back tomorrow, I asked...",
+   "mt_time": 0.09314783400623128
+  },
+  {
+   "t": 39.553899459016975,
+   "type": "tts_audio",
+   "bytes": 51756,
+   "seconds": 1.172607709750567
+  },
+  {
+   "t": 39.57744258400635,
+   "type": "tts_audio",
+   "bytes": 24620,
+   "seconds": 0.5572789115646258
+  },
+  {
+   "t": 39.577518875012174,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 1.2633812080021016,
+    "mt_time": 0.09314783400623128,
+    "tts_time": 0.07365562501945533,
+    "input_to_stt_latency": 1.2649368749989662,
+    "total_latency": 1.4301846670277882
+   }
+  },
+  {
+   "t": 41.49683891699533,
+   "type": "transcription_result",
+   "text": "Akolo n\u00e1s pre...",
+   "stt_time": 1.0569439579849131,
+   "span": null
+  },
+  {
+   "t": 41.56034312499105,
+   "type": "translation_result",
+   "text": "How much for...",
+   "mt_time": 0.06311612500576302
+  },
+  {
+   "t": 41.59928404199309,
+   "type": "tts_audio",
+   "bytes": 30252,
+   "seconds": 0.6849886621315193
+  },
+  {
+   "t": 41.59952216700185,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 1.0569439579849131,
+    "mt_time": 0.06311612500576302,
+    "tts_time": 0.038587709015700966,
+    "input_to_stt_latency": 1.3790236669883598,
+    "total_latency": 1.1586477920063771
+   }
+  }
+ ]
+}

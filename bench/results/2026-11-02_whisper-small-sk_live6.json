@@ -1,0 +1,362 @@
+{
+ "model": "ct2_models/whisper-small-sk",
+ "model_tag": "whisper-small-sk",
+ "mode": "live",
+ "cap": 6.0,
+ "beam": 5,
+ "temperature": 0.0,
+ "language": "sk",
+ "compute_type": "int8",
+ "device": "cpu",
+ "machine": "arm64 CPU int8",
+ "python": "3.11.15",
+ "faster_whisper": "1.2.0",
+ "ctranslate2": "4.8.4",
+ "git_head": "faf68ff6977906415ec3a0ec5ffa090d74041ac7",
+ "utc": "2026-11-02T10:54:45+00:00",
+ "clips": [
+  {
+   "clip": "me_sk_script",
+   "wer": 0.7083,
+   "cer": 0.5831,
+   "hypothesis": "dobré ráno a vytýte si toho ešte v jeho kaškého, pre ktoré žijú v riadnom čase. Hovorím, pán Chliny a môj chlas, budete počuť hovoriť... mikrofónom a dedukujú, kedy reč začína a končí... om preložené a potom opäť preverené. klasom, ktorý počuje... nie ako cudzinec. som učil s istým mojím hlasom. Minút isté reč. mestnosti záleží viac ako na drahom mikrofóne. hovorte sáleň, tempom. názvy a technici vrazi... u mimoriadnu srstivosť vo boh jazykoch. nad akoukoľvek aplikatúrou. . Preložný hlas je presmerovaný na... ... hromaždenie ako verteľné mikrofón. ostatní účastníci počúvajú slovenčinu, zatiaľ čo ja stále hovorím en hlice.",
+   "reference_path": "bench/refs/me_sk_script.txt",
+   "audio_seconds": 134.3,
+   "wall_seconds": 19.7,
+   "rtf": 0.147,
+   "n_segments": 17,
+   "segment_bounds": [
+    [
+     1.72,
+     6.98
+    ],
+    [
+     8.46,
+     11.84
+    ],
+    [
+     16.72,
+     20.16
+    ],
+    [
+     24.54,
+     26.74
+    ],
+    [
+     39.6,
+     41.44
+    ],
+    [
+     56.32,
+     57.62
+    ],
+    [
+     59.82,
+     62.06
+    ],
+    [
+     63.56,
+     65.18
+    ],
+    [
+     67.5,
+     70.76
+    ],
+    [
+     73.22,
+     74.96
+    ],
+    [
+     80.8,
+     82.62
+    ],
+    [
+     83.5,
+     86.4
+    ],
+    [
+     101.38,
+     103.46
+    ],
+    [
+     105.8,
+     108.66
+    ],
+    [
+     110.24,
+     110.72
+    ],
+    [
+     111.14,
+     113.58
+    ],
+    [
+     116.0,
+     121.36
+    ]
+   ]
+  },
+  {
+   "clip": "me_sk_trhove",
+   "wer": 0.4031,
+   "cer": 0.1868,
+   "hypothesis": ". Včera ráno som išiel na trh kúpiť čestný chlieb a mleko. Stretol som tam z trho... ľa ľuba, ktorý predával med Assyri. Ahoj! desi sa túlov celé mesiace. spýtal som vás, uspievam. rozprával som mu o svojej práci a dlhých cestech vlákom cez Horej a Dliny. až ma bol každý kĺb. ochmili sme si sadli na lavičku pod veľkú vŕbu a dali sme si kávu. môžem prísť aj zajtra. Spýtal som sa... Akolo nás prebehli tety a hádzali si farábnu loptu. jedno te všetko neslo džban plný malín a smialo sa na celok... uľa. . Vona čerstvého pečiva sa niesla vzduchom a ja som si spomenul na detstvo u starých er detšer. Ťálky a v skrálej msty, električky. Lebo mi potom odkazoval fotografie zo svojej záchrany. e riadke mecibuli od čestnoku, rostli ľalie, ky vonky... a neskutočne veľké týkvice. Pozri. táto vaše „Fish Shed Devet Kills“. pochválil sa. nevedel som vlastným očiam. o. Musím už ísť, ale v piatej prídem zas. povedal som a popravili sme sa domov. ešte dnes cítim chuť dlho chleba s maslom a menom. Bolo to jednoznačne kratších... tento jesného mesať sa. ešte život prenesie?",
+   "reference_path": "bench/refs/me_sk_trhove.txt",
+   "audio_seconds": 103.57,
+   "wall_seconds": 34.05,
+   "rtf": 0.329,
+   "n_segments": 28,
+   "segment_bounds": [
+    [
+     1.0,
+     7.72
+    ],
+    [
+     7.8,
+     12.52
+    ],
+    [
+     13.0,
+     15.72
+    ],
+    [
+     16.1,
+     18.06
+    ],
+    [
+     19.54,
+     25.42
+    ],
+    [
+     25.86,
+     27.52
+    ],
+    [
+     28.68,
+     34.04
+    ],
+    [
+     35.26,
+     36.78
+    ],
+    [
+     37.28,
+     38.3
+    ],
+    [
+     38.72,
+     43.38
+    ],
+    [
+     44.32,
+     50.42
+    ],
+    [
+     50.5,
+     50.72
+    ],
+    [
+     51.12,
+     57.4
+    ],
+    [
+     57.4,
+     57.86
+    ],
+    [
+     58.2,
+     61.24
+    ],
+    [
+     62.42,
+     65.54
+    ],
+    [
+     66.26,
+     69.94
+    ],
+    [
+     70.3,
+     71.06
+    ],
+    [
+     71.52,
+     73.64
+    ],
+    [
+     74.34,
+     74.84
+    ],
+    [
+     75.22,
+     77.24
+    ],
+    [
+     78.2,
+     79.02
+    ],
+    [
+     79.48,
+     81.62
+    ],
+    [
+     82.54,
+     85.48
+    ],
+    [
+     86.0,
+     88.82
+    ],
+    [
+     90.0,
+     96.66
+    ],
+    [
+     96.7,
+     98.42
+    ],
+    [
+     99.46,
+     102.52
+    ]
+   ]
+  },
+  {
+   "clip": "me_sk_trhove_b",
+   "wer": 0.4188,
+   "cer": 0.1839,
+   "hypothesis": "Včera ráno som išiel na trh kúpiť čerstvý chlieb a mleko. Tretal som tam z tereho prijatia Ľuba. , ktorý predoval MED a SIRRI. Acho, hej? kdesi sedu o celom mesici. spýtal ste ma so smerom. rozprával som mu o svojej práci a o dlhí cesty vlakom cez Chory a do línie. Až mám povedal každý kĺb. chvíli sme si sadli na líčku pod veľkú vŕbu a dali sme si kávu. môžem prísť aj zajtra. Spýtal som sa. okolo nás, behovali deti a hádzali si farbnú loptu. , je všetko nesled už pán plný malín a smiehalo sa na celé kolo. pona čerstvého pečela sa niesla vzduchom a jase si spomenula na tetvu chrodičov. jal tie vzťahky a vzchral jej mzdy električky. , lebo mi potom ukázal fotografie zo svojej záchraty. medzi radke medzi búlie a čestné kúraste ľádia. ifoni? skutočne veľké týkvice. Pozri! táto vaše vyššie deväťkilo. ochválil sa. neveril som vlastným otčom. š ísť, ale v piatok prídem SaS. povedal som a popral zmysel domov. ešte dnes, cítim chuť toho chleba s maslom a medou. , bolo to jedna z ne kratších rán... achto jesenného mäsiť sa. koľko takýchto dní nám ešte život prinesie.",
+   "reference_path": "bench/refs/me_sk_trhove_b.txt",
+   "audio_seconds": 109.03,
+   "wall_seconds": 36.58,
+   "rtf": 0.335,
+   "n_segments": 31,
+   "segment_bounds": [
+    [
+     1.0,
+     5.86
+    ],
+    [
+     7.2,
+     9.68
+    ],
+    [
+     10.54,
+     12.52
+    ],
+    [
+     13.64,
+     14.2
+    ],
+    [
+     14.64,
+     16.86
+    ],
+    [
+     17.52,
+     19.14
+    ],
+    [
+     20.34,
+     26.6
+    ],
+    [
+     27.58,
+     29.36
+    ],
+    [
+     31.0,
+     35.38
+    ],
+    [
+     36.6,
+     38.1
+    ],
+    [
+     38.72,
+     39.68
+    ],
+    [
+     41.0,
+     42.14
+    ],
+    [
+     42.56,
+     45.78
+    ],
+    [
+     46.4,
+     51.8
+    ],
+    [
+     52.8,
+     59.26
+    ],
+    [
+     59.3,
+     60.18
+    ],
+    [
+     61.5,
+     64.3
+    ],
+    [
+     65.76,
+     69.02
+    ],
+    [
+     70.04,
+     73.56
+    ],
+    [
+     74.1,
+     74.7
+    ],
+    [
+     75.1,
+     76.94
+    ],
+    [
+     77.84,
+     78.34
+    ],
+    [
+     78.96,
+     80.78
+    ],
+    [
+     81.3,
+     82.06
+    ],
+    [
+     83.52,
+     85.54
+    ],
+    [
+     86.54,
+     89.82
+    ],
+    [
+     90.5,
+     92.82
+    ],
+    [
+     94.2,
+     98.18
+    ],
+    [
+     99.5,
+     101.68
+    ],
+    [
+     102.12,
+     103.96
+    ],
+    [
+     104.98,
+     108.1
+    ]
+   ]
+  }
+ ]
+}

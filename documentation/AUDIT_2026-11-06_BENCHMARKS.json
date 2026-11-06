@@ -1,0 +1,374 @@
+{
+  "checked_date": "2026-11-06",
+  "scope": "Re-audit saved receipts and artifacts; no new inference, no listening grades",
+  "routes": [
+    {
+      "path": "/Users/yegor/Documents/STU/BP/route_receipt.json",
+      "sha256": "c45aaf8879516a275df92a2e9a9c8821a3b86072787ef344f87afaffbe57ffb7",
+      "metric": "server first successful WAV send completion minus ingress-anchored first voiced sample",
+      "gpu_inventory": "Tesla T4, 580.178.04, 15360 MiB\nTesla T4, 580.178.04, 15360 MiB",
+      "profiles": [
+        {
+          "profile": "default",
+          "repeats": 3,
+          "utterances": 18,
+          "onset_p50": 3.4696718290000206,
+          "onset_p95": 4.031292085800009,
+          "stage_p50": 0.5770776835000788,
+          "stage_p95": 2.197822785599958,
+          "under2": 0,
+          "effective_stt_device": "cuda",
+          "compute": "float16",
+          "reference": null,
+          "errors": [],
+          "quality": "ungraded",
+          "drain_complete": [
+            "unknown; fixed observation window then Stop",
+            "unknown; fixed observation window then Stop",
+            "unknown; fixed observation window then Stop"
+          ]
+        },
+        {
+          "profile": "P_short",
+          "repeats": 3,
+          "utterances": 33,
+          "onset_p50": 2.0323766080000496,
+          "onset_p95": 3.051562270199952,
+          "stage_p50": 0.49087189300007594,
+          "stage_p95": 2.2558109176000016,
+          "under2": 10,
+          "effective_stt_device": "cuda",
+          "compute": "float16",
+          "reference": null,
+          "errors": [],
+          "quality": "ungraded",
+          "drain_complete": [
+            "unknown; fixed observation window then Stop",
+            "unknown; fixed observation window then Stop",
+            "unknown; fixed observation window then Stop"
+          ]
+        },
+        {
+          "profile": "P_short2",
+          "repeats": 3,
+          "utterances": 46,
+          "onset_p50": 1.8644297414999187,
+          "onset_p95": 4.2194755882499635,
+          "stage_p50": 0.3978175824999539,
+          "stage_p95": 2.374536336500057,
+          "under2": 26,
+          "effective_stt_device": "cuda",
+          "compute": "float16",
+          "reference": null,
+          "errors": [],
+          "quality": "ungraded",
+          "drain_complete": [
+            "unknown; fixed observation window then Stop",
+            "unknown; fixed observation window then Stop",
+            "unknown; fixed observation window then Stop"
+          ]
+        },
+        {
+          "profile": "P_incr",
+          "repeats": 3,
+          "utterances": 15,
+          "onset_p50": 11.671366786000021,
+          "onset_p95": 12.884453098099993,
+          "stage_p50": 0.3922269150000375,
+          "stage_p95": 0.6778273922000835,
+          "under2": 0,
+          "effective_stt_device": "cuda",
+          "compute": "float16",
+          "reference": null,
+          "errors": [],
+          "quality": "ungraded",
+          "drain_complete": [
+            "unknown; fixed observation window then Stop",
+            "unknown; fixed observation window then Stop",
+            "unknown; fixed observation window then Stop"
+          ]
+        }
+      ],
+      "changed_or_missing_current_files": [
+        "backend/main.py",
+        "backend/pipeline.py",
+        "backend/registry.py",
+        "backend/streaming/pipeline.py",
+        "backend/stt/faster_whisper_stt.py",
+        "backend/tts/base.py",
+        "languages/packs/de-en.json",
+        "languages/packs/en-de.json",
+        "languages/packs/en-fr.json",
+        "languages/packs/fr-en.json"
+      ]
+    },
+    {
+      "path": "/Users/yegor/Developer/bp-kaggle-out/run1/route_receipt.json",
+      "sha256": "5bd09ac99a765c3c0e80c0bb5fa43a7f8caeed49dc563331551064935c147f23",
+      "metric": "server first successful WAV send completion minus ingress-anchored first voiced sample",
+      "gpu_inventory": "Tesla T4, 580.178.04, 15360 MiB\nTesla T4, 580.178.04, 15360 MiB",
+      "profiles": [
+        {
+          "profile": "default",
+          "repeats": 3,
+          "utterances": 15,
+          "onset_p50": 3.5402851810000016,
+          "onset_p95": 4.055142436999984,
+          "stage_p50": 0.5390109169999846,
+          "stage_p95": 0.6801460872000235,
+          "under2": 0,
+          "effective_stt_device": "cuda",
+          "compute": "float16",
+          "reference": null,
+          "errors": [],
+          "quality": "ungraded",
+          "drain_complete": [
+            "unknown; fixed observation window then Stop",
+            "unknown; fixed observation window then Stop",
+            "unknown; fixed observation window then Stop"
+          ]
+        },
+        {
+          "profile": "low_latency",
+          "repeats": 3,
+          "utterances": 15,
+          "onset_p50": 8.18092194299993,
+          "onset_p95": 12.342743580399933,
+          "stage_p50": 1.8891003930000352,
+          "stage_p95": 8.45798079030005,
+          "under2": 0,
+          "effective_stt_device": "cpu",
+          "compute": "int8",
+          "reference": null,
+          "errors": [],
+          "quality": "ungraded",
+          "drain_complete": [
+            "unknown; fixed observation window then Stop",
+            "unknown; fixed observation window then Stop",
+            "unknown; fixed observation window then Stop"
+          ]
+        }
+      ],
+      "changed_or_missing_current_files": [
+        "backend/main.py",
+        "backend/pipeline.py",
+        "backend/registry.py",
+        "backend/streaming/pipeline.py",
+        "backend/stt/faster_whisper_stt.py",
+        "backend/tts/base.py"
+      ]
+    },
+    {
+      "path": "/Users/yegor/Developer/bp-kaggle-out/run2/route_receipt.json",
+      "sha256": "c45aaf8879516a275df92a2e9a9c8821a3b86072787ef344f87afaffbe57ffb7",
+      "metric": "server first successful WAV send completion minus ingress-anchored first voiced sample",
+      "gpu_inventory": "Tesla T4, 580.178.04, 15360 MiB\nTesla T4, 580.178.04, 15360 MiB",
+      "profiles": [
+        {
+          "profile": "default",
+          "repeats": 3,
+          "utterances": 18,
+          "onset_p50": 3.4696718290000206,
+          "onset_p95": 4.031292085800009,
+          "stage_p50": 0.5770776835000788,
+          "stage_p95": 2.197822785599958,
+          "under2": 0,
+          "effective_stt_device": "cuda",
+          "compute": "float16",
+          "reference": null,
+          "errors": [],
+          "quality": "ungraded",
+          "drain_complete": [
+            "unknown; fixed observation window then Stop",
+            "unknown; fixed observation window then Stop",
+            "unknown; fixed observation window then Stop"
+          ]
+        },
+        {
+          "profile": "P_short",
+          "repeats": 3,
+          "utterances": 33,
+          "onset_p50": 2.0323766080000496,
+          "onset_p95": 3.051562270199952,
+          "stage_p50": 0.49087189300007594,
+          "stage_p95": 2.2558109176000016,
+          "under2": 10,
+          "effective_stt_device": "cuda",
+          "compute": "float16",
+          "reference": null,
+          "errors": [],
+          "quality": "ungraded",
+          "drain_complete": [
+            "unknown; fixed observation window then Stop",
+            "unknown; fixed observation window then Stop",
+            "unknown; fixed observation window then Stop"
+          ]
+        },
+        {
+          "profile": "P_short2",
+          "repeats": 3,
+          "utterances": 46,
+          "onset_p50": 1.8644297414999187,
+          "onset_p95": 4.2194755882499635,
+          "stage_p50": 0.3978175824999539,
+          "stage_p95": 2.374536336500057,
+          "under2": 26,
+          "effective_stt_device": "cuda",
+          "compute": "float16",
+          "reference": null,
+          "errors": [],
+          "quality": "ungraded",
+          "drain_complete": [
+            "unknown; fixed observation window then Stop",
+            "unknown; fixed observation window then Stop",
+            "unknown; fixed observation window then Stop"
+          ]
+        },
+        {
+          "profile": "P_incr",
+          "repeats": 3,
+          "utterances": 15,
+          "onset_p50": 11.671366786000021,
+          "onset_p95": 12.884453098099993,
+          "stage_p50": 0.3922269150000375,
+          "stage_p95": 0.6778273922000835,
+          "under2": 0,
+          "effective_stt_device": "cuda",
+          "compute": "float16",
+          "reference": null,
+          "errors": [],
+          "quality": "ungraded",
+          "drain_complete": [
+            "unknown; fixed observation window then Stop",
+            "unknown; fixed observation window then Stop",
+            "unknown; fixed observation window then Stop"
+          ]
+        }
+      ],
+      "changed_or_missing_current_files": [
+        "backend/main.py",
+        "backend/pipeline.py",
+        "backend/registry.py",
+        "backend/streaming/pipeline.py",
+        "backend/stt/faster_whisper_stt.py",
+        "backend/tts/base.py",
+        "languages/packs/de-en.json",
+        "languages/packs/en-de.json",
+        "languages/packs/en-fr.json",
+        "languages/packs/fr-en.json"
+      ]
+    }
+  ],
+  "omnivoice": {
+    "receipt_sha256": "17ea95deec7fdc695bfde0a4a82499567f6b9398cf4cc6dafdf7acd8d2d1ee3e",
+    "revision": "c5fdb5ccb189668d56333f77ba2629f4cd7535f4",
+    "gpu": "Tesla T4",
+    "rows": [
+      {
+        "id": "en-0",
+        "service_s": 0.6491562319999957,
+        "duration_s": 3.04,
+        "rtf": 0.2135382342105249,
+        "audio_sha256": "c95c0a68a2ca1f8ecf8ec6f04b671a74030ed8631a6f45f96b35589d6043af0d",
+        "peak_allocator_bytes": 2147516928
+      },
+      {
+        "id": "en-1",
+        "service_s": 0.8597344269999212,
+        "duration_s": 5.83,
+        "rtf": 0.14746731166379437,
+        "audio_sha256": "c10c3dda45cf4b3c5ad355091aa78a4c4dd12d6e6cccde2abefed77223539602",
+        "peak_allocator_bytes": 2174220800
+      },
+      {
+        "id": "en-2",
+        "service_s": 0.8414534030000596,
+        "duration_s": 4.77,
+        "rtf": 0.1764053255765324,
+        "audio_sha256": "a4a717770482de992259e88cd45f567bc34f80b26affba651ecf2883066c5fa4",
+        "peak_allocator_bytes": 2173337088
+      },
+      {
+        "id": "en-3",
+        "service_s": 1.5415394709999646,
+        "duration_s": 15.12,
+        "rtf": 0.10195366871692887,
+        "audio_sha256": "8f2eb604319383e9599012312c58f45d02fe5267b2427ea9bd7e25aef32ac925",
+        "peak_allocator_bytes": 2267679232
+      },
+      {
+        "id": "sk-0",
+        "service_s": 0.6912466299999096,
+        "duration_s": 4.3,
+        "rtf": 0.16075503023253712,
+        "audio_sha256": "26b01fb571500a6ad5c9e8370662afb422ccb8d09f733f75eda7c1ee36b4260d",
+        "peak_allocator_bytes": 2159008768
+      },
+      {
+        "id": "sk-1",
+        "service_s": 1.0365771259999974,
+        "duration_s": 8.09,
+        "rtf": 0.12813067070457324,
+        "audio_sha256": "7e8807a79008258c8cd716f01418dcf781758a532c09a4bb6f3592aaebb6e3d2",
+        "peak_allocator_bytes": 2193600000
+      },
+      {
+        "id": "sk-2",
+        "service_s": 0.8432689989999744,
+        "duration_s": 4.29,
+        "rtf": 0.19656620023309426,
+        "audio_sha256": "bc1de176dbba1e1c5443f0a5215418d40455250014008c8d239db50ae84c182b",
+        "peak_allocator_bytes": 2173158912
+      },
+      {
+        "id": "sk-3",
+        "service_s": 1.9383973819999483,
+        "duration_s": 17.73,
+        "rtf": 0.10932867354765641,
+        "audio_sha256": "b40c7ff45ea007e5f1827ebb312a7a217740651e612aced47bb329f50aa2a20c",
+        "peak_allocator_bytes": 2309931520
+      },
+      {
+        "id": "cs-0",
+        "service_s": 0.5583168470000146,
+        "duration_s": 3.42,
+        "rtf": 0.1632505400584838,
+        "audio_sha256": "680f85d7f10ee47216fb60aceea0460450f75242270a43130eb59922418a7e63",
+        "peak_allocator_bytes": 2125797376
+      },
+      {
+        "id": "cs-1",
+        "service_s": 0.7133888030000435,
+        "duration_s": 6.01,
+        "rtf": 0.11870030000000724,
+        "audio_sha256": "a00ddaa2a5dcfc0f9d66e57ff026f715c30173b581d6a78ec2b0a653448d8a70",
+        "peak_allocator_bytes": 2158195200
+      },
+      {
+        "id": "cs-2",
+        "service_s": 0.6406623100000388,
+        "duration_s": 4.64,
+        "rtf": 0.13807377370690493,
+        "audio_sha256": "20616029f1a003666098b8f101cc9c808bc0ac497c84e13b33afe59b55a0cc77",
+        "peak_allocator_bytes": 2139047424
+      },
+      {
+        "id": "cs-3",
+        "service_s": 1.403462203999993,
+        "duration_s": 13.69,
+        "rtf": 0.10251732680788847,
+        "audio_sha256": "ff89582c79fbc5d4f277af4df9f0944bac7595d0d7c80c6c431f7b595592d7c4",
+        "peak_allocator_bytes": 2238757376
+      }
+    ],
+    "verified_normalized_references": 3,
+    "scenarios": 9,
+    "quality": "human_review_pending",
+    "route_acceptance": "route_unverified",
+    "source_job_sha256_current": "bc1cbd7c6ced615f49051cdbdbc1fbc8e5d729c244e1b5a49a24779bdffbbdf6",
+    "source_job_sha256_receipt": "738b7eaf44c2f14efeaf7330104f0a32244b7c7ba0eadb1e5e1045f750357c60",
+    "source_changed": true,
+    "native_streaming": false,
+    "stt_mt_included": false
+  }
+}

@@ -1,0 +1,64 @@
+{
+ "model": "ct2_models/whisper-small-sk",
+ "model_tag": "naive+vad_default",
+ "mode": "whole",
+ "cap": null,
+ "beam": 5,
+ "temperature": 0.0,
+ "language": "sk",
+ "compute_type": "int8",
+ "device": "cpu",
+ "variant": "vad_default",
+ "transcribe_options": {
+  "vad_filter": true
+ },
+ "faster_whisper": "1.2.0",
+ "utc": "2026-11-02T13:09:48+00:00",
+ "clips": [
+  {
+   "clip": "me_sk_script",
+   "wer": 0.2344,
+   "cer": 0.103,
+   "hypothesis": "Dobré ráno a viete si v tejto šivejokáške a pre kultúru reči v reálnom čase. Hovorím po anglicky a môj hlas budete počuť hovoriť po slovensky do niekoľkých sekúnd. Systém počúva mikrofónom a dedokuje, keď je reč začína a končí. Najprv je reč pripísaná do textu, potom preložená a potom opäť spreverená. Každý krok beží lokálne na tento počtač. cí je čas medzi mojimi slovami a predloženým hlasom, ktorý počuješ. Naším cieľom je zdržanie len pár sekúnd do skratky na prirodzený rozhovor. Hlasové klónovanie znamená, že slovenský výstup nie je ako ja, nie ako cudzinec. Aby som učil systém môj com hlasom, zaznamenávam pár minút čistej reči. Na tichej miestnosti záleží viac ako na drahom mikrofóne. Prosím, hovorte stále tempo s krátkymi prestávkami medzi vetami. Čísla, názvy a technické výrazy si vyžadujú mimoriadnu starostlivosť vo boh jazykoch. linka titulkov ukazujú jej čiastočné výsledky, zatiaľ, čo som ešte hovorím. ky môžete presunúť do plaváčov okna nad akoukoľvek aplikáciou. Predložený hlas je presmerovaný na zhromaždenie ako vertálny mikrofón. Ostatní účastníci počúvajú slovenčinu, zatiaľ, čo ja stále hovorím, anihlický. Otázky publika bude predložená opačným smerom. Ďakujem vám vámisí, mávam vám a teším sa na vaše otázky.",
+   "audio_seconds": 134.3,
+   "wall_seconds": 209.95,
+   "rtf": 1.563,
+   "vad_kept_seconds": 123.82,
+   "vad_total_seconds": 134.3,
+   "hyp_words": 193,
+   "loops": 0,
+   "czech_like_words": 0,
+   "n_segments": null
+  },
+  {
+   "clip": "me_sk_trhove",
+   "wer": 0.3508,
+   "cer": 0.1523,
+   "hypothesis": "včerá ráno som išiel na trh kúpiť čestný chlieb a mleko. Stretol som tam z trho priateľa Ľuba, ktorý predoval med a sry. „Ahoj, kdesi sa tu lehol celé mesiace,“ spýtal sa ma, „ospevám.“ Porozprával som mu o svojej práci a dlhých cestech vlákom cez hory a dlhiny. Až ma bol každý kĺbu. „Pochmili sme si sadli na lavičku,“ veľkú vrbu, „a dali sme si kávu.“ „Môžem prísť aj zajtra?“ spýtal som sa. „Ako nás prebiehali tete a hádzali si jej farábnu loptu.“ Jednotlivé všetko nieslo džbanplný malín a smialo sa na celé kolo. Vonát čerstvého Pečiva sa niesla vzduchom a ja som si spomenul netectvo u starých rodičov. Vďal, keď v skráli vsty električov, , lebo mi potom ukázol fotografie zo svojej záhrady. Medzirátke medzi búlie a čestnékú rástli lálie, bivónky a neskutočné veľké tikvice. „Pozri, táto váži vyše deväť kíl,“ pochválil sa. „Nevedel som vlastným otčom. Musím už ísť, ale v piatku prídem zas.“ „Povedal som a poprali sme sa domov.“ „Ešte dnes toho chleba s maslom a medom.“ „Bolo to jednoznačné krašie chráň tento jesného mesiaca.“ „Koľko takých tnín nám ešte život prenesie?“",
+   "audio_seconds": 103.57,
+   "wall_seconds": 184.48,
+   "rtf": 1.781,
+   "vad_kept_seconds": 102.6,
+   "vad_total_seconds": 103.57,
+   "hyp_words": 185,
+   "loops": 0,
+   "czech_like_words": 0,
+   "n_segments": null
+  },
+  {
+   "clip": "me_sk_trhove_b",
+   "wer": 0.3037,
+   "cer": 0.1159,
+   "hypothesis": "Včera ráno som išiel na trh kúpiť čerstvý chlieb a mleko. Stretol som tam starého priateľa Ľuba, ktorý predoval med a syry. „Ahoj, kdesi ste tu celé mesice?“ Spýtal som ma so smievom. Prosprával som mu o svojej práci a o dlhý cesty vlakom cez Chory a doliny. Až ma bol každý kĺb. Včera, o chvíli sme si sadli na lavíčku pod veľkú vŕbu a dali sme si kávu. „Môžem prísť aj zajtra?“ Spýtal som sa. „Okolo nás pobehovali deti a hádzali si farobnú loptu. Jedno dievčetko neslalo dosť pán plný malín a smiehalo sa na celé kolo. Von čerstvého pečova sa niesla vzduchom a jase si spomeno len na detstvo u starých rodičov. Vtálky a vzchrali jej mzdy a električky. Ľubom mi potom ukázal fotografie zo svojej záchrany. Medzirátke medzi búlie a čestné kúrasti ľália. Vývony ani skutočné veľké týkvice. „Pozri, táto váži vyše deväť kíl?“ Pochválil sa. „Neveril som vlastným očom. Musím už ísť, ale v piatok prídem zas, povedal om a pobrhalo sme sa domov. Ešte dnes cítim chuť toho chleba s maslom a medom. Bolo to jedno z najkratších chráň, tá, kto je z jedného mesiaca. Koľko takýchto dní nám ešte život prinesie.",
+   "audio_seconds": 109.03,
+   "wall_seconds": 223.02,
+   "rtf": 2.045,
+   "vad_kept_seconds": 107.99,
+   "vad_total_seconds": 109.03,
+   "hyp_words": 197,
+   "loops": 0,
+   "czech_like_words": 0,
+   "n_segments": null
+  }
+ ]
+}

@@ -1,0 +1,13 @@
+✔ await route, play sequentially, never overlap queued chunks (2.583959ms)
+✔ Stop during pending routing prevents late playback (0.476709ms)
+✔ routing rejection stops without speaker fallback (0.358375ms)
+✔ Stop cancels playback and queue; stale completion cannot restart it (0.542125ms)
+✔ queue overload stops visibly instead of growing without limit (0.378916ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 132.006834

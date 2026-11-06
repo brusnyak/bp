@@ -50,11 +50,11 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
         raise HTTPException(status_code=500, detail="Internal Server Error during password verification")
 
 
-def create_access_token(email: str) -> str:
-    """Mint a session JWT for an already-authenticated email."""
+def create_access_token(email: str, hours: float = JWT_EXPIRE_HOURS) -> str:
+    """Mint a session JWT for an already-authenticated email (guests get a shorter lifetime)."""
     now = int(time.time())
     return jwt.encode(
-        {"sub": email, "iat": now, "exp": now + JWT_EXPIRE_HOURS * 3600},
+        {"sub": email, "iat": now, "exp": now + int(hours * 3600)},
         _jwt_secret(),
         algorithm=JWT_ALGORITHM,
     )
@@ -70,3 +70,17 @@ def decode_access_token(token: str) -> str:
     if not email:
         raise HTTPException(status_code=401, detail="Invalid authentication credentials")
     return email
+
+
+_LOOPBACK_HOSTS = ("127.0.0.1", "localhost", "::1")
+
+
+def rate_limit_enabled() -> bool:
+    """Rate limiting: BP_ENABLE_RATE_LIMIT=1/0 wins; BP_DISABLE_RATE_LIMIT=1 turns it off (tests);
+    otherwise it is ON whenever the server listens beyond loopback (open registration + guests)."""
+    flag = os.environ.get("BP_ENABLE_RATE_LIMIT")
+    if flag in ("1", "0"):
+        return flag == "1"
+    if os.environ.get("BP_DISABLE_RATE_LIMIT") == "1":
+        return False
+    return os.environ.get("BP_HOST", "localhost") not in _LOOPBACK_HOSTS
