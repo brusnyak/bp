@@ -1,3 +1,6 @@
+# Kaggle benchmark jobs only — uploaded to T4 kernels as /kaggle/working/benchmark-requirements.txt
+# NOT used by local setup (use requirements.txt / requirements-dev.txt instead).
+# Near-duplicate of requirements.txt with Kaggle-pinned versions; kept for Kaggle job compatibility.
 faster-whisper==1.2.0
 ctranslate2>=4.0.0
 sentencepiece==0.2.1

@@ -95,8 +95,11 @@ if rc != 0:
 # Verify python3.10
 rc, out = sh("/tmp/python310-install/bin/python3.10 --version", 30)
 step("python310_check", output=out.strip())
-# Install torch CUDA in python3.10
-rc, out = sh("/tmp/python310-install/bin/python3.10 -m pip install -q torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124", 900)
+# Install torch CUDA in python3.10 (use --only-binary to avoid building from source)
+rc, out = sh("/tmp/python310-install/bin/python3.10 -m pip install -q --only-binary :all: torch==2.4.0+cu124 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124", 900)
+if rc != 0:
+    # Fallback: try without version pin
+    rc, out = sh("/tmp/python310-install/bin/python3.10 -m pip install -q --only-binary :all: torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124", 900)
 if rc != 0:
     step("error", msg="torch install failed", output=out[-2000:])
     R["status"] = "failed"; save(); sys.exit(1)
