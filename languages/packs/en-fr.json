@@ -1,0 +1,13 @@
+{
+  "pair": "en-fr",
+  "source": "en",
+  "target": "fr",
+  "stt": { "engine": "faster_whisper", "model": "base", "language": "en" },
+  "mt": { "engine": "opus-mt", "model": "Helsinki-NLP/opus-mt-en-fr" },
+  "tts": { "engine": "piper", "voice": "fr_FR-siwis-medium" },
+  "clip": null,
+  "reference": null,
+  "license": "commercial-ok (attribution: Opus-MT CC-BY-4.0; voice dataset public domain/CC0)",
+  "vad": { "end_of_sentence_gating": true, "silence_timeout_s": 0.3, "max_segment_s": 3.0 },
+  "notes": "scaffolded — add clip, convert MT, install FR TTS voice (fr_FR-siwis-medium), then: bp language test en-fr"
+}

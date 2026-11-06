@@ -1,0 +1,5 @@
+Source: kaggle-sanitized-receipt.json measured service_s/audio_duration_s; arrivals are SYNTHETIC (0,3,6 s). Sequential playback model, no clause streaming.
+max first-playable delay (s) / drop count; columns: rate 1.0, 1.15, 1.25, 1.25+drop>3s
+en audio_s= [3.04, 5.83, 4.77] 3.69/0 2.93/0 2.52/0 2.52/0
+sk audio_s= [4.3, 8.09, 4.29] 7.08/0 5.47/0 4.60/0 1.13/1
+cs audio_s= [3.42, 6.01, 4.64] 3.99/0 2.94/0 2.52/0 2.52/0

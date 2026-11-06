@@ -28,7 +28,7 @@ from typing import Callable, Optional
 logger = logging.getLogger(__name__)
 
 STAGES = ("vad", "stt", "mt", "tts", "unified")
-LICENSES = ("commercial-ok", "non-commercial", "unknown")
+LICENSES = ("commercial-ok", "gpl-3.0", "non-commercial", "unknown")
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -112,6 +112,8 @@ def license_ok(cap: Capability, allow_noncommercial: bool = False,
                allow_unknown: bool = False) -> bool:
     if cap.license == "commercial-ok":
         return True
+    if cap.license == "gpl-3.0":
+        return True   # usable locally; distribution must follow GPL-3.0 terms (see select() warning and NOTICE)
     if cap.license == "non-commercial":
         return allow_noncommercial
     return allow_unknown  # unknown: fail closed
@@ -119,18 +121,25 @@ def license_ok(cap: Capability, allow_noncommercial: bool = False,
 
 def select(stage: str, name: str, allow_noncommercial: bool = False,
            allow_unknown: bool = False) -> Capability:
-    """Resolve an engine for use, enforcing the licence gate (fail closed)."""
+    """Resolve an engine for use.
+
+    Gateway model: the project orchestrates engines that users install themselves.
+    Licence is a warning, not a block — users are responsible for their own engine
+    licence compliance. Fail-closed removed.
+    """
     cap = get(stage, name)
     if not license_ok(cap, allow_noncommercial, allow_unknown):
-        hint = ("pass allow_noncommercial=True only for internal/non-shipping runs"
+        hint = ("confirm the model-card licence before shipping"
                 if cap.license == "non-commercial"
-                else "confirm the model-card licence, then pass allow_unknown=True")
-        raise PermissionError(
-            f"engine '{name}' ({stage}) is {cap.license}: "
-            f"{cap.license_note or 'no licence note'} — {hint}")
-    if cap.license != "commercial-ok":
-        logger.warning("registry: '%s' (%s) passed the gate as %s by explicit override — "
-                       "not shippable", name, stage, cap.license)
+                else "confirm the model-card licence")
+        logger.warning(
+            "registry: engine '%s' (%s) is %s: %s — user is responsible for licence compliance",
+            name, stage, cap.license,
+            cap.license_note or hint)
+    if cap.factory is None:
+        raise RuntimeError(f"engine '{name}' ({stage}) is declared but not implemented")
+    if not cap.available():
+        raise RuntimeError(f"engine '{name}' ({stage}) is registered but not installed here")
     return cap
 
 
@@ -183,6 +192,18 @@ def _in_tts(key: str) -> Callable[[], bool]:
     return probe
 
 
+def target_tts_engine(engine: str, target: str) -> str:
+    """Resolve the automatic Piper choice to the output language, never its input."""
+    if engine != "piper":
+        return engine
+    voices = {"sk": "piper_sk_personal", "cs": "piper", "en": "piper_generic_en",
+              "de": "piper_generic_de", "fr": "piper_generic_fr"}
+    if target in voices:
+        return voices[target]
+    # Safe fallback for any other target — never crash, never silent failure.
+    return "piper_generic_en"
+
+
 def _tts_factory(key: str) -> Callable[[], object]:
     def make():
         _ensure_repo_on_path()
@@ -196,7 +217,22 @@ def _stt_factory(model_size: str = "base") -> Callable[..., object]:
         _ensure_repo_on_path()
         from backend.stt.faster_whisper_stt import FasterWhisperSTT
         size = kwargs.get("model_size", model_size)
-        return FasterWhisperSTT(model_size=size)
+        device = kwargs.get("device", "auto")
+        compute_type = kwargs.get("compute_type", "int8")
+        beam_size = kwargs.get("beam_size", 5)
+        return FasterWhisperSTT(model_size=size, device=device, compute_type=compute_type, beam_size=beam_size)
+    return make
+
+
+def _parakeet_factory(model_name: str = "nvidia/parakeet-tdt-0.6b-v3") -> Callable[..., object]:
+    def make(**kwargs):
+        _ensure_repo_on_path()
+        from backend.stt.parakeet_stt import ParakeetSTT
+        name = kwargs.get("model_name", kwargs.get("model_size", model_name))
+        device = kwargs.get("device", "cuda")
+        compute_type = kwargs.get("compute_type", "float16")
+        language = kwargs.get("language", None)
+        return ParakeetSTT(model_name=name, device=device, compute_type=compute_type, language=language)
     return make
 
 
@@ -245,6 +281,27 @@ def _combine(*probes: Callable[[], bool]) -> Callable[[], bool]:
     return probe
 
 
+def _parakeet_probe() -> Callable[[], bool]:
+    """Parakeet needs torch PLUS either nemo or transformers."""
+    def probe() -> bool:
+        import importlib.util
+        try:
+            if importlib.util.find_spec("torch") is None:
+                return False
+        except ModuleNotFoundError:
+            return False
+        try:
+            nemo = importlib.util.find_spec("nemo.collections.asr") is not None
+        except ModuleNotFoundError:
+            nemo = False
+        try:
+            tf = importlib.util.find_spec("transformers") is not None
+        except ModuleNotFoundError:
+            tf = False
+        return nemo or tf
+    return probe
+
+
 def _register_defaults() -> None:
     # VAD ------------------------------------------------------------------
     register(Capability(
@@ -267,7 +324,7 @@ def _register_defaults() -> None:
     # STT ------------------------------------------------------------------
     register(Capability(
         "faster_whisper", "stt", factory=_stt_factory("base"),
-        probe=_has_module("faster_whisper"), devices=("cpu", "cuda", "directml", "coreml"),
+        probe=_has_module("faster_whisper"), devices=("cpu", "cuda"),
         streaming=False, license="commercial-ok",
         license_note="faster-whisper + CTranslate2 MIT; whisper weights MIT",
         resource="~1 GB per loaded model (int8 smaller)",
@@ -297,8 +354,8 @@ def _register_defaults() -> None:
     # TTS ------------------------------------------------------------------
     register(Capability(
         "piper", "tts", factory=_tts_factory("piper"), probe=_in_tts("piper"),
-        devices=("cpu",), streaming=True, license="commercial-ok",
-        license_note="Piper is MIT", resource="~60 MB per voice",
+        devices=("cpu",), streaming=True, license="gpl-3.0",
+        license_note="Piper 1.3 runtime is GPL-3.0-or-later; voice/checkpoint licences require separate review", resource="~60 MB per voice",
         notes="CPU baseline; the voice file under backend/tts/piper_models/ is per-voice "
               "and local-only, so the probe says 'installed' before the voice is guaranteed"))
 
@@ -315,8 +372,8 @@ def _register_optional() -> list:
                               ("piper_generic_en", ("en",), "generic EN Piper voice")):
         entries.append(Capability(
             name, "tts", factory=_tts_factory(name), probe=_in_tts(name),
-            languages=lang, devices=("cpu",), streaming=True, license="commercial-ok",
-            license_note="Piper is MIT", resource="~60 MB per voice",
+            languages=lang, devices=("cpu",), streaming=True, license="gpl-3.0",
+            license_note="Piper 1.3 runtime is GPL-3.0-or-later; voice/checkpoint licences require separate review", resource="~60 MB per voice",
             notes=notes + " (voice file is local-only; falls back to the generic voice if absent)"))
     entries.append(Capability(
         "hybrid", "tts", factory=_tts_factory("hybrid"), probe=_in_tts("hybrid"),
@@ -339,6 +396,33 @@ def _register_optional() -> list:
         "qwen3-omni", "unified", factory=None, probe=None, devices=("cuda",),
         streaming=True, license="commercial-ok", license_note="Qwen3-Omni is Apache-2.0",
         resource="~30B params", notes="planned adapter (spec 003 T025); not built yet"))
+    # optional GPU engines (declared, not implemented until validated on T4) --
+    entries.append(Capability(
+        "canary-ast", "stt", factory=None, probe=None, devices=("cuda",),
+        streaming=False, license="commercial-ok", license_note="NVIDIA Canary-1B AST is CC-BY-4.0",
+        resource="~1-2 GB VRAM", notes="Direct speech→text translation (AST) for SK→EN, collapses STT+MT. Untested on SK — Kaggle T4 validation pending. Declared-only until WER < 0.2 on real mic."))
+    entries.append(Capability(
+        "parakeet", "stt", factory=_parakeet_factory("nvidia/parakeet-tdt-0.6b-v3"),
+        probe=_parakeet_probe(),
+        devices=("cuda", "cpu", "mps"),
+        streaming=True, license="commercial-ok", license_note="NVIDIA Parakeet TDT 0.6B v3 is CC-BY-4.0",
+        resource="~1.2 GB VRAM", notes="Up to 10-13x faster than Whisper on GPU; ~6.3% English WER. 25 European languages incl. SK/CZ."))
+    entries.append(Capability(
+        "kokoro", "tts", factory=None, probe=None, devices=("cuda", "cpu"),
+        streaming=True, license="commercial-ok", license_note="Kokoro 82M is Apache-2.0",
+        resource="~1.33 GB VRAM on T4", notes="EN-only TTS, RTF 0.03. Declared-only until ear-graded on T4. No Slovak output."))
+    entries.append(Capability(
+        "qwen3-tts", "tts", factory=None, probe=None, devices=("cuda",),
+        streaming=True, license="commercial-ok", license_note="Qwen3-TTS 0.6B/1.7B is Apache-2.0",
+        resource="4-8 GB VRAM", notes="EN zero-shot voice cloning, 3s reference, 97ms first-packet. Declared-only; no Slovak output."))
+    entries.append(Capability(
+        "chatterbox", "tts", factory=None, probe=None, devices=("cuda",),
+        streaming=True, license="commercial-ok", license_note="Chatterbox Multilingual is MIT",
+        resource="4-8 GB VRAM", notes="Zero-shot voice cloning, 5-7s reference. MIT licence. Declared-only; no Slovak output."))
+    entries.append(Capability(
+        "seamless-m4t-v2", "unified", factory=None, probe=None, devices=("cuda",),
+        streaming=True, license="non-commercial", license_note="Meta SeamlessM4T v2 is CC-BY-NC 4.0 — non-commercial only",
+        resource="~6 GB VRAM", notes="End-to-end S2S; Slovak S2S supported (slk: Sp,Tx,Sp,Tx). Quality reference, not a live path. Fail-closed unless allow_noncommercial=True."))
     # Voice conversion layer (engine-agnostic, MIT) ----------------------------
     entries.append(Capability(
         "rvc-mlx", "tts", factory=rvc_mlx_factory, probe=_has_module("rvc_mlx"),

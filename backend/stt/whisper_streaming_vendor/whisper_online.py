@@ -640,14 +640,15 @@ class VACOnlineASRProcessor(OnlineASRProcessor):
     def __init__(self, online_chunk_size, *a, **kw):
         self.online_chunk_size = online_chunk_size
 
+        vad_model = kw.pop("vad_model", None)
         self.online = OnlineASRProcessor(*a, **kw)
 
         # VAC:
         import torch
-        model, _ = torch.hub.load(
-            repo_or_dir='snakers4/silero-vad',
-            model='silero_vad'
-        )
+        if vad_model is None:
+            model, _ = torch.hub.load(repo_or_dir="snakers4/silero-vad", model="silero_vad")
+        else:
+            model = vad_model
         from silero_vad_iterator import FixedVADIterator
         self.vac = FixedVADIterator(model)  # we use the default options there: 500ms silence, 100ms padding, etc.  
 

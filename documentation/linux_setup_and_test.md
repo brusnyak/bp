@@ -35,7 +35,9 @@ python3 scripts/setup.py --dev          # venv + deps + .env + certs + voices + 
 
 `scripts/setup.py` supersedes the old manual steps (it also picks Python 3.12 — the pins
 support 3.10–3.12). Measured: **250 s** wall for setup itself (cold pip + HF downloads +
-all conversions) plus ~90 s apt + shallow clone on top.
+all conversions) plus ~90 s apt + shallow clone on top. The old `setup_windows.ps1` /
+`SETUP_WINDOWS.md` / `requirements-windows.txt` were deleted by the `lite` merge — do
+not resurrect them.
 
 GPU note: no change — ROCm still comes from the torch ROCm index and has no recorded
 evidence on any machine (*Unknown* table below).

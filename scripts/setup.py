@@ -19,7 +19,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 VENV = ROOT / ".venv"
 PY = VENV / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
-PIPER_VOICES = ["en_US-ryan-medium", "sk_SK-lili-medium", "cs_CZ-jirka-medium"]
+PIPER_VOICES = ["en_US-john-medium", "sk_SK-lili-medium", "cs_CZ-jirka-medium"]
 MT_PAIRS = ["en-sk", "sk-en", "en-cs"]
 ENV = {**os.environ, "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"}
 
@@ -92,7 +92,7 @@ def main():
     step("Self-test (verify models load, engines available, pipeline pass)")
     run([PY, "scripts/bp.py", "selftest"])
 
-    print(f"\nDone in {time.time() - t0:.0f}s. Start: {PY} app.py  ->  https://localhost:8000 (accept the self-signed cert)")
+    print(f"\nDone in {time.time() - t0:.0f}s. Start: {PY} app.py  ->  http://localhost:8000 (plain HTTP on localhost: mic works, no certificate warning; BP_HTTPS=1 for LAN/phone)")
 
 
 if __name__ == "__main__":

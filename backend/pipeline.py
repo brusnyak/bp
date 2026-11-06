@@ -5,10 +5,10 @@ simple async interface, handles model pooling, and enforces the licence gate.
 
     from backend.pipeline import Pipeline
 
-    pipe = Pipeline(source_lang="en", target_lang="sk", tts_engine="piper")
+    pipe = Pipeline(PipelineConfig(source_lang="en", target_lang="sk", tts_engine="piper"))
     await pipe.initialize()
     audio = await pipe.translate("Hello world")
-    # audio is (np.ndarray, sample_rate) — ready to play or save
+    # result.audio and result.sample_rate are ready to play or save
     await pipe.close()
 
 The cascade remains local-first, no cloud dependencies.
@@ -24,10 +24,11 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 
-from backend.registry import instantiate, select, engines as list_engines, license_ok
+from backend.registry import instantiate, select, engines as list_engines, license_ok, target_tts_engine
 from backend.stt.faster_whisper_stt import FasterWhisperSTT
 from backend.mt.ctranslate2_mt import CTranslate2MT
 from backend.tts.piper_tts import PiperTTS
+from backend.main import get_pooled_model, release_pooled_model, BP_DEVICE
 
 log = logging.getLogger(__name__)
 
@@ -47,10 +48,6 @@ class PipelineConfig:
     speaker_wav_path: Optional[str] = None
     speaker_text: Optional[str] = None
     speaker_lang: Optional[str] = None
-    # Pooling config (per-process, shared across Pipeline instances)
-    pool_stt: int = 3
-    pool_mt: int = 5
-    pool_tts: int = 5
 
 
 @dataclass
@@ -69,89 +66,18 @@ class Pipeline:
     High-level async pipeline: STT → MT → TTS.
     
     One instance = one language direction + engine choices.
-    Models are pooled at the module level (shared across instances).
+    Models are pooled via backend.main's shared model pool (get_pooled_model /
+    release_pooled_model) — no duplicate pool here.
     """
-    
-    _model_pool: Dict[Tuple, Dict[str, Any]] = {}
-    _pool_locks: Dict[Tuple, asyncio.Lock] = {}
-    _pool_config: Dict[str, int] = {"stt": 3, "mt": 5, "tts": 5}
     
     def __init__(self, config: PipelineConfig):
         self.cfg = config
         self._stt: Optional[FasterWhisperSTT] = None
         self._mt: Optional[CTranslate2MT] = None
         self._tts: Optional[Any] = None
+        self._tts_engine_name = target_tts_engine(config.tts_engine, config.target_lang)
         self._initialized = False
         self._init_lock = asyncio.Lock()
-        
-        # Apply pool config from first instance
-        if config.pool_stt:
-            Pipeline._pool_config["stt"] = config.pool_stt
-        if config.pool_mt:
-            Pipeline._pool_config["mt"] = config.pool_mt
-        if config.pool_tts:
-            Pipeline._pool_config["tts"] = config.pool_tts
-    
-    @classmethod
-    def _pool_key(cls, stage: str, engine: str, **config) -> Tuple:
-        import hashlib, json
-        cfg_str = json.dumps(config, sort_keys=True)
-        cfg_hash = hashlib.md5(cfg_str.encode()).hexdigest()[:8]
-        return (stage, engine, cfg_hash)
-    
-    @classmethod
-    async def _get_pooled(cls, stage: str, engine: str, factory: Callable, **config) -> Tuple[Any, bool]:
-        key = cls._pool_key(stage, engine, **config)
-        
-        if key not in cls._pool_locks:
-            cls._pool_locks[key] = asyncio.Lock()
-        
-        async with cls._pool_locks[key]:
-            if key in cls._model_pool:
-                cls._model_pool[key]["ref_count"] += 1
-                cls._model_pool[key]["last_used"] = time.time()
-                return cls._model_pool[key]["instance"], False
-            
-            # Check pool limit
-            stage_limit = cls._pool_config.get(stage, 10)
-            current = sum(1 for k in cls._model_pool if k[0] == stage)
-            if current >= stage_limit:
-                candidates = [(k, v) for k, v in cls._model_pool.items() if k[0] == stage and v["ref_count"] == 0]
-                if candidates:
-                    oldest = min(candidates, key=lambda x: x[1]["last_used"])
-                    log.info(f"Pipeline: Evicting LRU {oldest[0]} (stage={stage})")
-                    del cls._model_pool[oldest[0]]
-            
-            log.info(f"Pipeline: Creating pooled {stage}/{engine} ({key})")
-            instance = factory()
-            cls._model_pool[key] = {
-                "instance": instance,
-                "ref_count": 1,
-                "last_used": time.time(),
-                "created_at": time.time(),
-                "stage": stage,
-                "engine": engine,
-                "config": config,
-            }
-            return instance, True
-    
-    @classmethod
-    async def _release_pooled(cls, stage: str, engine: str, **config) -> bool:
-        key = cls._pool_key(stage, engine, **config)
-        if key not in cls._model_pool:
-            return False
-        
-        cls._model_pool[key]["ref_count"] -= 1
-        cls._model_pool[key]["last_used"] = time.time()
-        
-        if cls._model_pool[key]["ref_count"] <= 0:
-            idle_ttl = 300  # 5 minutes
-            if time.time() - cls._model_pool[key]["last_used"] >= idle_ttl:
-                del cls._model_pool[key]
-                if key in cls._pool_locks:
-                    del cls._pool_locks[key]
-                return True
-        return False
     
     async def initialize(self) -> None:
         """Load/pool all models. Idempotent — safe to call multiple times."""
@@ -163,7 +89,7 @@ class Pipeline:
             for stage, engine in [
                 ("stt", self.cfg.stt_engine),
                 ("mt", self.cfg.mt_engine),
-                ("tts", self.cfg.tts_engine),
+                ("tts", self._tts_engine_name),
             ]:
                 try:
                     select(stage, engine, 
@@ -175,17 +101,15 @@ class Pipeline:
                     raise RuntimeError(f"Unknown engine {stage}/{engine}")
             
             # STT
-            self._stt, _ = await self._get_pooled(
+            self._stt, _ = await get_pooled_model(
                 "stt", self.cfg.stt_engine,
                 lambda: self._make_stt(),
-                model_size=self.cfg.stt_model_size
+                model_size=self.cfg.stt_model_size, beam_size=self.cfg.beam_size
             )
-            if hasattr(self._stt, "beam_size"):
-                self._stt.beam_size = self.cfg.beam_size
             
             # MT
             mt_path = self._mt_model_path()
-            self._mt, _ = await self._get_pooled(
+            self._mt, _ = await get_pooled_model(
                 "mt", self.cfg.mt_engine,
                 lambda: instantiate("mt", self.cfg.mt_engine, 
                                     model_path=mt_path, device="cpu",
@@ -195,9 +119,9 @@ class Pipeline:
             )
             
             # TTS
-            self._tts, _ = await self._get_pooled(
-                "tts", self.cfg.tts_engine,
-                lambda: instantiate("tts", self.cfg.tts_engine,
+            self._tts, _ = await get_pooled_model(
+                "tts", self._tts_engine_name,
+                lambda: instantiate("tts", self._tts_engine_name,
                                     allow_noncommercial=self.cfg.allow_noncommercial,
                                     allow_unknown=self.cfg.allow_unknown_license),
             )
@@ -207,7 +131,16 @@ class Pipeline:
                      f"({self.cfg.stt_engine}/{self.cfg.mt_engine}/{self.cfg.tts_engine})")
     
     def _make_stt(self) -> FasterWhisperSTT:
-        return FasterWhisperSTT(model_size=self.cfg.stt_model_size, compute_type="int8")
+        model = self.cfg.stt_model_size
+        if self.cfg.stt_engine == "faster_whisper":
+            local = os.path.join("ct2_models", f"whisper-{model}")
+            if os.path.isfile(os.path.join(local, "model.bin")):
+                model = local
+            elif not os.path.isfile(os.path.join(model, "model.bin")):
+                from faster_whisper.utils import download_model
+                model = download_model(model, local_files_only=True)
+        return instantiate("stt", self.cfg.stt_engine, model_size=model,
+                           compute_type="int8", beam_size=self.cfg.beam_size, device=BP_DEVICE)
     
     def _mt_model_path(self) -> str:
         name = f"Helsinki-NLP/opus-mt-{self.cfg.source_lang}-{self.cfg.target_lang}"
@@ -256,7 +189,8 @@ class Pipeline:
         
         # TTS
         tts_start = time.perf_counter()
-        audio, sr, syn_s = self._tts.synthesize(translation, language=self.cfg.target_lang)
+        audio, sr, syn_s = self._tts.synthesize(translation, language=self.cfg.target_lang,
+                                               speaker_wav_path=self.cfg.speaker_wav_path)
         latencies["tts"] = time.perf_counter() - tts_start
         
         latencies["total"] = time.perf_counter() - total_start
@@ -284,12 +218,12 @@ class Pipeline:
     async def close(self) -> None:
         """Release model references. Call when done with this pipeline."""
         if self._stt:
-            await self._release_pooled("stt", self.cfg.stt_engine, model_size=self.cfg.stt_model_size)
+            release_pooled_model("stt", self.cfg.stt_engine, model_size=self.cfg.stt_model_size, beam_size=self.cfg.beam_size)
         if self._mt:
-            await self._release_pooled("mt", self.cfg.mt_engine, 
-                                       source=self.cfg.source_lang, target=self.cfg.target_lang)
+            release_pooled_model("mt", self.cfg.mt_engine, 
+                                 source=self.cfg.source_lang, target=self.cfg.target_lang)
         if self._tts:
-            await self._release_pooled("tts", self.cfg.tts_engine)
+            release_pooled_model("tts", self._tts_engine_name)
         self._stt = self._mt = self._tts = None
         self._initialized = False
     

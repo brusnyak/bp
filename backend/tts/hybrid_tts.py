@@ -192,14 +192,14 @@ class HybridTTS:
         instance's self.sample_rate (22050) — true for every Piper voice actually installed in
         this project (checked: all are 22050) including the uncloned-fallback case, but not a
         structural guarantee if a differently-configured Piper voice is ever added."""
-        from backend.tts.text_chunking import split_into_phrases, chunk_audio_by_duration
+        from backend.tts.text_chunking import split_into_phrases
         phrases = split_into_phrases(text)
         if not phrases:
             return
         for phrase in phrases:
             wav, sr, _ = self.synthesize(phrase, language=language, speaker_wav_path=speaker_wav_path)
             if wav is not None and len(wav) > 0:
-                yield from chunk_audio_by_duration(wav, sr)
+                yield wav
 
 if __name__ == "__main__":
     # Test script

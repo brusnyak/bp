@@ -704,12 +704,12 @@ body {
 }
 
 .btn-init {
-  background: var(--accent-color);
-  color: var(--surface-color);
+  background: #1b5e20;   /* white on this green is about 9:1 in both themes */
+  color: #fff;
 }
 
 .btn-init:hover {
-  background: var(--accent-color);
+  background: #2e7d32;
   transform: translateY(-2px);
 }
 
@@ -1360,3 +1360,210 @@ body {
   .column-header { flex-wrap: wrap; gap: 0.5rem; }
   .hint-text, .metric-label, .placeholder { overflow-wrap: anywhere; }
 }
+
+/* Meeting preparation uses the existing product tokens. */
+.session-preparation { margin: 1rem; padding: 1.1rem 1.35rem; background: var(--surface-color); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 1rem; }
+.session-preparation h2 { font-family: var(--font-heading); margin-top: 0; }
+.session-preparation p { max-width: 75ch; }
+.session-preparation select { max-width: 100%; margin: .5rem; }
+.session-preparation label { display: block; margin-block: .75rem; }
+.session-preparation a { color: var(--primary-color); text-decoration: underline; text-underline-offset: .2em; }
+.session-preparation :focus-visible, .main-controls :focus-visible { outline: 2px solid var(--primary-color); outline-offset: 3px; }
+#routeStatus { font-weight: 600; }
+.control-group details { max-width: 28rem; }
+.control-group details summary { cursor: pointer; padding: .5rem; }
+@media (max-width: 600px) { .session-preparation { margin: .5rem; } .session-preparation button, .session-preparation select { width: 100%; margin-inline: 0; } }
+
+.main-controls .top-row, .main-controls .top-row.expanded { display: flex; flex-wrap: wrap; gap: 1rem; }
+.main-controls .top-row > * { flex: 1 1 220px; min-width: 0; max-width: 100%; }
+.main-controls .control-group, .main-controls .control-group details { min-width: 0; max-width: 100%; }
+.main-controls .model-select { min-width: 0; max-width: 100%; }
+.main-controls details:not([open]) > :not(summary) { display: none; }
+.state-indicators { flex-wrap: wrap; }
+@media (max-width: 700px) { .main-controls .top-row > * { flex-basis: 100%; } }
+
+
+/* Virtual-cable guidance (added 2026-11-04) */
+.cable-help { max-width: 38rem; margin: 0.5rem auto 0; text-align: left; font-size: 0.9rem; color: var(--secondary-color); }
+.cable-help summary { cursor: pointer; font-weight: 600; color: var(--text-color); }
+.cable-help ol { margin: 0.5rem 0 0.5rem 1.25rem; padding: 0; }
+.cable-help li { margin-bottom: 0.25rem; }
+#playback-rate-group { flex-wrap: wrap; }
+#playback-rate-group p { flex-basis: 100%; margin: 0.25rem 0 0; font-size: 0.75rem; color: var(--secondary-color); max-width: 20rem; }
+.virtual-mic-hint-centered, #startReason { white-space: normal; overflow-wrap: anywhere; }
+#startReason { margin: 0; font-size: 0.85rem; flex-basis: 100%; text-align: center; }
+/* Do not let the widest child (select rows, hints) stretch the page past the viewport */
+.container { min-width: 0; width: 100%; box-sizing: border-box; }
+.container > *, .main-controls, .main-controls .top-row { min-width: 0; max-width: 100%; box-sizing: border-box; }
+.main-controls select { max-width: 100%; }
+.content .column { min-width: 0; flex: 1 1 0; }
+.column-header { flex-wrap: wrap; gap: 0.5rem; }
+.column-header select { max-width: 100%; min-width: 0; }
+
+/* ---- Session flow (2026-11-04): inline sign-in notice, numbered steps, styled controls ---- */
+.auth-notice { margin: 0.75rem 0 0.25rem; text-align: center; font-size: 0.95rem; color: var(--text-color); }
+.auth-notice a { color: var(--primary-color); font-weight: 600; text-underline-offset: 3px; }
+.auth-notice #routeStatus { margin-right: 0.35rem; }
+
+.main-controls .step-row { background: transparent; border: 0; border-bottom: 1px solid var(--border-color); box-shadow: none; border-radius: 0; padding: 0 0 1rem; margin: 0 0 1rem; }
+.main-controls .step-title { display: flex; align-items: center; gap: 0.6rem; margin: 0 0 0.6rem; font-size: 1.05rem; color: var(--text-color); }
+.main-controls .step-title-plain { margin: 1.1rem 0 0.6rem; }
+.step-no { display: inline-grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: var(--primary-color); color: #FFFFFF; font-size: 0.85rem; font-weight: 700; flex: none; }
+.step-fields { display: flex; flex-wrap: wrap; gap: 0.6rem 0.85rem; align-items: center; }
+.step-fields label { font-weight: 600; }
+.sound-check .hint-text { margin: 0.6rem 0 0; font-size: 0.9rem; color: var(--secondary-color); }
+.check-label { display: flex; gap: 0.6rem; align-items: flex-start; margin-top: 0.75rem; font-size: 0.95rem; line-height: 1.45; cursor: pointer; }
+
+.main-controls select,
+.step-fields select {
+  appearance: none;
+  -webkit-appearance: none;
+  min-height: 2.5rem;
+  max-width: 100%;
+  padding: 0.5rem 2.25rem 0.5rem 0.8rem;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--text-color);
+  background-color: var(--surface-color);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23808080' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  background-size: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.main-controls select:focus-visible,
+.step-fields select:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+
+input[type="checkbox"] { width: 1.1rem; height: 1.1rem; margin: 0.15rem 0 0; flex: none; accent-color: var(--primary-color); cursor: pointer; }
+input[type="checkbox"]:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+
+.main-controls details { margin-top: 0.25rem; }
+.main-controls details > summary { cursor: pointer; color: var(--primary-color); font-weight: 600; font-size: 0.95rem; list-style-position: inside; }
+.main-controls details > summary:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 3px; border-radius: 4px; }
+.main-controls details > p { margin: 0.5rem 0 0; font-size: 0.88rem; color: var(--secondary-color); line-height: 1.5; }
+.main-controls details label { display: block; font-weight: 600; margin: 0.6rem 0 0.35rem; }
+.main-controls details select { width: 100%; }
+
+.control-buttons .btn { min-height: 2.75rem; }
+.cable-help { width: 100%; text-align: center; font-size: 0.92rem; }
+.cable-help > summary { cursor: pointer; color: var(--primary-color); font-weight: 600; }
+.cable-help ol { display: inline-block; text-align: left; margin: 0.5rem 0; padding-left: 1.25rem; line-height: 1.55; }
+.cable-help > p { color: var(--secondary-color); margin: 0.25rem 0 0; }
+
+@media (max-width: 600px) {
+  .main-controls .step-fields { flex-direction: column; align-items: stretch; }
+  .main-controls .step-fields select, .main-controls .step-fields .btn { width: 100%; }
+  .auth-notice { text-align: left; }
+}
+
+
+/* Diagnostics are collapsed by default: the page is for speaking, not for dashboards */
+.diagnostics { margin: 1rem 0; border: 1px solid var(--border-color, #d8dde3); border-radius: .75rem; background: var(--surface-color, #fff); }
+.diagnostics > summary { cursor: pointer; padding: .8rem 1.1rem; font-weight: 600; list-style-position: inside; }
+.diagnostics[open] > summary { border-bottom: 1px solid var(--border-color, #d8dde3); }
+.diagnostics .latency-metrics, .diagnostics .log-container { box-shadow: none; border: 0; margin: 0; }
+
+/* ---- Shell v3 (2026-11-05): slim header, route grid, run row, status strip ---- */
+body { font-family: var(--font-body); }
+.container { max-width: 1240px; }
+.live-bar { display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0 0.75rem; margin-bottom: 0.75rem; border-bottom: 1px solid var(--border-color); }
+.live-bar .brand { margin-right: auto; }
+.live-bar h1 { margin: 0; font: 600 1rem/1 var(--font-body); color: var(--text-color); }
+.close-sidebar-btn { display: grid; place-items: center; background: none; border: 0; color: var(--text-color); cursor: pointer; padding: 0.25rem; border-radius: 0.5rem; }
+.close-sidebar-btn:hover { background: color-mix(in srgb, var(--text-color) 9%, transparent); }
+
+.auth-notice { display: flex; flex-wrap: wrap; align-items: center; gap: 0.25rem 0.75rem; margin: 0 0 1rem; padding: 0.65rem 0.95rem; background: color-mix(in srgb, var(--primary-color) 6%, var(--surface-color)); border: 1px solid var(--border-color); border-radius: 0.75rem; font-size: 0.9rem; text-align: left; }
+.auth-notice #routeStatus { margin: 0; font-weight: 500; }
+.auth-notice a { white-space: nowrap; }
+
+.main-controls { padding: 1.5rem 1.75rem; border-radius: 1.1rem; box-shadow: 0 18px 36px -24px var(--shadow-color); }
+@media (prefers-reduced-motion: no-preference) {
+  .main-controls { animation: live-rise 0.7s var(--ease) both; }
+  .subtitle-strip { animation: live-rise 0.7s var(--ease) 0.1s both; }
+}
+@keyframes live-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.main-controls .step-title { font-family: var(--font-body); font-weight: 700; font-size: 1rem; }
+.step-no { color: var(--on-primary); }
+
+/* Step 2: two tidy fields, advanced options folded */
+.main-controls .top-row.route-grid, .main-controls .top-row.route-grid.expanded { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem 1.5rem; align-items: start; margin-bottom: 0.5rem; }
+.main-controls .route-grid > .control-group { grid-column: auto !important; flex-direction: column; align-items: stretch; gap: 0.4rem; min-width: 0; width: 100%; justify-self: stretch; }
+.main-controls .route-grid > .control-group.route-advanced { grid-column: 1 / -1 !important; }
+.main-controls .route-grid select { width: 100%; }
+.main-controls .route-grid label { font-size: 0.88rem; font-weight: 600; }
+.main-controls .route-grid p { margin: 0; font-size: 0.82rem; color: var(--secondary-color); }
+.main-controls .route-grid .hidden { display: none; }
+
+/* Step 3: primary actions left, secondary right */
+.run-row { justify-content: flex-start; gap: 0.6rem; }
+.run-row .btn { min-height: 2.75rem; }
+.run-spacer { flex: 1 1 0; }
+.run-row .btn-primary:not(:disabled) { box-shadow: 0 10px 22px -12px var(--primary-color); }
+.run-row .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+.run-status { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.5rem; margin: 1rem 0 0.25rem; padding: 0.75rem 1rem; background: var(--background-color-end); border-radius: 0.75rem; }
+.run-status .hint-text { margin: 0; font-size: 0.88rem; color: var(--secondary-color); flex: 1 1 14rem; }
+.run-status .state-indicators { gap: 1.1rem; margin-left: auto; }
+.run-status .state-item { font-size: 0.85rem; gap: 0.35rem; }
+.run-status .state-icon { font-size: 1.25rem; transition: color 0.25s, transform 0.25s var(--ease); }
+.run-status .state-icon.active { color: var(--log-success-color); transform: scale(1.15); }
+.run-status .input-level-container { justify-content: flex-start; height: auto; gap: 0.5rem; font-size: 0.85rem; }
+.run-status .mic-input-level-label { font-weight: 600; color: var(--secondary-color); }
+.run-status .input-level-bar-segments { width: 100px; }
+.main-controls .virtual-mic-hint-centered { text-align: left; font-size: 0.85rem; margin: 0.75rem 0 0; }
+.cable-help { text-align: left; }
+.cable-help ol { display: block; }
+
+.column-header h2 { font-family: var(--font-heading); }
+
+@media (max-width: 760px) {
+  .main-controls { padding: 1.1rem; }
+  .main-controls .top-row.route-grid { grid-template-columns: minmax(0, 1fr); }
+  .run-row { flex-direction: row; }
+  .run-row .btn { flex: 1 1 8rem; }
+  .run-spacer { display: none; }
+  .run-status .state-indicators { margin-left: 0; }
+}
+.run-status .hint-text { text-align: left; }
+.run-status .hint-text, .run-status p { text-align: left !important; }
+.run-row .btn-init, [data-theme="dark"] .run-row .btn-init { background: #1b5e20; color: #fff; }
+.run-row .btn-init:hover, [data-theme="dark"] .run-row .btn-init:hover { background: #2e7d32; color: #fff; }
+
+/* Direction row, guest notice, account dialog */
+.route-direction .direction-row { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+.direction-label { font-family: var(--font-heading); font-weight: 700; font-size: 1.15rem; }
+.swap-btn { display: inline-flex; align-items: center; gap: 0.35rem; min-height: 2.5rem; padding: 0.4rem 0.9rem; }
+.swap-btn .material-symbols-outlined { font-size: 1.3rem; transition: transform 0.35s var(--ease); }
+.swap-btn:hover .material-symbols-outlined { transform: rotate(180deg); }
+.auth-notice .where { flex-basis: 100%; font-size: 0.82rem; color: var(--secondary-color); }
+.account-dialog { max-width: 30rem; width: calc(100% - 2rem); border: 1px solid var(--border-color); border-radius: 1rem; padding: 1.5rem; background: var(--surface-color); color: var(--text-color); box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.45); }
+.account-dialog::backdrop { background: rgba(10, 28, 79, 0.55); }
+.account-dialog h2 { margin: 0 0 0.6rem; font-size: 1.3rem; }
+.account-dialog p { margin: 0 0 1.25rem; line-height: 1.55; color: var(--secondary-color); }
+.dialog-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.dialog-actions .btn { text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+
+/* Language controls (live-langs.js): picker triggers replace the visible selects once the server's routes are known */
+.lp-stack { flex-direction: column; align-items: flex-start; gap: 0; min-height: 52px; padding: .3rem .95rem; min-width: 8.5rem; }
+.lp-stack small { font-size: .7rem; letter-spacing: .04em; text-transform: uppercase; }
+.lp-stack span { font-size: 1.05rem; font-weight: 700; }
+.icon-swap { width: 44px; height: 44px; display: inline-grid; place-items: center; border-radius: 50%; border: 1px solid var(--border-color); background: var(--surface-color); color: var(--primary-color); cursor: pointer; transition: transform .1s ease-out; }
+.icon-swap:active { transform: scale(.95); }
+.icon-swap:disabled { opacity: .4; cursor: not-allowed; }
+.field-label { display: block; font-weight: 600; margin-bottom: .35rem; }
+.lp-enhanced .column-header .language-select { display: none; }
+@media (max-width: 520px) { .lp-stack { min-width: 0; flex: 1; } .route-direction .direction-row { flex-wrap: nowrap; } }
+
+/* Guest notice: a quiet status row, not an alert. Sign-in is a secondary text link. */
+.auth-notice { background: var(--surface-color); border-color: var(--border-color); padding: .5rem .9rem; gap: .15rem .9rem; }
+.auth-notice #routeStatus { flex: 1 1 14rem; }
+.auth-notice #accountHint { color: var(--secondary-color); font-size: .85rem; }
+.auth-notice #accountLink { font-weight: 600; font-size: .85rem; text-decoration: none; min-height: 32px; display: inline-flex; align-items: center; }
+.auth-notice #accountLink:hover { text-decoration: underline; }
+
+/* Guided Run step: one button leads, the real controls stay in the page for the script and for assistive tech lookups */
+.guided #initBtn, .guided #startStopBtn { display: none; }
+.btn-go { min-width: 12rem; min-height: 52px; font-size: 1.05rem; }
+.btn-go.btn-stop { background: var(--danger-color); }
+.btn-go:disabled { opacity: .6; cursor: progress; }

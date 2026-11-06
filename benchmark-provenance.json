@@ -1,0 +1,6 @@
+{
+  "git_hash": "1b38c1685d4a2a9debb7cb7e7c24a943abb9f4e7",
+  "created": "2026-11-05",
+  "purpose": "Kaggle kernel repo staging fingerprint — identifies the exact BP checkout the kernel mounts",
+  "repo_root_files": ["app.py", "backend/", "languages/packs/", "requirements.txt", "ct2_models/", "speaker_voices/", "benchmark-provenance.json"]
+}

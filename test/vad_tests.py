@@ -15,13 +15,41 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../backend')))
 
-from backend.main import handle_audio_stream, initialize_all_models, AUDIO_SAMPLE_RATE, VAD_FRAME_DURATION, SILENCE_TIMEOUT, STREAMING_CHUNK_LENGTH
+from backend.main import (
+    handle_audio_stream, initialize_all_models, User,
+    AUDIO_SAMPLE_RATE, VAD_FRAME_DURATION, SILENCE_TIMEOUT, STREAMING_CHUNK_LENGTH,
+)
 from backend.utils.audio_utils import resample_audio # Import resample_audio
+from backend.utils.auth import create_access_token, get_password_hash # JWT for WS auth
+
+TEST_EMAIL = "vad-test@bp.local"
+TEST_PASSWORD = "vad-test-pw"
+
+@pytest.fixture(autouse=True)
+def isolated_vad_auth(monkeypatch):
+    """Authenticate the stream without writing a test identity to the owner's database."""
+    import backend.main as bm
+    from backend.utils.db_manager import Base, get_db_session_and_engine
+    engine, sessions = get_db_session_and_engine("sqlite:///:memory:")
+    Base.metadata.create_all(bind=engine)
+    with sessions() as db:
+        db.add(User(username="vad-test", email=TEST_EMAIL,
+                    hashed_password=get_password_hash(TEST_PASSWORD)))
+        db.commit()
+    monkeypatch.setattr(bm, "SessionLocal", sessions)
+    yield
+    engine.dispose()
+
+
+def _auth_token():
+    return create_access_token(TEST_EMAIL)
+
 
 # Mock WebSocket for testing
 class MockWebSocket:
     def __init__(self):
         self.received_messages = []
+        self.start_pending = True
         self.accepted = False
         self.client = MagicMock(host="test_host", port=12345)
         self.client_state = WebSocketState.CONNECTED
@@ -36,15 +64,33 @@ class MockWebSocket:
     async def accept(self):
         self.accepted = True
 
+    async def close(self, code=None, reason=None):
+        """Stub WebSocket.close so JWT auth (4003) doesn't crash unit tests."""
+        self.accepted = False
+
     async def receive(self):
-        # Simulate receiving audio bytes
+        # Match production ordering: Start authorizes capture before any PCM frames.
+        if self.start_pending:
+            self.start_pending = False
+            return {"type": "websocket.receive", "text": json.dumps({"type": "start"})}
         if self.audio_to_send:
             chunk = self.audio_to_send.pop(0)
+            # Silence timeout is measured on the wall clock: feeding the entire clip
+            # without pacing cannot exercise speech-end detection before disconnect.
+            await asyncio.sleep(len(chunk) / AUDIO_SAMPLE_RATE)
             return {"type": "websocket.receive", "bytes": chunk.tobytes()}
-        else:
-            # Simulate a slight delay before disconnecting to allow background tasks to finish
-            await asyncio.sleep(0.5)
-            raise WebSocketDisconnect(code=1000, reason="Test finished")
+        # Let normal VAD-triggered processing finish while the client is connected.
+        # Disconnect is cancellation, never a hidden transcription flush.
+        import backend.main as bm
+        await asyncio.sleep(0)
+        session = bm.active_sessions.get("test_host:12345", {})
+        tasks = set(session.get("pipeline_tasks", set()))
+        if session.get("active_pipeline_task"):
+            tasks.add(session["active_pipeline_task"])
+        pending = [task for task in tasks if not task.done()]
+        if pending:
+            await asyncio.wait_for(asyncio.gather(*pending), timeout=15)
+        raise WebSocketDisconnect(code=1000, reason="Test finished")
 
     async def receive_bytes(self):
         # This is for the original handle_audio_stream, not the refactored one
@@ -130,7 +176,7 @@ async def test_vad_speech_detection_and_processing():
     websocket.set_audio_to_send(audio_chunks)
 
     start_time = time.time()
-    await handle_audio_stream(websocket)
+    await handle_audio_stream(websocket, token=_auth_token())
     
     # Give background tasks a moment to complete
     await asyncio.sleep(2) 
@@ -188,7 +234,7 @@ async def test_vad_silence_handling(): # Removed setup_models fixture
     audio_chunks = create_audio_chunks(silence_segment, chunk_length_seconds)
     websocket.set_audio_to_send(audio_chunks)
 
-    await handle_audio_stream(websocket)
+    await handle_audio_stream(websocket, token=_auth_token())
     await asyncio.sleep(0.5)
 
     # Assertions
@@ -247,7 +293,7 @@ async def test_vad_aggressiveness_and_short_speech(): # Removed setup_models fix
     audio_chunks = create_audio_chunks(full_audio, chunk_length_seconds)
     websocket.set_audio_to_send(audio_chunks)
 
-    await handle_audio_stream(websocket)
+    await handle_audio_stream(websocket, token=_auth_token())
     await asyncio.sleep(1)
 
     transcription_found = False
@@ -302,7 +348,7 @@ async def test_vad_long_speech_streaming(): # Removed setup_models fixture
     audio_chunks = create_audio_chunks(full_audio, chunk_length_seconds)
     websocket.set_audio_to_send(audio_chunks)
 
-    await handle_audio_stream(websocket)
+    await handle_audio_stream(websocket, token=_auth_token())
     await asyncio.sleep(3)
 
     streaming_transcriptions = 0

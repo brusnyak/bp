@@ -1,0 +1,189 @@
+{
+ "schema": 1,
+ "status": "complete",
+ "steps": [
+  {
+   "t": 20.9,
+   "step": "copied code",
+   "src": "/kaggle/input/datasets/yegorby/bp-lang-code-20261104/bp-code"
+  },
+  {
+   "t": 34.8,
+   "step": "pip requirements",
+   "rc": 0,
+   "tail": "sdk 0.4.9 requires websockets>=14, but you have websockets 12.0 which is incompatible.\ngoogle-adk 2.7.1 requires google-auth[pyopenssl]>=2.47, but you have google-auth 2.35.0 which is incompatible.\ngoogle-adk 2.7.1 requires websockets<16,>=15.0.1, but you have websockets 12.0 which is incompatible.\n"
+  },
+  {
+   "t": 85.8,
+   "step": "convert en-sk",
+   "rc": 0,
+   "ok": true,
+   "tail": ""
+  },
+  {
+   "t": 104.5,
+   "step": "convert en-cs",
+   "rc": 0,
+   "ok": true,
+   "tail": ""
+  },
+  {
+   "t": 127.8,
+   "step": "convert sk-en",
+   "rc": 0,
+   "ok": true,
+   "tail": ""
+  },
+  {
+   "t": 145.9,
+   "step": "convert cs-en",
+   "rc": 0,
+   "ok": true,
+   "tail": ""
+  },
+  {
+   "t": 157.0,
+   "step": "stt download",
+   "rc": 0,
+   "tail": "e-v3-turbo/snapshots/0a363e9161cbc7ed1431c9597a8ceaf0c4f78fcf\nWarning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"
+  },
+  {
+   "t": 176.9,
+   "step": "devices",
+   "stt": "cuda",
+   "mt": "cuda"
+  },
+  {
+   "t": 259.5,
+   "step": "run c1",
+   "status": "complete",
+   "clients_ok": 1,
+   "lag_median_s": 0.607,
+   "lag_p95_s": 1.603
+  },
+  {
+   "t": 339.5,
+   "step": "run c2",
+   "status": "complete",
+   "clients_ok": 2,
+   "lag_median_s": 0.946,
+   "lag_p95_s": 1.647
+  },
+  {
+   "t": 419.9,
+   "step": "run c4",
+   "status": "complete",
+   "clients_ok": 4,
+   "lag_median_s": 1.236,
+   "lag_p95_s": 1.954
+  },
+  {
+   "t": 501.3,
+   "step": "run c8",
+   "status": "complete",
+   "clients_ok": 8,
+   "lag_median_s": 3.704,
+   "lag_p95_s": 4.289
+  }
+ ],
+ "errors": [],
+ "runs": {
+  "c1": {
+   "status": "complete",
+   "clients": 1,
+   "clients_ok": 1,
+   "wall_s": 80.2,
+   "segments": 17,
+   "voiced": 17,
+   "lag_median_s": 0.607,
+   "lag_p95_s": 1.603,
+   "lag_max_s": 1.848,
+   "first_word_max_s": 4.505,
+   "errors": []
+  },
+  "c2": {
+   "status": "complete",
+   "clients": 2,
+   "clients_ok": 2,
+   "wall_s": 77.6,
+   "segments": 32,
+   "voiced": 32,
+   "lag_median_s": 0.946,
+   "lag_p95_s": 1.647,
+   "lag_max_s": 2.039,
+   "first_word_max_s": 4.905,
+   "errors": []
+  },
+  "c4": {
+   "status": "complete",
+   "clients": 4,
+   "clients_ok": 4,
+   "wall_s": 78.0,
+   "segments": 56,
+   "voiced": 56,
+   "lag_median_s": 1.236,
+   "lag_p95_s": 1.954,
+   "lag_max_s": 2.113,
+   "first_word_max_s": 5.44,
+   "errors": []
+  },
+  "c8": {
+   "status": "complete",
+   "clients": 8,
+   "clients_ok": 8,
+   "wall_s": 79.0,
+   "segments": 120,
+   "voiced": 120,
+   "lag_median_s": 3.704,
+   "lag_p95_s": 4.289,
+   "lag_max_s": 4.717,
+   "first_word_max_s": 8.458,
+   "errors": []
+  }
+ },
+ "deviations": [
+  "requirements relaxed for Python 3.13; SQLAlchemy>=2.0.36"
+ ],
+ "acceptance": "route_unverified",
+ "tts_voice": "generic public Piper voices sk lili / cs jirka / en ryan (personal fine-tunes not uploaded)",
+ "input_audio_sha256": {
+  "clip_en.wav": "8d73a572db1120a3e8c812588a1eb2f17b3e720a78fcd7482026391a9b95628b",
+  "clip_sk.wav": "b8b94368e23588d5331ba91947b3c0b89f40918f495f7f932b854c5daaeb7ea2",
+  "clip_cs.wav": "ccde0840e39f125ff7ebe0754d9b1027d547f910e6afe26a850950df3e393b39"
+ },
+ "elapsed_s": 501.4,
+ "gpu": "Tesla T4",
+ "python": "3.13.16 (main, Oct  1 2026, 15:40:24) [GCC 13.3.0]",
+ "versions": {
+  "torch": "2.11.0+cu130",
+  "transformers": "5.20.2",
+  "faster-whisper": "1.2.0",
+  "ctranslate2": "4.8.5",
+  "fastapi": "0.141.1",
+  "uvicorn": "0.38.0",
+  "websockets": "12.0",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3",
+  "onnxruntime": "1.31.1",
+  "piper-tts": "1.3.0",
+  "SQLAlchemy": "2.1.6",
+  "sacrebleu": "2.6.0"
+ },
+ "mt_ok": {
+  "en-sk": true,
+  "en-cs": true,
+  "sk-en": true,
+  "cs-en": true
+ },
+ "stt": {
+  "model": "large-v3-turbo",
+  "device": "cuda",
+  "compute_type": "float16",
+  "smoke_tail": "SMOKE  When the sunlight strikes rainbows in the air, they act as a prism and form a r\n"
+ },
+ "mt": {
+  "device": "cuda",
+  "compute_type": "int8",
+  "smoke_tail": "CTranslate2MT: Using specified device: cuda.\nCTranslate2MT initialized with model_path=ct2_models/Helsinki-NLP--opus-mt-en-sk, device=cuda\nMTSMOKE ('Zdravím svet.', 0.26322460174560547)\n"
+ }
+}

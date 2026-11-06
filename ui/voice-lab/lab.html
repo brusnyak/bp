@@ -11,8 +11,9 @@
     <link rel="icon" type="image/png" sizes="192x192" href="../images/icon-192.png" />
     <link rel="stylesheet" href="../global-styles.css" />
     <link rel="stylesheet" href="lab-style.css?v=20261002b" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-  </head>
+    <link rel="stylesheet" href="/ui/vendor/fonts.css" />
+    <link rel="stylesheet" href="/ui/vendor/material-symbols.css" />
+</head>
   <body>
     <header class="lab-hero">
       <div class="lab-hero-inner">
@@ -105,7 +106,7 @@
           <div class="lab-dropzone" id="dropzone">
             <input type="file" id="uploadInput" accept="audio/*" multiple />
             <p><strong>Drop audio files here</strong> or click to browse</p>
-            <p class="lab-hint">WAV, M4A, MP3 — staged locally, nothing uploads anywhere.</p>
+            <p class="lab-hint">WAV, M4A, MP3 — staged locally, staged files stay in this browser until you explicitly upload them to the running BP server.</p>
           </div>
           <div id="uploadList"></div>
         </div>

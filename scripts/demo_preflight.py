@@ -6,7 +6,7 @@ speaker-voice registry, proof clips, secrets file) and, with --server, the runni
 backend itself (HTTPS root + /api/voice-lab/status + engine list).
 
     python3 scripts/demo_preflight.py              # assets only, any python3
-    python3 scripts/demo_preflight.py --server     # also probe https://localhost:8000
+    python3 scripts/demo_preflight.py --server     # also probe http://localhost:8000
 
 Exit code 0 = every required check passed (warnings allowed). Nothing is written.
 See documentation/demo_runbook_2026-09-28.md for what to do about each failure.
@@ -20,12 +20,10 @@ import sys
 import urllib.request
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BASE_URL = "https://localhost:8000"
+BASE_URL = "http://localhost:8000"
 
 # Required to start the demo at all; missing = exit 1.
 REQUIRED = [
-    ("certs/cert.pem", "HTTPS/WSS certificate (else: make certs)"),
-    ("certs/key.pem", "HTTPS/WSS key (else: make certs)"),
     (".env", "secrets file: GOOGLE_CLIENT_ID + JWT_SECRET (see documentation/amd_fetch_checklist.md)"),
     ("backend/tts/piper_models/sk_SK-personal-male-medium.onnx",
      "shipped personal SK voice (the demo voice)"),
@@ -127,7 +125,7 @@ def report(title, results, miss="FAIL"):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--server", action="store_true",
-                    help="also probe the running backend on https://localhost:8000")
+                    help="also probe the running backend on http://localhost:8000")
     args = ap.parse_args()
 
     print(f"Demo pre-flight -- repo: {REPO_ROOT}")

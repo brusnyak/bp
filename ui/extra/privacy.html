@@ -4,71 +4,103 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark light">
-    <title>Privacy Policy</title>
+    <title>Privacy Policy · Real-Time Speech Translation</title>
+    <meta name="description" content="What Real-Time Speech Translation processes, stores and shares.">
+    <script>document.documentElement.classList.add("js");</script>
+    <link rel="stylesheet" href="/ui/vendor/fonts.css">
+    <link rel="stylesheet" href="/ui/vendor/material-symbols.css">
     <link rel="stylesheet" href="/ui/global-styles.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="/ui/site.css?v=20261105">
+    <link rel="stylesheet" href="/ui/extra/extra.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <a href="javascript:history.back()" class="back-button">
-                <span class="material-symbols-outlined">arrow_back</span>
-                Back
-            </a>
-            <div class="theme-toggle-wrapper">
-                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
-                    <span class="material-symbols-outlined"></span>
-                </button>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="bar" id="bar">
+        <div class="wrap">
+            <a class="brand" href="/"><span class="brand-mark" aria-hidden="true"><span class="material-symbols-outlined">record_voice_over</span></span>Speech Translation</a>
+            <div class="bar-actions">
+                <a class="cta small" href="/ui/live-speech/live.html">Open live translation</a>
+                <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle theme"><span class="material-symbols-outlined"></span></button>
             </div>
         </div>
-        <div class="content-section floating-container">
-            <h1>Privacy Policy for Real-Time Speech Translation</h1>
-            <p>This Privacy Policy describes how your personal information is collected, used, and shared when you use the Real-Time Speech Translation application.</p>
+    </header>
+    <main id="main">
+        <div class="wrap">
+            <div class="doc-head">
+                <h1>Privacy Policy</h1>
+                <p>Draft, written 2026-11-05 from the code. Not reviewed by a lawyer.</p>
+            </div>
+            <div class="doc-layout">
+                <nav class="toc" aria-label="On this page"><h2>On this page</h2><ol id="toc"></ol></nav>
+                <div class="prose">
 
-            <h2>Information We Collect</h2>
-            <p>We collect information to provide better services to all our users. The types of information we collect include:</p>
-            <ul>
-                <li>**Personal Information:** When you register for an account, we may collect your username and email address. If you choose to use voice cloning features, we will collect and store audio recordings of your voice.</li>
-                <li>**Usage Data:** We collect information about how you access and use the application, such as your interactions with the translation features, selected languages, and performance metrics (e.g., latency data).</li>
-                <li>**Device Information:** We may collect information about the device you use to access our services, including hardware model, operating system, and unique device identifiers.</li>
-            </ul>
+<div class="summary">
+    <div><strong>Audio is not stored</strong><span>Microphone audio is processed and discarded.</span></div>
+    <div><strong>No tracking</strong><span>No analytics, no advertising code, no spoken text in logs.</span></div>
+    <div><strong>Recordings stay until deleted</strong><span>There is no automatic expiry; deletion is a request to the operator.</span></div>
+</div>
+<section id="processed">
+<h2>What the software processes</h2>
+<p>This describes what the software does. If you run it yourself, you are the operator and this applies to your installation.</p>
+<div class="table-scroll"><table class="data-table">
+<thead><tr><th>Data</th><th>What happens</th><th>Stored?</th></tr></thead>
+<tbody>
+<tr><td>Microphone audio</td><td>Streamed to the server you are connected to, converted to text and translated. Nothing is sent to a third-party speech service by default.</td><td>No</td></tr>
+<tr><td>Guest session</td><td>A guest gets a shared guest identity and a token that expires after 2 hours. No name, email or recordings are kept, and guests cannot record or store voices.</td><td>No</td></tr>
+<tr><td>Account data</td><td>Username, email address and a salted password hash (Argon2), only if you register. Guests have no account data.</td><td>Yes, on the server</td></tr>
+<tr><td>Voice recordings</td><td>Only if you record or upload a voice for a personal voice. You can rename or delete them in the voice menu.</td><td>Yes, under your account</td></tr>
+<tr><td>Server logs</td><td>Timings, language pairs and text lengths for troubleshooting. They contain no spoken words and no session tokens.</td><td>On the server</td></tr>
+<tr><td>Session logs</td><td>Off by default. If the operator enables them (<code>BP_LOG_SESSIONS=1</code>), the server writes transcripts, translations and timings to local files for accuracy review. Operators must tell participants before enabling this.</td><td>Only if enabled</td></tr>
+<tr><td>Browser storage</td><td>Your sign-in token, name and email, theme and chosen output device, kept in your browser. See <a href="/ui/extra/cookies.html">cookies and local storage</a>.</td><td>In your browser</td></tr>
+</tbody></table></div>
+</section>
+<section id="where">
+<h2>Where your audio goes</h2>
+<p>To the machine that runs the translator. If you run BP yourself (<code>make run</code> on localhost), nothing leaves your computer. On a shared server your audio goes to that server, where it is processed and not stored. The live page says which case you are in.</p>
+</section>
+<section id="third-parties">
+<h2>Requests your browser makes to others</h2>
+<p>Fonts and icons are served by this server. The demo thumbnail loads from YouTube, and the video player loads from YouTube only when you press play. YouTube sees your IP address then. If you use Google sign-in, Google processes that login and its sign-in script runs in your browser. There is no analytics or advertising code.</p>
+</section>
+<section id="operator">
+<h2>Who is responsible</h2>
+<p>For the author&rsquo;s own instance the operator is Yegor Brusnyak (contact on the <a href="/ui/extra/feedback.html">feedback page</a>). If you run your own copy, you are the operator of that copy. Voice recordings are stored on the basis of your consent when you upload them, and you can withdraw it by deleting them.</p>
+</section>
+<section id="retention">
+<h2>Sharing and retention</h2>
+<p>The software does not share your data with anyone. Recordings and logs stay on the server until the operator deletes them. There is no automatic expiry yet, and account deletion is a manual request to the operator.</p>
+</section>
+<section id="rights">
+<h2>Your rights</h2>
+<p>You can ask the operator to access, correct or delete your data, or to restrict its processing. Contact the operator through the <a href="/ui/extra/feedback.html">feedback page</a>. You can also complain to the Slovak data protection authority (<a href="https://dataprotection.gov.sk" rel="noopener noreferrer">Úrad na ochranu osobných údajov</a>). Voice recordings can reveal identity, so upload only recordings of your own voice.</p>
+</section>
+<section id="changes">
+<h2>Changes</h2>
+<p>This page is updated when the software&rsquo;s data handling changes. The date above shows the last review.</p>
+</section>
 
-            <h2>How We Use Your Information</h2>
-            <p>We use the information we collect for the following purposes:</p>
-            <ul>
-                <li>To provide, maintain, and improve our real-time speech translation services.</li>
-                <li>To personalize your experience, including voice cloning and language preferences.</li>
-                <li>To monitor and analyze usage and trends to improve the functionality and user experience of the application.</li>
-                <li>To ensure the security and integrity of our services.</li>
-                <li>To communicate with you about your account or service updates.</li>
-            </ul>
-
-            <h2>Sharing Your Information</h2>
-            <p>We do not share your personal information with third-party companies, organizations, or individuals outside of Real-Time Speech Translation, except in the following limited circumstances:</p>
-            <ul>
-                <li>**With Your Consent:** We will share personal information with companies, organizations, or individuals outside of Real-Time Speech Translation when we have your explicit consent to do so.</li>
-                <li>**For Legal Reasons:** We will share personal information with companies, organizations, or individuals outside of Real-Time Speech Translation if we have a good-faith belief that access, use, preservation, or disclosure of the information is reasonably necessary to meet any applicable law, regulation, legal process, or enforceable governmental request.</li>
-            </ul>
-
-            <h2>Data Security</h2>
-            <p>We are committed to protecting the security of your information. We use a variety of security technologies and procedures to help protect your personal information from unauthorized access, use, or disclosure.</p>
-
-            <h2>Your Data Rights</h2>
-            <p>You have certain rights regarding your personal data, including:</p>
-            <ul>
-                <li>The right to access, update, or delete the personal information we hold about you.</li>
-                <li>The right to object to the processing of your personal data.</li>
-                <li>The right to request that we restrict the processing of your personal data.</li>
-                <li>The right to data portability.</li>
-            </ul>
-            <p>To exercise any of these rights, please contact us via the <a href="/ui/feedback.html">Feedback page</a>.</p>
-
-            <h2>Changes to This Privacy Policy</h2>
-            <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page. You are advised to review this Privacy Policy periodically for any changes.</p>
-
-            <p>If you have any questions about this Privacy Policy, please contact us via the <a href="/ui/feedback.html">Feedback page</a>.</p>
+                </div>
+            </div>
         </div>
-    </div>
+    </main>
+    <footer class="foot">
+        <div class="wrap">
+            <div class="foot-top">
+                <a class="brand" href="/"><span class="brand-mark" aria-hidden="true"><span class="material-symbols-outlined">record_voice_over</span></span>Speech Translation</a>
+                <nav aria-label="Footer">
+                    <a href="/ui/extra/about.html">About</a>
+                    <a href="/ui/extra/faq.html">FAQ</a>
+                    <a href="/ui/extra/feedback.html">Feedback</a>
+                    <a href="/ui/extra/privacy.html">Privacy</a>
+                    <a href="/ui/extra/terms.html">Terms</a>
+                    <a href="/ui/extra/cookies.html">Cookies</a>
+                </nav>
+            </div>
+            <small>&copy; 2026 Yegor Brusnyak. Code is MIT-licensed; model and voice licences differ (see NOTICE.md in the repository).</small>
+        </div>
+    </footer>
     <script src="/ui/theme-toggle.js"></script>
+    <script src="/ui/extra/doc.js"></script>
+    <script src="/ui/i18n/i18n.js"></script>
 </body>
 </html>

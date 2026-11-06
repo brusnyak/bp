@@ -17,6 +17,11 @@
   },
   "clip": null,
   "reference": null,
-  "license": "unknown",
-  "notes": "licence for 'Helsinki-NLP/opus-mt-en-pl' could not be verified (HF returns HTTP 401 for unauthenticated lookups) — confirm the model card, or pass --license. scaffolded by bp language add — fill clip/reference, then run: bp language test en-pl"
+  "license": "unverified",
+  "notes": "licence for 'Helsinki-NLP/opus-mt-en-pl' could not be verified (HF returns HTTP 401 for unauthenticated lookups) — confirm the model card, or pass --license. scaffolded by bp language add — fill clip/reference, then run: bp language test en-pl",
+  "vad": {
+    "end_of_sentence_gating": true,
+    "silence_timeout_s": 0.25,
+    "max_segment_s": 3.0
+  }
 }

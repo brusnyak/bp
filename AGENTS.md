@@ -1,5 +1,7 @@
 # AGENTS.md — BP (real-time EN↔SK speech translation)
 
+> Current repair state (2026-11-04): start with `PRODUCT.md`, `documentation/implementation-2026-11-04/RESULTS.md` and `documentation/HANDOFF_NEXT_SESSION.md`. Earlier dated counts, readiness claims, media-access behavior and Kaggle failure explanations below are historical. Current contracts require authenticated explicit preparation, offline assets, target-language TTS, terminal Stop and reviewed full-route evidence. Full cloned-speech/LHC/commercial acceptance remains pending.
+
 Project-level memory for every agent working in this repo. Read `PLAN.md` (state +
 next steps), `DESIGN.md` (UI contract) and `.specify/memory/constitution.md`
 (binding principles) before changing anything. Global conventions: `~/memory-vault`
@@ -30,8 +32,12 @@ Branch state and history (verified 2026-09-28, after the `lite` landing):
   one-command setup, Slovak-tuned `whisper-small` STT default (SK→EN ~3 s vs 9–11 s),
   measured demo report, 75-sentence recording kit, and the weight (piper onnx, ct2 models,
   recordings, certs) moved out of git into local-only/ignored files.
-- `origin/main` is still at `f6904a5` (PR #1 only) — our line is **not pushed**; pushing
-  needs the owner's go-ahead.
+- 2026-11-03 update: the line **is pushed**; `main` = `origin/main` = `faf68ff` (CI matrix
+  + SDK/thesis-numbers commit, cloned fresh 2026-10-30). Hand-written dirty batch
+  (UPDATES.md 2026-10-30: SK→EN quality tiers env `BP_SK_STT_MODEL`, JWT on WS, `bench/`)
+  sits uncommitted, awaiting owner decision. Demo voice restored from
+  `~/Documents/STU/BP-voice-backup` + `GOOGLE_CLIENT_ID/SECRET` appended to `.env` →
+  preflight "ALL REQUIRED CHECKS PASSED" (2026-11-03).
 - `voice-lab`, `worktree-agent-a342c9d7f70fec900` are fully merged ancestors — dead ends,
   do not branch from them.
 
@@ -42,7 +48,7 @@ New work lands as a **branch on the remote**, never as a direct rewrite of `main
 1. Contributor: commit on a `win/*` (or similar) branch, push, open a PR (that is how
    `79a8476` and the `lite` branch arrived).
 2. Mac: `git fetch`, merge that branch into the integration line, resolve conflicts,
-   then run the three gates — `make test` (38 expected), `.venv/bin/python
+   then run the three gates — `make test` (87 expected, verified 2026-11-06), `.venv/bin/python
    test/interrupt_smoke_test.py` (needs `make run`), `make demo-check`.
 3. Only after the gates pass: ff `main` at `~/Documents/STU/BP` onto the tip.
 
@@ -60,26 +66,44 @@ works too). ~92 s on a warm Mac, ~850 s cold on the Windows laptop. The old
 | Command | What |
 |---|---|
 | `python3.11 scripts/setup.py --dev` (= `make install`) | one-command setup: `.venv` + deps + `.env` + certs + voices + MT/STT model conversion |
-| `make run` | backend, `https://localhost:8000` (self-signed cert in `certs/`) |
+| `make run` | backend, `http://localhost:8000` (plain HTTP; `BP_HTTPS=1` for HTTPS with the self-signed cert in `certs/`) |
 | `make demo-check` | demo pre-flight: assets + live server (`scripts/demo_preflight.py --server`) |
 | `make lab` | Voice Lab static page, `http://localhost:8080/ui/voice-lab/lab.html`, no backend |
-| `make test` | 38 tests: hardware, VAD, MT, API, auth, security, config, ratings |
+| `make test` | 87 tests: hardware, VAD, MT, API, auth, security, config, ratings |
 | `python3 scripts/update_voice_lab_library.py --no-test` | regenerate `ui/voice-lab/library.json` (never hand-edit) |
 | `.venv/bin/python test/interrupt_smoke_test.py` | live WS rehearsal, needs `make run` |
 | `.venv/bin/python scripts/e2e_ensk_new_voice.py` | full EN→SK offline run, writes `processed/e2e_ensk.json` |
 
-Demo: `documentation/demo_runbook_2026-09-28.md` (+ `monday_test_checklist.md`,
-`handler_update_2026-09.md`). Thesis: `documentation/thesis_draft.md`.
+Demo: `documentation/demo_runbook_2026-09-28.md` (+ `monday_test_checklist.md`). Thesis: `documentation/thesis_draft.md`.
+
+## Architecture v2 — streaming redesign (in progress)
+
+Ground-up redesign for near real-time streaming + multi-speaker meetings. New modules:
+
+| Module | File | Purpose |
+|--------|------|---------|
+| Hardware auto-config | `backend/hardware_scan.py` | Scans CPU/RAM/GPU at startup, selects STT/MT/TTS/VAD config per machine |
+| Meeting session manager | `backend/session_manager.py` | Multi-speaker meeting rooms, per-speaker voice, per-listener language |
+| Streaming pipeline | `backend/streaming/pipeline.py` | True STT→MT→TTS streaming (0.7s windows, local-agreement, fragment emit) |
+| Streaming spec | `documentation/STREAMING_SPEC.md` | Latency budget, config env vars, test plan |
+| Multi-speaker design | `documentation/MULTI_SPEAKER.md` | Room model, translation matrix, API endpoints |
+| Architecture overview | `documentation/ARCHITECTURE_V2.md` | Full v2 design, deployment modes, LHC fit |
+
+Key change vs v1: v1 waits for silence/3s segment before STT→MT→TTS (~6-8s first word). v2 streams 0.7s audio windows, commits words via local-agreement, emits translated fragments as they're ready (~0.9s first word on CPU, ~0.5s on GPU T4).
+
+WebSocket endpoints: existing `/ws` (single-user, backward compatible) + `/ws/meeting` (multi-speaker room). HTTP: `/api/hardware` (auto-config), `/api/meeting/create|list|{room_id}`.
+
+Kaggle full-route test: `scripts/gpu_bench/kaggle_full_route/kaggle_full_route.py` — pushes to Tesla T4, measures p50/p95 first-audio for 90s continuous SK→EN speech.
+
+Voices: `speaker_voices/` has 7 owner recordings (EN/SK/CS with transcripts). Backup at `~/Documents/STU/BP-voice-backup/` matches. Piper models in `backend/tts/piper_models/` (incl. `sk_SK-personal-male-medium`, `en_US-personal-v2`). CT2 models in `ct2_models/` (whisper-base, whisper-small-sk, all opus-mt pairs).
 
 ## Test reality (measured 2026-09-28, M1 Pro)
 
 - `make test` = explicit pytest over `hardware_test` (7), `vad_tests` (4),
   `backend_auth_tests` (6), `backend_api_tests` (3) — the original 20 — plus
-  `mt_model_tests`, `security_tests`, `config_tests` from `lite`: **33 tests, green on
-  macOS 2026-09-28 (merge gate) and on the Windows laptop (33/33)**.
-- `test/full_pipeline_test.py` is a **broken leftover**: it imports
-  `backend.tts.f5_tts`, removed in August, so it breaks `pytest test/` collection.
-  Exclude it or delete it; do not silently "fix" it into a test.
+  `mt_model_tests`, `security_tests`, `config_tests` from `lite`: **87 tests, green on
+  macOS 2026-11-06 (verified)**.
+- `test/full_pipeline_test.py` deleted (was a broken F5 leftover importing removed `backend.tts.f5_tts`).
 - `test/interrupt_smoke_test.py`, `backend_vad_stt_test.py`, `concurrent_*` are live
   scripts that need a running server, not pytest files.
 - `test/backend_api_tests.py` used to wipe `speaker_voices/speaker_voices.json` and
@@ -112,7 +136,9 @@ Demo: `documentation/demo_runbook_2026-09-28.md` (+ `monday_test_checklist.md`,
 2. **Accelerate SK→EN turnaround latency**:
    - Target: close the ~2x latency gap (SK→EN ~1.4s vs EN→SK ~0.7s).
    - Analysis: MT and TTS are already sub-150ms. The gap is 100% in Slovak STT (`whisper-small-sk` at ~1.3s vs EN `base` at ~0.55s).
-   - Test `beam_size=1` (greedy) vs `beam_size=2` / `5` in `faster-whisper` on Slovak speech with `scripts/eval_sk_direction.py` to check speedup vs accuracy trade-off.
+   - `whisper-small-sk` is NOT a safe SK→EN default (Czech-like hallucinations, WER 0.25–0.32 > 0.2 gate, measured `bench/results` 2026-11-02). `initialize_all_models` now sets `session_config["stt_experimental_sk"]=True` for SK source unless `BP_SK_STT_MODEL` is set; the UI must flag SK→EN as experimental.
+   - Quality path: `BP_SK_STT_MODEL=kinit/whisper-large-v3-turbo-sk` (~6–13% WER per SloPal 2026, ~800 MB). Verify Mac RTF acceptable before shipping SK→EN live.
+   - Machine-aware model selection (run anywhere): `BP_DEVICE=cpu|cuda|mps|auto` (STT), `BP_COMPUTE_TYPE=int8|float16|float32`, `BP_MT_DEVICE=cpu|cuda` (CT2 MT). Defaults: STT auto/int8, MT cpu/int8.
    - Benchmark `initial_prompt` with common Slovak diacritics / orthography.
    - Profile `cpu_threads` and chunking thresholds.
 3. Voice cloning speed + quality: record the 75-sentence set
@@ -127,27 +153,11 @@ Demo: `documentation/demo_runbook_2026-09-28.md` (+ `monday_test_checklist.md`,
    (done / worked-on / future work).
 7. Housekeeping: delete `test/full_pipeline_test.py`; re-run
    `python3 scripts/update_voice_lab_library.py --no-test` for the `*_v2b` takes.
-8. **GPU path (2026-10-02, evidence in `documentation/model_landscape_2026-10.md` §10.2–10.4):** free T4 (Colab + Kaggle) runs
-   OmniVoice cloning at RTF 0.14–0.17 (long) / ~0.7 s per phrase and X-Voice at 0.46–0.80; owner ear: clones good, Seamless =
-   generic voice. Next: (a) meeting simulation with OmniVoice as TTS on a GPU (`scripts/meeting_sim.py`, timeline input →
-   translation → output); (b) live measurement on the presentation machine (needs a GPU box; Kaggle/Colab cannot run the
-   live mic path); (c) capture numeric ear grades (log in on :8000 or export JSON). Piper fine-tuning only matters for CPU-only
-   machines. Kaggle CLI + private dataset `yegorby/bp-gpu-bench-refs` + Modal token were created for this; revoke when done.
-9. **Load tests on a free T4 (2026-10-02, `documentation/load_tests_2026-10.md`, data `processed/gpu_bench/load_T4/`)**: full cascade with OmniVoice
-   clone RTF 0.18-0.34, first audio ~2 s at any length; one TTS worker = ~2 continuous speakers / ~8 meeting participants, knee at 12;
-   3-min presentation: 0 s processing queue, playback backlog 8-11 s in alternating EN/SK (clone speaks ~1.3x slower than source).
-   Next: TTS pool on 2xT4, OmniVoice `speed` ~1.2 + stale-segment drop policy, fix VRAM sampler, then a live mic run on a GPU machine.
-   UI (same day): one-click ear grading, tested/experimental language lists, phone-width layouts; OmniVoice option added to the live TTS
-   dropdown but NOT yet tested through the live UI. Kaggle token / private dataset / Modal token still to revoke when done.
-10. **Shipped OmniVoice engine on T4 (kernel bp-gpu-final, 2026-10-02):** first chunk 0.52-0.55 s @12 steps (0.75 @16) => first audio ~1.1 s;
-   VRAM ~5.8 GB (needs ~8 GB card), GPU 90-95 % at saturation (compute-bound); 12 steps = ~4 continuous speakers / ~12 meeting participants;
-   batching 4/call does NOT help on T4. `OMNIVOICE_STEPS` default is now 12 (owner ear check: SK 12 steps 4/5 vs 16 steps 2/5 cut-off; EN 5/5 both). Next: live mic run
-   on a GPU machine, faster GPU, duration cap vs playback backlog.
-11. **Project state (2026-10-02, owner):** ratings imported (`scripts/grade_library.py --apply --import voice-ratings.json`). Everything left needs better compute: live mic run
-   with OmniVoice on a GPU machine, faster GPU numbers, duration cap vs playback backlog. Kaggle/Modal cleanup due 2026-10-09 (vault action-queue).
-12. **Lightened + dry-setup measured (2026-10-02, `documentation/setup_friction_2026-10.md`):** project 9.4 GB -> 2.9 GB (side venvs + legacy `venv` removed, freezes in `documentation/envs/`);
-   fresh clone = 89 s / 705 MB .git (history carries old model binaries; rewrite not done, would break the Windows fork), `setup.py --dev` 428 s, tests 38/38, ~9 min total.
-   Owner voice backup outside git: `~/Documents/STU/BP-voice-backup`.
+8. **GPU path (T4 / ≤8 GB VRAM target):** `backend/registry.py` declares optional GPU engines — Canary AST (SK→EN, CC-BY-4.0), Kokoro (EN TTS, RTF 0.03, 1.33 GB VRAM on T4), Qwen3-TTS / Chatterbox (EN zero-shot cloning, 4–8 GB VRAM, MIT), SeamlessM4T v2 (S2S, CC-BY-NC non-commercial, quality reference only). Canary AST measured on Kaggle T4 2026-11-03 (SK ASR WER 0.0477 <0.2 ✅, but SK→EN AST chrF++ ~52 below commercial bar) — speed path, not quality path; NOT promoted to live route. CPU baseline (Piper + faster-whisper) intact for torch-free Windows.
+9. **Kaggle T4 validation:** Canary AST done 2026-11-03 (not promoted). OmniVoice live-speech / long-sentence / presentation-pipeline test submitted to Kaggle (bp-omnivoice-matrix-20261104, RUNNING). Kokoro EN ear-grading pending. Revoke Kaggle/Modal tokens when done.
+10. **Load tests (T4, `documentation/load_tests_2026-10.md`):** OmniVoice clone RTF 0.18–0.34 (batch/QC path only — NOT live). Live path = Piper SK/EN on CPU (RTF ~0.04) + optional Kokoro EN GPU (RTF 0.03). New split: Kokoro EN + Piper SK on T4 (load test pending).
+11. **Project state (2026-10-02, owner):** ratings imported (`scripts/grade_library.py --apply --import voice-ratings.json`). Everything left needs better compute: live mic run on GPU machine, faster GPU numbers, duration cap vs playback backlog.
+12. **Lightened + dry-setup measured (2026-10-02, `documentation/setup_friction_2026-10.md`):** project 9.4 GB -> 2.9 GB; fresh clone = 89 s / 705 MB .git; `setup.py --dev` 428 s, tests 38/38, ~9 min total. Owner voice backup outside git: `~/Documents/STU/BP-voice-backup`.
 
 ## Session 2026-10-20 — Night Mode Findings
 
@@ -209,7 +219,7 @@ Demo: `documentation/demo_runbook_2026-09-28.md` (+ `monday_test_checklist.md`,
 | `bp language` commands missing | Wired into `bp.py` | `bp language list|test|add|remove|show` all work |
 | `setup.py` didn't run `bp selftest` | Added at end of setup | `python3.11 scripts/setup.py --dev` runs selftest, passes |
 | `e2e` test broken (wrong file) | Fixed path to `me_en_script.m4a` | `bp e2e` runs (needs audio file) |
-| Live test scripts in `test/` | Moved to `scripts/live/` | `make test` = 38/38 clean |
+| Live test scripts in `test/` | Moved to `scripts/live/` | `make test` = 87/87 clean |
 | `/health` + `/metrics` missing | Added @router.get endpoints | `GET /health` (public), `GET /metrics` (auth) |
 | Config-driven engine swap | Registry `instantiate()` used for all stages | STT/MT/TTS/VAD engine names from session config |
 | Per-pack `beam_size` | Backend reads `config.get("beam_size")` | Frontend wiring pending |
@@ -219,7 +229,7 @@ Demo: `documentation/demo_runbook_2026-09-28.md` (+ `monday_test_checklist.md`,
 
 | Test | Result |
 |------|--------|
-| `make test` | 38/38 pass |
+| `make test` | 87/87 pass |
 | `bp selftest` | PASSED (5 warnings for optional engines) |
 | `bp engine gate` (4/4) | All pass (STT, MT, TTS, VAD) |
 | `bp language list` | 3 verified (en-sk, en-cs), 1 experimental (sk-en) |
@@ -239,4 +249,4 @@ Demo: `documentation/demo_runbook_2026-09-28.md` (+ `monday_test_checklist.md`,
 - Plug-and-play language packs: `bp language add <pair>` → auto-resolves models, runs smoke test
 - Engine swap via config: change `stt_engine`, `mt_engine`, `tts_engine` in pack
 - Health/metrics for server ops: `/health` (public), `/metrics` (auth)
-- All tests pass, demo preflight passes
+- 38 pass; demo preflight passes

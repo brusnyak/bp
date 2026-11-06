@@ -1,0 +1,17 @@
+{
+  "id": "yegorby/bp-production-ws-cs-en-default-vs-low-latency",
+  "title": "BP production WS CS-EN: default vs low_latency",
+  "code_file": "job.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [
+    "yegorby/bp-t4-assets-20261105"
+  ],
+  "competition_sources": [],
+  "model_sources": [],
+  "category_ids": [],
+  "keywords": []
+}

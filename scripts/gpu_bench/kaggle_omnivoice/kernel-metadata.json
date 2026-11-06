@@ -1,0 +1,17 @@
+{
+  "id": "yegorby/bp-omnivoice-zero-shot-tts-benchmark-on-t4",
+  "title": "BP OmniVoice zero-shot TTS benchmark on T4",
+  "code_file": "job.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [
+    "yegorby/bp-t4-assets-20261105"
+  ],
+  "competition_sources": [],
+  "model_sources": [],
+  "category_ids": [],
+  "keywords": []
+}

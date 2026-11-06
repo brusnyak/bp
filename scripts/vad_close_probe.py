@@ -27,7 +27,7 @@ async def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--seconds", type=float, default=2.0)
     ap.add_argument("--silence", type=float, default=3.0)
-    ap.add_argument("--url", default="wss://localhost:8000/ws")
+    ap.add_argument("--url", default="ws://localhost:8000/ws")
     args = ap.parse_args()
 
     tone = (0.5 * np.sin(2 * np.pi * 440.0 * np.arange(int(SAMPLE_RATE * args.seconds)) / SAMPLE_RATE)).astype(np.float32)
