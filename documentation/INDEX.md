@@ -2,7 +2,11 @@
 
 > Current repair state (2026-11-04): start with `PRODUCT.md`, `documentation/implementation-2026-11-04/RESULTS.md` and `documentation/HANDOFF_NEXT_SESSION.md`. Earlier dated counts, readiness claims, media-access behavior and Kaggle failure explanations below are historical. Current contracts require authenticated explicit preparation, offline assets, target-language TTS, terminal Stop and reviewed full-route evidence. Full cloned-speech/LHC/commercial acceptance remains pending.
 
-26 files (2026-10-01). Start with the first group; the rest is lookup by task.
+28 active files (plus 40 dated items in `archive/`). Start with the first group; the rest is lookup by task.
+Dated snapshots, audits, roasts, and handoffs from 2026-08 through 2026-11 have been moved to
+`documentation/archive/` — they are historical, not current contracts. Current contracts are
+`PRODUCT.md`, `PLAN.md`, `AGENTS.md`, `documentation/implementation-2026-11-04/RESULTS.md`,
+and `documentation/HANDOFF_NEXT_SESSION.md`.
 `documentation/README.md` is a stale overview (names SeamlessM4T/F5-TTS as live
 components — both retired); trust PLAN.md + the files below over it.
 

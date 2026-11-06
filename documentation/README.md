@@ -39,21 +39,23 @@ configurable so it can run on a laptop or a T4-class GPU server.
 | STT (EN) | faster-whisper `base` int8 | MIT | Parakeet EN, Qwen3-ASR |
 | STT (SK) | faster-whisper `small-sk` int8 | MIT | Canary AST (STT+MT collapse, untested on SK) |
 | MT | Opus-MT CT2 int8 per pair | CC-BY-4.0 | MADLAD-3B (CUDA), NLLB (CC-BY-NC, blocked) |
-| TTS (SK) | Piper (owner fine-tune / generic) | MIT | SeamlessM4T v2 S2S (prosody, CC-BY-NC) |
-| TTS (EN) | Piper | MIT | Kokoro 82M (RTF 0.03, 1.33 GB VRAM on T4) |
+| TTS (SK) | Piper (owner fine-tune / generic) | GPL-3.0-or-later | SeamlessM4T v2 S2S (prosody, CC-BY-NC, blocked) |
+| TTS (EN) | Piper | GPL-3.0-or-later | Kokoro 82M (RTF 0.03, 1.33 GB VRAM on T4) |
 
-All default engines are commercial-safe (MIT/BSD/Apache-2.0/CC-BY-4.0). Non-commercial
+Default engines are commercial-safe (faster-whisper/CT2 MIT/Apache-2.0, Opus-MT CC-BY-4.0,
+Piper GPL-3.0-or-later — not bundled; separate licence decision for distribution). Non-commercial
 engines (XTTS CPML, NLLB CC-BY-NC, SeamlessM4T CC-BY-NC) are **fail-closed** behind the
 licence gate — they cannot be selected in the default profile without explicit override.
 
 ## Measured baseline (CPU, M1 Pro / Ryzen 8645HS)
 
-| Direction | STT | MT | TTS | End-to-end turn |
-|-----------|-----|-----|-----|-----------------|
-| EN→SK | whisper-base ~0.55 s | Opus-MT ~0.08 s | Piper ~0.17 s | ~0.78–1.3 s |
-| SK→EN | whisper-small-sk ~1.3 s | Opus-MT ~0.08 s | Piper ~0.07 s | ~1.27–1.64 s (STT-bound) |
+| Direction | STT | MT | TTS | End-to-end (measured) |
+|-----------|-----|-----|-----|-----------------------|
+| EN→SK | whisper-base ~0.59 s per 2s window | Opus-MT ~0.03 s | Piper ~0.05 s | ~0.67 s per window; RTF 0.672 (faster than real-time, M1 Pro CPU); first audio 0.39s |
+| SK→EN | whisper-small-sk ~1.3 s | Opus-MT ~0.08 s | Piper ~0.07 s | ~1.27–1.64 s (STT-bound; experimental, WER 0.25–0.32 > 0.2 gate) |
+| CS→EN | whisper-base (CPU) poor quality | Opus-MT ~0.04 s | Piper ~0.04 s | RTF 1.127 on CPU — not trusted; near real-time on Kaggle T4 GPU (p50 1.86s, p95 4.22s) |
 
-SK→EN is the bottleneck and the weak direction — honest about it in the thesis.
+SK→EN is the bottleneck and the weak direction — experimental only, honest about it in the thesis.
 
 ## Quick start (zero-knowledge user)
 
@@ -65,7 +67,7 @@ make run                            # https://localhost:8000 (self-signed cert)
 # Open the UI, click Initialize Pipeline, select languages, speak
 ```
 
-- `make test` → 38/38 pass
+- `make test` → 87 tests pass (verified 2026-11-06, M1 Pro)
 - `.venv/bin/python scripts/bp.py selftest` → full verification
 - `make demo-check` → demo pre-flight (assets + live server)
 - `make lab` → Voice Lab static page (no backend)
@@ -106,17 +108,18 @@ SK→EN quality until a challenger crosses the 0.2 WER gate.
 | `ui/` | Browser interface (plain HTML/CSS/JS, PWA, PiP) |
 | `scripts/` | `setup.py`, `bp.py` CLI, bench, conversion, evaluation tooling |
 | `scripts/bp.py` | Single CLI entry: `bp language|engine|stt|e2e|selftest` |
-| `test/` | pytest suites (38 tests) |
+| `test/` | pytest suites (87 tests) |
 | `documentation/` | Thesis draft, findings, research, runbooks |
 | `specs/003-end-to-end-completion/` | Feature spec: any-language, swap-any-engine, plug-and-play |
 
 ## Key documents
 
-- `documentation/research_findings_2026-11-03.md` — enterprise S2S, voice cloning, Qwen/
-  Canary/Parakeet landscape, Slovak relevance, T4 VRAM fit
 - `documentation/model_landscape_2026-10.md` — per-component model verdicts (STT/MT/TTS/S2S)
-- `documentation/project_status_2026-10-20.md` — verified status, swap ladder, CLI reference
+- `documentation/VERIFICATION_RESULTS_2026-11-06.md` — measured pipeline results (EN→SK RTF 0.672, CS→EN T4 p50 1.86s)
+- `documentation/LICENSE_INVENTORY_2026-11-06.md` — licence compliance audit
 - `documentation/demo_runbook_2026-09-28.md` — stage demo pre-flight, script, fallback ladder
+- `documentation/linux_setup_and_test.md` — third-OS (Linux) test sheet
+- Historical/superseded documents moved to `documentation/archive/`
 - `PLAN.md` — live development plan and next steps
 - `AGENTS.md` — project memory for agents (read before changing anything)
 

@@ -17,7 +17,7 @@ Microphone → voice-activity detection → speech recognition (STT) → machine
 | Slovak / Czech → English | Experimental: recognition errors are still common on Slovak and Czech speech |
 | Other packs (`languages/packs/`) | Declared; need installed models and a test before use |
 
-**Speed (measured 2026-11-06, M-series Mac M1):** about 0.2–0.4 s per speech phrase end to end (STT ~0.1–0.4 s, translation ~0.03–0.08 s, synthesis ~0.04–0.15 s). Continuous streaming — audio is processed as it arrives, not batched into 3 s segments. A listener hears the translation roughly 0.3–0.5 s behind a continuous speaker. Parakeet TDT v3 on GPU/MPS for English STT; Whisper small-sk for Slovak/Czech STT. Raw data: `documentation/evidence/2026-11-04/` and `documentation/implementation-2026-11-04/`.
+**Speed (measured 2026-11-06, M1 Pro 16GB, CPU):** EN→SK first translated audio 0.39s; ~0.67s per 2s speech window (STT ~0.59s, MT ~0.03s, TTS ~0.05s); RTF 0.672 (faster than real-time on the reference Mac). Continuous streaming — audio is processed as it arrives, not batched into 3 s segments. Whisper `base` int8 for EN STT; Whisper `small-sk` int8 for SK/CS STT. SK→EN is experimental (whisper-small-sk WER 0.25–0.32 > 0.2 gate). CS→EN near real-time on Kaggle T4 GPU (p50 1.86s, p95 4.22s onset→first audio); not trusted on local CPU due to STT quality. Raw data: `documentation/VERIFICATION_RESULTS_2026-11-06.md` and `documentation/implementation-2026-11-04/`.
 
 ## Quick start
 
@@ -71,7 +71,7 @@ Open **http://localhost:8000** in Chrome or Edge (plain HTTP on `localhost` coun
 | STT (EN) | Parakeet TDT v3 | CC-BY-4.0 | `whisper-small` (CPU fallback) |
 | STT (SK/CZ) | Whisper `small-sk`/`small` int8 | MIT | `large-v3-turbo`, fine-tuned Slovak models (untested here) |
 | MT | Opus-MT, CTranslate2 int8 | CC-BY-4.0 | MADLAD-3B (CUDA) |
-| TTS | Piper | GPL-3.0-or-later runtime; each voice has its own licence | Kokoro 82M (English), OmniVoice cloning (GPU, research) |
+| TTS | Piper | GPL-3.0-or-later runtime (not bundled; user installs via `setup.py --dev`); each voice has its own licence | Kokoro 82M (English), OmniVoice cloning (GPU, research) |
 
 ## Project structure
 
@@ -112,7 +112,7 @@ Recognition, translation and synthesis run locally. Session logs are off by defa
 | Cloned voice | Listener review of meaning, intelligibility and identity on the exact models and hardware |
 | Real meeting | Run with a physical microphone, speakers and a virtual cable; record first-audio p50/p95 and queue growth |
 | Clean install | Test on a fresh machine per supported OS |
-| Licences | Defaults are now CC0/public-domain voices (see `documentation/licences.md`); the owner's personal fine-tunes, OmniVoice and the Slovak STT fine-tune still need clearance |
+| Licences | Default engines: faster-whisper/CT2 MIT/Apache-2.0, Opus-MT CC-BY-4.0, Piper GPL-3.0-or-later (not bundled; separate licence decision for distribution). Owner's personal fine-tunes, OmniVoice (CC-BY-NC weights) and Slovak STT fine-tune still need clearance. XTTS/NLLB/SeamlessM4T non-commercial — blocked by registry gate. |
 | Shared operation | Capacity, retention, monitoring and a support owner |
 
 Repository licence: see `LICENSE`. Engine, checkpoint and voice licences are separate; the registry gate (`backend/registry.py`) blocks unlicensed engines but is not a completed commercial audit.
