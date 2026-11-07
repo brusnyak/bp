@@ -26,7 +26,7 @@
 2. **Voice in your own voice for other people.** Today only a Slovak fine-tune exists (the owner's, local, not distributable). Cloning (OmniVoice, XTTS) needs a GPU and the available weights carry non-commercial licences. Needed: a listener review of identity and meaning on the exact models, and a licence decision.
 3. **Fresh-machine installs** for macOS and Windows (profile flags) and the macOS CI flake.
 4. **Public site**: `docs/index.html` on the `gh-pages` branch is a Slovak status page dated 3 November with outdated numbers. A new page can be generated from the evidence files; publishing is the owner's decision.
-5. **Licence audit** for distribution: Piper is GPL-3.0-or-later (not bundled), Parakeet and Opus-MT need attribution, personal fine-tunes and OmniVoice are restricted. `documentation/LICENSE_INVENTORY_2026-11-06.md` lists them; no legal review was done.
+5. **Licences (owner decision 2026-11-07):** the project is a configuration layer. It bundles no model weights (checked: no `.onnx`, `.bin`, `.pt` or `.safetensors` file is tracked) and its setup downloads each model from its publisher, so the user accepts that model's licence. The list is in `LICENSE_INVENTORY_2026-11-06.md`. One boundary to keep in mind: whoever runs it as a shared or hosted service (a room for other people) is the operator and should pick models whose licences allow that (Piper is GPL, OmniVoice and XTTS weights are non-commercial).
 6. **Operations for shared use**: capacity limits per GPU, retention, monitoring, a support owner.
 
 ## Decisions needed
@@ -34,4 +34,4 @@
 - Build the accurate streaming route and test it on the real server on a T4? (recommended first)
 - Then build room mode? (the LHC scenario; the larger piece)
 - Publish a regenerated `docs/index.html` to the project site?
-- Which cloned-voice route to pursue for listeners, given the licences?
+- Which cloned-voice route to pursue for listeners?

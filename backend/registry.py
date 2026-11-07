@@ -401,7 +401,9 @@ def _register_optional() -> list:
                               ("piper_sk_personal", ("sk",), "SK fine-tune (local-only)"),
                               ("piper_sk_omni", ("sk",), "SK OmniVoice-Piper hybrid voice"),
                               ("piper_generic_sk", ("sk",), "generic SK Piper voice"),
-                              ("piper_generic_en", ("en",), "generic EN Piper voice")):
+                              ("piper_generic_en", ("en",), "generic EN Piper voice"),
+                              ("piper_generic_de", ("de",), "generic DE Piper voice (thorsten-medium)"),
+                              ("piper_generic_fr", ("fr",), "generic FR Piper voice (siwis-medium)")):
         entries.append(Capability(
             name, "tts", factory=_tts_factory(name), probe=_in_tts(name),
             languages=lang, devices=("cpu",), streaming=True, license="gpl-3.0",
