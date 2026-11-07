@@ -232,6 +232,14 @@ def _mlx_whisper_factory() -> Callable[..., object]:
     return make
 
 
+def _parakeet_onnx_factory() -> Callable[..., object]:
+    def make(**kwargs):
+        _ensure_repo_on_path()
+        from backend.stt.onnx_parakeet_stt import OnnxParakeetSTT
+        return OnnxParakeetSTT()
+    return make
+
+
 def _parakeet_factory(model_name: str = "nvidia/parakeet-tdt-0.6b-v3") -> Callable[..., object]:
     def make(**kwargs):
         _ensure_repo_on_path()
@@ -345,6 +353,14 @@ def _register_defaults() -> None:
         license_note="mlx-whisper MIT; whisper weights MIT",
         resource="~1.6 GB (large-v3-turbo) on the Apple GPU; macOS arm64 only",
         notes="Mac default candidate: measured 2026-11-07, see documentation/BENCHMARKS.md; set BP_STT_ENGINE=mlx_whisper"))
+
+    register(Capability(
+        "parakeet_onnx", "stt", factory=_parakeet_onnx_factory(),
+        probe=lambda: _has_module("onnx_asr")() and _has_module("onnxruntime")(), devices=("cpu", "cuda"),
+        streaming=True, license="commercial-ok",
+        license_note="Parakeet TDT v3 weights CC-BY-4.0 (attribution), onnx-asr MIT",
+        resource="~700 MB int8 / 2.5 GB fp32 ONNX; cost scales with audio length (81 ms @0.5 s, 224 ms @3 s on M1 CPU)",
+        notes="low-latency streaming engine for BP_INCREMENTAL=1; language auto-detected (see backend/stt/onnx_parakeet_stt.py)"))
 
     # MT -------------------------------------------------------------------
     register(Capability(

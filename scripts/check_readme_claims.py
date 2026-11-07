@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MATRIX = ROOT / "documentation/evidence/2026-11-07/lang_matrix.json"
 KAGGLE = ROOT / "route_receipt.json"
 PACED = ROOT / "documentation/evidence/2026-11-07/paced_replay_summary.json"
+SIM = ROOT / "documentation/evidence/2026-11-07/stream_sim.json"
 TOL = 0.06  # relative; also accepts <=0.06 absolute for values under 1
 
 
@@ -28,7 +29,7 @@ def kaggle_profile(profile, q):
 
 
 def resolve(cid):
-    """ID grammar: kaggle:<profile>:p50|p95 | stt:<model>:<lang>:wer | mt:<model>:<lang>:<to_en|from_en>:chrf | paced:<key>"""
+    """ID grammar: kaggle:<profile>:p50|p95 | stt:<model>:<lang>:wer | mt:<model>:<lang>:<to_en|from_en>:chrf | paced:<key> | sim:<cell>:wer|lat|p90"""
     k = cid.split(":")
     if k[0] == "kaggle":
         return kaggle_profile(k[1], {"p50": 0.5, "p95": 0.95}[k[2]])
@@ -37,6 +38,9 @@ def resolve(cid):
         return m["stt_t4"][f"{k[1]}|{k[2]}"]["WER"] * 100
     if k[0] == "mt":
         return m["mt_t4"][f"{k[1]}|{k[2]}|{k[3]}"]["chrF"]
+    if k[0] == "sim":      # sim:<stream>|<engine>|<strategy>:wer|lat|p90   (T4 streaming simulation)
+        c = json.loads(SIM.read_text())["cells"][k[1]]
+        return {"wer": c["WER"] * 100, "lat": c["latency_median_s"], "p90": c["latency_p90_s"]}[k[2]]
     if k[0] == "paced":
         return json.loads(PACED.read_text())[k[1]]
     raise KeyError(cid)

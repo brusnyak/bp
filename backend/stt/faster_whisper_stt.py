@@ -73,6 +73,9 @@ class FasterWhisperSTT:
         # doesn't kill short speech segments (default 0.6 is too aggressive for
         # sub-second final segments).
         transcribe_options["no_speech_threshold"] = 0.3
+        # Chunks are independent utterances. With the default (True) the kinit Slovak turbo model dropped half of a 134 s
+        # reading on the Mac CPU (WER 66.7%); with False it scores 17.7-18.2% (2026-11-07 A/B).
+        transcribe_options["condition_on_previous_text"] = False
 
         segments, info = self.model.transcribe(audio_data, **transcribe_options)
         # transcribe() returns a lazy generator: the decoding happens while it is consumed, so the

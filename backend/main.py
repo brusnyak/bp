@@ -158,6 +158,15 @@ router = APIRouter()
 # Configuration
 DEFAULT_STT_MODEL_SIZE = "base" # Default STT model size
 DEFAULT_STT_ENGINE = os.environ.get("BP_STT_ENGINE", "faster_whisper")  # "mlx_whisper" on Apple Silicon (see backend/stt/mlx_whisper_stt.py)
+
+
+def _effective_stt_engine(config: Dict[str, Any]) -> str:
+    """Engine for this session. mlx_whisper has no Slovak fine-tune, so a Slovak source with BP_SK_STT_MODEL set
+    (e.g. the converted kinit/whisper-large-v3-turbo-sk, 6.5% vs 10.7% plain turbo on FLEURS-sk) goes to faster-whisper."""
+    engine = config.get("stt_engine", DEFAULT_STT_ENGINE)
+    if engine == "mlx_whisper" and str(config.get("source_lang", "")).startswith("sk") and os.environ.get("BP_SK_STT_MODEL"):
+        return "faster_whisper"
+    return engine
 DEFAULT_TTS_MODEL = "piper"
 AUDIO_SAMPLE_RATE = 16000 # Standard sample rate for VAD and STT (Reverted to 16000 Hz for VAD/STT compatibility)
 MAX_VOICE_UPLOAD_BYTES = 50 * 1024 * 1024 # /voices/upload had no size cap - unbounded file.read() into memory
@@ -410,7 +419,7 @@ def cleanup_session_models(client_info: str):
     # Release STT
     if session_data.get("stt_model"):
         stt_size = config.get("stt_model_size", "base")
-        release_pooled_model("stt", config.get("stt_engine", DEFAULT_STT_ENGINE), **session_data.get("stt_pool_config", {"model_size": stt_size}))
+        release_pooled_model("stt", _effective_stt_engine(config), **session_data.get("stt_pool_config", {"model_size": stt_size}))
     
     # Release MT models
     for mt_key, mt_model in session_data.get("mt_models", {}).items():
@@ -571,7 +580,7 @@ async def _initialize_stt_model(session_data: Dict[str, Any], stt_model_size: st
     """Initializes the STT model for a given session via the engine registry.
     Engine name comes from session_config['stt_engine'] or defaults to 'faster_whisper'."""
     config = session_data.get("session_config", {})
-    stt_engine = config.get("stt_engine", DEFAULT_STT_ENGINE)
+    stt_engine = _effective_stt_engine(config)
     if stt_engine == "faster_whisper":
         stt_model_size = local_stt_source(stt_model_size)
         config["stt_model_size"] = stt_model_size
@@ -1994,7 +2003,7 @@ async def _run_pipeline_task(websocket, audio_segment_np, segment_start_time, is
 from backend.stt.incremental import Agreement, Fragmenter
 
 INCREMENTAL_STEP_S = float(os.environ.get("BP_INCR_STEP_S", "0.7"))      # min new audio between hypotheses
-INCREMENTAL_MIN_AUDIO_S = 1.0
+INCREMENTAL_MIN_AUDIO_S = float(os.environ.get("BP_INCR_MIN_AUDIO_S", "1.0"))
 
 
 class _Frames(list):

@@ -1,0 +1,15 @@
+{
+  "id": "yegorby/bp-e2e-chain-t4",
+  "title": "BP E2E Chain T4",
+  "code_file": "job.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [],
+  "competition_sources": [],
+  "model_sources": [],
+  "category_ids": [],
+  "keywords": []
+}
