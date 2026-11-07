@@ -28,12 +28,12 @@
 **Modified:**
 - `README.md` — commercial-readiness gap table, cs-en experimental, SK→EN Canary chrF++ note, OmniVoice=batch/QC only, honest assessment section
 - `AGENTS.md` §8-9 — Canary AST Kaggle done (not promoted), OmniVoice job submitted, load split clarified
-- `PLAN.md` — removed handler_update reference from handler deliverable section
+- `documentation/archive/2026-11-07-stale/PLAN.md` — removed handler_update reference from handler deliverable section
 - `documentation/INDEX.md` — removed handler_update row
 - `documentation/model_landscape_2026-10.md` — Canary AST measured, OmniVoice=batch/QC only, X-Voice/OmniVoice GPU measured
 - `documentation/load_tests_2026-10.md` — Kokoro/Piper split added, OmniVoice=batch/QC only
-- `documentation/monday_test_checklist.md` — CZ accuracy row added, SK→EN updated with Canary results
-- `documentation/demo_runbook_2026-09-28.md` — removed `SETUP_WINDOWS.md` ref, updated honest gap with Canary results
+- `documentation/archive/2026-11-07-stale/monday_test_checklist.md` — CZ accuracy row added, SK→EN updated with Canary results
+- `documentation/archive/2026-11-07-stale/demo_runbook_2026-09-28.md` — removed `SETUP_WINDOWS.md` ref, updated honest gap with Canary results
 - `documentation/linux_setup_and_test.md` — removed deleted Windows file references
 - `documentation/evaluation_2026-10-18.md` — sk-en experimental, OmniVoice=batch/QC only
 - `documentation/project_status_2026-10-20.md` — CZ row fixed, OmniVoice clarified, Canary results added
@@ -45,7 +45,7 @@
 
 **Created:**
 - `documentation/TEMP_NAVIGATION_MAP.md` — single index of all sources of truth
-- `documentation/HANDOFF_NEXT_SESSION.md` (this file)
+- `documentation/archive/2026-11-07-stale/HANDOFF_NEXT_SESSION.md` (this file)
 
 **Pre-existing uncommitted changes (NOT mine — do not touch unless you know what they are):**
 - `app.py`, `backend/main.py`, `backend/registry.py`, `reports/index-report.html`, `scripts/bp.py`, `scripts/live/interrupt_smoke_test.py`, `test/config_tests.py`, `test/vad_tests.py`
@@ -87,7 +87,7 @@ An MCP server would add protocol maintenance without new capability. Skip for no
 
 - `documentation/TEMP_NAVIGATION_MAP.md` — full index of sources of truth
 - `AGENTS.md` — project memory (read before changing anything)
-- `PLAN.md` — live dev plan
+- `documentation/archive/2026-11-07-stale/PLAN.md` — live dev plan
 - `documentation/PLAN_2026-11-03.md` — working plan, phased scope
 - `.specify/memory/constitution.md` — v1.0.0, cross-platform / evidence-first / Slovak non-negotiable / real-time / plug-and-play / simplicity
 

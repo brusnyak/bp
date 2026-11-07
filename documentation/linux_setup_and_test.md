@@ -1,4 +1,7 @@
-# Linux setup + test sheet (third OS, not yet run)
+# Linux setup + test sheet
+
+**Measured 2026-11-07 (clean export of the commit, Python 3.11 container on Ubuntu 24.04 aarch64 under colima on an M1 Mac):** `python scripts/setup.py --dev --no-npm` finished in 352 s; the CI test list passed (91 tests); `make check-docs` passed. Not yet run: x86 Linux with an NVIDIA GPU end to end through the browser UI (the Kaggle T4 kernels exercise the same Python packages but not the web UI).
+
 
 Constitution I says every required-path dependency must run on Windows, macOS **and**
 Linux without per-OS hand-tuning. Windows 11 (CPU-only) and macOS (M1 Pro) are measured;

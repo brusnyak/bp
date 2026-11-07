@@ -12,11 +12,11 @@ endif
 install: ## Venv + deps + .env + certs + Piper voices + MT models (add DEV=1 for test deps).
 	$(PYTHON) scripts/setup.py $(if $(DEV),--dev,)
 
-run: ## Run the server on http://localhost:8000 (loopback only; BP_HOST=0.0.0.0 for LAN; BP_HTTPS=1 for HTTPS).
-	$(VENV_PY) app.py
+run: ## Run the server on http://localhost:8000 (loopback only; BP_HOST=0.0.0.0 for LAN; BP_HTTPS=1 for HTTPS). PRESET=mac|nvidia|cpu loads presets/<name>.env (not on Windows).
+	@if [ -n "$(PRESET)" ]; then set -a; . ./presets/$(PRESET).env; set +a; fi; $(VENV_PY) app.py
 
 test: ## Run the backend test suite.
-	export BP_DISABLE_RATE_LIMIT=1; $(VENV_PY) -m pytest test/hardware_test.py test/hardware_scan_tests.py test/vad_tests.py test/mt_model_tests.py test/backend_api_tests.py test/backend_auth_tests.py test/security_tests.py test/config_tests.py test/readiness_regression_test.py test/language_evidence_test.py test/incremental_tests.py test/ui_manifest_test.py test/prosody_tests.py test/mlx_guard_tests.py test/onnx_parakeet_words_test.py -q
+	export BP_DISABLE_RATE_LIMIT=1; $(VENV_PY) -m pytest test/hardware_test.py test/hardware_scan_tests.py test/vad_tests.py test/mt_model_tests.py test/backend_api_tests.py test/backend_auth_tests.py test/security_tests.py test/config_tests.py test/readiness_regression_test.py test/language_evidence_test.py test/incremental_tests.py test/ui_manifest_test.py test/prosody_tests.py test/mlx_guard_tests.py test/onnx_parakeet_words_test.py test/setup_plan_test.py -q
 
 
 check-docs: ## Fail if a number quoted in the docs differs from the saved benchmark receipt (<!-- claim:ID -->value<!-- /claim -->).

@@ -1,80 +1,22 @@
-# Documentation index
+# Documentation index (current as of 2026-11-07)
 
-> Current repair state (2026-11-04): start with `PRODUCT.md`, `documentation/implementation-2026-11-04/RESULTS.md` and `documentation/HANDOFF_NEXT_SESSION.md`. Earlier dated counts, readiness claims, media-access behavior and Kaggle failure explanations below are historical. Current contracts require authenticated explicit preparation, offline assets, target-language TTS, terminal Stop and reviewed full-route evidence. Full cloned-speech/LHC/commercial acceptance remains pending.
+Start here: [`../README.md`](../README.md) (what it is, install, configuration), then:
 
-28 active files (plus 40 dated items in `archive/`). Start with the first group; the rest is lookup by task.
-Dated snapshots, audits, roasts, and handoffs from 2026-08 through 2026-11 have been moved to
-`documentation/archive/` — they are historical, not current contracts. Current contracts are
-`PRODUCT.md`, `PLAN.md`, `AGENTS.md`, `documentation/implementation-2026-11-04/RESULTS.md`,
-and `documentation/HANDOFF_NEXT_SESSION.md`.
-`documentation/README.md` is a stale overview (names SeamlessM4T/F5-TTS as live
-components — both retired); trust PLAN.md + the files below over it.
-
-## Start here
-
-| File | What |
+| Read | When |
 |---|---|
-| `compute_capacity_report_2026-09.md` | Mac vs NVIDIA laptop vs university server, MEASURED / PROJECTED labelled |
-| `demo_runbook_2026-09-28.md` | Stage demo pre-flight, script, fallback ladder |
-| `monday_test_checklist.md` | Dry-run checklist |
+| [`STATUS.md`](STATUS.md) | Where the project stands: what works, what is measured but not built, what is not built, decisions |
+| [`LANGUAGES.md`](LANGUAGES.md) | Best configuration per language and hardware, with measured quality and timing |
+| [`BENCHMARKS.md`](BENCHMARKS.md) | Method, results, negative results and limits; how to rerun on Kaggle |
+| [`DEMO.md`](DEMO.md) | A presentation test from a clean clone |
+| [`KAGGLE_SETUP.md`](KAGGLE_SETUP.md) | Running benchmark kernels on a Kaggle T4 |
+| [`linux_setup_and_test.md`](linux_setup_and_test.md) | Linux install notes and test ladder |
+| [`MULTI_USER_SERVER.md`](MULTI_USER_SERVER.md), [`MULTI_SPEAKER.md`](MULTI_SPEAKER.md) | Design notes for shared use (room mode is **not built**, see STATUS) |
+| [`sdk.md`](sdk.md), [`cli_quickref.md`](cli_quickref.md) | Interfaces and commands |
+| [`model_landscape_2026-10.md`](model_landscape_2026-10.md), [`s2s_landscape_2026-10-18.md`](s2s_landscape_2026-10-18.md) | Engine research with `MEASURED`/`VENDOR` labels (October; superseded by BENCHMARKS where they overlap) |
+| [`LICENSE_INVENTORY_2026-11-06.md`](LICENSE_INVENTORY_2026-11-06.md) | Licences of engines, models and voices |
+| [`VERIFICATION_RESULTS_2026-11-06.md`](VERIFICATION_RESULTS_2026-11-06.md), [`load_tests_2026-10.md`](load_tests_2026-10.md) | Earlier verification and load measurements (read with the dates in mind) |
+| [`fundamentals.md`](fundamentals.md), [`fundamentals_deep.md`](fundamentals_deep.md), [`thesis_draft.md`](thesis_draft.md), [`piper_training_runbook.md`](piper_training_runbook.md), [`supabase_auth_db_guide.md`](supabase_auth_db_guide.md) | Background, thesis text, voice training, auth |
 
-## Voice work (the active thread)
+Evidence for every quoted number: [`evidence/2026-11-07/`](evidence/2026-11-07/). `make check-docs` fails when a marked number differs from its receipt.
 
-| File | What |
-|---|---|
-| `verification_omni_piper_sk_2026-09-30.md` | New-voice verdict: SUPERSEDED by ear — both personal voices kill-graded for trembling (owner 2026-10-01); intelligibility numbers stand |
-| `model_landscape_2026-10.md` | Current landscape: STT/MT/TTS/S2S verdicts + runnable matrix + eval order (replaces 6 files below). §10 = 2026-10-02 addendum (X-Voice lead) |
-| `piper_training_runbook.md` | No-repeat training sheet: epoch targets, corpus rules, resume chain, fan-noise options |
-| `recording_session_2026-09-28.md` | Mic recording protocol that produced the v2b takes |
-| `recording_script_sk_v2.md` / `recording_script_v2.md` / `reading_script_bilingual.md` | What the owner read |
-
-## Pipeline evidence
-
-| File | What |
-|---|---|
-| `demo_report_2026-09.md` (+ `demo_report_skeleton.md`) | Measured demo numbers |
-| `progress_since_the_break.md` | Narrative progress log |
-| `concurrency_accuracy_2026-08-21.md` | Concurrency vs accuracy notes |
-
-## Setup / run / admin
-
-| File | What |
-|---|---|
-| `footprint_audit_2026-09-28.md` | Ranked disk/venv cut list (open: delete legacy venvs) |
-| `linux_setup_and_test.md` | Third-OS test sheet (not executed) |
-| `security_audit_2026-09.md` | Auth/secrets review |
-| `supabase_auth_db_guide.md` | Auth + DB guide |
-| `project_overview.md` | Generic overview (see README staleness note above) |
-
-## CLI (`scripts/bp.py` — the script index; `bp --help` is authoritative)
-
-| Command | Script | When |
-|---|---|---|
-
-Unwrapped on purpose: one-shot setup (`setup.py`, `convert_*`, `fetch_whisper.py`,
-`gen_cert.py`), diagnostics (`*_probe.py`, `streaming_audit.py` in
-`scripts/archive/`), retired spikes (`stt_parakeet_spike.py`,
-`eval_*.py`, `benchmark_*.py` — numbers already in PLAN.md / landscape report).
-
-| `README.md` | Current overview — accurate stack, quick start, enterprise comparison, voice-cloning limits |
-| `fundamentals_deep.md` | Companion to fundamentals: verifiable numbers, system python only |
-| `reading_script_bilingual.md` | Recording source text; parsed by `bp stt` for STT refs — do not reformat |
-| `voice_and_app_direction_2026-09.md` | Owner requirements (one voice, multilingual, any OS) |
-
-## Thesis
-
-| File | What |
-|---|---|
-| `thesis_draft.md` | Draft; one `[DOPLNIŤ]` marker left (AI-declaration skeleton) |
-| `fundamentals.md` / `fundamentals_deep.md` | Theory chapters (fundamentals §9 connectors, §10 ground basics + exercises) |
-
-## Research spikes (closed, read-only)
-
-S2S, simultaneous-translation, hybrid-TTS/OpenVoice, Coqui perf, realtime-rearchitecture,
-SK/DE bootstrap, UX walkaround, TTS comparison, performance test results — all in
-`hybrid_tts_openvoice_2026-08-21.md`, `COQUI_TTS_PERFORMANCE_REPORT.md`,
-`realtime_pipeline_rearchitecture_2026-08-22.md`, `sk_de_bootstrap_findings_2026-08-19.md`,
-`ux_walkaround.md`, `TTS_COMPARISON_REPORT.md`, `PERFORMANCE_TEST_RESULTS.md`,
-`personal_voice_bootstrap_2026-08-19.md`, `coqui_tts_sections.md`.
-The six superseded research files were deleted 2026-10-01 (content in git history);
- their verdicts live in `model_landscape_2026-10.md` §8. Retired one-shot scripts live in `scripts/archive/` and dead test scripts in `test/archive/` (runnable, unindexed).
+Archived (kept for history, not maintained): [`archive/`](archive/) and [`archive/2026-11-07-stale/`](archive/2026-11-07-stale/): the September architecture and streaming specs with contradictory latency budgets, old runbooks and handoffs, the old plan and file index.
