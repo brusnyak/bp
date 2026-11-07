@@ -66,7 +66,7 @@ of it is a planning failure, not a badge.
 |---|---|---|
 | Biggest batch that fits + resume chain | free | fewer, longer nights; machine usable by day |
 | `nice`/thread cap (e.g. `OMP_NUM_THREADS`, torch threads) for day runs | free | slower steps, quiet fans, usable desktop |
-| Rented CUDA (RTX 3060-class) | ~$3–5 for the whole 15 GPU-h plan (measured math in `compute_capacity_report_2026-09.md`) | 2500 steps in ~1–1.5 h; full 10k-step run in one evening; no fan noise at home |
+| Rented CUDA (RTX 3060-class) | ~$3–5 for the whole 15 GPU-h plan (measured math in `documentation/archive/2026-11-07-stale/compute_capacity_report_2026-09.md`) | 2500 steps in ~1–1.5 h; full 10k-step run in one evening; no fan noise at home |
 | University server | free if granted | same as rented + no third-party data transfer |
 | Checkpoint handoff (LewisSmallwood pattern) | free | pause on Mac, resume on any CUDA box mid-run — no step lost |
 

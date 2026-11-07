@@ -1,6 +1,6 @@
 # Live Speech Translation
 
-Real-time speech translation that runs on your own machine: speak English, hear Slovak or Czech a moment later, with live captions on both sides. Built as a Bachelor's thesis project (STU FEI) and developed towards a commercial product.
+Real-time speech translation that runs on your own machine: speak English, hear German, Slovak or Czech a moment later, with live captions on both sides. Built as a Bachelor's thesis project (STU FEI) and developed towards a commercial product.
 
 [![Watch the demo](https://img.youtube.com/vi/_-jwEyGxDYs/maxresdefault.jpg)](https://www.youtube.com/watch?v=_-jwEyGxDYs)
 
@@ -13,6 +13,7 @@ Microphone → voice-activity detection → speech recognition (STT) → machine
 | Direction | Status |
 |-----------|--------|
 | English → Slovak | Works; the demo route |
+| English → German | Components and the chain are measured (`documentation/LANGUAGES.md`); not yet run live in the browser |
 | English → Czech | Works |
 | Slovak / Czech → English | Experimental: recognition errors are still common on Slovak and Czech speech |
 | Other packs (`languages/packs/`) | Declared; need installed models and a test before use |
@@ -33,9 +34,11 @@ Microphone → voice-activity detection → speech recognition (STT) → machine
 ```bash
 git clone https://github.com/brusnyak/bp.git
 cd bp
-python3.11 scripts/setup.py --dev   # venv, dependencies, .env, voices, translation models (needs Python 3.11 or 3.12 and ffmpeg)
-make run                            # http://localhost:8000
+python3.11 scripts/setup.py --profile mac --langs de,sk   # venv, dependencies, .env, voices, models for your hardware
+make run PRESET=mac                                         # http://localhost:8000
 ```
+
+Profiles: `mac` (Apple Silicon, MLX), `nvidia` (CUDA), `cpu`; languages `de,sk,cs,fr,pl` (see `documentation/LANGUAGES.md` for the measured best configuration per language, `documentation/DEMO.md` for a presentation walkthrough). Add `--dev` for the test dependencies. Needs Python 3.11 or 3.12 and ffmpeg.
 
 Open **http://localhost:8000** in Chrome or Edge (plain HTTP on `localhost` counts as a secure page, so the microphone works and there is no certificate warning). Press **Try it as a guest** (or create an account), pick the direction, press **Initialize**, run the sound check, then **Start**.
 
@@ -101,7 +104,7 @@ Open **http://localhost:8000** in Chrome or Edge (plain HTTP on `localhost` coun
 | `test/` | pytest suites; Node playback tests: `node --test test/session_playback_test.cjs` |
 | `documentation/` | Thesis draft, findings, research, runbooks |
 
-More: `PRODUCT.md` (positioning), `PLAN.md` (development plan), `AGENTS.md` (project memory), `documentation/implementation-2026-11-04/` (latest measurements).
+More: `PRODUCT.md` (positioning), `documentation/STATUS.md` (where the project stands), `AGENTS.md` (project memory), `documentation/implementation-2026-11-04/` (latest measurements).
 
 ## Integration (conference rooms, LHC)
 
@@ -120,15 +123,6 @@ Recognition, translation and synthesis run locally. Session logs are off by defa
 
 ## Status and licence
 
-**Not yet a commercial release.** Remaining gates before selling it:
+**Not yet a commercial release.** The honest state, with what is measured, what is not built (accurate streaming route, room mode with one voice and language per listener) and what is waiting for a decision, is in [`documentation/STATUS.md`](documentation/STATUS.md). Measurements and how to reproduce them: [`documentation/BENCHMARKS.md`](documentation/BENCHMARKS.md).
 
-| Gate | Remaining proof |
-|------|-----------------|
-| Slovak / Czech recognition | A stronger model and a scored test (WER) per direction |
-| Cloned voice | Listener review of meaning, intelligibility and identity on the exact models and hardware |
-| Real meeting | Run with a physical microphone, speakers and a virtual cable; record first-audio p50/p95 and queue growth |
-| Clean install | Test on a fresh machine per supported OS |
-| Licences | Default engines: faster-whisper/CT2 MIT/Apache-2.0, Opus-MT CC-BY-4.0, Piper GPL-3.0-or-later (not bundled; separate licence decision for distribution). Owner's personal fine-tunes, OmniVoice (CC-BY-NC weights) and Slovak STT fine-tune still need clearance. XTTS/NLLB/SeamlessM4T non-commercial — blocked by registry gate. |
-| Shared operation | Capacity, retention, monitoring and a support owner |
-
-Repository licence: see `LICENSE`. Engine, checkpoint and voice licences are separate; the registry gate (`backend/registry.py`) blocks unlicensed engines but is not a completed commercial audit.
+Licences: default engines are faster-whisper/CTranslate2 (MIT/Apache-2.0), Opus-MT (CC-BY-4.0), Piper (GPL-3.0-or-later, not bundled), Parakeet (CC-BY-4.0, optional). Personal fine-tunes and OmniVoice (CC-BY-NC weights) are restricted; see `documentation/LICENSE_INVENTORY_2026-11-06.md`. Repository licence: see `LICENSE`. The registry gate (`backend/registry.py`) blocks unlicensed engines but is not a completed commercial audit.

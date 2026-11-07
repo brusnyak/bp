@@ -4,7 +4,7 @@
   "target": "de",
   "stt": { "engine": "faster_whisper", "model": "base", "language": "en" },
   "mt": { "engine": "opus-mt", "model": "Helsinki-NLP/opus-mt-en-de" },
-  "tts": { "engine": "piper", "voice": "de_DE-karlsson-low" },
+  "tts": { "engine": "piper", "voice": "de_DE-thorsten-medium" },
   "clip": null,
   "reference": null,
   "license": "commercial-ok (attribution: Opus-MT CC-BY-4.0; voice dataset public domain/CC0)",

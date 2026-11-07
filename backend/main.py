@@ -230,6 +230,9 @@ def _pick_stt_model(source_lang: str, requested: str) -> str:
         if os.path.exists(os.path.join(SK_STT_LOCAL_MODEL, "model.bin")):
             return SK_STT_LOCAL_MODEL
         return "small-sk"
+    env = os.environ.get("BP_STT_MODEL")   # presets/*.env: e.g. large-v3-turbo on a GPU, small on a CPU
+    if env and requested in ("base", "small", DEFAULT_STT_MODEL_SIZE):
+        return env
     return requested
 
 # VAD Configuration (matching BP xtts)
