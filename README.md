@@ -79,6 +79,7 @@ Open **http://localhost:8000** in Chrome or Edge (plain HTTP on `localhost` coun
 | `BP_PROSODY_EXTRA_LAG_S` | `0.6` | Slack that makes pause mirroring possible: more mimicry = more delay (median +0.18 s measured) |
 | `BP_PROSODY_MAX_LEAD_S`, `BP_PAUSE_COMMA_S`, `BP_PAUSE_SENTENCE_S` | `2.0`, `0.25`, `0.5` | Longest pause added before a segment; silence after a comma / sentence end inside one translation |
 | `BP_STT_HALLUCINATION_GUARD` | `1` | Drop loops ("1-1-1-…"), caption credits and stock phrases on short noise slices (mlx engine). `0` disables |
+| `BP_ROOM_MAX_LISTENERS`, `BP_ROOM_MAX_LANGS` | `50`, `6` | Room mode limits: listeners per room and distinct languages (each language costs one translation and one voice) |
 | `BP_STT_CONTEXT` | `0` | `1` feeds the previous sentence to the recogniser as context. Off: its first live test produced a repetition loop |
 | `BP_DEVICE`, `BP_MT_DEVICE` | auto | `cpu` or `cuda` for STT and MT |
 
@@ -112,7 +113,7 @@ More: `PRODUCT.md` (positioning), `documentation/STATUS.md` (where the project s
 |------|--------|-----|
 | One person, one direction, into Teams/Zoom | Works | Browser session plus a virtual audio cable (BlackHole, VB-Cable) as playback device and meeting microphone |
 | Captions only | Works | Live page subtitle strip and pop-out window |
-| Per-seat broadcast (one speaker, many listeners, each with own language and earbuds) | Designed, not built | One recognition pass, one translation and voice per language, one WebSocket per seat; see `documentation/HANDOFF_2026-11-04_session2_spec_plan.md` section 2.2 and 6.3 |
+| Per-seat broadcast (one speaker, many listeners, each with their own language and earbuds) | Built and unit-tested; real-model test pending | Speaker: normal session with `?room=ID` on the live page. Listeners: `/ui/listen/listen.html?room=ID`. One translation and voice per language, not per listener. `documentation/STATUS.md` |
 | Multi-speaker meeting with overlap | Not built | One stream per participant is the cheapest route; speaker separation is future work |
 
 Interface contract: `POST /api/guest` or `/api/login` returns a token; open `ws://HOST/ws?token=TOKEN`, send the config message, stream 16 kHz audio; read `transcription_result`, `translation_result` and binary WAV `tts_audio` messages. Capacity measured on one T4 (English to Slovak, continuous speech): about 4 simultaneous sessions with median lag under 1.5 s, 8 sessions 3.7 s.
@@ -123,6 +124,6 @@ Recognition, translation and synthesis run locally. Session logs are off by defa
 
 ## Status and licence
 
-**Not yet a commercial release.** The honest state, with what is measured, what is not built (accurate streaming route, room mode with one voice and language per listener) and what is waiting for a decision, is in [`documentation/STATUS.md`](documentation/STATUS.md). Measurements and how to reproduce them: [`documentation/BENCHMARKS.md`](documentation/BENCHMARKS.md).
+**Not yet a commercial release.** The honest state, with what works, what is built but not yet validated (room mode with one voice and language per listener), what is not built (cloned voices for listeners) and what to do next, is in [`documentation/STATUS.md`](documentation/STATUS.md). Measurements and how to reproduce them: [`documentation/BENCHMARKS.md`](documentation/BENCHMARKS.md).
 
 Licences: this repository is MIT and ships no model weights; `setup.py` downloads each model from its publisher, so you accept each model's licence when you choose it (list: `documentation/LICENSE_INVENTORY_2026-11-06.md`; Piper is GPL-3.0-or-later and is installed separately, OmniVoice and XTTS weights are non-commercial). If you run it as a shared service for other people you are the operator: pick models whose licences allow that. The registry gate (`backend/registry.py`) blocks engines marked non-commercial in commercial mode but is not a legal audit.
