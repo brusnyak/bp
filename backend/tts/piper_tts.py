@@ -11,6 +11,7 @@ from backend import hardware
 class PiperTTS:
     SUPPORTS_CLONING = False
     SUPPORTS_STREAMING = True  # T045
+    SUPPORTS_PROSODY = True    # accepts length_scale / pauses in synthesize_stream (backend/prosody.py)
 
     def __init__(
         self,
@@ -85,6 +86,7 @@ class PiperTTS:
         language: str = "sk",
         speaker_wav_path: Optional[str] = None,
         output_path: Optional[str] = None,
+        length_scale: Optional[float] = None,
     ) -> Tuple[np.ndarray, int, float]: # Keep output_path for now, but make it optional and don't use it for primary return
         """
         Synthesizes speech from text using Piper.
@@ -125,7 +127,7 @@ class PiperTTS:
             wav_file.setsampwidth(sample_width)
             wav_file.setframerate(sample_rate)
             # Piper's synthesize_wav expects text and a file-like object, without speaker_id
-            self.model.synthesize_wav(text, wav_file)
+            self.model.synthesize_wav(text, wav_file, syn_config=SynthesisConfig(length_scale=length_scale) if length_scale else None)
         audio_buffer.seek(0)  # Rewind the buffer to read its content
 
         audio_waveform, sample_rate = sf.read(audio_buffer)
@@ -148,6 +150,8 @@ class PiperTTS:
         text: str,
         language: str = "sk",
         speaker_wav_path: Optional[str] = None,
+        length_scale: Optional[float] = None,
+        pauses: bool = False,
         **kwargs,
     ):
         """T045: yield one audio chunk per clause-level phrase instead of synthesizing (and
@@ -161,7 +165,12 @@ class PiperTTS:
         phrases = split_into_phrases(text)
         if not phrases:
             return
-        for phrase in phrases:
-            wav, sr, _ = self.synthesize(phrase, language=language, speaker_wav_path=speaker_wav_path)
+        for i, phrase in enumerate(phrases):
+            wav, sr, _ = self.synthesize(phrase, language=language, speaker_wav_path=speaker_wav_path, length_scale=length_scale)
             if wav is not None and len(wav) > 0:
+                if pauses and i < len(phrases) - 1:  # prosody mirror: silence after commas / sentence ends
+                    from backend.prosody import trailing_pause_s
+                    gap = trailing_pause_s(phrase)
+                    if gap > 0:
+                        wav = np.concatenate([np.asarray(wav), np.zeros(int(sr * gap), dtype=np.asarray(wav).dtype)])
                 yield wav

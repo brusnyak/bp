@@ -198,6 +198,7 @@ def main():
     for (section, grade), n in sorted(rollup.items()):
         print(f"  {section:14s} {grade:9s} {n}")
     if apply:
+        os.makedirs(os.path.dirname(OUT), exist_ok=True)   # a copy without the tracked processed/ files has no directory yet (Linux pass 2026-11-07)
         with open(OUT, "w") as f:
             json.dump({"version": 1, "grades": grades}, f, indent=2,
                       ensure_ascii=False)

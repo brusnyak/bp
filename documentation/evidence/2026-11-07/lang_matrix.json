@@ -1,0 +1,531 @@
+{
+ "date": "2026-11-07",
+ "kernel": "yegorby/bp-lang-matrix-t4 (scripts/gpu_bench/kaggle_matrix), runs v2 (whisper), v3 (parakeet, mt), v4 (de/cs mt)",
+ "data": "STT: FLEURS test 60 clips/lang; MT: opus-100 test <=200 sentences 4-40 words (relative scores only)",
+ "gpu": "Tesla T4, 15360 MiB\nTesla T4, 15360 MiB",
+ "stt_t4": {
+  "whisper-base|de": {
+   "WER": 0.181,
+   "WER_median": 0.161,
+   "n": 60,
+   "RTF": 0.016,
+   "per_clip_s": 0.23,
+   "audio_s": 852.6
+  },
+  "whisper-base|cs": {
+   "WER": 0.673,
+   "WER_median": 0.667,
+   "n": 60,
+   "RTF": 0.024,
+   "per_clip_s": 0.298,
+   "audio_s": 738.5
+  },
+  "whisper-base|sk": {
+   "WER": 0.646,
+   "WER_median": 0.652,
+   "n": 60,
+   "RTF": 0.018,
+   "per_clip_s": 0.223,
+   "audio_s": 737.6
+  },
+  "whisper-base|pl": {
+   "WER": 0.379,
+   "WER_median": 0.341,
+   "n": 60,
+   "RTF": 0.021,
+   "per_clip_s": 0.196,
+   "audio_s": 555.0
+  },
+  "whisper-base|fr": {
+   "WER": 0.256,
+   "WER_median": 0.257,
+   "n": 60,
+   "RTF": 0.02,
+   "per_clip_s": 0.212,
+   "audio_s": 650.4
+  },
+  "whisper-base|en": {
+   "WER": 0.086,
+   "WER_median": 0.068,
+   "n": 60,
+   "RTF": 0.018,
+   "per_clip_s": 0.169,
+   "audio_s": 572.5
+  },
+  "whisper-small|de": {
+   "WER": 0.109,
+   "WER_median": 0.075,
+   "n": 60,
+   "RTF": 0.023,
+   "per_clip_s": 0.323,
+   "audio_s": 852.6
+  },
+  "whisper-small|cs": {
+   "WER": 0.378,
+   "WER_median": 0.385,
+   "n": 60,
+   "RTF": 0.029,
+   "per_clip_s": 0.357,
+   "audio_s": 738.5
+  },
+  "whisper-small|sk": {
+   "WER": 0.378,
+   "WER_median": 0.369,
+   "n": 60,
+   "RTF": 0.029,
+   "per_clip_s": 0.36,
+   "audio_s": 737.6
+  },
+  "whisper-small|pl": {
+   "WER": 0.196,
+   "WER_median": 0.191,
+   "n": 60,
+   "RTF": 0.033,
+   "per_clip_s": 0.306,
+   "audio_s": 555.0
+  },
+  "whisper-small|fr": {
+   "WER": 0.148,
+   "WER_median": 0.14,
+   "n": 60,
+   "RTF": 0.029,
+   "per_clip_s": 0.317,
+   "audio_s": 650.4
+  },
+  "whisper-small|en": {
+   "WER": 0.061,
+   "WER_median": 0.054,
+   "n": 60,
+   "RTF": 0.024,
+   "per_clip_s": 0.231,
+   "audio_s": 572.5
+  },
+  "whisper-large-v3-turbo|de": {
+   "WER": 0.048,
+   "WER_median": 0.011,
+   "n": 60,
+   "RTF": 0.034,
+   "per_clip_s": 0.477,
+   "audio_s": 852.6
+  },
+  "whisper-large-v3-turbo|cs": {
+   "WER": 0.116,
+   "WER_median": 0.087,
+   "n": 60,
+   "RTF": 0.042,
+   "per_clip_s": 0.516,
+   "audio_s": 738.5
+  },
+  "whisper-large-v3-turbo|sk": {
+   "WER": 0.107,
+   "WER_median": 0.083,
+   "n": 60,
+   "RTF": 0.041,
+   "per_clip_s": 0.502,
+   "audio_s": 737.6
+  },
+  "whisper-large-v3-turbo|pl": {
+   "WER": 0.077,
+   "WER_median": 0.054,
+   "n": 60,
+   "RTF": 0.05,
+   "per_clip_s": 0.46,
+   "audio_s": 555.0
+  },
+  "whisper-large-v3-turbo|fr": {
+   "WER": 0.069,
+   "WER_median": 0.044,
+   "n": 60,
+   "RTF": 0.043,
+   "per_clip_s": 0.471,
+   "audio_s": 650.4
+  },
+  "whisper-large-v3-turbo|en": {
+   "WER": 0.045,
+   "WER_median": 0.038,
+   "n": 60,
+   "RTF": 0.043,
+   "per_clip_s": 0.411,
+   "audio_s": 572.5
+  },
+  "parakeet-tdt-v3|de": {
+   "WER": 0.063,
+   "WER_median": 0.04,
+   "n": 60,
+   "RTF": 0.125,
+   "per_clip_s": 1.774,
+   "audio_s": 852.6
+  },
+  "parakeet-tdt-v3|cs": {
+   "WER": 0.14,
+   "WER_median": 0.08,
+   "n": 60,
+   "RTF": 0.119,
+   "per_clip_s": 1.463,
+   "audio_s": 738.5
+  },
+  "parakeet-tdt-v3|sk": {
+   "WER": 0.099,
+   "WER_median": 0.071,
+   "n": 60,
+   "RTF": 0.117,
+   "per_clip_s": 1.435,
+   "audio_s": 737.6
+  },
+  "parakeet-tdt-v3|pl": {
+   "WER": 0.099,
+   "WER_median": 0.077,
+   "n": 60,
+   "RTF": 0.121,
+   "per_clip_s": 1.123,
+   "audio_s": 555.0
+  },
+  "parakeet-tdt-v3|fr": {
+   "WER": 0.05,
+   "WER_median": 0.042,
+   "n": 60,
+   "RTF": 0.119,
+   "per_clip_s": 1.295,
+   "audio_s": 650.4
+  },
+  "parakeet-tdt-v3|en": {
+   "WER": 0.051,
+   "WER_median": 0.046,
+   "n": 60,
+   "RTF": 0.118,
+   "per_clip_s": 1.127,
+   "audio_s": 572.5
+  }
+ },
+ "mt_t4": {
+  "opus-mt|sk|to_en": {
+   "chrF": 62.1,
+   "BLEU": 42.6,
+   "sent_per_s": 33.8,
+   "n": 200,
+   "sample": [
+    "- What are you gonna do to him?",
+    "Who needs legs when we have wheels?"
+   ]
+  },
+  "opus-mt|sk|from_en": {
+   "chrF": 55.6,
+   "BLEU": 35.1,
+   "sent_per_s": 34.9,
+   "n": 200,
+   "sample": [
+    "Čo budeš robiť?",
+    "Kto potrebuje nohy, keď máš kolesá?"
+   ]
+  },
+  "opus-mt|pl|to_en": {
+   "chrF": 50.6,
+   "BLEU": 29.8,
+   "sent_per_s": 37.3,
+   "n": 200,
+   "sample": [
+    "In addition, these contracts are subject to a specific consumer protection regime within the meaning of the Directive.",
+    "I want you to stop reading those magazines."
+   ]
+  },
+  "opus-mt|fr|to_en": {
+   "chrF": 60.4,
+   "BLEU": 38.9,
+   "sent_per_s": 34.8,
+   "n": 200,
+   "sample": [
+    "- You were kissing at the bus stop!",
+    "With a farceous irony, the young Czech artist Krištof Kintera chamboule l'art et la vie."
+   ]
+  },
+  "opus-mt|fr|from_en": {
+   "chrF": 61.0,
+   "BLEU": 38.1,
+   "sent_per_s": 27.3,
+   "n": 200,
+   "sample": [
+    "- Tu étais à un arrêt de bus pour l'embrasser !",
+    "Avec l'ironie et le malice, la jeune artiste tchèque Krištof Kintera tourne l'art et la vie sur leur tête."
+   ]
+  },
+  "nllb-600m|sk|to_en": {
+   "chrF": 59.0,
+   "BLEU": 39.2,
+   "sent_per_s": 16.7,
+   "n": 200,
+   "sample": [
+    "- What do you want to do to him?",
+    "Who needs legs when we have wheels?"
+   ]
+  },
+  "nllb-600m|sk|from_en": {
+   "chrF": 51.5,
+   "BLEU": 29.1,
+   "sent_per_s": 13.9,
+   "n": 200,
+   "sample": [
+    "Čo budeš robiť?",
+    "Kto potrebuje nohy, keď máš kolesá?"
+   ]
+  },
+  "nllb-600m|pl|to_en": {
+   "chrF": 48.0,
+   "BLEU": 27.1,
+   "sent_per_s": 16.1,
+   "n": 200,
+   "sample": [
+    "In addition, these contracts are subject to a specific mode of consumer protection within the meaning of the Directive.",
+    "I'd like you to stop reading these magazines."
+   ]
+  },
+  "nllb-600m|pl|from_en": {
+   "chrF": 46.1,
+   "BLEU": 22.0,
+   "sent_per_s": 14.5,
+   "n": 200,
+   "sample": [
+    "Umowy te podlegają również szczególnemu systemowi ochrony konsumentów zgodnie z dyrektywą.",
+    "Chciałbym, żebyś przestała czytać te czasopisma."
+   ]
+  },
+  "nllb-600m|fr|to_en": {
+   "chrF": 56.3,
+   "BLEU": 33.2,
+   "sent_per_s": 11.3,
+   "n": 200,
+   "sample": [
+    "- You were kissing at the bus stop!",
+    "With a farcical irony, the young Czech artist Krištof Kintera confounds art and life."
+   ]
+  },
+  "nllb-600m|fr|from_en": {
+   "chrF": 57.6,
+   "BLEU": 33.2,
+   "sent_per_s": 10.6,
+   "n": 200,
+   "sample": [
+    "- Tu étais à l'arrêt de bus et tu l'embrassais !",
+    "Avec ironie et méchanceté, le jeune artiste tchèque Krištof Kintera tourne l'art et la vie sur leurs têtes."
+   ]
+  },
+  "opus-mt|de|to_en": {
+   "chrF": 57.9,
+   "BLEU": 39.4,
+   "sent_per_s": 21.9,
+   "n": 200,
+   "sample": [
+    "Prehistoric Archaeology in the Third Reich\".",
+    "The terms of use are agreed upon by clicking on \"Save profile\"."
+   ]
+  },
+  "opus-mt|de|from_en": {
+   "chrF": 52.9,
+   "BLEU": 28.7,
+   "sent_per_s": 21.4,
+   "n": 200,
+   "sample": [
+    "Prähistorische Archäologie im Dritten Reich\".",
+    "Mit einem Klick auf 'Profil speichern' stimmen Sie diesen Bedingungen zu."
+   ]
+  },
+  "opus-mt|cs|to_en": {
+   "chrF": 59.2,
+   "BLEU": 40.5,
+   "sent_per_s": 39.0,
+   "n": 200,
+   "sample": [
+    "he's already become in the corporate precin of the century.",
+    "- I'm going home to my family."
+   ]
+  },
+  "opus-mt|cs|from_en": {
+   "chrF": 51.2,
+   "BLEU": 27.8,
+   "sent_per_s": 37.0,
+   "n": 200,
+   "sample": [
+    "Vyvinula se na korporátní zločin století.",
+    "- Jdu domů ke své rodině."
+   ]
+  },
+  "nllb-600m|de|to_en": {
+   "chrF": 55.7,
+   "BLEU": 35.8,
+   "sent_per_s": 11.5,
+   "n": 200,
+   "sample": [
+    "Prehistoric archaeology in the Third Reich\".",
+    "The terms of use are agreed by the user clicking on \"Save Profile\"."
+   ]
+  },
+  "nllb-600m|de|from_en": {
+   "chrF": 51.7,
+   "BLEU": 27.7,
+   "sent_per_s": 7.7,
+   "n": 200,
+   "sample": [
+    "Prähistorische Archäologie im Dritten Reich\".",
+    "Indem Sie auf \"Profil speichern\" klicken, stimmen Sie, der Nutzer, diesen Allgemeinen Geschäftsbedingungen zu."
+   ]
+  },
+  "nllb-600m|cs|to_en": {
+   "chrF": 53.8,
+   "BLEU": 33.4,
+   "sent_per_s": 13.7,
+   "n": 200,
+   "sample": [
+    "He's already becoming the corporate precinct of the century.",
+    "- I'm flying home to my family."
+   ]
+  },
+  "nllb-600m|cs|from_en": {
+   "chrF": 46.7,
+   "BLEU": 21.0,
+   "sent_per_s": 10.1,
+   "n": 200,
+   "sample": [
+    "Vyvinula se do korporátního zločinu století.",
+    "- Jdu domů ke své rodině."
+   ]
+  },
+  "nllb-1.3b|de|to_en": {
+   "chrF": 54.6,
+   "BLEU": 35.1,
+   "sent_per_s": 4.5,
+   "n": 200,
+   "sample": [
+    "Prehistoric archaeology in the Third Reich\".",
+    "The terms of use are agreed by the user clicking on \"Save profile\"."
+   ]
+  },
+  "nllb-1.3b|de|from_en": {
+   "chrF": 51.1,
+   "BLEU": 28.8,
+   "sent_per_s": 5.3,
+   "n": 200,
+   "sample": [
+    "Prähistorische Archäologie im Dritten Reich\".",
+    "Wenn Sie auf \"Profil speichern\" klicken, stimmen Sie diesen Geschäftsbedingungen zu."
+   ]
+  },
+  "nllb-1.3b|cs|to_en": {
+   "chrF": 55.4,
+   "BLEU": 35.1,
+   "sent_per_s": 4.2,
+   "n": 200,
+   "sample": [
+    "He's already become the corporate precinct of the century.",
+    "- I'm going home to my family."
+   ]
+  },
+  "nllb-1.3b|cs|from_en": {
+   "chrF": 47.2,
+   "BLEU": 18.1,
+   "sent_per_s": 4.6,
+   "n": 200,
+   "sample": [
+    "Vyvinuli se do korporátního zločinu století.",
+    "- Jdu domů ke své rodině."
+   ]
+  }
+ },
+ "parakeet_t4_note": "onnxruntime had no CUDA provider: Parakeet ran on CPU in Kaggle, speed is not a GPU number",
+ "mac_m1_pro": [
+  {
+   "engine": "mlx-turbo",
+   "set": "fleurs-de",
+   "WER": 0.044,
+   "RTF": 0.067,
+   "s_per_clip": 0.93,
+   "n": 20
+  },
+  {
+   "engine": "mlx-turbo",
+   "set": "fleurs-en",
+   "WER": 0.054,
+   "RTF": 0.088,
+   "s_per_clip": 0.83,
+   "n": 20
+  },
+  {
+   "engine": "mlx-turbo",
+   "set": "owner-en-script",
+   "WER": 0.014,
+   "RTF": 0.041,
+   "s_per_clip": 4.77,
+   "n": 1
+  },
+  {
+   "engine": "mlx-turbo",
+   "set": "owner-sk-script",
+   "WER": 0.354,
+   "RTF": 0.049,
+   "s_per_clip": 6.53,
+   "n": 1
+  },
+  {
+   "engine": "mlx-small",
+   "set": "fleurs-de",
+   "WER": 0.105,
+   "RTF": 0.028,
+   "s_per_clip": 0.38,
+   "n": 20
+  },
+  {
+   "engine": "mlx-small",
+   "set": "fleurs-en",
+   "WER": 0.073,
+   "RTF": 0.032,
+   "s_per_clip": 0.3,
+   "n": 20
+  },
+  {
+   "engine": "mlx-small",
+   "set": "owner-en-script",
+   "WER": 0.041,
+   "RTF": 0.021,
+   "s_per_clip": 2.36,
+   "n": 1
+  },
+  {
+   "engine": "mlx-small",
+   "set": "owner-sk-script",
+   "WER": 0.594,
+   "RTF": 0.027,
+   "s_per_clip": 3.67,
+   "n": 1
+  },
+  {
+   "engine": "parakeet-cpu",
+   "set": "fleurs-de",
+   "WER": 0.048,
+   "RTF": 0.061,
+   "s_per_clip": 0.84,
+   "n": 20
+  },
+  {
+   "engine": "parakeet-cpu",
+   "set": "fleurs-en",
+   "WER": 0.048,
+   "RTF": 0.085,
+   "s_per_clip": 0.8,
+   "n": 20
+  },
+  {
+   "engine": "parakeet-cpu",
+   "set": "owner-en-script",
+   "WER": 0.059,
+   "RTF": 0.089,
+   "s_per_clip": 10.2,
+   "n": 1
+  },
+  {
+   "engine": "parakeet-cpu",
+   "set": "owner-sk-script",
+   "WER": 0.807,
+   "RTF": 0.08,
+   "s_per_clip": 10.69,
+   "n": 1
+  }
+ ]
+}

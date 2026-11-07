@@ -260,7 +260,7 @@ class SessionPipeline:
         self.pipe = Pipeline(PipelineConfig(
             source_lang=session_config["source_lang"],
             target_lang=session_config["target_lang"],
-            stt_engine=session_config.get("stt_engine", "faster_whisper"),
+            stt_engine=session_config.get("stt_engine", os.environ.get("BP_STT_ENGINE", "faster_whisper")),
             stt_model_size=session_config.get("stt_model_size", "base"),
             mt_engine=session_config.get("mt_engine", "opus-mt"),
             tts_engine=session_config.get("tts_model_choice", "piper"),
