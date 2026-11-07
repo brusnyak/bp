@@ -46,6 +46,6 @@ code{{background:#f2f2f2;padding:0 .25rem}}small{{color:#555}}@media(prefers-col
 <tr><td>Same, every 0.5 s</td><td>{s('en-owner|turbo|agree-0.5')}</td><td>{s('de-fleurs|turbo|agree-0.5')}</td></tr></table>
 <h2>Real server end to end <small>(Kaggle T4, your 60 s English reading replayed through the live route)</small></h2>
 <table><tr><th>Route</th><th>Delay median / p90</th><th>First-word delay</th><th>Transcript error</th></tr>{route_rows}</table>
-<p><b>Honest status.</b> One speaker, one direction runs live on a laptop; German and Slovak are validated through the real server on a GPU. The room mode (many listeners, each with an earpiece and a language) is designed, not built. See the status page for the full list.</p>
+<p><b>Honest status.</b> One speaker, one direction runs live on a laptop; German and Slovak are validated through the real server on a GPU. Room mode (many listeners, each with an earpiece and a language) is built and unit-tested; its real-model test is pending. See the status page for the full list.</p>
 </body></html>"""
 out = ROOT / "documentation/site/index.html"; out.write_text(html, encoding="utf-8"); print("wrote", out, len(html), "bytes")
