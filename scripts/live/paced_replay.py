@@ -97,7 +97,7 @@ async def run(a):
 
     async with websockets.connect(url, ssl=ctx, max_size=None) as ws:
         await ws.send(json.dumps({"type": "config_update", "source_lang": a.src, "target_lang": a.tgt,
-                                  "tts_model_choice": a.tts}))
+                                  "tts_model_choice": a.tts, **({"room_id": a.room} if a.room else {})}))
         while True:
             m = json.loads(await asyncio.wait_for(ws.recv(), timeout=a.load_timeout))
             if m.get("type") == "error":
@@ -174,6 +174,7 @@ if __name__ == "__main__":
     p.add_argument("--base", default="http://127.0.0.1:8013")
     p.add_argument("--src", default="en")
     p.add_argument("--tgt", default="sk")
+    p.add_argument("--room", default=None, help="publish every recognised phrase to this room (listeners: /ws/listen)")
     p.add_argument("--tts", default="piper")
     p.add_argument("--seconds", type=float, default=60)
     p.add_argument("--offset", type=float, default=0)

@@ -1004,7 +1004,8 @@ document.addEventListener('DOMContentLoaded', () => {
             speaker_lang: speakerLang,
             vad_enabled: vadEnabled,
             vad_aggressiveness: vadAggressiveness,
-            silence_rms_threshold: silenceRmsThreshold
+            silence_rms_threshold: silenceRmsThreshold,
+            ...(new URLSearchParams(location.search).get('room') ? { room_id: new URLSearchParams(location.search).get('room') } : {})   // room mode: open this page with ?room=ID
         };
 
         if (generation !== captureGeneration || websocket.readyState !== WebSocket.OPEN) { initBtn.disabled = false; return false; }
