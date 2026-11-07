@@ -17,31 +17,7 @@ from typing import Optional, Tuple
 import numpy as np
 
 DEFAULT_REPO = "mlx-community/whisper-large-v3-turbo"
-GUARD = os.environ.get("BP_STT_HALLUCINATION_GUARD", "1") != "0"
-# Whisper emits these on breaths, clicks and room noise (no VAD filter in MLX): seen 7x in a 60 s live replay of
-# quiet speech on 2026-11-07. Dropped only when the audio chunk is short; real sentences are longer.
-HALLUCINATIONS = {"thank you", "thanks", "thanks for watching", "thank you for watching", "okay", "ok", "oh", "you", "bye", "hmm", "uh", "um", "mm", "ah"}
-SHORT_CHUNK_S = 1.8
-
-
-import re
-
-MIN_CHUNK_S = 0.4          # nothing intelligible fits in less (a 0.02 s tail produced "Oh." and a 35 s TTS cascade on 2026-11-07)
-MAX_CHARS_PER_S = 30       # fast speech is ~15-18 chars/s; far above this is a decoding loop
-LOOP_RE = re.compile(r"(\S{1,12})(?:[-\s,.]+\1){5,}")   # "1-1-1-1-1-1", "ha ha ha ha ha ha"
-CREDIT_RE = re.compile(r"transcription by|subtitles? by|captions? by|castingwords|amara\.org|thanks for watching|please subscribe", re.I)
-
-
-def is_garbage(text: str, chunk_s: float, compression_ratio: float = 0.0) -> bool:
-    """True for output that cannot be real speech for this chunk: repetition loops, caption credits, impossible length."""
-    t = text.strip()
-    if not t:
-        return False
-    return bool(LOOP_RE.search(t) or CREDIT_RE.search(t) or compression_ratio > 2.4 or len(t) > MAX_CHARS_PER_S * max(chunk_s, 0.5) + 20)
-
-
-def _norm(t: str) -> str:
-    return "".join(c for c in t.lower() if c.isalnum() or c == " ").strip()
+from backend.stt.guards import GUARD, HALLUCINATIONS, SHORT_CHUNK_S, _norm, is_garbage  # noqa: F401  (shared with every engine; re-exported for tests)
 
 
 class MLXWhisperSTT:

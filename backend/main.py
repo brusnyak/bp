@@ -147,6 +147,7 @@ from starlette.websockets import WebSocketState # Import WebSocketState
 
 from backend.stt.faster_whisper_stt import FasterWhisperSTT
 from backend import prosody as _prosody
+from backend.stt import guards as _stt_guards
 from backend.stt.streaming_captions import SessionCaptioner, STREAMING_CAPTIONS_AVAILABLE  # T044
 from backend.mt.ctranslate2_mt import CTranslate2MT
 from backend.tts.piper_tts import PiperTTS
@@ -1768,6 +1769,10 @@ async def _process_speech_segment_pipeline(
         cleaned_text = transcribed_text.strip().replace('.', '').replace(',', '').replace('!', '').replace('?', '').strip()
         if not cleaned_text:
             logging.info(f"Backend: Session {client_info}: Transcription contains only punctuation (likely background noise). Skipping translation and TTS.")
+            return
+
+        if pretranscribed is None and _stt_guards.should_drop(transcribed_text, audio_segment_np.size / AUDIO_SAMPLE_RATE):
+            logging.info(f"Backend: Session {client_info}: dropped likely hallucination ({len(transcribed_text.strip())} chars, chunk {audio_segment_np.size / AUDIO_SAMPLE_RATE:.2f}s).")
             return
 
         # Track last non-empty transcription for promoting to final if the tail segment is too short
