@@ -67,7 +67,11 @@ def preset_env(name):
 PORT = 8013
 def run(src_l, tgt_l):
     key = f'{src_l}-{tgt_l}'; slog = OUT / f'server_{key}.log'; out_json = OUT / f'replay_{key}.json'; audio, ref = INPUTS[src_l]
-    env = {k: v for k, v in os.environ.items() if k != 'LD_LIBRARY_PATH'}          # the point: no manual library path
+    orig_ld = os.environ.get('LD_LIBRARY_PATH', '')
+    # Simulate a GPU box without a CUDA toolkit: keep the driver directories, drop toolkit ones, add no pip paths. backend/cuda_libs.py must find the pip-installed libraries itself.
+    env = {k: v for k, v in os.environ.items() if k != 'LD_LIBRARY_PATH'}
+    env['LD_LIBRARY_PATH'] = ':'.join(x for x in orig_ld.split(':') if x and 'cuda' not in x.lower())
+    R['env']['ld_original'] = orig_ld; R['env']['ld_used'] = env['LD_LIBRARY_PATH']
     env.update(preset_env('nvidia')); env.update({'BP_NO_SSL': '1', 'BP_PORT': str(PORT), 'BP_ENABLE_RATE_LIMIT': '0', 'BP_MT_DEVICE': 'cpu', 'BP_SILENCE_RMS': '0',
                 'JWT_SECRET': secrets.token_urlsafe(32), 'BP_LOG_PATH': str(OUT / f'applog_{key}.log'), 'BP_LOG_SESSIONS': '1'})
     srv = subprocess.Popen([str(VPY), 'app.py'], cwd=BP, env=env, stdout=open(slog, 'w'), stderr=subprocess.STDOUT)

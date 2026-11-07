@@ -1,0 +1,15 @@
+{
+  "id": "yegorby/bp-convert-mt",
+  "title": "BP Convert MT",
+  "code_file": "job.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": false,
+  "enable_internet": true,
+  "dataset_sources": ["yegorby/bp-code-20261107"],
+  "competition_sources": [],
+  "model_sources": [],
+  "category_ids": [],
+  "keywords": []
+}

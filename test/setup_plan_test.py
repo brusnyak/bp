@@ -28,3 +28,10 @@ def test_every_preset_file_exists_for_every_profile():
     root = pathlib.Path(__file__).resolve().parents[1]
     for name in setup.PROFILES:
         assert (root / "presets" / f"{name}.env").is_file(), name
+
+
+def test_profile_speech_models_are_the_repos_faster_whisper_uses():
+    """The nvidia profile once pointed at Systran/faster-whisper-large-v3-turbo, which does not exist (found on a fresh Linux install 2026-11-07)."""
+    from faster_whisper.utils import _MODELS
+    assert setup.PROFILES["nvidia"]["stt"][0] == _MODELS["large-v3-turbo"]
+    assert setup.PROFILES["cpu"]["stt"][0] == _MODELS["small"]
