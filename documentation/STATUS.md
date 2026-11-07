@@ -1,6 +1,6 @@
 # Where the project stands (2026-11-07)
 
-**Verdict:** a single speaker can run live translation on their own machine today (English to Slovak, Czech, German; German measured per component, not yet run live in the browser). The accurate low-error streaming route and the room mode (many listeners, each with an earpiece and their own language) are **not built**. The project is not ready to present as a finished product; it is ready to hand to a technical person as a working, measured base.
+**Verdict:** a single speaker can run live translation on their own machine today (English to Slovak, Czech, German; German validated end to end through the real server on a T4, not yet through the browser UI or on a Mac). The room mode (many listeners, each with an earpiece and their own language) are **not built**. The project is not ready to present as a finished product; it is ready to hand to a technical person as a working, measured base.
 
 ## Works today (each line says how it was checked)
 
@@ -8,6 +8,7 @@
 |---|---|---|
 | One-command install, default languages | Works in a clean Linux container (setup 352 s, 91 tests pass) | session receipt 2026-11-07; Linux log in `documentation/linux_setup_and_test.md` |
 | `--profile mac|nvidia|cpu` and `--langs` | **Code and unit tests only.** Not yet run end to end on a fresh machine of each type | `test/setup_plan_test.py` |
+| Real server on a Kaggle T4, EN to DE and EN to SK, both streaming routes | Works with zero server errors. German with agreement every 1.0 s: delay 1.56 s (2 s chunks: 3.89 s). Found and fixed two bugs (German voice not registered, invented stock phrases) | `route_test.json`, `BENCHMARKS.md` section 2b |
 | Live route EN to SK on a Mac, MLX turbo, pause mirror | Works; median delay 1.19 s, no errors in a 4-minute browser session | `documentation/evidence/2026-11-07/`, `logs/` |
 | Per-language quality and timing | Measured on a T4 for German, French, Polish, Czech, Slovak, English | `LANGUAGES.md`, `BENCHMARKS.md` |
 | Slovak accuracy | kinit fine-tune 6.5% on FLEURS, 19.8% on the owner's non-native reading | `sk_compare.json` |
@@ -15,10 +16,9 @@
 | Docs numbers cannot drift | `make check-docs` verifies every marked number against its receipt | `scripts/check_readme_claims.py` |
 | Tests | 100+ pass on macOS; CI passes on Ubuntu and Windows; the macOS job had one timing-sensitive failure (`vad_tests.py::test_vad_long_speech_streaming`) | `gh run view 42342557832` |
 
-## Measured but not built
+## Streaming route: validated on a GPU, not yet on a Mac
 
-- **Accurate streaming route.** The simulation shows that decoding the growing buffer every 1.0 s and committing only words two decodes agree on gives 5.0% English and 11.2% German word error at about 2.3 s, against 19% and 33% for the current 2 s chunks at about 1.2 s. The old `BP_INCREMENTAL=1` code has the building blocks (agreement, fragments) but duplicated and dropped fragments in the one real-route test with Parakeet. It needs a real-route test on a GPU box before it becomes the default. Next action: a Kaggle kernel that runs the actual server and the paced replay with this route (staging the code as a dataset).
-- **Parakeet for low-latency captions.** Cheap per step (0.1-0.3 real-time factor) but unstable early guesses (26-28% error at 0.3 s steps).
+The accurate route (`BP_INCREMENTAL=1`: decode the growing buffer, commit words two decodes agree on) is validated on a T4 through the real server for English to German and English to Slovak, and is on in the `nvidia` preset. Open items: the real-route transcript error (21-24%) is four times the offline simulation (5%), so voice-activity cuts and chunk edges still cost accuracy; a step below 1.0 s collapses the queue; the Mac cannot keep up with turbo at short steps (0.72 s per call), so it stays on 2 s chunks until Parakeet or a smaller model is validated there. Parakeet is cheap per step but its early guesses are unstable (26-28% error at 0.3 s steps).
 
 ## Not built
 
@@ -31,7 +31,6 @@
 
 ## Decisions needed
 
-- Build the accurate streaming route and test it on the real server on a T4? (recommended first)
-- Then build room mode? (the LHC scenario; the larger piece)
+- Build room mode now that the streaming route is validated on a T4? (the LHC scenario; the larger piece)
 - Publish a regenerated `docs/index.html` to the project site?
 - Which cloned-voice route to pursue for listeners?

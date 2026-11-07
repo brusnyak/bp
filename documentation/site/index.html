@@ -16,5 +16,7 @@ code{background:#f2f2f2;padding:0 .25rem}small{color:#555}@media(prefers-color-s
 <tr><td>Independent 2 s chunks (current live route)</td><td>1.17 s, 19.1%</td><td>1.23 s, 33.1%</td></tr>
 <tr><td>Growing buffer every 1.0 s, commit agreed words</td><td>2.31 s, 5.0%</td><td>2.34 s, 11.2%</td></tr>
 <tr><td>Same, every 0.5 s</td><td>1.45 s, 12.3%</td><td>1.36 s, 23.9%</td></tr></table>
-<p><b>Honest status.</b> One speaker, one direction runs live on a laptop. The accurate streaming route and the room mode (many listeners, each with an earpiece and a language) are designed and measured, not built. See the status page for the full list.</p>
+<h2>Real server end to end <small>(Kaggle T4, your 60 s English reading replayed through the live route)</small></h2>
+<table><tr><th>Route</th><th>Delay median / p90</th><th>First-word delay</th><th>Transcript error</th></tr><tr><td>English to German, 2 s chunks</td><td>3.89 s / 5.34 s</td><td>6.01 s</td><td>22.1%</td></tr><tr><td>English to German, agreement every 1.0 s (recommended on a GPU)</td><td>1.56 s / 2.55 s</td><td>3.67 s</td><td>21.3%</td></tr><tr><td>English to German, agreement every 0.5 s (collapses)</td><td>17.88 s / 23.54 s</td><td>20.59 s</td><td>47.5%</td></tr><tr><td>English to Slovak, 2 s chunks</td><td>1.97 s / 2.88 s</td><td>4.05 s</td><td>23.8%</td></tr><tr><td>English to Slovak, agreement every 1.0 s</td><td>1.89 s / 3.10 s</td><td>3.92 s</td><td>23.0%</td></tr></table>
+<p><b>Honest status.</b> One speaker, one direction runs live on a laptop; German and Slovak are validated through the real server on a GPU. The room mode (many listeners, each with an earpiece and a language) is designed, not built. See the status page for the full list.</p>
 </body></html>
