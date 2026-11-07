@@ -13,7 +13,7 @@ Microphone → voice-activity detection → speech recognition (STT) → machine
 | Direction | Status |
 |-----------|--------|
 | English → Slovak | Works; the demo route |
-| English → German | Components and the chain are measured (`documentation/LANGUAGES.md`); not yet run live in the browser |
+| English → German | Works end to end through the real server on a GPU (`documentation/LANGUAGES.md`); not yet run through the browser UI or on a Mac |
 | English → Czech | Works |
 | Slovak / Czech → English | Experimental: recognition errors are still common on Slovak and Czech speech |
 | Other packs (`languages/packs/`) | Declared; need installed models and a test before use |
@@ -71,7 +71,7 @@ Open **http://localhost:8000** in Chrome or Edge (plain HTTP on `localhost` coun
 | `BP_MIN_UTTERANCE_S` | `1.0` | Minimum utterance length for STT (seconds) |
 | `BP_ENABLE_RATE_LIMIT` | off on loopback, on otherwise | Limits registration, login and uploads. `0` disables, `1` forces on |
 | `BP_LOG_SESSIONS` | off | `1` writes transcripts and translations to `processed/sessions/` (personal data; tell participants) |
-| `BP_INCREMENTAL` | off | Deprecated — use continuous streaming mode instead |
+| `BP_INCREMENTAL` | off | Accurate streaming route: decodes the growing buffer and commits words two decodes agree on. On in the `nvidia` preset with `BP_INCR_STEP_S=1.0` (validated on a T4: English to German delay 3.9 s to 1.6 s). A step below 1.0 s collapses the queue |
 | `BP_SK_STT_MODEL` | built-in | Slovak recognition model name or CTranslate2 directory |
 | `BP_STT_ENGINE` | `faster_whisper` | Speech recognition engine. `mlx_whisper` = large-v3-turbo on the Apple GPU (macOS arm64; `pip install mlx-whisper`) |
 | `BP_MLX_MODEL` | `mlx-community/whisper-large-v3-turbo` | Model repo for `mlx_whisper` |

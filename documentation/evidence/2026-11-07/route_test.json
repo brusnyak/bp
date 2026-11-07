@@ -1,0 +1,259 @@
+{
+ "runs": {
+  "en-de|chunk2": {
+   "segments": 34,
+   "with_audio": 23,
+   "lag_median_s": 3.89,
+   "lag_p90_s": 5.34,
+   "lag_max_s": 5.59,
+   "first_word_lag_median_s": 6.01,
+   "tail_after_input_s": 4.86,
+   "transcript_WER_prefix": 0.221,
+   "transcript_events": 24,
+   "duplicate_transcripts": 0,
+   "stock_phrase_segments": 0,
+   "server_errors": 0,
+   "wall_s": 91,
+   "translation_sample": [
+    "Guten Morgen.",
+    "Guten Morgen und willkommen in dieser Live-to-Botschaft.",
+    "von Echtzeit-Rede",
+    "Übersetzung",
+    "Ich spreche Englisch, und du wirst..."
+   ]
+  },
+  "en-de|agree10": {
+   "segments": 34,
+   "with_audio": 24,
+   "lag_median_s": 1.56,
+   "lag_p90_s": 2.55,
+   "lag_max_s": 4.13,
+   "first_word_lag_median_s": 3.67,
+   "tail_after_input_s": 2.68,
+   "transcript_WER_prefix": 0.213,
+   "transcript_events": 24,
+   "duplicate_transcripts": 0,
+   "stock_phrase_segments": 0,
+   "server_errors": 0,
+   "wall_s": 83,
+   "translation_sample": [
+    "Guten Morgen.",
+    "Guten Morgen und willkommen zu diesem Leben im Messias.",
+    "von Echtzeit-Rede",
+    "Übersetzung",
+    "Ich spreche Englisch und du wirst..."
+   ]
+  },
+  "en-de|agree05": {
+   "segments": 41,
+   "with_audio": 27,
+   "lag_median_s": 17.88,
+   "lag_p90_s": 23.54,
+   "lag_max_s": 25.27,
+   "first_word_lag_median_s": 20.59,
+   "tail_after_input_s": 26.24,
+   "transcript_WER_prefix": 0.475,
+   "transcript_events": 31,
+   "duplicate_transcripts": 0,
+   "stock_phrase_segments": 0,
+   "server_errors": 0,
+   "wall_s": 83,
+   "translation_sample": [
+    "Guten Morgen.",
+    "Guten Morgen und willkommen zu diesem Leben im Messias.",
+    "Guten Morgen und willkommen",
+    "Durchdringung von Echtzeitgeschwindigkeit",
+    "Übersetzung"
+   ]
+  },
+  "en-sk|chunk2": {
+   "segments": 34,
+   "with_audio": 24,
+   "lag_median_s": 1.97,
+   "lag_p90_s": 2.88,
+   "lag_max_s": 3.88,
+   "first_word_lag_median_s": 4.05,
+   "tail_after_input_s": 1.41,
+   "transcript_WER_prefix": 0.238,
+   "transcript_events": 24,
+   "duplicate_transcripts": 0,
+   "stock_phrase_segments": 0,
+   "server_errors": 0,
+   "wall_s": 83,
+   "translation_sample": [
+    "Dobré ráno.",
+    "Dobré ráno a vitajte v tomto Živom Mesiášovi.",
+    "príhovoru v reálnom čase",
+    "preklad",
+    "Hovorím po anglicky a ty..."
+   ]
+  },
+  "en-sk|agree10": {
+   "segments": 34,
+   "with_audio": 24,
+   "lag_median_s": 1.89,
+   "lag_p90_s": 3.1,
+   "lag_max_s": 4.03,
+   "first_word_lag_median_s": 3.92,
+   "tail_after_input_s": 1.38,
+   "transcript_WER_prefix": 0.23,
+   "transcript_events": 24,
+   "duplicate_transcripts": 0,
+   "stock_phrase_segments": 0,
+   "server_errors": 0,
+   "wall_s": 83,
+   "translation_sample": [
+    "Dobré ráno.",
+    "Dobré ráno a vitajte v tejto živej správe.",
+    "rýchlosť v reálnom čase,",
+    "preklad",
+    "Hovorím po anglicky a ty..."
+   ]
+  }
+ },
+ "log": [
+  {
+   "t": 63.4,
+   "m": "staged",
+   "src": "/kaggle/input/datasets/yegorby/bp-code-20261107",
+   "audio": "/kaggle/input/datasets/yegorby/bp-owner-scripts-20261107/en_script_reading.m4a"
+  },
+  {
+   "t": 90.7,
+   "m": "pip",
+   "rc": 0,
+   "tail": "ggingface-hub<3.0,>=1.32.0, but you have huggingface-hub 0.36.2 which is incompatible.\ngoogle-adk 2.7.1 requires google-auth[pyopenssl]>=2.47, but you have google-auth 2.35.0 which is incompatible.\ngoogle-adk 2.7.1 requires websockets<16,>=15.0.1, but you have websockets 12.0 which is incompatible.\n"
+  },
+  {
+   "t": 92.8,
+   "m": "voice",
+   "v": "en_US-john-medium",
+   "rc": 0
+  },
+  {
+   "t": 94.0,
+   "m": "voice",
+   "v": "de_DE-thorsten-medium",
+   "rc": 0
+  },
+  {
+   "t": 95.5,
+   "m": "voice",
+   "v": "sk_SK-lili-medium",
+   "rc": 0
+  },
+  {
+   "t": 149.6,
+   "m": "mt_convert",
+   "pair": "en-de",
+   "rc": 0,
+   "tail": ""
+  },
+  {
+   "t": 166.7,
+   "m": "mt_convert",
+   "pair": "en-sk",
+   "rc": 0,
+   "tail": ""
+  },
+  {
+   "t": 265.9,
+   "m": "run",
+   "run": "en-de|chunk2",
+   "segments": 34,
+   "with_audio": 23,
+   "lag_median_s": 3.89,
+   "lag_p90_s": 5.34,
+   "lag_max_s": 5.59,
+   "first_word_lag_median_s": 6.01,
+   "tail_after_input_s": 4.86,
+   "transcript_WER_prefix": 0.221,
+   "transcript_events": 24,
+   "duplicate_transcripts": 0,
+   "stock_phrase_segments": 0,
+   "server_errors": 0,
+   "wall_s": 91
+  },
+  {
+   "t": 360.0,
+   "m": "run",
+   "run": "en-de|agree10",
+   "segments": 34,
+   "with_audio": 24,
+   "lag_median_s": 1.56,
+   "lag_p90_s": 2.55,
+   "lag_max_s": 4.13,
+   "first_word_lag_median_s": 3.67,
+   "tail_after_input_s": 2.68,
+   "transcript_WER_prefix": 0.213,
+   "transcript_events": 24,
+   "duplicate_transcripts": 0,
+   "stock_phrase_segments": 0,
+   "server_errors": 0,
+   "wall_s": 83
+  },
+  {
+   "t": 454.2,
+   "m": "run",
+   "run": "en-de|agree05",
+   "segments": 41,
+   "with_audio": 27,
+   "lag_median_s": 17.88,
+   "lag_p90_s": 23.54,
+   "lag_max_s": 25.27,
+   "first_word_lag_median_s": 20.59,
+   "tail_after_input_s": 26.24,
+   "transcript_WER_prefix": 0.475,
+   "transcript_events": 31,
+   "duplicate_transcripts": 0,
+   "stock_phrase_segments": 0,
+   "server_errors": 0,
+   "wall_s": 83
+  },
+  {
+   "t": 548.3,
+   "m": "run",
+   "run": "en-sk|chunk2",
+   "segments": 34,
+   "with_audio": 24,
+   "lag_median_s": 1.97,
+   "lag_p90_s": 2.88,
+   "lag_max_s": 3.88,
+   "first_word_lag_median_s": 4.05,
+   "tail_after_input_s": 1.41,
+   "transcript_WER_prefix": 0.238,
+   "transcript_events": 24,
+   "duplicate_transcripts": 0,
+   "stock_phrase_segments": 0,
+   "server_errors": 0,
+   "wall_s": 83
+  },
+  {
+   "t": 642.4,
+   "m": "run",
+   "run": "en-sk|agree10",
+   "segments": 34,
+   "with_audio": 24,
+   "lag_median_s": 1.89,
+   "lag_p90_s": 3.1,
+   "lag_max_s": 4.03,
+   "first_word_lag_median_s": 3.92,
+   "tail_after_input_s": 1.38,
+   "transcript_WER_prefix": 0.23,
+   "transcript_events": 24,
+   "duplicate_transcripts": 0,
+   "stock_phrase_segments": 0,
+   "server_errors": 0,
+   "wall_s": 83
+  },
+  {
+   "t": 645.9,
+   "m": "done",
+   "wall_s": 646
+  }
+ ],
+ "env": {
+  "gpu": "Tesla T4\nTesla T4"
+ },
+ "status": "done"
+}
