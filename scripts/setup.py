@@ -34,7 +34,7 @@ DEFAULT_LANGS = "de,sk,cs"
 PROFILES = {   # extra pip packages and the speech model each hardware profile runs (documentation/LANGUAGES.md)
     "cpu": {"pip": ["onnx-asr", "onnxruntime"], "stt": ("Systran/faster-whisper-small", "ct2_models/whisper-small")},
     "mac": {"pip": ["mlx-whisper", "onnx-asr", "onnxruntime"], "stt": None},   # MLX model is fetched from the Hugging Face hub below
-    "nvidia": {"pip": ["nvidia-cublas-cu12", "nvidia-cudnn-cu12", "onnx-asr", "onnxruntime-gpu"], "stt": ("Systran/faster-whisper-large-v3-turbo", "ct2_models/whisper-large-v3-turbo")},
+    "nvidia": {"pip": ["nvidia-cublas-cu12", "nvidia-cudnn-cu12", "onnx-asr", "onnxruntime-gpu"], "stt": ("mobiuslabsgmbh/faster-whisper-large-v3-turbo", "ct2_models/whisper-large-v3-turbo")},   # the repo faster-whisper itself maps "large-v3-turbo" to
 }
 
 
