@@ -1,0 +1,15 @@
+{
+  "id": "yegorby/bp-sk-turbo-compare-t4",
+  "title": "BP SK Turbo Compare T4",
+  "code_file": "job.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": ["yegorby/bp-owner-scripts-20261107"],
+  "competition_sources": [],
+  "model_sources": [],
+  "category_ids": [],
+  "keywords": []
+}
