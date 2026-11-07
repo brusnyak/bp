@@ -147,6 +147,7 @@ from starlette.websockets import WebSocketState # Import WebSocketState
 
 from backend.stt.faster_whisper_stt import FasterWhisperSTT
 from backend import prosody as _prosody
+from backend import room as _room
 from backend.stt import guards as _stt_guards
 from backend.stt.streaming_captions import SessionCaptioner, STREAMING_CAPTIONS_AVAILABLE  # T044
 from backend.mt.ctranslate2_mt import CTranslate2MT
@@ -1775,6 +1776,13 @@ async def _process_speech_segment_pipeline(
             logging.info(f"Backend: Session {client_info}: dropped likely hallucination ({len(transcribed_text.strip())} chars, chunk {audio_segment_np.size / AUDIO_SAMPLE_RATE:.2f}s).")
             return
 
+        # Room mode: hand the recognised phrase to every listener language of this speaker's room (one translation + one voice per language).
+        _rid = session_config.get("room_id")
+        if _rid:
+            _r = _room.get_room(_rid, create=False)
+            if _r and _r.listeners:
+                _r.publish(transcribed_text.strip(), source_lang, onset=segment_start_time - audio_segment_np.size / AUDIO_SAMPLE_RATE)
+
         # Track last non-empty transcription for promoting to final if the tail segment is too short
         session_data["last_transcription_text"] = transcribed_text
 
@@ -2275,6 +2283,8 @@ async def handle_audio_stream(websocket: WebSocket, token: Optional[str] = None)
                             new_speaker_text = data.get("speaker_text", session_config["speaker_text"])
                             new_speaker_lang = data.get("speaker_lang", session_config["speaker_lang"])
                             new_vad_enabled = data.get("vad_enabled", session_config["vad_enabled"]) # Get new VAD enabled state
+                            if "room_id" in data:   # room mode: this session is the speaker of that room (listeners join /ws/listen)
+                                session_config["room_id"] = (str(data["room_id"])[:64] or None)
                             logging.debug(f"Backend: Received config_update: {data}")
 
                             config_changed = (

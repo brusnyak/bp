@@ -362,6 +362,63 @@ def create_app(db_session_local_override=None) -> FastAPI:
             "notes": cfg.notes,
         }
 
+    # ----------------------------------------------------------------------- room mode
+    @_app.post("/api/room", summary="Create a room (speaker side); listeners join /ws/listen?room=ID&lang=xx")
+    async def room_create(current_user: User = Depends(backend_main.get_current_user)):
+        from backend.room import get_room, new_room_id
+        rid = new_room_id(); get_room(rid)
+        return {"room_id": rid, "listen_path": f"/ui/listen/listen.html?room={rid}"}
+
+    @_app.get("/api/room/{room_id}", summary="Room status: listeners per language")
+    async def room_status(room_id: str, current_user: User = Depends(backend_main.get_current_user)):
+        from backend.room import get_room
+        room = get_room(room_id, create=False)
+        if room is None:
+            raise HTTPException(status_code=404, detail="no such room")
+        langs: dict = {}
+        for l in room.listeners.values():
+            langs[l.lang] = langs.get(l.lang, 0) + 1
+        return {"room_id": room_id, "listeners": len(room.listeners), "languages": langs, "phrases_published": room.published}
+
+    @_app.websocket("/ws/listen")
+    async def listen_websocket(websocket: WebSocket):
+        """Room listener: ?room=ID&lang=de&token=TOKEN. Receives JSON {type: room_caption, lang, seq, source, translated} and binary WAV chunks.
+        Client may send {"type": "set_lang", "lang": "fr"}."""
+        user = authenticated_user(websocket.query_params.get("token"))
+        await websocket.accept()
+        if user is None:
+            await websocket.close(code=4003, reason="Authentication required"); return
+        from backend.room import get_room
+        room_id = (websocket.query_params.get("room") or "")[:64]
+        lang = (websocket.query_params.get("lang") or "en")[:8]
+        if not room_id:
+            await websocket.send_json({"type": "error", "message": "room is required"}); await websocket.close(); return
+        room = get_room(room_id)
+        try:
+            listener = room.add_listener(websocket, lang)
+        except ValueError as e:
+            await websocket.send_json({"type": "error", "message": str(e)}); await websocket.close(); return
+        await websocket.send_json({"type": "joined", "room_id": room_id, "lang": lang, "listeners": len(room.listeners)})
+        try:
+            while True:
+                msg = await websocket.receive()
+                if msg["type"] == "websocket.disconnect":
+                    break
+                if msg.get("text"):
+                    try:
+                        data = json.loads(msg["text"])
+                        if data.get("type") == "set_lang":
+                            room.set_language(listener.id, str(data.get("lang", lang))[:8]); lang = listener.lang
+                            await websocket.send_json({"type": "lang_set", "lang": lang})
+                    except ValueError as e:
+                        await websocket.send_json({"type": "error", "message": str(e)})
+                    except Exception:
+                        pass
+        except Exception:
+            pass
+        finally:
+            room.remove_listener(listener.id)
+
     # ------------------------------------------------------- meeting room mgmt
     @_app.post("/api/meeting/create", summary="Create a meeting room")
     async def meeting_create(room_id: Optional[str] = Query(None),

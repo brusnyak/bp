@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Listen: live translation</title>
+<style>
+:root{color-scheme:light dark;--bg:#fff;--fg:#111;--mut:#666;--line:#ddd;--acc:#0a6}
+@media(prefers-color-scheme:dark){:root{--bg:#111;--fg:#eee;--mut:#aaa;--line:#333;--acc:#4dd9a0}}
+body{margin:0;font:17px/1.5 system-ui,sans-serif;background:var(--bg);color:var(--fg);max-width:640px;margin:0 auto;padding:16px}
+h1{font-size:1.2rem;margin:.2rem 0 1rem}label{display:block;margin:.6rem 0 .2rem;color:var(--mut);font-size:.9rem}
+input,select,button{font:inherit;padding:.5rem .6rem;border:1px solid var(--line);border-radius:6px;background:transparent;color:inherit;width:100%;box-sizing:border-box}
+button{background:var(--acc);color:#fff;border:0;margin-top:1rem;cursor:pointer}button:disabled{opacity:.5}
+#state{color:var(--mut);margin:.8rem 0}#caps{margin-top:1rem}.cap{padding:.5rem 0;border-top:1px solid var(--line)}.src{color:var(--mut);font-size:.85rem}
+</style></head><body>
+<h1>Listen in your language</h1>
+<label for="room">Room</label><input id="room" autocomplete="off">
+<label for="lang">My language</label>
+<select id="lang"><option value="en">English</option><option value="de">Deutsch</option><option value="sk">Slovenčina</option><option value="cs">Čeština</option><option value="fr">Français</option><option value="pl">Polski</option></select>
+<button id="go">Start listening</button>
+<div id="state">Wear headphones or an earpiece. The translated voice plays here; captions appear below.</div>
+<div id="caps"></div>
+<script>
+const $ = id => document.getElementById(id), qs = new URLSearchParams(location.search);
+$('room').value = qs.get('room') || ''; if (qs.get('lang')) $('lang').value = qs.get('lang');
+let ws = null, ctx = null, playAt = 0;
+async function token() {
+  let t = localStorage.getItem('userToken'); if (t) return t;
+  const r = await fetch('/api/guest', { method: 'POST' }); const d = await r.json(); return d.token || d.access_token;
+}
+function play(buf) {                       // one-at-a-time queue on the audio clock: chunks never overlap, silence padding inside each chunk keeps the speaker's pauses
+  ctx.decodeAudioData(buf.slice(0)).then(a => {
+    const s = ctx.createBufferSource(); s.buffer = a; s.connect(ctx.destination);
+    const t = Math.max(ctx.currentTime + 0.02, playAt); s.start(t); playAt = t + a.duration;
+  }).catch(() => {});
+}
+$('go').onclick = async () => {
+  if (ws) { ws.close(); ws = null; $('go').textContent = 'Start listening'; $('state').textContent = 'Stopped.'; return; }
+  const room = $('room').value.trim(); if (!room) { $('state').textContent = 'Enter the room code.'; return; }
+  ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); await ctx.resume(); playAt = 0;
+  const tk = await token(); if (!tk) { $('state').textContent = 'Could not sign in as guest.'; return; }
+  ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/listen?room=' + encodeURIComponent(room) + '&lang=' + $('lang').value + '&token=' + encodeURIComponent(tk));
+  ws.binaryType = 'arraybuffer';
+  ws.onopen = () => { $('go').textContent = 'Stop'; $('state').textContent = 'Connected. Waiting for the speaker.'; };
+  ws.onclose = () => { $('go').textContent = 'Start listening'; $('state').textContent = 'Disconnected.'; ws = null; };
+  ws.onmessage = ev => {
+    if (typeof ev.data !== 'string') return play(ev.data);
+    const m = JSON.parse(ev.data);
+    if (m.type === 'error') $('state').textContent = m.message;
+    else if (m.type === 'joined') $('state').textContent = 'Listening in ' + m.lang + ' (' + m.listeners + ' in the room).';
+    else if (m.type === 'room_caption') {
+      const d = document.createElement('div'); d.className = 'cap'; d.textContent = m.translated;
+      const s = document.createElement('div'); s.className = 'src'; s.textContent = m.source; d.appendChild(s); $('caps').prepend(d);
+    }
+  };
+};
+$('lang').onchange = () => { if (ws && ws.readyState === 1) ws.send(JSON.stringify({ type: 'set_lang', lang: $('lang').value })); };
+</script></body></html>
