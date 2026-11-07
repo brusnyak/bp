@@ -123,7 +123,7 @@ def main():
 
     if not a.skip_models:
         step("Translation models (+ Slovak speech model): one-time CTranslate2 conversion in an isolated env; skips what exists")
-        run([sys.executable, "scripts/convert_models.py", "--pairs", ",".join(pairs), *(["--skip-stt-model"] if "sk" not in a.langs.split(",") else [])])
+        run([sys.executable, "scripts/convert_models.py", "--pairs", ",".join(pairs), *(["--skip-stt-model"] if "sk" not in a.langs.split(",") else []), *(["--sk-model", "kinit"] if a.profile in ("mac", "nvidia") else [])])
 
     # Voice Lab ear-grade store (processed/ear_grades.json is generated + gitignored; /api/ratings and the ratings tests need it).
     step("Voice Lab grade store")

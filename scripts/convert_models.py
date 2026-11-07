@@ -29,7 +29,9 @@ def run(cmd):
     subprocess.run([str(c) for c in cmd], cwd=ROOT, env=ENV, check=True)
 
 
-SK_STT = ("NaiveNeuron/whisper-small-sk", "ct2_models/whisper-small-sk")  # Slovak-fine-tuned Whisper small (MIT)
+SK_SMALL = ("NaiveNeuron/whisper-small-sk", "ct2_models/whisper-small-sk")        # Slovak-fine-tuned Whisper small (MIT): CPU default
+SK_KINIT = ("kinit/whisper-large-v3-turbo-sk", "ct2_models/whisper-large-v3-turbo-sk")  # Slovak turbo fine-tune: 6.5% vs 10.7% plain turbo on FLEURS-sk (presets mac/nvidia use it)
+SK_STT = SK_KINIT if "--sk-model" in sys.argv and sys.argv[sys.argv.index("--sk-model") + 1] == "kinit" else SK_SMALL
 
 
 def main():
