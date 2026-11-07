@@ -1,4 +1,4 @@
-.PHONY: install run test test-ui i18n demo-check demo-audio lab clean help
+.PHONY: install run test test-ui i18n demo-check demo-audio lab clean help check-docs
 
 # Same commands on every OS; the real work lives in scripts/setup.py.
 ifeq ($(OS),Windows_NT)
@@ -16,8 +16,11 @@ run: ## Run the server on http://localhost:8000 (loopback only; BP_HOST=0.0.0.0 
 	$(VENV_PY) app.py
 
 test: ## Run the backend test suite.
-	export BP_DISABLE_RATE_LIMIT=1; $(VENV_PY) -m pytest test/hardware_test.py test/hardware_scan_tests.py test/vad_tests.py test/mt_model_tests.py test/backend_api_tests.py test/backend_auth_tests.py test/security_tests.py test/config_tests.py test/readiness_regression_test.py test/language_evidence_test.py test/incremental_tests.py test/ui_manifest_test.py -q
+	export BP_DISABLE_RATE_LIMIT=1; $(VENV_PY) -m pytest test/hardware_test.py test/hardware_scan_tests.py test/vad_tests.py test/mt_model_tests.py test/backend_api_tests.py test/backend_auth_tests.py test/security_tests.py test/config_tests.py test/readiness_regression_test.py test/language_evidence_test.py test/incremental_tests.py test/ui_manifest_test.py test/prosody_tests.py test/mlx_guard_tests.py -q
 
+
+check-docs: ## Fail if a number quoted in the docs differs from the saved benchmark receipt (<!-- claim:ID -->value<!-- /claim -->).
+	$(PYTHON) scripts/check_readme_claims.py
 
 i18n: ## Interface translations: coverage per locale, then check the generated manifests are fresh.
 	$(PYTHON) scripts/i18n_tool.py coverage

@@ -224,6 +224,14 @@ def _stt_factory(model_size: str = "base") -> Callable[..., object]:
     return make
 
 
+def _mlx_whisper_factory() -> Callable[..., object]:
+    def make(**kwargs):
+        _ensure_repo_on_path()
+        from backend.stt.mlx_whisper_stt import MLXWhisperSTT
+        return MLXWhisperSTT(model_size=kwargs.get("model_size", "large-v3-turbo"), beam_size=kwargs.get("beam_size", 5))
+    return make
+
+
 def _parakeet_factory(model_name: str = "nvidia/parakeet-tdt-0.6b-v3") -> Callable[..., object]:
     def make(**kwargs):
         _ensure_repo_on_path()
@@ -329,6 +337,14 @@ def _register_defaults() -> None:
         license_note="faster-whisper + CTranslate2 MIT; whisper weights MIT",
         resource="~1 GB per loaded model (int8 smaller)",
         notes="chunked, not streaming; model_size is per-language-pack"))
+
+    register(Capability(
+        "mlx_whisper", "stt", factory=_mlx_whisper_factory(),
+        probe=_has_module("mlx_whisper"), devices=("cpu",),
+        streaming=False, license="commercial-ok",
+        license_note="mlx-whisper MIT; whisper weights MIT",
+        resource="~1.6 GB (large-v3-turbo) on the Apple GPU; macOS arm64 only",
+        notes="Mac default candidate: measured 2026-11-07, see documentation/BENCHMARKS.md; set BP_STT_ENGINE=mlx_whisper"))
 
     # MT -------------------------------------------------------------------
     register(Capability(

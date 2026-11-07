@@ -1,0 +1,32 @@
+{
+ "note": "scripts/live/paced_replay.py at 1x; EN->SK; fw_base = 29 s test clip, faster-whisper base; mlx / mlx_prosody = owner en_script_reading.m4a first 60 s, mlx-whisper large-v3-turbo; M1 Pro normal QoS",
+ "runs": {
+  "fw_base": {
+   "median": 0.82,
+   "p90": 1.23,
+   "max": 1.75,
+   "segments": 17,
+   "with_audio": 15
+  },
+  "mlx": {
+   "median": 1.01,
+   "p90": 1.88,
+   "max": 2.76,
+   "segments": 36,
+   "with_audio": 28
+  },
+  "mlx_prosody": {
+   "median": 1.19,
+   "p90": 2.65,
+   "max": 3.88,
+   "segments": 29,
+   "with_audio": 22
+  }
+ },
+ "fw_base_lag_median": 0.82,
+ "mlx_lag_median": 1.01,
+ "mlx_prosody_lag_median": 1.19,
+ "mlx_prosody_lag_p90": 2.65,
+ "mlx_prosody_padded_segments": 15,
+ "mlx_prosody_pad_total_s": 12.5
+}
