@@ -21,3 +21,11 @@ def test_real_speech_passes():
     assert not is_garbage("Good morning and welcome to this live demonstration of real time speech translation.", 6.0)
     assert not is_garbage("It is one of the first of the fifteen.", 2.5)
     assert not is_garbage("", 1.0)
+
+
+def test_should_drop_stock_phrase_on_short_chunk_only():
+    from backend.stt.guards import should_drop
+    assert should_drop(" Thank you.", 2.0) and should_drop("Okay.", 1.0)
+    assert not should_drop("Thank you for listening, and I look forward to your questions.", 2.0)   # a real sentence
+    assert not should_drop(" Thank you.", 4.0)                                                       # long chunk: probably real
+    assert not should_drop("", 1.0) and not should_drop("   ", 1.0)

@@ -101,8 +101,8 @@ def _piper_generic_en_factory() -> PiperTTS:
 
 
 def _piper_generic_de_factory() -> PiperTTS:
-    # Generic DE base voice (karlsson-low, downloaded from rhasspy/piper-voices), no fine-tune.
-    return PiperTTS(model_id="de_DE-karlsson-low", device=hardware.detect_backend("tts_baseline"))
+    # Generic DE base voice (thorsten-medium, downloaded from rhasspy/piper-voices; the voice benchmarked in documentation/LANGUAGES.md), no fine-tune.
+    return PiperTTS(model_id="de_DE-thorsten-medium", device=hardware.detect_backend("tts_baseline"))
 
 
 def _piper_generic_fr_factory() -> PiperTTS:
