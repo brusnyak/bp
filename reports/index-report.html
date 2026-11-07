@@ -562,7 +562,7 @@
       <caption>Jazykové cesty a hranice dôkazov</caption>
       <thead><tr><th scope="col">Smer</th><th scope="col">Stav</th><th scope="col">Dôkaz a ďalší krok</th></tr></thead>
       <tbody>
-        <tr><th scope="row">EN → SK</th><td><span class="badge measured">Zaznamenaný živý beh</span></td><td>Historická latencia 0,78–1,3 s. Zdroj: živé merania v PLAN.md; dnes sa živý beh neopakoval.</td></tr>
+        <tr><th scope="row">EN → SK</th><td><span class="badge measured">Zaznamenaný živý beh</span></td><td>Historická latencia 0,78–1,3 s. Zdroj: živé merania v documentation/archive/2026-11-07-stale/PLAN.md; dnes sa živý beh neopakoval.</td></tr>
         <tr><th scope="row">SK → EN</th><td><span class="badge projected">Experimentálne</span></td><td>V6: opravené WER 0,2727 na krátkom klipe; úplnosť referencie neoverená. Potrebný test na úplných mikrofónových nahrávkach.</td></tr>
         <tr><th scope="row">EN → CS / CS → EN</th><td><span class="badge unknown">Treba doložiť celú cestu</span></td><td>Český pack a modely sú kandidát na druhú jazykovú cestu. Samotná prítomnosť Piper jirka a Opus-MT nepotvrdzuje presnosť, živú latenciu ani oba smery.</td></tr>
         <tr><th scope="row">Ďalšie jazyky</th><td><span class="badge unknown">Plánované</span></td><td>Až po SK/CS. Každý smer potrebuje vlastný STT, MT, TTS, licenčnú kontrolu a výstupný artefakt.</td></tr>
@@ -851,7 +851,7 @@
 
   <footer>
     <div>Aktualizácia 3. 11. 2026: oprava autentifikácie Kaggle, prepočet v6 a nový Canary v1 test. Ostatné čísla v archíve a inventári sú historické merania alebo tvrdenia dodávateľov; v tejto aktualizácii sa neopakovali.</div>
-    <div class="src">Primárne podklady: <a href="https://huggingface.co/nvidia/canary-1b-v2">modelová karta Canary-1b-v2</a> · <a href="https://github.com/Kaggle/kaggle-cli/blob/main/docs/README.md#authentication">Kaggle CLI autentifikácia</a> · <a href="#kaggle">nové výsledkové záznamy</a>. Historický inventár vychádza z <code>documentation/model_landscape_2026-10.md</code> a <code>PLAN.md</code>.</div>
+    <div class="src">Primárne podklady: <a href="https://huggingface.co/nvidia/canary-1b-v2">modelová karta Canary-1b-v2</a> · <a href="https://github.com/Kaggle/kaggle-cli/blob/main/docs/README.md#authentication">Kaggle CLI autentifikácia</a> · <a href="#kaggle">nové výsledkové záznamy</a>. Historický inventár vychádza z <code>documentation/model_landscape_2026-10.md</code> a <code>documentation/archive/2026-11-07-stale/PLAN.md</code>.</div>
   </footer>
 
 
@@ -875,7 +875,7 @@ const MODELS = [
     sk:"covers", skText:"99 jazykov vr. SK", lic:"safe", licText:"MIT",
     ev:["measured"], verdict:"reject", vText:"Zamietnuté",
     key:"WER 0.12 FLEURS-sk, ale 0.41&ndash;0.52 na vlastnom mikrofóne, ~7&ndash;9 s/klip.",
-    note:"Zamietnuté: destilácia ho pripravila o kapacitu pre nízkozdrojové jazyky. Definitívny negatívny výsledok, PLAN.md 2026-09-29." },
+    note:"Zamietnuté: destilácia ho pripravila o kapacitu pre nízkozdrojové jazyky. Definitívny negatívny výsledok, documentation/archive/2026-11-07-stale/PLAN.md 2026-09-29." },
   { dom:"STT", name:"Parakeet-TDT v3 0.6B", flag:false, sub:["680 MB INT8 ONNX", "sherpa-onnx CPU", "25 EU jazykov"],
     sk:"covers", skText:"25 EU jazykov vr. SK", lic:"safe", licText:"CC-BY-4.0",
     ev:["vendor","measured","community"], verdict:"reject", vText:"Odložené",
@@ -904,7 +904,7 @@ const MODELS = [
   { dom:"STT", name:"Zipformer / Moonshine / Cohere-transcribe", flag:false, sub:["nenáročné na CPU", "žiadne pokrytie SK/CZ"],
     sk:"none", skText:"žiadne pokrytie SK/CZ", lic:"restricted", licText:"rôzne",
     ev:["measured"], verdict:"reject", vText:"Mŕtve",
-    key:"Zabité / odstavené s dôvodmi, PLAN.md 2026-09-29.",
+    key:"Zabité / odstavené s dôvodmi, documentation/archive/2026-11-07-stale/PLAN.md 2026-09-29.",
     note:"Mŕtve, netestovať znova." },
   { dom:"STT", name:"Multitalker Parakeet streaming", flag:false, sub:["jedna inštancia na rečníka", "25 jazykov"],
     sk:"covers", skText:"25 jazykov (SK pravdepodobne)", lic:"safe", licText:"CC-BY-4.0",
@@ -993,7 +993,7 @@ const MODELS = [
   { dom:"TTS", name:"XTTS / F5 / CosyVoice-staršie", flag:false, sub:["viazané na CUDA alebo bez SK"],
     sk:"none", skText:"bez SK alebo viazané na CUDA", lic:"restricted", licText:"rôzne",
     ev:["measured"], verdict:"reject", vText:"Mŕtve",
-    key:"Zamietnutia platia (tts_landscape_2026-09.md + PLAN.md).",
+    key:"Zamietnutia platia (tts_landscape_2026-09.md + documentation/archive/2026-11-07-stale/PLAN.md).",
     note:"Mŕtve, netestovať znova." },
   { dom:"TTS", name:"Kyutai Pocket TTS 100M", flag:true, sub:["100M", "rýchlejšie než realtime na CPU", "kód na jeden riadok"],
     sk:"covers", skText:"viacjazyčné (overiť SK)", lic:"restricted", licText:"open (Kyutai)",
@@ -1069,11 +1069,11 @@ const IDX = [
   { t:"Verdikt o novom hlase", f:"documentation/verification_omni_piper_sk_2026-09-30.md &middot; processed/engine_ab/matrix_omnihq.json &middot; processed/machine_listen.json" },
   { t:"QC hromadného korpusu", f:"processed/omni_hq_sk/manifest.json &middot; processed/omni_hq_en/manifest.json" },
   { t:"Sluchové hodnotenia", f:"processed/ear_grades.json cez scripts/grade_library.py &middot; ui/voice-lab/library.json" },
-  { t:"Náklady tréningu", f:"processed/overnight_hq_2026-09-30.log &middot; compute_capacity_report_2026-09.md &sect;2&ndash;&sect;3" },
+  { t:"Náklady tréningu", f:"processed/overnight_hq_2026-09-30.log &middot; documentation/archive/2026-11-07-stale/compute_capacity_report_2026-09.md &sect;2&ndash;&sect;3" },
   { t:"Prototypy (spikes)", f:"processed/new_models/nemotron_matrix.json &middot; scripts/bench_nemotron.py &middot; processed/new_models/seamless_matrix.json &middot; processed/new_models/chatterbox_matrix.json &middot; scripts/bench_new_models.py" },
   { t:"X-Voice SK zero-shot (2026-10-02)", f:"processed/engine_ab/xvoice_zeroshot_v2.wav &middot; processed/new_models/xvoice_matrix.json &middot; processed/gpu_bench/colab_T4.json &middot; processed/gpu_bench/kaggle_T4/ &middot; documentation/model_landscape_2026-10.md &sect;10" },
   { t:"Záťažový test T4 (2026-10-02)", f:"scripts/gpu_bench/load_bench.py &middot; scripts/gpu_bench/kaggle_load/ &middot; processed/gpu_bench/load_T4/load_bench.json &middot; documentation/load_tests_2026-10.md" },
-  { t:"Zahrnuté predošlé verdikty", f:"PLAN.md &bdquo;Measured 2026-09-29&ldquo; (turbo negatívny, zipformer/cohere kills, VAD anomália, opravy chýb živého TTS hlasu)" }
+  { t:"Zahrnuté predošlé verdikty", f:"documentation/archive/2026-11-07-stale/PLAN.md &bdquo;Measured 2026-09-29&ldquo; (turbo negatívny, zipformer/cohere kills, VAD anomália, opravy chýb živého TTS hlasu)" }
 ];
 
 const LAT = [

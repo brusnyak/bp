@@ -9,7 +9,7 @@ backend itself (HTTPS root + /api/voice-lab/status + engine list).
     python3 scripts/demo_preflight.py --server     # also probe http://localhost:8000
 
 Exit code 0 = every required check passed (warnings allowed). Nothing is written.
-See documentation/demo_runbook_2026-09-28.md for what to do about each failure.
+See documentation/DEMO.md for what to do about each failure.
 """
 
 import argparse

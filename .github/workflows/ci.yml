@@ -42,7 +42,7 @@ jobs:
         shell: bash
         run: |
           if [ "$RUNNER_OS" = "Windows" ]; then PY=.venv/Scripts/python.exe; else PY=.venv/bin/python; fi
-          $PY -m pytest test/hardware_test.py test/vad_tests.py test/mt_model_tests.py test/backend_api_tests.py test/backend_auth_tests.py test/security_tests.py test/config_tests.py test/readiness_regression_test.py test/language_evidence_test.py test/incremental_tests.py test/prosody_tests.py test/mlx_guard_tests.py test/onnx_parakeet_words_test.py -q
+          $PY -m pytest test/hardware_test.py test/vad_tests.py test/mt_model_tests.py test/backend_api_tests.py test/backend_auth_tests.py test/security_tests.py test/config_tests.py test/readiness_regression_test.py test/language_evidence_test.py test/incremental_tests.py test/prosody_tests.py test/mlx_guard_tests.py test/onnx_parakeet_words_test.py test/setup_plan_test.py -q
       - name: Doc claims match the saved benchmark receipts
         shell: bash
         run: |

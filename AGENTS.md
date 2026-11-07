@@ -1,8 +1,8 @@
 # AGENTS.md — BP (real-time EN↔SK speech translation)
 
-> Current repair state (2026-11-04): start with `PRODUCT.md`, `documentation/implementation-2026-11-04/RESULTS.md` and `documentation/HANDOFF_NEXT_SESSION.md`. Earlier dated counts, readiness claims, media-access behavior and Kaggle failure explanations below are historical. Current contracts require authenticated explicit preparation, offline assets, target-language TTS, terminal Stop and reviewed full-route evidence. Full cloned-speech/LHC/commercial acceptance remains pending.
+> Current state (2026-11-07): start with `documentation/STATUS.md` (where the project stands), `documentation/LANGUAGES.md` and `documentation/BENCHMARKS.md`; every quoted number is checked by `make check-docs`. Older state (2026-11-04): `PRODUCT.md`, `documentation/implementation-2026-11-04/RESULTS.md` and `documentation/archive/2026-11-07-stale/HANDOFF_NEXT_SESSION.md`. Earlier dated counts, readiness claims, media-access behavior and Kaggle failure explanations below are historical. Current contracts require authenticated explicit preparation, offline assets, target-language TTS, terminal Stop and reviewed full-route evidence. Full cloned-speech/LHC/commercial acceptance remains pending.
 
-Project-level memory for every agent working in this repo. Read `PLAN.md` (state +
+Project-level memory for every agent working in this repo. Read `documentation/archive/2026-11-07-stale/PLAN.md` (state +
 next steps), `DESIGN.md` (UI contract) and `.specify/memory/constitution.md`
 (binding principles) before changing anything. Global conventions: `~/memory-vault`
 (`pages/agent-rules.md`, `pages/agent-memory.md`); session journal: vault
@@ -20,7 +20,7 @@ Backend FastAPI + WebSocket, UI plain HTML/CSS/JS. Owner: Yegor Brusnyak.
 
 | Machine | Path | Role |
 |---|---|---|
-| Mac, M1 Pro 16GB | `~/Documents/STU/BP` (main checkout, `main`) | reference box: all measurements in `PLAN.md` are from here; has `.venv` (post-`lite`; legacy `venv` still on disk), `.venv-stt` (Parakeet), `.venv-train` (Piper fine-tune), `models/` (OpenVoice), `.env`, HF cache |
+| Mac, M1 Pro 16GB | `~/Documents/STU/BP` (main checkout, `main`) | reference box: all measurements in `documentation/archive/2026-11-07-stale/PLAN.md` are from here; has `.venv` (post-`lite`; legacy `venv` still on disk), `.venv-stt` (Parakeet), `.venv-train` (Piper fine-tune), `models/` (OpenVoice), `.env`, HF cache |
 | Windows 11, AMD, CPU-only, no admin | fork `I-BRUS/bp`, branch `lite` (GitHub user `I-BRUS`) | portability proof: one-command `scripts/setup.py`, torch-free runtime, Piper-only (no XTTS/Coqui wheels) |
 
 Branch state and history (verified 2026-09-28, after the `lite` landing):
@@ -58,7 +58,7 @@ conversion) and one setup path — `python3.11 scripts/setup.py --dev` (the Mac'
 `python3` is 3.14, which the script rejects by design; `PYTHON=python3.11 make install`
 works too). ~92 s on a warm Mac, ~850 s cold on the Windows laptop. The old
 `setup_windows.ps1` / `SETUP_WINDOWS.md` / `requirements-windows.txt` were deleted by
-`lite` — do not resurrect them. Plans behind that split: `documentation/footprint_audit_2026-09-28.md`
+`lite` — do not resurrect them. Plans behind that split: `documentation/archive/2026-11-07-stale/footprint_audit_2026-09-28.md`
 (ranked cut list) and `documentation/linux_setup_and_test.md` (third-OS test sheet).
 
 ## Run it
@@ -74,7 +74,7 @@ works too). ~92 s on a warm Mac, ~850 s cold on the Windows laptop. The old
 | `.venv/bin/python test/interrupt_smoke_test.py` | live WS rehearsal, needs `make run` |
 | `.venv/bin/python scripts/e2e_ensk_new_voice.py` | full EN→SK offline run, writes `processed/e2e_ensk.json` |
 
-Demo: `documentation/demo_runbook_2026-09-28.md` (+ `monday_test_checklist.md`). Thesis: `documentation/thesis_draft.md`.
+Demo: `documentation/archive/2026-11-07-stale/demo_runbook_2026-09-28.md` (+ `documentation/archive/2026-11-07-stale/monday_test_checklist.md`). Thesis: `documentation/thesis_draft.md`.
 
 ## Architecture v2 — streaming redesign (in progress)
 
@@ -85,9 +85,9 @@ Ground-up redesign for near real-time streaming + multi-speaker meetings. New mo
 | Hardware auto-config | `backend/hardware_scan.py` | Scans CPU/RAM/GPU at startup, selects STT/MT/TTS/VAD config per machine |
 | Meeting session manager | `backend/session_manager.py` | Multi-speaker meeting rooms, per-speaker voice, per-listener language |
 | Streaming pipeline | `backend/streaming/pipeline.py` | True STT→MT→TTS streaming (0.7s windows, local-agreement, fragment emit) |
-| Streaming spec | `documentation/STREAMING_SPEC.md` | Latency budget, config env vars, test plan |
+| Streaming spec | `documentation/archive/2026-11-07-stale/STREAMING_SPEC.md` | Latency budget, config env vars, test plan |
 | Multi-speaker design | `documentation/MULTI_SPEAKER.md` | Room model, translation matrix, API endpoints |
-| Architecture overview | `documentation/ARCHITECTURE_V2.md` | Full v2 design, deployment modes, LHC fit |
+| Architecture overview | `documentation/archive/2026-11-07-stale/ARCHITECTURE_V2.md` | Full v2 design, deployment modes, LHC fit |
 
 Key change vs v1: v1 waits for silence/3s segment before STT→MT→TTS (~6-8s first word). v2 streams 0.7s audio windows, commits words via local-agreement, emits translated fragments as they're ready (~0.9s first word on CPU, ~0.5s on GPU T4).
 
@@ -157,7 +157,7 @@ Voices: `speaker_voices/` has 7 owner recordings (EN/SK/CS with transcripts). Ba
 9. **Kaggle T4 validation:** Canary AST done 2026-11-03 (not promoted). OmniVoice live-speech / long-sentence / presentation-pipeline test submitted to Kaggle (bp-omnivoice-matrix-20261104, RUNNING). Kokoro EN ear-grading pending. Revoke Kaggle/Modal tokens when done.
 10. **Load tests (T4, `documentation/load_tests_2026-10.md`):** OmniVoice clone RTF 0.18–0.34 (batch/QC path only — NOT live). Live path = Piper SK/EN on CPU (RTF ~0.04) + optional Kokoro EN GPU (RTF 0.03). New split: Kokoro EN + Piper SK on T4 (load test pending).
 11. **Project state (2026-10-02, owner):** ratings imported (`scripts/grade_library.py --apply --import voice-ratings.json`). Everything left needs better compute: live mic run on GPU machine, faster GPU numbers, duration cap vs playback backlog.
-12. **Lightened + dry-setup measured (2026-10-02, `documentation/setup_friction_2026-10.md`):** project 9.4 GB -> 2.9 GB; fresh clone = 89 s / 705 MB .git; `setup.py --dev` 428 s, tests 38/38, ~9 min total. Owner voice backup outside git: `~/Documents/STU/BP-voice-backup`.
+12. **Lightened + dry-setup measured (2026-10-02, `documentation/archive/2026-11-07-stale/setup_friction_2026-10.md`):** project 9.4 GB -> 2.9 GB; fresh clone = 89 s / 705 MB .git; `setup.py --dev` 428 s, tests 38/38, ~9 min total. Owner voice backup outside git: `~/Documents/STU/BP-voice-backup`.
 
 ## Session 2026-10-20 — Night Mode Findings
 

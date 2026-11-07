@@ -14,6 +14,8 @@ MATRIX = ROOT / "documentation/evidence/2026-11-07/lang_matrix.json"
 KAGGLE = ROOT / "route_receipt.json"
 PACED = ROOT / "documentation/evidence/2026-11-07/paced_replay_summary.json"
 SIM = ROOT / "documentation/evidence/2026-11-07/stream_sim.json"
+E2E = ROOT / "documentation/evidence/2026-11-07/e2e_chain.json"
+SKC = ROOT / "documentation/evidence/2026-11-07/sk_compare.json"
 TOL = 0.06  # relative; also accepts <=0.06 absolute for values under 1
 
 
@@ -29,7 +31,7 @@ def kaggle_profile(profile, q):
 
 
 def resolve(cid):
-    """ID grammar: kaggle:<profile>:p50|p95 | stt:<model>:<lang>:wer | mt:<model>:<lang>:<to_en|from_en>:chrf | paced:<key> | sim:<cell>:wer|lat|p90"""
+    """ID grammar: kaggle:<profile>:p50|p95 | stt:<model>:<lang>:wer | mt:<model>:<lang>:<to_en|from_en>:chrf | paced:<key> | sim:<cell>:wer|lat|p90 | e2e:<dir>:chain|stt|mt|tts | sk:<kinit|plain|small>:<fleurs|owner>"""
     k = cid.split(":")
     if k[0] == "kaggle":
         return kaggle_profile(k[1], {"p50": 0.5, "p95": 0.95}[k[2]])
@@ -41,6 +43,13 @@ def resolve(cid):
     if k[0] == "sim":      # sim:<stream>|<engine>|<strategy>:wer|lat|p90   (T4 streaming simulation)
         c = json.loads(SIM.read_text())["cells"][k[1]]
         return {"wer": c["WER"] * 100, "lat": c["latency_median_s"], "p90": c["latency_p90_s"]}[k[2]]
+    if k[0] == "e2e":      # e2e:<direction>:chain|stt|mt|tts   (Kaggle T4, median of 25 clips, seconds)
+        c = json.loads(E2E.read_text())["chain"][k[1]]
+        return {"chain": c["chain_s_median"], "stt": c["stt_s"], "mt": c["mt_s"], "tts": c["tts_s"]}[k[2]]
+    if k[0] == "sk":       # sk:<kinit|plain|small>:<fleurs|owner>  -> word error %
+        c = json.loads(SKC.read_text())["cells"]
+        name = {"kinit": "kinit/whisper-large-v3-turbo-sk", "plain": "large-v3-turbo (plain)", "small": "NaiveNeuron/whisper-small-sk (incumbent)"}[k[1]]
+        return c[f"{name}|{'fleurs-sk' if k[2] == 'fleurs' else 'owner-sk'}"]["WER"] * 100
     if k[0] == "paced":
         return json.loads(PACED.read_text())[k[1]]
     raise KeyError(cid)
