@@ -80,3 +80,4 @@ eval_data/
 
 # generated from NTREX-128 (not redistributed); rebuild with scripts/build_recording_set.py
 documentation/recording_script_sk_v2.md
+logs/

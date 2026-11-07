@@ -17,7 +17,14 @@ Microphone → voice-activity detection → speech recognition (STT) → machine
 | Slovak / Czech → English | Experimental: recognition errors are still common on Slovak and Czech speech |
 | Other packs (`languages/packs/`) | Declared; need installed models and a test before use |
 
-**Speed (measured 2026-11-06, M1 Pro 16GB, CPU):** EN→SK first translated audio 0.39s; ~0.67s per 2s speech window (STT ~0.59s, MT ~0.03s, TTS ~0.05s); RTF 0.672 (faster than real-time on the reference Mac). Continuous streaming — audio is processed as it arrives, not batched into 3 s segments. Whisper `base` int8 for EN STT; Whisper `small-sk` int8 for SK/CS STT. SK→EN is experimental (whisper-small-sk WER 0.25–0.32 > 0.2 gate). CS→EN near real-time on Kaggle T4 GPU (p50 1.86s, p95 4.22s onset→first audio); not trusted on local CPU due to STT quality. Raw data: `documentation/VERIFICATION_RESULTS_2026-11-06.md` and `documentation/implementation-2026-11-04/`.
+**Speed and accuracy (measured 2026-11-07; every number below is checked against its saved receipt by `make check-docs`):**
+
+- **Live route, EN→SK, M1 Pro, delay from end of speech to the first translated audio** (`scripts/live/paced_replay.py` at 1×, evidence in `documentation/evidence/2026-11-07/`): Whisper `base` median <!-- claim:paced:fw_base_lag_median -->0.82<!-- /claim --> s; `mlx-whisper` large-v3-turbo median <!-- claim:paced:mlx_lag_median -->1.01<!-- /claim --> s; turbo with the pause mirror (below) median <!-- claim:paced:mlx_prosody_lag_median -->1.19<!-- /claim --> s, p90 <!-- claim:paced:mlx_prosody_lag_p90 -->2.65<!-- /claim --> s. An earlier "0.39 s first audio" figure could not be reproduced and was removed.
+- **Speech recognition, Kaggle T4, mean word error on FLEURS read speech (60 clips per language)**, German: base 18.1%, small <!-- claim:stt:whisper-small:de:wer -->10.9<!-- /claim -->%, large-v3-turbo <!-- claim:stt:whisper-large-v3-turbo:de:wer -->4.8<!-- /claim -->%, Parakeet v3 <!-- claim:stt:parakeet-tdt-v3:de:wer -->6.3<!-- /claim -->%. Czech: turbo <!-- claim:stt:whisper-large-v3-turbo:cs:wer -->11.6<!-- /claim -->% (base 67%). Slovak: turbo <!-- claim:stt:whisper-large-v3-turbo:sk:wer -->10.7<!-- /claim -->%, Parakeet <!-- claim:stt:parakeet-tdt-v3:sk:wer -->9.9<!-- /claim -->%. Turbo wins German, Czech, Polish and English; Parakeet wins French and Slovak by under 2 points. Full table: `documentation/evidence/2026-11-07/lang_matrix.json`. Parakeet ran on CPU in that run (no CUDA provider), so its speed there is not a GPU number.
+- **Translation, same T4 run, chrF on 200 opus-100 test sentences (relative scores):** German→English Opus-MT <!-- claim:mt:opus-mt:de:to_en:chrf -->57.9<!-- /claim --> versus NLLB-1.3B 54.6; Opus-MT won every language/direction cell measured, 4–8× faster.
+- **CS→EN on Kaggle T4, full route (`route_receipt.json`):** default profile p50 <!-- claim:kaggle:default:p50 -->3.48<!-- /claim --> s, p95 <!-- claim:kaggle:default:p95 -->4.13<!-- /claim --> s from speech onset to first audio. The shorter 1.0 s-segment profile reaches p50 1.87 s / p95 4.26 s (choppier output). Earlier figures of 1.86/4.22 s belonged to that profile, not the default.
+- **Your own voice matters:** the same Slovak script scores 11.5% word error when read by a Slovak Piper voice and 35.4% when read by a non-native speaker (large-v3-turbo, Mac). Slovak→English is experimental for that reason; the model is not the only limit.
+- **Test status:** 100 backend tests pass on macOS (`make test`). CI: Ubuntu and Windows pass; the macOS job failed once on `vad_tests.py::test_vad_long_speech_streaming` (timing-sensitive; passes locally).
 
 ## Quick start
 
@@ -61,6 +68,13 @@ Open **http://localhost:8000** in Chrome or Edge (plain HTTP on `localhost` coun
 | `BP_LOG_SESSIONS` | off | `1` writes transcripts and translations to `processed/sessions/` (personal data; tell participants) |
 | `BP_INCREMENTAL` | off | Deprecated — use continuous streaming mode instead |
 | `BP_SK_STT_MODEL` | built-in | Slovak recognition model name or CTranslate2 directory |
+| `BP_STT_ENGINE` | `faster_whisper` | Speech recognition engine. `mlx_whisper` = large-v3-turbo on the Apple GPU (macOS arm64; `pip install mlx-whisper`) |
+| `BP_MLX_MODEL` | `mlx-community/whisper-large-v3-turbo` | Model repo for `mlx_whisper` |
+| `BP_PROSODY` | `1` | Mirror the speaker's pauses and speaking pace in the translated audio (Piper voices). `0` = play phrases back-to-back as before |
+| `BP_PROSODY_EXTRA_LAG_S` | `0.6` | Slack that makes pause mirroring possible: more mimicry = more delay (median +0.18 s measured) |
+| `BP_PROSODY_MAX_LEAD_S`, `BP_PAUSE_COMMA_S`, `BP_PAUSE_SENTENCE_S` | `2.0`, `0.25`, `0.5` | Longest pause added before a segment; silence after a comma / sentence end inside one translation |
+| `BP_STT_HALLUCINATION_GUARD` | `1` | Drop loops ("1-1-1-…"), caption credits and stock phrases on short noise slices (mlx engine). `0` disables |
+| `BP_STT_CONTEXT` | `0` | `1` feeds the previous sentence to the recogniser as context. Off: its first live test produced a repetition loop |
 | `BP_DEVICE`, `BP_MT_DEVICE` | auto | `cpu` or `cuda` for STT and MT |
 
 ## The stack
@@ -68,8 +82,8 @@ Open **http://localhost:8000** in Chrome or Edge (plain HTTP on `localhost` coun
 | Stage | Default engine | Licence | Optional |
 |-------|---------------|---------|----------|
 | VAD | WebRTC VAD | BSD-3 | Silero VAD |
-| STT (EN) | Parakeet TDT v3 | CC-BY-4.0 | `whisper-small` (CPU fallback) |
-| STT (SK/CZ) | Whisper `small-sk`/`small` int8 | MIT | `large-v3-turbo`, fine-tuned Slovak models (untested here) |
+| STT (EN) | Whisper `base` int8 via faster-whisper (what `setup.py` installs) | MIT | `mlx-whisper` large-v3-turbo on Apple Silicon (`BP_STT_ENGINE=mlx_whisper`, recommended), faster-whisper large-v3-turbo on CUDA, Parakeet TDT v3 (CC-BY-4.0, not installed by setup) |
+| STT (SK/CZ) | Whisper `small-sk`/`small` int8 | MIT | `large-v3-turbo` (10.7% Slovak / 11.6% Czech on T4, see above); `kinit/whisper-large-v3-turbo-sk` via `BP_SK_STT_MODEL` needs CTranslate2 conversion, untested here |
 | MT | Opus-MT, CTranslate2 int8 | CC-BY-4.0 | MADLAD-3B (CUDA) |
 | TTS | Piper | GPL-3.0-or-later runtime (not bundled; user installs via `setup.py --dev`); each voice has its own licence | Kokoro 82M (English), OmniVoice cloning (GPU, research) |
 

@@ -29,6 +29,18 @@ except ImportError:
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
+# Keep a rotating copy on disk so a live UI test can be reviewed afterwards (BP_LOG_FILE=0 disables). Texts are already
+# redacted by _log_text, so the file holds timings and lengths, not speech content.
+if os.environ.get("BP_LOG_FILE", "1") != "0":
+    try:
+        from logging.handlers import RotatingFileHandler
+        _log_path = os.environ.get("BP_LOG_PATH", os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "logs", "bp-server.log"))
+        os.makedirs(os.path.dirname(_log_path), exist_ok=True)
+        _fh = RotatingFileHandler(_log_path, maxBytes=3_000_000, backupCount=3, encoding="utf-8")
+        _fh.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+        logging.getLogger().addHandler(_fh)
+    except OSError:
+        pass  # read-only checkout: console logging only
 
 # Initialize the database for the main application
 from backend.utils.db_manager import SQLALCHEMY_DATABASE_URL, get_db_session_and_engine, init_db, User # Import init_db and User
@@ -134,6 +146,7 @@ import ffmpeg # Import ffmpeg for audio conversion
 from starlette.websockets import WebSocketState # Import WebSocketState
 
 from backend.stt.faster_whisper_stt import FasterWhisperSTT
+from backend import prosody as _prosody
 from backend.stt.streaming_captions import SessionCaptioner, STREAMING_CAPTIONS_AVAILABLE  # T044
 from backend.mt.ctranslate2_mt import CTranslate2MT
 from backend.tts.piper_tts import PiperTTS
@@ -144,6 +157,7 @@ router = APIRouter()
 
 # Configuration
 DEFAULT_STT_MODEL_SIZE = "base" # Default STT model size
+DEFAULT_STT_ENGINE = os.environ.get("BP_STT_ENGINE", "faster_whisper")  # "mlx_whisper" on Apple Silicon (see backend/stt/mlx_whisper_stt.py)
 DEFAULT_TTS_MODEL = "piper"
 AUDIO_SAMPLE_RATE = 16000 # Standard sample rate for VAD and STT (Reverted to 16000 Hz for VAD/STT compatibility)
 MAX_VOICE_UPLOAD_BYTES = 50 * 1024 * 1024 # /voices/upload had no size cap - unbounded file.read() into memory
@@ -396,7 +410,7 @@ def cleanup_session_models(client_info: str):
     # Release STT
     if session_data.get("stt_model"):
         stt_size = config.get("stt_model_size", "base")
-        release_pooled_model("stt", config.get("stt_engine", "faster_whisper"), **session_data.get("stt_pool_config", {"model_size": stt_size}))
+        release_pooled_model("stt", config.get("stt_engine", DEFAULT_STT_ENGINE), **session_data.get("stt_pool_config", {"model_size": stt_size}))
     
     # Release MT models
     for mt_key, mt_model in session_data.get("mt_models", {}).items():
@@ -557,7 +571,7 @@ async def _initialize_stt_model(session_data: Dict[str, Any], stt_model_size: st
     """Initializes the STT model for a given session via the engine registry.
     Engine name comes from session_config['stt_engine'] or defaults to 'faster_whisper'."""
     config = session_data.get("session_config", {})
-    stt_engine = config.get("stt_engine", "faster_whisper")
+    stt_engine = config.get("stt_engine", DEFAULT_STT_ENGINE)
     if stt_engine == "faster_whisper":
         stt_model_size = local_stt_source(stt_model_size)
         config["stt_model_size"] = stt_model_size
@@ -1609,6 +1623,14 @@ def _queue_pre_vad_audio(audio, queue, pending, threshold_met):
     return admitted
 
 
+def _stt_prompt(session_data) -> Optional[str]:
+    """Pack vocabulary prompt + the tail of the previous transcription: fragments cut at pauses lose their left context,
+    which is where "live demonstration" became "live to Messiah". OFF by default (BP_STT_CONTEXT=1 enables): the first live test with it on produced a repetition loop and a credits hallucination; unproven until A/B-tested."""
+    base = session_data.get("language_pack", {}).get("stt", {}).get("initial_prompt") or ""
+    tail = (session_data.get("last_transcription_text") or "")[-160:].strip() if os.environ.get("BP_STT_CONTEXT", "0") == "1" else ""
+    return (f"{base} {tail}".strip()) or None
+
+
 async def _process_speech_segment_pipeline(
     websocket: WebSocket, audio_segment_np: np.ndarray, segment_start_time: float, is_final: bool = True,
     session_config: Dict[str, Any] = None, # Add session_config parameter
@@ -1715,7 +1737,7 @@ async def _process_speech_segment_pipeline(
                     AUDIO_SAMPLE_RATE,
                     language=None if source_lang == "auto" else source_lang,
                     vad_filter=use_vad_filter,
-                    initial_prompt=(session_data.get("language_pack", {}).get("stt", {}).get("initial_prompt") or None),
+                    initial_prompt=_stt_prompt(session_data),
                 ),
             )
         if source_lang == "auto" and detected_source_lang:
@@ -1772,6 +1794,13 @@ async def _process_speech_segment_pipeline(
             await safe_send("translation_result", {"type": "translation_result", "translated": "", "is_final": is_final, "metrics": {"mt_time": mt_total_time}})
             return
 
+        # Runaway guard: one VAD segment cannot carry more speech than ~22 chars per source second. A decoding loop upstream
+        # ("1-1-1-...") once became 35 s of TTS and stalled the whole queue (2026-11-07 live replay).
+        _src_s = audio_segment_np.size / AUDIO_SAMPLE_RATE
+        if len(translated_text) > max(120, 22 * _src_s + 40):
+            logging.warning(f"Backend: Session {client_info}: translation of {len(translated_text)} chars for {_src_s:.2f}s of audio looks like a decoding loop; dropping it before TTS.")
+            return
+
         # Send translation result to frontend
         await safe_send("translation_result", {"type": "translation_result", "translated": translated_text, "is_final": is_final, "metrics": {"mt_time": mt_total_time}})
     # model_call_lock released here — TTS below runs unlocked, is the only phase barge-in cancels.
@@ -1822,13 +1851,20 @@ async def _process_speech_segment_pipeline(
         logging.info(f"Backend: Session {client_info}: Starting streaming TTS synthesis with '{tts_model_choice}'...")
         queue = asyncio.Queue()
 
+        prosody_on = _prosody.ENABLED and getattr(tts_engine, "SUPPORTS_PROSODY", False)
+        sched = session_data.setdefault("prosody_sched", _prosody.PlayoutScheduler()) if prosody_on else None
+        follower = session_data.setdefault("prosody_rate", _prosody.RateFollower()) if prosody_on else None
+        prosody_kwargs = {"length_scale": follower.scale, "pauses": True} if prosody_on else {}
+        stream_audio_s = 0.0
+
         def run_streaming_tts():
             try:
                 # synthesize_stream yields numpy arrays
                 for chunk in tts_engine.synthesize_stream(
                     text=translated_text,
                     language=tts_lang,
-                    speaker_wav_path=speaker_wav_path
+                    speaker_wav_path=speaker_wav_path,
+                    **prosody_kwargs
                 ):
                     loop.call_soon_threadsafe(queue.put_nowait, chunk)
                 loop.call_soon_threadsafe(queue.put_nowait, None) # Sentinel
@@ -1847,10 +1883,25 @@ async def _process_speech_segment_pipeline(
                 break
 
             chunk_count += 1
+            stream_audio_s += len(chunk) / stream_sample_rate
+            if prosody_on and chunk_count == 1:
+                # Mirror the speaker's pause before this segment: pad silence so the onset-to-onset spacing is kept.
+                # Reported onsets are None for most segments and span a whole utterance for finals, so they cannot drive the
+                # scheduler (found 2026-11-07: 4 of 22 segments had one). Use when THIS audio started: dispatch time minus its length.
+                chunk_onset = segment_start_time - audio_segment_np.size / AUDIO_SAMPLE_RATE
+                lead_s = sched.lead_silence(chunk_onset, time.perf_counter())
+                if lead_s > 0:
+                    chunk = np.concatenate([np.zeros(int(stream_sample_rate * lead_s), dtype=np.asarray(chunk).dtype), np.asarray(chunk)])
+                    logging.info(f"Backend: Session {client_info}: prosody lead silence {lead_s:.2f}s")
             # Convert numpy chunk to WAV bytes
             audio_buffer = io.BytesIO()
             sf.write(audio_buffer, chunk, stream_sample_rate, format="WAV")
             await safe_send("tts_audio", audio_buffer.getvalue(), is_bytes=True)
+
+        if prosody_on and chunk_count:
+            sched.committed(stream_audio_s)
+            scale = follower.update(audio_segment_np.size / AUDIO_SAMPLE_RATE, stream_audio_s)
+            logging.info(f"Backend: Session {client_info}: prosody rate: source {audio_segment_np.size / AUDIO_SAMPLE_RATE:.2f}s vs tts {stream_audio_s:.2f}s -> length_scale {scale:.2f}")
 
         tts_total_time = time.perf_counter() - tts_start_time
         logging.info(f"Backend: Session {client_info}: Streaming TTS completed. Time: {tts_total_time:.2f}s. Chunks: {chunk_count}")
