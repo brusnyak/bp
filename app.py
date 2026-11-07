@@ -1,6 +1,9 @@
 import uvicorn
 from dotenv import load_dotenv
 
+from backend.cuda_libs import preload_pip_cuda_libs
+preload_pip_cuda_libs()  # pip-installed CUDA libraries on Linux (no-op elsewhere); must run before any engine import
+
 load_dotenv()  # local .env (GOOGLE_CLIENT_ID etc.) — untracked, never committed
 
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Request
