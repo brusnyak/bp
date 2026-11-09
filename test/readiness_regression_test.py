@@ -107,7 +107,7 @@ def test_mps_is_never_selected_for_ctranslate2(monkeypatch):
 
 def test_automatic_voice_matches_target_and_explicit_choice_preserved():
     assert target_tts_engine("piper", "en") == "piper_generic_en"
-    assert target_tts_engine("piper", "sk") == "piper_sk_personal"
+    assert target_tts_engine("piper", "sk") == "piper_generic_sk"
     assert target_tts_engine("piper", "cs") == "piper"
     assert target_tts_engine("custom", "en") == "custom"
     pack = json.loads(Path("languages/packs/cs-en.json").read_text())
@@ -184,7 +184,7 @@ def test_sdk_pools_beam_and_target_voice_separately(monkeypatch):
         assert en._stt.beam_size == 1
         assert sk._stt.beam_size == 5
         assert ("tts", "piper_generic_en") in [(a, b) for a, b, c in calls]
-        assert ("tts", "piper_sk_personal") in [(a, b) for a, b, c in calls]
+        assert ("tts", "piper_generic_sk") in [(a, b) for a, b, c in calls]
         await en.close(); await sk.close()
         assert all(e["ref_count"] == 0 for e in bm._model_pool.values())
     asyncio.run(check())

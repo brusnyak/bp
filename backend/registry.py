@@ -196,7 +196,7 @@ def target_tts_engine(engine: str, target: str) -> str:
     """Resolve the automatic Piper choice to the output language, never its input."""
     if engine != "piper":
         return engine
-    voices = {"sk": "piper_sk_personal", "cs": "piper", "en": "piper_generic_en",
+    voices = {"sk": "piper_generic_sk", "cs": "piper", "en": "piper_generic_en",
               "de": "piper_generic_de", "fr": "piper_generic_fr"}
     if target in voices:
         return voices[target]

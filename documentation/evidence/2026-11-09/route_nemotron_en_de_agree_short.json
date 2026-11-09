@@ -1,0 +1,1172 @@
+{
+ "strategy": "agree_short",
+ "audio": "processed/testaudio/en_paced.wav",
+ "seconds": 60.0,
+ "src": "en",
+ "tgt": "de",
+ "tts": "piper",
+ "input_end_s": 44.46,
+ "rates": {
+  "1.0": {
+   "segments": 20,
+   "with_audio": 20,
+   "first_audio_after_source_end_s": [
+    0.197,
+    1.135,
+    0.527,
+    1.098,
+    0.214,
+    0.258,
+    0.425,
+    0.211,
+    0.538,
+    0.488,
+    0.49,
+    0.499,
+    0.507,
+    0.463,
+    0.216,
+    0.542,
+    0.272,
+    0.523,
+    0.194,
+    0.516
+   ],
+   "lag_s": [
+    0.197,
+    1.368,
+    2.058,
+    1.098,
+    0.214,
+    0.891,
+    3.213,
+    0.769,
+    0.609,
+    1.712,
+    1.275,
+    0.62,
+    0.507,
+    0.864,
+    0.216,
+    1.54,
+    0.777,
+    0.959,
+    0.194,
+    0.712
+   ],
+   "lag_median_s": 0.864,
+   "lag_p90_s": 2.058,
+   "source_end_s": [
+    2.52,
+    3.54,
+    4.68,
+    6.96,
+    9.64,
+    11.66,
+    11.88,
+    15.16,
+    16.98,
+    20.0,
+    22.04,
+    23.96,
+    26.9,
+    28.8,
+    32.1,
+    33.26,
+    36.56,
+    38.48,
+    41.8,
+    43.48
+   ],
+   "listen_start_s": [
+    2.717,
+    4.908,
+    6.738,
+    8.058,
+    9.854,
+    12.551,
+    15.093,
+    15.929,
+    17.589,
+    21.712,
+    23.315,
+    24.58,
+    27.407,
+    29.664,
+    32.316,
+    34.8,
+    37.337,
+    39.439,
+    41.994,
+    44.192
+   ],
+   "lag_max_s": 3.213,
+   "first_word_lag_s": [
+    1.257,
+    1.368,
+    2.058,
+    1.098,
+    1.554,
+    1.891,
+    3.213,
+    1.809,
+    1.069,
+    2.472,
+    1.555,
+    0.78,
+    1.167,
+    0.984,
+    1.276,
+    1.68,
+    1.797,
+    1.859,
+    1.234,
+    1.372
+   ],
+   "first_word_lag_max_s": 3.213,
+   "segment_s": [
+    1.06,
+    0.0,
+    0.0,
+    0.0,
+    1.34,
+    1.0,
+    0.0,
+    1.04,
+    0.46,
+    0.76,
+    0.28,
+    0.16,
+    0.66,
+    0.12,
+    1.06,
+    0.14,
+    1.02,
+    0.9,
+    1.04,
+    0.66
+   ],
+   "lag_growth_s": 0.5149999999999999,
+   "last_listen_end_vs_input_end_s": 1.68
+  },
+  "1.25": {
+   "segments": 20,
+   "with_audio": 20,
+   "first_audio_after_source_end_s": [
+    0.197,
+    1.135,
+    0.527,
+    1.098,
+    0.214,
+    0.258,
+    0.425,
+    0.211,
+    0.538,
+    0.488,
+    0.49,
+    0.499,
+    0.507,
+    0.463,
+    0.216,
+    0.542,
+    0.272,
+    0.523,
+    0.194,
+    0.516
+   ],
+   "lag_s": [
+    0.197,
+    1.135,
+    1.459,
+    1.098,
+    0.214,
+    0.351,
+    2.165,
+    0.211,
+    0.538,
+    0.816,
+    0.49,
+    0.499,
+    0.507,
+    0.463,
+    0.216,
+    1.043,
+    0.272,
+    0.523,
+    0.194,
+    0.516
+   ],
+   "lag_median_s": 0.507,
+   "lag_p90_s": 1.459,
+   "source_end_s": [
+    2.52,
+    3.54,
+    4.68,
+    6.96,
+    9.64,
+    11.66,
+    11.88,
+    15.16,
+    16.98,
+    20.0,
+    22.04,
+    23.96,
+    26.9,
+    28.8,
+    32.1,
+    33.26,
+    36.56,
+    38.48,
+    41.8,
+    43.48
+   ],
+   "listen_start_s": [
+    2.717,
+    4.675,
+    6.139,
+    8.058,
+    9.854,
+    12.011,
+    14.045,
+    15.371,
+    17.518,
+    20.816,
+    22.53,
+    24.459,
+    27.407,
+    29.263,
+    32.316,
+    34.303,
+    36.832,
+    39.003,
+    41.994,
+    43.996
+   ],
+   "lag_max_s": 2.165,
+   "first_word_lag_s": [
+    1.257,
+    1.135,
+    1.459,
+    1.098,
+    1.554,
+    1.351,
+    2.165,
+    1.251,
+    0.998,
+    1.576,
+    0.77,
+    0.659,
+    1.167,
+    0.583,
+    1.276,
+    1.183,
+    1.292,
+    1.423,
+    1.234,
+    1.176
+   ],
+   "first_word_lag_max_s": 2.165,
+   "segment_s": [
+    1.06,
+    0.0,
+    0.0,
+    0.0,
+    1.34,
+    1.0,
+    0.0,
+    1.04,
+    0.46,
+    0.76,
+    0.28,
+    0.16,
+    0.66,
+    0.12,
+    1.06,
+    0.14,
+    1.02,
+    0.9,
+    1.04,
+    0.66
+   ],
+   "lag_growth_s": 0.319,
+   "last_listen_end_vs_input_end_s": 1.1
+  },
+  "adaptive": {
+   "segments": 20,
+   "with_audio": 20,
+   "first_audio_after_source_end_s": [
+    0.197,
+    1.135,
+    0.527,
+    1.098,
+    0.214,
+    0.258,
+    0.425,
+    0.211,
+    0.538,
+    0.488,
+    0.49,
+    0.499,
+    0.507,
+    0.463,
+    0.216,
+    0.542,
+    0.272,
+    0.523,
+    0.194,
+    0.516
+   ],
+   "lag_s": [
+    0.197,
+    1.368,
+    2.058,
+    1.098,
+    0.214,
+    0.891,
+    3.213,
+    0.576,
+    0.538,
+    1.422,
+    0.984,
+    0.499,
+    0.507,
+    0.864,
+    0.216,
+    1.54,
+    0.647,
+    0.829,
+    0.194,
+    0.712
+   ],
+   "lag_median_s": 0.829,
+   "lag_p90_s": 2.058,
+   "source_end_s": [
+    2.52,
+    3.54,
+    4.68,
+    6.96,
+    9.64,
+    11.66,
+    11.88,
+    15.16,
+    16.98,
+    20.0,
+    22.04,
+    23.96,
+    26.9,
+    28.8,
+    32.1,
+    33.26,
+    36.56,
+    38.48,
+    41.8,
+    43.48
+   ],
+   "listen_start_s": [
+    2.717,
+    4.908,
+    6.738,
+    8.058,
+    9.854,
+    12.551,
+    15.093,
+    15.736,
+    17.518,
+    21.422,
+    23.024,
+    24.459,
+    27.407,
+    29.664,
+    32.316,
+    34.8,
+    37.207,
+    39.309,
+    41.994,
+    44.192
+   ],
+   "lag_max_s": 3.213,
+   "first_word_lag_s": [
+    1.257,
+    1.368,
+    2.058,
+    1.098,
+    1.554,
+    1.891,
+    3.213,
+    1.616,
+    0.998,
+    2.182,
+    1.264,
+    0.659,
+    1.167,
+    0.984,
+    1.276,
+    1.68,
+    1.667,
+    1.729,
+    1.234,
+    1.372
+   ],
+   "first_word_lag_max_s": 3.213,
+   "segment_s": [
+    1.06,
+    0.0,
+    0.0,
+    0.0,
+    1.34,
+    1.0,
+    0.0,
+    1.04,
+    0.46,
+    0.76,
+    0.28,
+    0.16,
+    0.66,
+    0.12,
+    1.06,
+    0.14,
+    1.02,
+    0.9,
+    1.04,
+    0.66
+   ],
+   "lag_growth_s": 0.5149999999999999,
+   "last_listen_end_vs_input_end_s": 1.68
+  }
+ },
+ "tts_messages": 22,
+ "events": [
+  {
+   "t": 2.5739190419990337,
+   "type": "transcription_result",
+   "text": "Good morning and welcome to",
+   "stt_time": 2.9199873097240925e-07,
+   "span": [
+    1.46,
+    2.52
+   ]
+  },
+  {
+   "t": 2.636604667000938,
+   "type": "translation_result",
+   "text": "Guten Morgen und willkommen zu",
+   "mt_time": 0.06244604200765025
+  },
+  {
+   "t": 2.717325375007931,
+   "type": "tts_audio",
+   "bytes": 96648,
+   "seconds": 2.190566893424036
+  },
+  {
+   "t": 2.7176475419983035,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 2.9199873097240925e-07,
+    "mt_time": 0.06244604200765025,
+    "tts_time": 0.08029041699774098,
+    "input_to_stt_latency": 0.00015208299737423658,
+    "onset_to_first_audio_s": 2.6757248750072904,
+    "source_onset_time": 111974.845097916,
+    "first_audio_sent_time": 111977.520822791,
+    "total_latency": 0.1427367510041222
+   }
+  },
+  {
+   "t": 4.543106291996082,
+   "type": "transcription_result",
+   "text": "this live demonstration",
+   "stt_time": 2.9199873097240925e-07,
+   "span": [
+    3.54,
+    3.54
+   ]
+  },
+  {
+   "t": 4.597466167004313,
+   "type": "translation_result",
+   "text": "diese Live-Demonstration",
+   "mt_time": 0.05395191699790303
+  },
+  {
+   "t": 4.675448209003662,
+   "type": "tts_audio",
+   "bytes": 80738,
+   "seconds": 1.829795918367347
+  },
+  {
+   "t": 4.675681124994298,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 2.9199873097240925e-07,
+    "mt_time": 0.05395191699790303,
+    "tts_time": 0.07738650000828784,
+    "input_to_stt_latency": 0.0002454579953337088,
+    "onset_to_first_audio_s": 4.633835750006256,
+    "source_onset_time": 111974.845097916,
+    "first_audio_sent_time": 111979.478933666,
+    "total_latency": 0.13133870900492184
+   }
+  },
+  {
+   "t": 5.106003084001713,
+   "type": "transcription_result",
+   "text": "of speech translation.",
+   "stt_time": 2.9199873097240925e-07,
+   "span": [
+    4.68,
+    4.68
+   ]
+  },
+  {
+   "t": 5.144566000002669,
+   "type": "translation_result",
+   "text": "der Sprach\u00fcbersetzung.",
+   "mt_time": 0.03816162499424536
+  },
+  {
+   "t": 5.206656374997692,
+   "type": "tts_audio",
+   "bytes": 57900,
+   "seconds": 1.3119274376417234
+  },
+  {
+   "t": 5.206837916994118,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 2.9199873097240925e-07,
+    "mt_time": 0.03816162499424536,
+    "tts_time": 0.06184204199234955,
+    "input_to_stt_latency": 0.0010968749993480742,
+    "onset_to_first_audio_s": 5.165320334010175,
+    "source_onset_time": 111974.845097916,
+    "first_audio_sent_time": 111980.01041825,
+    "total_latency": 0.10000395898532588
+   }
+  },
+  {
+   "t": 7.963541417004308,
+   "type": "transcription_result",
+   "text": "I am",
+   "stt_time": 3.3299147617071867e-07,
+   "span": [
+    6.96,
+    6.96
+   ]
+  },
+  {
+   "t": 8.001926041994011,
+   "type": "translation_result",
+   "text": "Das bin ich.",
+   "mt_time": 0.037692374986363575
+  },
+  {
+   "t": 8.058274833994801,
+   "type": "tts_audio",
+   "bytes": 68556,
+   "seconds": 1.5535600907029479
+  },
+  {
+   "t": 8.05867479200242,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 3.3299147617071867e-07,
+    "mt_time": 0.037692374986363575,
+    "tts_time": 0.05611424999369774,
+    "input_to_stt_latency": 0.00011620800069067627,
+    "onset_to_first_audio_s": 2.376742792010191,
+    "source_onset_time": 111980.485097916,
+    "first_audio_sent_time": 111982.861840708,
+    "total_latency": 0.09380695797153749
+   }
+  },
+  {
+   "t": 9.704235416997108,
+   "type": "transcription_result",
+   "text": "speaking English and you will hear",
+   "stt_time": 3.7500285543501377e-07,
+   "span": [
+    8.3,
+    9.64
+   ]
+  },
+  {
+   "t": 9.753138208994642,
+   "type": "translation_result",
+   "text": "Englisch sprechen und Sie werden h\u00f6ren",
+   "mt_time": 0.04841616599878762
+  },
+  {
+   "t": 9.8536527499964,
+   "type": "tts_audio",
+   "bytes": 118976,
+   "seconds": 2.69687074829932
+  },
+  {
+   "t": 9.853741708997404,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 3.7500285543501377e-07,
+    "mt_time": 0.04841616599878762,
+    "tts_time": 0.09999854199122638,
+    "input_to_stt_latency": 0.0001253749942407012,
+    "onset_to_first_audio_s": 4.172096916998271,
+    "source_onset_time": 111980.485097916,
+    "first_audio_sent_time": 111984.657194833,
+    "total_latency": 0.14841508299286943
+   }
+  },
+  {
+   "t": 11.736405333998846,
+   "type": "transcription_result",
+   "text": "German or Slovic within a second",
+   "stt_time": 5.420006345957518e-07,
+   "span": [
+    10.66,
+    11.66
+   ]
+  },
+  {
+   "t": 11.805188875005115,
+   "type": "translation_result",
+   "text": "Deutsch oder Slovic innerhalb einer Sekunde",
+   "mt_time": 0.06861316600407008
+  },
+  {
+   "t": 11.917951124996762,
+   "type": "tts_audio",
+   "bytes": 112172,
+   "seconds": 2.5425850340136056
+  },
+  {
+   "t": 11.918191250006203,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 5.420006345957518e-07,
+    "mt_time": 0.06861316600407008,
+    "tts_time": 0.11240633300621994,
+    "input_to_stt_latency": 0.00017283300985582173,
+    "onset_to_first_audio_s": 6.236415292005404,
+    "source_onset_time": 111980.485097916,
+    "first_audio_sent_time": 111986.721513208,
+    "total_latency": 0.18102004101092461
+   }
+  },
+  {
+   "t": 12.236335374996997,
+   "type": "transcription_result",
+   "text": "or two.",
+   "stt_time": 4.169996827840805e-07,
+   "span": [
+    11.88,
+    11.88
+   ]
+  },
+  {
+   "t": 12.266357208995032,
+   "type": "translation_result",
+   "text": "oder zwei.",
+   "mt_time": 0.029772875001071952
+  },
+  {
+   "t": 12.305358917001286,
+   "type": "tts_audio",
+   "bytes": 36908,
+   "seconds": 0.8359183673469388
+  },
+  {
+   "t": 12.305635750002693,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 4.169996827840805e-07,
+    "mt_time": 0.029772875001071952,
+    "tts_time": 0.038884207999217324,
+    "input_to_stt_latency": 0.0013858339953003451,
+    "onset_to_first_audio_s": 6.6241532920103054,
+    "source_onset_time": 111980.485097916,
+    "first_audio_sent_time": 111987.109251208,
+    "total_latency": 0.06865749999997206
+   }
+  },
+  {
+   "t": 15.23863204200461,
+   "type": "transcription_result",
+   "text": "The system listens through the",
+   "stt_time": 5.420006345957518e-07,
+   "span": [
+    14.12,
+    15.16
+   ]
+  },
+  {
+   "t": 15.296635417005746,
+   "type": "translation_result",
+   "text": "Das System lauscht durch die",
+   "mt_time": 0.05784700000367593
+  },
+  {
+   "t": 15.370810749998782,
+   "type": "tts_audio",
+   "bytes": 73260,
+   "seconds": 1.6602267573696146
+  },
+  {
+   "t": 15.370933583995793,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 5.420006345957518e-07,
+    "mt_time": 0.05784700000367593,
+    "tts_time": 0.07397024999954738,
+    "input_to_stt_latency": 0.00016991699521895498,
+    "onset_to_first_audio_s": 2.5294408750050934,
+    "source_onset_time": 111987.645097916,
+    "first_audio_sent_time": 111990.174538791,
+    "total_latency": 0.1318177920038579
+   }
+  },
+  {
+   "t": 17.35183916700771,
+   "type": "transcription_result",
+   "text": "microphone and the size when a phrase has ended.",
+   "stt_time": 2.9199873097240925e-07,
+   "span": [
+    16.52,
+    16.98
+   ]
+  },
+  {
+   "t": 17.435702917005983,
+   "type": "translation_result",
+   "text": "Mikrofon und die Gr\u00f6\u00dfe, wenn eine Phrase beendet ist.",
+   "mt_time": 0.08358358299301472
+  },
+  {
+   "t": 17.51795387499442,
+   "type": "tts_audio",
+   "bytes": 107636,
+   "seconds": 2.4397278911564624
+  },
+  {
+   "t": 17.590396875006263,
+   "type": "tts_audio",
+   "bytes": 74284,
+   "seconds": 1.6834467120181407
+  },
+  {
+   "t": 17.590523334001773,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 2.9199873097240925e-07,
+    "mt_time": 0.08358358299301472,
+    "tts_time": 0.154482083991752,
+    "input_to_stt_latency": 0.0012207919935462996,
+    "onset_to_first_audio_s": 4.674992625004961,
+    "source_onset_time": 111987.645097916,
+    "first_audio_sent_time": 111992.320090541,
+    "total_latency": 0.2380659589834977
+   }
+  },
+  {
+   "t": 20.367770084005315,
+   "type": "transcription_result",
+   "text": "First the words are recognized.",
+   "stt_time": 2.9199873097240925e-07,
+   "span": [
+    19.24,
+    20.0
+   ]
+  },
+  {
+   "t": 20.414186666996102,
+   "type": "translation_result",
+   "text": "Zuerst werden die Worte erkannt.",
+   "mt_time": 0.04619900000398047
+  },
+  {
+   "t": 20.487949375004973,
+   "type": "tts_audio",
+   "bytes": 70700,
+   "seconds": 1.6021768707482993
+  },
+  {
+   "t": 20.4881272920029,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 2.9199873097240925e-07,
+    "mt_time": 0.04619900000398047,
+    "tts_time": 0.07348616600211244,
+    "input_to_stt_latency": 0.0011026249994756654,
+    "onset_to_first_audio_s": 2.506572917001904,
+    "source_onset_time": 111992.785097916,
+    "first_audio_sent_time": 111995.291670833,
+    "total_latency": 0.11968545800482389
+   }
+  },
+  {
+   "t": 22.420414624997647,
+   "type": "transcription_result",
+   "text": "Then they are translated.",
+   "stt_time": 2.9099464882165194e-07,
+   "span": [
+    21.76,
+    22.04
+   ]
+  },
+  {
+   "t": 22.471634708999773,
+   "type": "translation_result",
+   "text": "Dann werden sie \u00fcbersetzt.",
+   "mt_time": 0.05107083400071133
+  },
+  {
+   "t": 22.53047204199538,
+   "type": "tts_audio",
+   "bytes": 55852,
+   "seconds": 1.2654875283446712
+  },
+  {
+   "t": 22.53065970899479,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 2.9099464882165194e-07,
+    "mt_time": 0.05107083400071133,
+    "tts_time": 0.05857254199509043,
+    "input_to_stt_latency": 0.0011107079917564988,
+    "onset_to_first_audio_s": 2.2290839169872925,
+    "source_onset_time": 111995.105097916,
+    "first_audio_sent_time": 111997.334181833,
+    "total_latency": 0.10964366699045058
+   }
+  },
+  {
+   "t": 24.341027874994325,
+   "type": "transcription_result",
+   "text": "And they are spoken again.",
+   "stt_time": 5.410111043602228e-07,
+   "span": [
+    23.8,
+    23.96
+   ]
+  },
+  {
+   "t": 24.39290666699526,
+   "type": "translation_result",
+   "text": "Und sie werden wieder gesprochen.",
+   "mt_time": 0.051612290990306064
+  },
+  {
+   "t": 24.458569209004054,
+   "type": "tts_audio",
+   "bytes": 86268,
+   "seconds": 1.9551927437641723
+  },
+  {
+   "t": 24.458708083999227,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 5.410111043602228e-07,
+    "mt_time": 0.051612290990306064,
+    "tts_time": 0.0652013749931939,
+    "input_to_stt_latency": 0.0016932500002440065,
+    "onset_to_first_audio_s": 2.117133834006381,
+    "source_onset_time": 111997.145097916,
+    "first_audio_sent_time": 111999.26223175,
+    "total_latency": 0.11681420699460432
+   }
+  },
+  {
+   "t": 27.284836959006498,
+   "type": "transcription_result",
+   "text": "Everything runs on this computer.",
+   "stt_time": 7.089984137564898e-07,
+   "span": [
+    26.24,
+    26.9
+   ]
+  },
+  {
+   "t": 27.333774750004523,
+   "type": "translation_result",
+   "text": "Alles l\u00e4uft auf diesem Computer.",
+   "mt_time": 0.048633166996296495
+  },
+  {
+   "t": 27.40727620900725,
+   "type": "tts_audio",
+   "bytes": 99562,
+   "seconds": 2.2566439909297054
+  },
+  {
+   "t": 27.407355959003326,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 7.089984137564898e-07,
+    "mt_time": 0.048633166996296495,
+    "tts_time": 0.07320683301077224,
+    "input_to_stt_latency": 0.0012454590032575652,
+    "onset_to_first_audio_s": 2.545890875000623,
+    "source_onset_time": 111999.665097916,
+    "first_audio_sent_time": 112002.210988791,
+    "total_latency": 0.1218407090054825
+   }
+  },
+  {
+   "t": 29.160757916994044,
+   "type": "transcription_result",
+   "text": "Without a cloud service.",
+   "stt_time": 4.159956006333232e-07,
+   "span": [
+    28.68,
+    28.8
+   ]
+  },
+  {
+   "t": 29.21406429199851,
+   "type": "translation_result",
+   "text": "Ohne Cloud-Service.",
+   "mt_time": 0.05297504201007541
+  },
+  {
+   "t": 29.263128459002473,
+   "type": "tts_audio",
+   "bytes": 56662,
+   "seconds": 1.2838548752834467
+  },
+  {
+   "t": 29.263214250007877,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 4.159956006333232e-07,
+    "mt_time": 0.05297504201007541,
+    "tts_time": 0.04872658400563523,
+    "input_to_stt_latency": 0.0012681660009548068,
+    "onset_to_first_audio_s": 2.0418022499943618,
+    "source_onset_time": 112002.025097916,
+    "first_audio_sent_time": 112004.066900166,
+    "total_latency": 0.10170204201131128
+   }
+  },
+  {
+   "t": 32.175780999998096,
+   "type": "transcription_result",
+   "text": "The delay is the time between",
+   "stt_time": 3.3300602808594704e-07,
+   "span": [
+    31.04,
+    32.1
+   ]
+  },
+  {
+   "t": 32.23064270900795,
+   "type": "translation_result",
+   "text": "Die Verz\u00f6gerung ist die Zeit zwischen",
+   "mt_time": 0.054673249993356876
+  },
+  {
+   "t": 32.31615129200509,
+   "type": "tts_audio",
+   "bytes": 109590,
+   "seconds": 2.4840362811791383
+  },
+  {
+   "t": 32.31624237500364,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 3.3300602808594704e-07,
+    "mt_time": 0.054673249993356876,
+    "tts_time": 0.08501512500515673,
+    "input_to_stt_latency": 0.00020879099611192942,
+    "onset_to_first_audio_s": 2.7346706249954877,
+    "source_onset_time": 112004.385097916,
+    "first_audio_sent_time": 112007.119768541,
+    "total_latency": 0.1396887080045417
+   }
+  },
+  {
+   "t": 33.633457333999104,
+   "type": "transcription_result",
+   "text": "my words and the voice you hear.",
+   "stt_time": 2.9199873097240925e-07,
+   "span": [
+    33.12,
+    33.26
+   ]
+  },
+  {
+   "t": 33.72171654200065,
+   "type": "translation_result",
+   "text": "Meine Worte und die Stimme, die du h\u00f6rst.",
+   "mt_time": 0.08754570900055114
+  },
+  {
+   "t": 33.801674250004,
+   "type": "tts_audio",
+   "bytes": 67900,
+   "seconds": 1.5386848072562358
+  },
+  {
+   "t": 33.86779299999762,
+   "type": "tts_audio",
+   "bytes": 44076,
+   "seconds": 0.9984580498866213
+  },
+  {
+   "t": 33.86781587499718,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 2.9199873097240925e-07,
+    "mt_time": 0.08754570900055114,
+    "tts_time": 0.14580495900008827,
+    "input_to_stt_latency": 0.001000832999125123,
+    "onset_to_first_audio_s": 4.219923291995656,
+    "source_onset_time": 112004.385097916,
+    "first_audio_sent_time": 112008.605021208,
+    "total_latency": 0.2333509599993704
+   }
+  },
+  {
+   "t": 36.61936224999954,
+   "type": "transcription_result",
+   "text": "Our goal is a delay short",
+   "stt_time": 2.4998735170811415e-07,
+   "span": [
+    35.54,
+    36.56
+   ]
+  },
+  {
+   "t": 36.69407416699687,
+   "type": "translation_result",
+   "text": "Unser Ziel ist eine Verz\u00f6gerung kurz",
+   "mt_time": 0.07441358399228193
+  },
+  {
+   "t": 36.8317326670076,
+   "type": "tts_audio",
+   "bytes": 92716,
+   "seconds": 2.10140589569161
+  },
+  {
+   "t": 36.83183804199507,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 2.4998735170811415e-07,
+    "mt_time": 0.07441358399228193,
+    "tts_time": 0.1370332919905195,
+    "input_to_stt_latency": 0.00023579198750667274,
+    "onset_to_first_audio_s": 2.690046125004301,
+    "source_onset_time": 112008.945097916,
+    "first_audio_sent_time": 112011.635144041,
+    "total_latency": 0.21144712597015314
+   }
+  },
+  {
+   "t": 38.86221975000808,
+   "type": "transcription_result",
+   "text": "enough for a natural conversation.",
+   "stt_time": 3.7500285543501377e-07,
+   "span": [
+    37.58,
+    38.48
+   ]
+  },
+  {
+   "t": 38.9163827500015,
+   "type": "translation_result",
+   "text": "genug f\u00fcr ein nat\u00fcrliches Gespr\u00e4ch.",
+   "mt_time": 0.05387300001166295
+  },
+  {
+   "t": 39.002630417002365,
+   "type": "tts_audio",
+   "bytes": 84186,
+   "seconds": 1.9079818594104307
+  },
+  {
+   "t": 39.00272625000798,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 3.7500285543501377e-07,
+    "mt_time": 0.05387300001166295,
+    "tts_time": 0.08568541599379387,
+    "input_to_stt_latency": 0.0009262090025004,
+    "onset_to_first_audio_s": 4.861146750001353,
+    "source_onset_time": 112008.945097916,
+    "first_audio_sent_time": 112013.806244666,
+    "total_latency": 0.13955879100831226
+   }
+  },
+  {
+   "t": 41.869184291994316,
+   "type": "transcription_result",
+   "text": "A quiet room matters more",
+   "stt_time": 4.580069798976183e-07,
+   "span": [
+    40.76,
+    41.8
+   ]
+  },
+  {
+   "t": 41.91476879200491,
+   "type": "translation_result",
+   "text": "Ein ruhiger Raum z\u00e4hlt mehr",
+   "mt_time": 0.045307124993996695
+  },
+  {
+   "t": 41.993547584002954,
+   "type": "tts_audio",
+   "bytes": 96976,
+   "seconds": 2.1980045351473922
+  },
+  {
+   "t": 41.99365187500371,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 4.580069798976183e-07,
+    "mt_time": 0.045307124993996695,
+    "tts_time": 0.07843449999927543,
+    "input_to_stt_latency": 0.00018333300249651074,
+    "onset_to_first_audio_s": 2.59216029199888,
+    "source_onset_time": 112014.205097916,
+    "first_audio_sent_time": 112016.797258208,
+    "total_latency": 0.12374208300025202
+   }
+  },
+  {
+   "t": 43.883898625004804,
+   "type": "transcription_result",
+   "text": "than an expensive microphone.",
+   "stt_time": 1.6599369700998068e-07,
+   "span": [
+    42.82,
+    43.48
+   ]
+  },
+  {
+   "t": 43.92715366699849,
+   "type": "translation_result",
+   "text": "als ein teures Mikrofon.",
+   "mt_time": 0.04293024999788031
+  },
+  {
+   "t": 43.99555387500732,
+   "type": "tts_audio",
+   "bytes": 86286,
+   "seconds": 1.9556009070294784
+  },
+  {
+   "t": 43.99563895900792,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 1.6599369700998068e-07,
+    "mt_time": 0.04293024999788031,
+    "tts_time": 0.06810479098930955,
+    "input_to_stt_latency": 0.0010737080010585487,
+    "onset_to_first_audio_s": 4.594184667002992,
+    "source_onset_time": 112014.205097916,
+    "first_audio_sent_time": 112018.799282583,
+    "total_latency": 0.11103520698088687
+   }
+  }
+ ]
+}
