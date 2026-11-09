@@ -12,6 +12,13 @@ import site
 import sys
 
 
+def is_blas_override(path: str) -> bool:
+    """libnvblas exports the CPU BLAS symbols (sgemm_ ...): loaded RTLD_GLOBAL it hijacks numpy and aborts the process with
+    "[NVBLAS] CPU Blas library need to be provided" at the first matrix product (found 2026-11-09 on a Kaggle T4: Voxtral's feature
+    extractor killed the server). CTranslate2, onnxruntime and torch never need it."""
+    return os.path.basename(path).startswith("libnvblas")
+
+
 def preload_pip_cuda_libs() -> int:
     """Load every nvidia/*/lib/lib*.so* found in site-packages; returns how many loaded. Safe to call twice."""
     if not sys.platform.startswith("linux"):
@@ -22,7 +29,7 @@ def preload_pip_cuda_libs() -> int:
         roots.append(site.getusersitepackages())
     except Exception:
         pass
-    pending = sorted({p for r in roots for p in glob.glob(os.path.join(r, "nvidia", "*", "lib", "lib*.so*"))})
+    pending = sorted({p for r in roots for p in glob.glob(os.path.join(r, "nvidia", "*", "lib", "lib*.so*")) if not is_blas_override(p)})
     loaded = 0
     for _ in range(3):          # a library may need another one that sorts after it: retry the failures
         still = []

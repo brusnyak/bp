@@ -12,3 +12,9 @@ def test_preload_is_safe_everywhere():
 
 def test_preload_twice_is_fine():
     assert preload_pip_cuda_libs() >= 0 and preload_pip_cuda_libs() >= 0
+
+
+def test_nvblas_is_never_preloaded():
+    from backend.cuda_libs import is_blas_override
+    assert is_blas_override("/x/nvidia/cublas/lib/libnvblas.so.12")
+    assert not is_blas_override("/x/nvidia/cublas/lib/libcublas.so.12")

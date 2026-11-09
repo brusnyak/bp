@@ -39,6 +39,7 @@ for pair in ('en-de', 'en-sk'):
     log('mt_convert', pair=pair, rc=rc, tail=o[-200:] if rc else '')
 
 rc, o = sh(f'{sys.executable} -m pip install -q -U "transformers>=5.22" accelerate "mistral-common[audio]"'); log('pip transformers 5.x', rc=rc, tail=o[-300:])
+rc, o = sh(f'{sys.executable} -c "from huggingface_hub import snapshot_download as d; d(\'mistralai/Voxtral-Mini-4B-Realtime-2602\')"'); log('voxtral weights cached', rc=rc, tail=o[-200:])   # a cold 8 GB download inside the server blocks its event loop past the websocket keepalive
 import importlib.metadata as _md; R['env']['transformers'] = _md.version('transformers'); save()
 
 norm = lambda s: re.findall(r"[^\W_]+", s.lower()); REF = norm(ref_text)
