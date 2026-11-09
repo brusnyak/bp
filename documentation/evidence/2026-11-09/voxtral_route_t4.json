@@ -1,0 +1,97 @@
+{
+ "env": {
+  "gpu": "Tesla T4\nTesla T4",
+  "transformers": "5.22.2"
+ },
+ "runs": {
+  "en-de|voxtral-agree_short": {
+   "segments": 16,
+   "with_audio": 16,
+   "lag_median_s": 3.15,
+   "lag_p90_s": 6.71,
+   "lag_max_s": 7.12,
+   "first_word_lag_median_s": 3.9,
+   "tail_after_input_s": 10.37,
+   "transcript_WER_prefix": 0.041,
+   "transcript_events": 16,
+   "duplicate_transcripts": 0,
+   "stock_phrase_segments": 0,
+   "server_errors": 0,
+   "wall_s": 102,
+   "translation_sample": [
+    "Guten Morgen und",
+    "willkommen zu diesem",
+    "Live-Demonstration von Echtzeit-Sprache \u00dcbersetzung.",
+    "Ich spreche.",
+    "Englisch und Sie werden"
+   ]
+  },
+  "en-de|voxtral-agree": {
+   "segments": 12,
+   "with_audio": 12,
+   "lag_median_s": 3.63,
+   "lag_p90_s": 6.03,
+   "lag_max_s": 6.57,
+   "first_word_lag_median_s": 4.83,
+   "tail_after_input_s": 10.16,
+   "transcript_WER_prefix": 0.041,
+   "transcript_events": 12,
+   "duplicate_transcripts": 0,
+   "stock_phrase_segments": 0,
+   "server_errors": 0,
+   "wall_s": 94,
+   "translation_sample": [
+    "Guten Morgen und willkommen zu diesem",
+    "Live-Demonstration von Echtzeit-Sprache \u00dcbersetzung.",
+    "Ich spreche Englisch und du wirst",
+    "H\u00f6re meine eigene Stimme in Sekundenschnelle Slowakisch sprechen.",
+    "Das System lauscht durch das Mikrofon und erkennt, wenn die Sprache beginnt"
+   ]
+  },
+  "en-sk|voxtral-agree_short": {
+   "segments": 17,
+   "with_audio": 17,
+   "lag_median_s": 3.06,
+   "lag_p90_s": 6.0,
+   "lag_max_s": 6.2,
+   "first_word_lag_median_s": 3.76,
+   "tail_after_input_s": 9.49,
+   "transcript_WER_prefix": 0.041,
+   "transcript_events": 17,
+   "duplicate_transcripts": 0,
+   "stock_phrase_segments": 0,
+   "server_errors": 0,
+   "wall_s": 95,
+   "translation_sample": [
+    "Dobr\u00e9 r\u00e1no.",
+    "Vitajte v tomto",
+    "\u017eiv\u00e1 demon\u0161tr\u00e1cia prekladu re\u010di v re\u00e1lnom \u010dase.",
+    "Hovor\u00edm po anglicky.",
+    "a budete"
+   ]
+  },
+  "en-de|whisper-agree_short": {
+   "segments": 32,
+   "with_audio": 27,
+   "lag_median_s": 3.16,
+   "lag_p90_s": 5.8,
+   "lag_max_s": 9.51,
+   "first_word_lag_median_s": 5.0,
+   "tail_after_input_s": 9.88,
+   "transcript_WER_prefix": 0.107,
+   "transcript_events": 27,
+   "duplicate_transcripts": 0,
+   "stock_phrase_segments": 0,
+   "server_errors": 0,
+   "wall_s": 101,
+   "translation_sample": [
+    "Guten Morgen und willkommen zu dieser Live-Demonstration",
+    "von real",
+    "Zeitsprache \u00dcbersetzung.",
+    "Ich spreche Englisch und du wirst",
+    "meine eigene Stimme h\u00f6ren"
+   ]
+  }
+ },
+ "note": "Voxtral Realtime through the real route on a Kaggle T4 (kernel bp-voxtral-route-t4 v2), Piper voices, owner English reading 60 s, paced replay at 1x"
+}
