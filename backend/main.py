@@ -2443,6 +2443,8 @@ async def handle_audio_stream(websocket: WebSocket, token: Optional[str] = None)
                                 if _rid_new and (_r_new is None or (_r_new.owner is not None and _r_new.owner != user.id)):
                                     logging.warning(f"Backend: Session {client_info}: room '{_rid_new}' does not exist or belongs to another user; speaker not attached.")
                                     _rid_new = None
+                                if _r_new is not None and _rid_new:
+                                    _r_new.src_lang = new_source_lang   # listeners joining later are checked against this language
                                 session_config["room_id"] = _rid_new
                             logging.debug(f"Backend: Received config_update: {data}")
 
