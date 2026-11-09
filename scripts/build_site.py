@@ -46,6 +46,12 @@ code{{background:#f2f2f2;padding:0 .25rem}}small{{color:#555}}@media(prefers-col
 <tr><td>Same, every 0.5 s</td><td>{s('en-owner|turbo|agree-0.5')}</td><td>{s('de-fleurs|turbo|agree-0.5')}</td></tr></table>
 <h2>Real server end to end <small>(Kaggle T4, your 60 s English reading replayed through the live route)</small></h2>
 <table><tr><th>Route</th><th>Delay median / p90</th><th>First-word delay</th><th>Transcript error</th></tr>{route_rows}</table>
+<h2>Against Google, Microsoft and OpenAI <small>(read from their own pages 2026-11-08)</small></h2>
+<table><tr><th></th><th>Google Gemini Live Translate</th><th>Microsoft Teams Interpreter</th><th>OpenAI gpt-realtime-translate</th><th>This project</th></tr>
+<tr><td>Design</td><td>one speech-to-speech model, keeps intonation, pacing, pitch</td><td>cascade: recognition, translation, voice</td><td>streaming speech-to-speech model</td><td>cascade (same as Microsoft)</td></tr>
+<tr><td>Lag</td><td>"a few seconds behind" (no number)</td><td>not stated</td><td>not stated</td><td>3.0-3.6 s on an M1 Pro (goal 3.0 s); 2.3-2.9 s on a T4 simulation at 6-17% word error</td></tr>
+<tr><td>Access</td><td>paid Google plan / API preview</td><td>Copilot or Teams Premium licence</td><td>API, usage-priced</td><td>runs on your own machine, no cloud or licence</td></tr></table>
+<p>Competes on behaviour (voice starts mid-sentence, a few seconds behind), on design (Microsoft's) and on running locally. Does not compete on measured quality: there is no side-by-side test, and pitch transfer across languages is not built. A streaming recogniser (Voxtral Realtime) is wired in and awaits a test on a GPU machine.</p>
 <p><b>Honest status.</b> One speaker, one direction runs live on a laptop; German and Slovak are validated through the real server on a GPU. Room mode (many listeners, each with an earpiece and a language) is built and unit-tested; its real-model test is pending. See the status page for the full list.</p>
 </body></html>"""
 out = ROOT / "documentation/site/index.html"; out.write_text(html, encoding="utf-8"); print("wrote", out, len(html), "bytes")
