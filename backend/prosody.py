@@ -23,7 +23,8 @@ EXTRA_LAG_S = float(os.environ.get("BP_PROSODY_EXTRA_LAG_S", "0.6"))
 RESET_GAP_S = 6.0          # a longer silence in the source starts a fresh anchor (new topic / speaker returned)
 COMMA_PAUSE_S = float(os.environ.get("BP_PAUSE_COMMA_S", "0.25"))
 SENTENCE_PAUSE_S = float(os.environ.get("BP_PAUSE_SENTENCE_S", "0.5"))
-RATE_MIN, RATE_MAX = 0.85, 1.15
+RATE_MIN = float(os.environ.get("BP_RATE_MIN", "0.85"))   # Piper length_scale floor: lower = voice may speed up more to catch the speaker's pace (measured 2026-11-09: Czech/German voices run 1.3x the English, backlog is the lag)
+RATE_MAX = float(os.environ.get("BP_RATE_MAX", "1.15"))
 
 
 def trailing_pause_s(phrase: str) -> float:

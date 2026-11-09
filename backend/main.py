@@ -2026,8 +2026,9 @@ async def _process_speech_segment_pipeline(
 
         if prosody_on and chunk_count:
             sched.committed(stream_audio_s)
-            scale = follower.update(audio_segment_np.size / AUDIO_SAMPLE_RATE, stream_audio_s)
-            logging.info(f"Backend: Session {client_info}: prosody rate: source {audio_segment_np.size / AUDIO_SAMPLE_RATE:.2f}s vs tts {stream_audio_s:.2f}s -> length_scale {scale:.2f}")
+            _src_dur = (source_span[1] - source_span[0]) if source_span and len(source_span) == 2 else audio_segment_np.size / AUDIO_SAMPLE_RATE   # incremental fragments carry no audio (1 zero sample): the pace follower used 0 s and never ran (62 of 62 log lines, 2026-11-09)
+            scale = follower.update(_src_dur, stream_audio_s)
+            logging.info(f"Backend: Session {client_info}: prosody rate: source {_src_dur:.2f}s vs tts {stream_audio_s:.2f}s -> length_scale {scale:.2f}")
 
         tts_total_time = time.perf_counter() - tts_start_time
         logging.info(f"Backend: Session {client_info}: Streaming TTS completed. Time: {tts_total_time:.2f}s. Chunks: {chunk_count}")
