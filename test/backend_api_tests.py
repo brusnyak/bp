@@ -113,7 +113,7 @@ async def test_initialize_full_pipeline_live():
     assert session is not None
     assert session["stt_model"] is not None
     assert session["tts_engine"] is not None
-    assert session["tts_engine_name"] == session["session_config"]["tts_model_choice"] == "piper_sk_personal"
+    assert session["tts_engine_name"] == session["session_config"]["tts_model_choice"] == "piper_generic_sk"
 
 
 # --- Ratings sync (Voice Lab persistence, 2026-10-01) ---
