@@ -235,6 +235,11 @@ def _mlx_whisper_factory() -> Callable[..., object]:
 def _voxtral_factory() -> Callable[..., object]:
     def make(**kwargs):
         _ensure_repo_on_path()
+        try:
+            import mlx_audio  # noqa: F401   Apple Silicon
+        except ImportError:   # NVIDIA GPU through Transformers >= 5.22
+            from backend.stt.voxtral_cuda_stt import VoxtralCudaSTT
+            return VoxtralCudaSTT()
         from backend.stt.voxtral_stt import VoxtralSTT
         return VoxtralSTT()
     return make
@@ -364,10 +369,10 @@ def _register_defaults() -> None:
 
     register(Capability(
         "voxtral", "stt", factory=_voxtral_factory(),
-        probe=_has_module("mlx_audio"), devices=("cpu",),
+        probe=lambda: _has_module("mlx_audio")() or _has_module("transformers")(), devices=("cpu", "cuda"),
         streaming=True, license="commercial-ok",
         license_note="Voxtral Mini 4B Realtime weights Apache 2.0; mlx-audio MIT",
-        resource="~2.3 GB (4-bit) on the Apple GPU; macOS arm64 only; 13 languages, no Slovak",
+        resource="Apple GPU: ~2.3 GB 4-bit via mlx-audio; NVIDIA: 8.25 GB fp16 via Transformers >= 5.22 (T4 ok); 13 languages, no Slovak",
         notes="streaming recogniser, ~0.5 s behind speech; set BP_STT_ENGINE=voxtral (other sources fall back to mlx_whisper)"))
 
     register(Capability(
