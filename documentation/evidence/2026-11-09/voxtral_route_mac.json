@@ -1,0 +1,333 @@
+{
+ "strategy": "agree_short",
+ "audio": "processed/testaudio/en_paced.wav",
+ "seconds": 60.0,
+ "src": "en",
+ "tgt": "de",
+ "tts": "piper",
+ "input_end_s": 44.46,
+ "rates": {
+  "1.0": {
+   "segments": 5,
+   "with_audio": 4,
+   "first_audio_after_source_end_s": [
+    4.513,
+    10.263,
+    11.429,
+    20.852,
+    null
+   ],
+   "lag_s": [
+    4.513,
+    10.263,
+    11.429,
+    20.852
+   ],
+   "lag_median_s": 11.429,
+   "lag_p90_s": 20.852,
+   "source_end_s": [
+    2.32,
+    4.68,
+    16.2,
+    16.96
+   ],
+   "listen_start_s": [
+    6.833,
+    14.943,
+    27.629,
+    37.812
+   ],
+   "lag_max_s": 20.852,
+   "first_word_lag_s": [
+    4.513,
+    10.263,
+    11.429,
+    20.852,
+    null
+   ],
+   "first_word_lag_max_s": 20.852,
+   "segment_s": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    null
+   ],
+   "lag_growth_s": 16.339,
+   "last_listen_end_vs_input_end_s": 0.83
+  },
+  "1.25": {
+   "segments": 5,
+   "with_audio": 4,
+   "first_audio_after_source_end_s": [
+    4.513,
+    10.263,
+    11.429,
+    20.852,
+    null
+   ],
+   "lag_s": [
+    4.513,
+    10.263,
+    11.429,
+    20.852
+   ],
+   "lag_median_s": 11.429,
+   "lag_p90_s": 20.852,
+   "source_end_s": [
+    2.32,
+    4.68,
+    16.2,
+    16.96
+   ],
+   "listen_start_s": [
+    6.833,
+    14.943,
+    27.629,
+    37.812
+   ],
+   "lag_max_s": 20.852,
+   "first_word_lag_s": [
+    4.513,
+    10.263,
+    11.429,
+    20.852,
+    null
+   ],
+   "first_word_lag_max_s": 20.852,
+   "segment_s": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    null
+   ],
+   "lag_growth_s": 16.339,
+   "last_listen_end_vs_input_end_s": -0.67
+  },
+  "adaptive": {
+   "segments": 5,
+   "with_audio": 4,
+   "first_audio_after_source_end_s": [
+    4.513,
+    10.263,
+    11.429,
+    20.852,
+    null
+   ],
+   "lag_s": [
+    4.513,
+    10.263,
+    11.429,
+    20.852
+   ],
+   "lag_median_s": 11.429,
+   "lag_p90_s": 20.852,
+   "source_end_s": [
+    2.32,
+    4.68,
+    16.2,
+    16.96
+   ],
+   "listen_start_s": [
+    6.833,
+    14.943,
+    27.629,
+    37.812
+   ],
+   "lag_max_s": 20.852,
+   "first_word_lag_s": [
+    4.513,
+    10.263,
+    11.429,
+    20.852,
+    null
+   ],
+   "first_word_lag_max_s": 20.852,
+   "segment_s": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    null
+   ],
+   "lag_growth_s": 16.339,
+   "last_listen_end_vs_input_end_s": -0.35
+  }
+ },
+ "tts_messages": 7,
+ "events": [
+  {
+   "t": 6.697995833004825,
+   "type": "transcription_result",
+   "text": "Good morning,",
+   "stt_time": 3.7500285543501377e-07,
+   "span": [
+    2.32,
+    2.32
+   ]
+  },
+  {
+   "t": 6.770982166999602,
+   "type": "translation_result",
+   "text": "Guten Morgen.",
+   "mt_time": 0.07274183299159631
+  },
+  {
+   "t": 6.8333265830005985,
+   "type": "tts_audio",
+   "bytes": 64904,
+   "seconds": 1.4707482993197278
+  },
+  {
+   "t": 6.8336366250005085,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 3.7500285543501377e-07,
+    "mt_time": 0.07274183299159631,
+    "tts_time": 0.062017958000069484,
+    "input_to_stt_latency": 0.0003879160067299381,
+    "onset_to_first_audio_s": 6.791921042007743,
+    "source_onset_time": 96567.614615791,
+    "first_audio_sent_time": 96574.406536833,
+    "total_latency": 0.13476016599452123
+   }
+  },
+  {
+   "t": 14.248890458009555,
+   "type": "transcription_result",
+   "text": "and welcome to this live demonstration of speech translation.",
+   "stt_time": 3.33995558321476e-07,
+   "span": [
+    4.68,
+    4.68
+   ]
+  },
+  {
+   "t": 14.592723791996832,
+   "type": "translation_result",
+   "text": "und willkommen zu dieser Live-Demonstration der Sprach\u00fcbersetzung.",
+   "mt_time": 0.3436015000042971
+  },
+  {
+   "t": 14.942931666999357,
+   "type": "tts_audio",
+   "bytes": 176520,
+   "seconds": 4.00172335600907
+  },
+  {
+   "t": 14.945374500006437,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 3.33995558321476e-07,
+    "mt_time": 0.3436015000042971,
+    "tts_time": 0.34632562499609776,
+    "input_to_stt_latency": 0.04256474999419879,
+    "onset_to_first_audio_s": 14.898164541998995,
+    "source_onset_time": 96567.614615791,
+    "first_audio_sent_time": 96582.512780333,
+    "total_latency": 0.6899274589959532
+   }
+  },
+  {
+   "t": 27.101590667007258,
+   "type": "transcription_result",
+   "text": "I am speaking English, and you will hear German or Slovak within",
+   "stt_time": 7.079943316057324e-07,
+   "span": [
+    16.2,
+    16.2
+   ]
+  },
+  {
+   "t": 27.431994917002157,
+   "type": "translation_result",
+   "text": "Ich spreche Englisch, und Sie h\u00f6ren Deutsch oder Slowakisch in",
+   "mt_time": 0.33092399999441113
+  },
+  {
+   "t": 27.628903333010385,
+   "type": "tts_audio",
+   "bytes": 93336,
+   "seconds": 2.1154648526077096
+  },
+  {
+   "t": 27.725848375004716,
+   "type": "tts_audio",
+   "bytes": 90668,
+   "seconds": 2.0549659863945577
+  },
+  {
+   "t": 27.72595704199921,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 7.079943316057324e-07,
+    "mt_time": 0.33092399999441113,
+    "tts_time": 0.29255929098872,
+    "input_to_stt_latency": 0.0043412910017650574,
+    "onset_to_first_audio_s": 21.947728042010567,
+    "source_onset_time": 96573.254615791,
+    "first_audio_sent_time": 96595.202343833,
+    "total_latency": 0.6234839989774628
+   }
+  },
+  {
+   "t": 37.480474083000445,
+   "type": "transcription_result",
+   "text": "a second or two. The system listens through the microphone and decides when a phrase has ended.",
+   "stt_time": 2.9199873097240925e-07,
+   "span": [
+    16.96,
+    16.96
+   ]
+  },
+  {
+   "t": 37.701428917003796,
+   "type": "translation_result",
+   "text": "ein oder zwei Sekunden. Das System lauscht durch das Mikrofon und entscheidet, wann ein Satz beendet ist.",
+   "mt_time": 0.22038583298854064
+  },
+  {
+   "t": 37.812230791998445,
+   "type": "tts_audio",
+   "bytes": 124842,
+   "seconds": 2.8298866213151928
+  },
+  {
+   "t": 37.95717037499708,
+   "type": "tts_audio",
+   "bytes": 144700,
+   "seconds": 3.2801814058956915
+  },
+  {
+   "t": 38.01645120800822,
+   "type": "tts_audio",
+   "bytes": 60460,
+   "seconds": 1.3699773242630386
+  },
+  {
+   "t": 38.01689629199973,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 2.9199873097240925e-07,
+    "mt_time": 0.22038583298854064,
+    "tts_time": 0.3148031250020722,
+    "input_to_stt_latency": 0.00927758299803827,
+    "onset_to_first_audio_s": 32.13092750000942,
+    "source_onset_time": 96573.254615791,
+    "first_audio_sent_time": 96605.385543291,
+    "total_latency": 0.5351892499893438
+   }
+  },
+  {
+   "t": 58.511545917004696,
+   "type": "transcription_result",
+   "text": "First, the words are recognized. Then they are translated. Then they are spoken again. Everything runs on this computer. Without a cloud service, the delay is the time between my words and the voice you hear. Our goal is a delay short enough for a natural conversation.",
+   "stt_time": 9.57996235229075e-07,
+   "span": [
+    38.48,
+    38.48
+   ]
+  }
+ ]
+}
