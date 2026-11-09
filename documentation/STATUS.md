@@ -23,6 +23,23 @@
 
 The accurate route (`BP_INCREMENTAL=1`: decode the growing buffer, commit words two decodes agree on) is validated on a T4 and is on in the `nvidia` preset. A step below 1.0 s collapses the queue. The Mac stays on 2 s chunks: turbo costs about 0.72 s per call there. Open: the real-route transcript error (21-24%) is four times the offline simulation (5%).
 
+## Mac ceiling and what needs better compute (owner decision 2026-11-08: stop tuning on the Mac)
+
+**Working state on the Mac (M1 Pro, 16 GB, shared with the desktop):** the Whisper turbo MLX route with `Speech cutting` = `agree` or `agree_short`, raw mic (default). Lag behind the speech 3.0-3.6 s against the 3.0 s goal; the voice starts mid-sentence; English input recognised at about 2-3% error. This is the best the repo reaches on this machine. Server command: see the handoff page. Nothing more is planned for the Mac.
+
+**Why the Mac stops here:** Whisper decodes a padded 30 s window on every call, about 0.7 s each however short the audio, and two agreeing decodes are needed per word. Four fragment sizes all landed at 3.0-3.2 s. A streaming recogniser removes that floor, but the Mac cannot show it, because the desktop (WindowServer, Orca, browsers) holds the GPU, and swap was 10.6 of 11.3 GB used during the tests. Running more tests there overloads the machine, so none are planned.
+
+**Voxtral Mini 4B Realtime (4-bit MLX) is installed and wired in but not proven:** `BP_STT_ENGINE=voxtral` (`backend/stt/voxtral_stt.py`; Slovak and other languages without Voxtral fall back to Whisper). Facts from 2026-11-08, all on the M1 Pro:
+- Transcript of the owner's English script was clean; offline speed 0.62 x real time in two runs (38.1 s audio in 23.2 s and 23.7 s).
+- Fed at real time in 0.2 s pushes: lag started at 0.3-0.5 s, then fell 3-6 s behind and stayed there (4 runs, load 5-28).
+- Fed in 0.64 s and 1.28 s pushes (standalone script, not through the server): lag stayed at or below 0.7 s for the whole 38 s. The engine default is now 0.64 s (`BP_VOXTRAL_STEP_S`). **This setting was never run through the real route** (the run was stopped), so the route result below is for the old 0.2 s default.
+- Real route (`paced_replay.py`, en to de, `agree_short`, 0.2 s pushes): all four automated criteria failed (median lag 8 s, recognition error 21.9%).
+
+**Needs a better processing unit (the work that is left):**
+1. Rerun the real route with Voxtral at 0.64 s pushes on a machine with a free GPU and spare memory (a 32 GB+ Apple Silicon Mac dedicated to the demo, or an NVIDIA box). `paced_replay.py processed/testaudio/en_paced.wav --strategy agree_short --src en --tgt de` then `score_success.py`. Pass = median lag at or under 3.0 s, early start at 50% or more.
+2. NVIDIA: Voxtral Realtime has vLLM and Transformers support; not tried in this repo. mlx-audio does not run on a T4, so it needs a separate engine file and a Kaggle notebook.
+3. Voice: OmniVoice (`backend/tts/omni_tts.py`) already clones the speaker's voice (RTF 0.18-0.34 on a T4, about 0.8-1 on Apple MPS), so a separate voice-conversion stage is not needed on a GPU box. Copying the pitch contour across languages is research-grade and not planned. Not measured: whether OmniVoice plus Voxtral fit one T4.
+
 ## Not validated yet (next actions, in order)
 
 1. Rerun `bp-fresh-install-t4` (installer, kinit conversion, CUDA preload, German and Slovak as input speech).
@@ -30,10 +47,89 @@ The accurate route (`BP_INCREMENTAL=1`: decode the growing buffer, commit words 
 3. German through the browser UI and on a Mac; record the reading script (`reading_script_multilingual.md`) and score it with `scripts/score_reading.py`.
 4. Push the local commits (4 ahead of `main` at the time of writing).
 
+## Room mode: what is required before others can run a meeting with it (2026-11-08)
+
+Room mode is built and unit-tested. It has not run with real models in front of real listeners. Everything below is a requirement, not a promise. Tick a line only with a recorded check.
+
+| # | Requirement | State |
+|---|---|---|
+| 1 | Real-model room test (3 and 12 listeners, 3 languages): latency, ordering, no stalls | open (`bp-room-test-t4`) |
+| 2 | Listener joins from a link or QR code with no login (today the page asks for a guest token; untested on a fresh install) | open |
+| 3 | Speaker page creates a room and shows code, link and QR (code and link field exist in the working tree; no QR; not browser-tested) | open |
+| 4 | Room is freed when the speaker leaves; listeners cannot create rooms by guessing an id | open (`backend/room.py` never calls `close_room`) |
+| 5 | One slow listener must not delay the others (send timeout per listener) | open (`_deliver` sends in turn, no timeout) |
+| 6 | Room creation checks that each needed language pair and voice is installed and tells the speaker (a German speaker with a French listener has no `de-fr` model; today the phrase is dropped with a log line) | open |
+| 7 | LAN run for real phones: `BP_HTTPS=1 BP_HOST=0.0.0.0`, certificate warning on every phone; document a `mkcert` or tunnel path | open |
+| 8 | Listener page in the audience's language, readable on a phone at 390 px | built in the working tree, not reviewed on a device |
+| 9 | Speaker page layout: room controls must not crowd the live page; design review | open |
+| 10 | Fresh install passes on Linux (rerun), then Windows | open |
+
+Live tests, 2026-11-08, Mac (session logs in `processed/sessions/`, not in the claims checker):
+
+- **Why the translation arrived after the sentence ended.** The English-to-Slovak log shows the wait between a voice phrase being ready and playing grew from about 0 s to about 19 s over 50 s of speech. The browser queue measured every phrase as 0.0 s long (WAV tag byte order bug in `session-playback.js`, mirrored by its unit test), so the backlog budget and speed-up never worked. Fixed 2026-11-08; adaptive playback is now on.
+- **Why the transcripts are poor.** The microphone is fine (RMS about 0.06, no clipping) and Parakeet via Type Whisper agrees on German. The cause is the fixed 2 s chunks: the same audio decoded whole is far better than decoded in chunks (German, Slovak, 62 chunks replayed), and short fragments produce stock hallucinations ("Ďakujem za pozornosť", "Titulky vytvořil JohnyX"). Slovak speech with the source set to `cs` is worse than with `sk`.
+- **Decode retries.** Whisper's temperature fallback cost 4-5 s per junk chunk and did not improve the text: replayed decode time 43.6 s to 17.8 s (German) and 65.1 s to 37.3 s (Slovak) with retries off. Off by default now (`BP_STT_FALLBACK=1` restores).
+- **Paced replay of the owner's German recording (30 s, real route, 1x):** median lag 1.3 s and worst 2.8 s after each segment's end with adaptive playback, translation ending 4.5 s after the input ended; first-word lag up to 4.8 s. The incremental route (`BP_INCREMENTAL=1`) was not better on the Mac (median lag 2.0 s). The floor with 2 s chunks is the chunk length plus 0.7 s recognition; a first-word target needs shorter or overlapping windows and has not been built.
+
+**What changed since the 2025-12 demo (found 2026-11-08 by diffing `2a2daab` against the working tree).** The demo closed a segment only at a pause (`SILENCE_TIMEOUT` 0.3 s, 15 s safety valve) and sent the whole phrase to the recogniser; its mid-speech streaming block was commented out. Today's `main.py` runs that block live: every `STREAMING_CHUNK_LENGTH` (2.0 s) it removes frames from the open phrase and sends them as an independent chunk, so continuous reading is cut every 2 s and never reaches the pause. `BP_STREAM_CHUNKS=0 BP_VAD_MAX_SEGMENT_S=15 BP_VAD_SILENCE_S=0.3` restores the demo behaviour (verified on a replay with pauses: 3 phrases cut at the pauses, `_full.wav` written). Next: measure that mode by ear and by log, then the agreement route, on the same recordings.
+
+**Strategy lab on the owner's Slovak recording** (57 s, reading lines A1-A4 twice; `scripts/live/strategy_lab.py`, recognition only, strict word match so a missing diacritic counts as an error; not in the claims checker):
+
+| Engine | Whole file | Pause (demo) | 2 s chunks | Growing buffer, 1.0 s |
+|---|---|---|---|---|
+| Whisper turbo (MLX, generic) | 47.7% error | 60.2% | 73.4% | collapsed: lag 38 s, words rarely agree |
+| Whisper turbo Slovak fine-tune (CPU) | 56.6% | 61.9% | 71.4% | not run |
+
+Reading: the strategy order holds (whole < pause < chunks), but even the whole-file best case is near 50% on this voice, so cutting alone does not fix Slovak. The owner's Slovak is B1-B2 (`owner-facts`); ASR trained on native speech is known to degrade on accented speech. That is a hypothesis: it fits that two engines and Parakeet all fail on whole files, and it is untested (a native-speaker recording through the same lab would test it). The CPU run's timing is not valid (it ran under the `heavy` wrapper beside the server). English phrases cut at pauses were transcribed correctly in the live pause-mode session (a 9.4 s phrase, `20261108-145829`).
+
+**Selectable cutting strategy (2026-11-08).** The live page has "Speech cutting" under Advanced: `phrase` (demo), `clause` (0.2 s pause or 4 s cap), `agree` (growing buffer, speak while talking), `chunks` (old 2 s windows). It is sent per session and written to the session log (`session_config` line), so every test says which strategy it used.
+
+**Generated test speech (2026-11-08).** `scripts/live/make_test_audio.py` renders the reading script with the generic Piper voices (Slovak lili, English john, German thorsten) into `processed/testaudio/<lang>_<paced|continuous|long>.wav` with the exact reference text; `scripts/live/synth_matrix.py` runs every strategy over them and prints one table. This removes the need for a person to read into the UI for each comparison. First check (Slovak, paced, Whisper turbo MLX): whole file 17.7% error, pause-cut 26.2%, against 47.7% whole-file on the owner's own Slovak. The gap fits an accent effect but one synthetic voice does not prove it. The full matrix has not been run yet.
+
+**Owner Slovak reading, direct recording (2026-11-08, 35 s, script lines A1-A6, Whisper turbo MLX, strict word match, `strategy_lab.py`):** whole file 43.8% error, pause-cut 41.0%, clause 57.4%, 2 s chunks 65.1%. The recording itself is hot: peak 1.0 and 2.5% of samples clipped (the script asks for peaks near -6 dB), which alone can cost accuracy. So the browser capture is not the main cause (the same engine does about as badly on a direct file). Earlier Kaggle numbers for the same speaker: kinit 19.8%, plain turbo 30.2% (`LANGUAGES.md`), against 6.5% and 10.7% on native FLEURS speech. A same-engine native-versus-owner comparison on identical scoring is in the Kaggle `strategy_matrix` kernel (stream `fleurs_sk` against `owner_sk_script`); not yet run.
+
+**Known limit, decided with the owner 2026-11-08: Slovak spoken by a non-native speaker.** Whisper turbo, the Slovak fine-tune and Parakeet TDT v3 (through the TypeWhisper app) all transcribe the owner's Slovak reading badly (about 40-55% strict word error here; Parakeet's output on the owner's reading is largely garbled), while Parakeet transcribes generated Slovak speech of the same text almost perfectly. Native listeners understand the owner; the recognisers do not. The owner chose not to spend more time on it: Slovak as the spoken language is documented as limited for this speaker. The demo case (English spoken, Slovak or German heard) is unaffected. See `REALTIME_OPTIONS_2026-11-08.md` for what else exists.
+
+**Success test for near real time (accepted by the owner 2026-11-08; full text and the reference systems in `NEAR_REALTIME_GOAL.md`).** English spoken, Slovak or German heard: (1) lag behind the speech position median at most 3.0 s, p90 at most 4.5 s; (2) of sentences with 8 or more words, at least half have their first clause voiced before the sentence ends; (3) lag grows at most 0.5 s per minute; (4) English recognition error at most 8% on whole phrases, no dropped phrase. Scored by `scripts/live/score_success.py` on a `paced_replay.py --strategy ...` run. Not a target: a voice within a second of the first word.
+
+**Success test, first run per strategy (2026-11-08, generated English `en_paced`, 44 s, English to Slovak, real route on the Mac, Whisper turbo MLX, adaptive playback, one run each so differences of a few tenths are noise; `score_success.py`):**
+
+| Strategy | 1 lag median / p90 (goal 3.0 / 4.5 s) | 2 early start (goal 50%) | 3 growth per min (goal 0.5 s) | 4 recognition error (goal 8%) |
+|---|---|---|---|---|
+| phrase | 1.71 / 2.26 pass | 0% fail | 0.4 pass | 1.0% pass |
+| clause | 1.05 / 3.61 pass | 25% fail | 1.56 fail | 35.4% fail |
+| agree | 3.58 / 5.70 fail | 50% pass | -3.5 pass | 2.1% pass |
+| chunks (2 s) | 1.64 / 2.96 pass | 100% pass | 0.53 fail | 14.6% fail |
+
+Reading: only the agreement route keeps accuracy and starts the voice before the sentence ends; it misses the lag goal by about 0.6 s. Phrase is accurate but cannot start early. Clause (0.2 s pause or 4 s cap) cuts words in half on clean speech and is the worst on quality; chunks start early but cost accuracy. Clause dropped 3 of 13 segments without audio (cause not yet found). A first version of the early-start check credited a voice to whichever sentence it overlapped; it was corrected the same day (a voice now belongs to the sentence it translates), which moved clause from 88% to 25% and phrase from 88% to 0%.
+
+**Agreement route tuning on the Mac (2026-11-08, generated English to Slovak, one run per setting, run-to-run spread about 0.5 s):** baseline median lag 3.1 s (earlier run 3.6 s), 3 words and 1.0 s max wait 3.2 s, plus a 0.5 s step 3.1 s, 2 words and 0.8 s wait 3.0 s with early start 62% (the only setting to pass criterion 2). Fragment size and step barely move the lag: the floor is two agreeing decodes of about 0.7 s each plus voice time. The Kaggle simulation puts agreement at 1.0 s near 2.4 s on a T4, so the lag goal needs a faster decode than Whisper turbo on this Mac, or a GPU.
+
+**Kaggle T4 strategy matrix (2026-11-08, `scripts/gpu_bench/kaggle_strategy_matrix`, simulation on the same clock model as the stream simulation, beam 1; word error / median commit latency; results in `processed/kaggle_matrix_json/strategy_matrix.json`):**
+
+| Stream, engine | whole | pause | clause | 2 s chunks | agree 1.0 s | agree 0.5 s |
+|---|---|---|---|---|---|---|
+| English generated, turbo | 1.0% | 1.0% / 2.4 s | 2.1% / 2.0 s | 10.4% / 1.2 s | 6.2% / 2.4 s | 11.5% / 1.3 s |
+| German FLEURS, turbo | 3.5% | 8.9% / 3.0 s | 12.1% / 1.9 s | 33.4% / 1.1 s | 10.4% / 2.3 s | 26.2% / 1.3 s |
+| Slovak FLEURS (native), Slovak fine-tune | 8.5% | 19.0% / 3.3 s | 25.8% / 2.2 s | 27.8% / 1.5 s | 16.9% / 2.9 s | 21.4% / 10.8 s |
+| Slovak, owner reading, Slovak fine-tune | 17.7% | 17.7% / 6.5 s | 33.9% / 2.4 s | 32.3% / 1.5 s | 27.4% / 3.2 s | 32.3% / 6.2 s |
+| Slovak, owner reading, plain turbo | 45.2% | 41.9% | 56.5% | 67.7% | 48.4% | 66.1% |
+| Slovak, owner reading, Parakeet | 90.3% | 100% | 82% | 102% | 98% | 95% |
+
+Reading: no strategy gives under 1.5 s with under 10% error; agreement every 1.0 s is the best compromise (about 2.3-2.9 s, 6-17% error), as in the earlier simulation. The Slovak fine-tune reads the owner at 17.7% against 8.5% on native speech, about twice the native error, while plain turbo (45.2%) and Parakeet (90%) fail on the owner's Slovak. The English FLEURS pause and clause cells (75%) are not trustworthy: the voice-activity cut misbehaved on that stream and the other streams do not show it.
+
+**Correction to the "known limit" paragraph above.** The 40-56% Slovak error figures came from plain turbo and from the owner's browser-captured audio. With the Slovak fine-tune on the owner's direct recording the error is 17.7%. The local CPU run of the same fine-tune on the browser-captured audio gave 56.6% (different sentences, different recording), so the browser capture path (echo cancellation, noise suppression and automatic gain are all on) is a suspect. The live page now accepts `?mic=raw` to switch those three off for an A/B reading; the session log records `mic_raw` or `mic_processed`.
+
+**Mic A/B (2026-11-08, English, A1-A6 read once on the page with the browser's echo cancellation, noise suppression and automatic gain on, once with them off; offline, Whisper turbo MLX on the saved full recordings, `strategy_lab.py`):** processed capture 6.7% whole-file error and 15.5% when cut at pauses; raw capture 2.7% and 4.0%. The raw recording is much quieter (peak 0.10, rms 0.011 against peak 0.51, rms 0.051) and still recognised better, so the processing is the problem, not the level. One take each, different strategies in the live sessions (phrase against clause), so treat it as strong evidence and not proof. Raw is now the default in `live-script.js` (`?mic=processed` restores the old behaviour); the session log records `mic_raw` or `mic_processed`.
+
+**Live page options added 2026-11-08:** `agree_short` ("Agreement, short pieces") voices 2-6 agreed words or after 0.8 s; it is the only agreement setting that passed the early-start test on the Mac (62%, one run).
+
+Diagnostics for the next live test (`BP_LOG_SESSIONS=1`): every recognised chunk is saved as `processed/sessions/<stamp>_<client>_chunks/NNN.wav` with the raw recogniser output (before the guards), the engine and the prompt in the session `.jsonl`; the browser logs `tts_received`, `tts_play_start` and `tts_ended` with the playback queue length. A wrong transcript can be replayed offline with any engine, and playback queueing can be separated from chunking and recognition.
+
 ## Not built
 
 1. **Cloned voice for other people.** Only a Slovak fine-tune exists (local, not distributable). Cloning needs a GPU and the weights carry non-commercial licences.
-2. **Room-mode polish:** a room-code field on the speaker page (today: open the speaker page with `?room=ID`), a localized listener page, authentication beyond the room code, and a capacity ceiling per GPU.
+2. **Room-mode polish:** see the table above; plus authentication beyond the room code and a capacity ceiling per GPU.
 3. **Operations for shared use:** retention, monitoring, a support owner.
 4. The old `/ws/meeting` scaffold (`backend/session_manager.py`) is a separate, unvalidated pipeline with one target language per speaker. Room mode does not use it.
 

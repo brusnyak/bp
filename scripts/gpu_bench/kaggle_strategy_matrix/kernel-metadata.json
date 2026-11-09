@@ -1,0 +1,15 @@
+{
+  "id": "yegorby/bp-strategy-matrix-t4",
+  "title": "BP Strategy Matrix T4",
+  "code_file": "job.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": ["yegorby/bp-testaudio-20261108"],
+  "competition_sources": [],
+  "model_sources": [],
+  "category_ids": [],
+  "keywords": []
+}

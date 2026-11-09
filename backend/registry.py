@@ -232,6 +232,14 @@ def _mlx_whisper_factory() -> Callable[..., object]:
     return make
 
 
+def _voxtral_factory() -> Callable[..., object]:
+    def make(**kwargs):
+        _ensure_repo_on_path()
+        from backend.stt.voxtral_stt import VoxtralSTT
+        return VoxtralSTT()
+    return make
+
+
 def _parakeet_onnx_factory() -> Callable[..., object]:
     def make(**kwargs):
         _ensure_repo_on_path()
@@ -353,6 +361,14 @@ def _register_defaults() -> None:
         license_note="mlx-whisper MIT; whisper weights MIT",
         resource="~1.6 GB (large-v3-turbo) on the Apple GPU; macOS arm64 only",
         notes="Mac default candidate: measured 2026-11-07, see documentation/BENCHMARKS.md; set BP_STT_ENGINE=mlx_whisper"))
+
+    register(Capability(
+        "voxtral", "stt", factory=_voxtral_factory(),
+        probe=_has_module("mlx_audio"), devices=("cpu",),
+        streaming=True, license="commercial-ok",
+        license_note="Voxtral Mini 4B Realtime weights Apache 2.0; mlx-audio MIT",
+        resource="~2.3 GB (4-bit) on the Apple GPU; macOS arm64 only; 13 languages, no Slovak",
+        notes="streaming recogniser, ~0.5 s behind speech; set BP_STT_ENGINE=voxtral (other sources fall back to mlx_whisper)"))
 
     register(Capability(
         "parakeet_onnx", "stt", factory=_parakeet_onnx_factory(),

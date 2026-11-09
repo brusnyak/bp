@@ -9,11 +9,11 @@ function wavBuffer(dataBytes) {
     const dv = new DataView(header);
     const write = (off, val, little = true) => dv['setUint' + (val > 0xffff ? 32 : 16)](off, val, little);
     // RIFF
-    write(0, 0x46464952, false);            // "RIFF"
+    write(0, 0x52494646, false);            // "RIFF"
     write(4, 36 + dataBytes, true);         // file size
-    write(8, 0x45564157, false);            // "WAVE"
+    write(8, 0x57415645, false);            // "WAVE"
     // fmt  (pos 12)
-    write(12, 0x20746d66, false);           // "fmt "
+    write(12, 0x666d7420, false);           // "fmt "
     write(16, 16, true);                    // fmt chunk size
     write(20, 1, true);                     // audio format = PCM
     write(22, 1, true);                     // channels = 1
@@ -22,7 +22,7 @@ function wavBuffer(dataBytes) {
     write(32, 2, true);                     // block align
     write(34, 16, true);                    // bits per sample
     // data (pos 36)
-    write(36, 0x61746164, false);           // "data"
+    write(36, 0x64617461, false);           // "data"
     write(40, dataBytes, true);             // data chunk size
     const payload = new Uint8Array(dataBytes);
     return new Uint8Array([...new Uint8Array(header), ...payload]).buffer;

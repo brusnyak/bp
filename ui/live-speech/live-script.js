@@ -254,7 +254,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let soundCheckRecorder = null;
     let checkedDevices = null;
     let starting = false;
-    const playback = new SessionPlayback({ onError: error => {
+    // Playback timing goes to the server session log (BP_LOG_SESSIONS=1) so lag can be split into chunking, recognition and playback queueing.
+    const playback = new SessionPlayback({ adaptive: true, onEvent: e => { try { if (websocket && websocket.readyState === 1) websocket.send(JSON.stringify({ type: 'client_event', t_ms: Math.round(performance.timeOrigin + performance.now()), ...e })); } catch (_) {} }, onError: error => {
         stopRealtimeAudioStreaming();
         checkedDevices = null;
         updateStartAvailability();
@@ -611,10 +612,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (checkedDevices !== deviceFingerprint()) throw new Error('Run the sound check for these devices before Start.');
             if (!document.getElementById('isolationConfirmed').checked) throw new Error('Confirm headphones or isolated input/output before Start.');
             const deviceId = document.getElementById('audioInputSelect').value;
+            // Echo cancellation, noise suppression and automatic gain are OFF by default (the page already requires headphones or isolated audio);
+            // ?mic=processed switches them back on. The choice is written to the session log as a client event.
+            const rawMic = new URLSearchParams(location.search).get('mic') !== 'processed';   // raw is the default since the 2026-11-08 A/B (English, same engine: 2.7% error raw against 6.7% processed)
             const audioConstraints = { audio: {
                 ...(deviceId ? { deviceId: { exact: deviceId } } : {}),
-                echoCancellation: true, noiseSuppression: true, autoGainControl: true
+                echoCancellation: !rawMic, noiseSuppression: !rawMic, autoGainControl: !rawMic
             }};
+            try { if (websocket && websocket.readyState === 1) websocket.send(JSON.stringify({ type: 'client_event', event: rawMic ? 'mic_raw' : 'mic_processed', t_ms: Math.round(performance.timeOrigin + performance.now()) })); } catch (_) {}
             const capturedStream = await navigator.mediaDevices.getUserMedia(audioConstraints);
             if (generation !== captureGeneration) { capturedStream.getTracks().forEach(track => track.stop()); return; }
             mainAudioStream = capturedStream;
@@ -1005,7 +1010,11 @@ document.addEventListener('DOMContentLoaded', () => {
             vad_enabled: vadEnabled,
             vad_aggressiveness: vadAggressiveness,
             silence_rms_threshold: silenceRmsThreshold,
-            ...(new URLSearchParams(location.search).get('room') ? { room_id: new URLSearchParams(location.search).get('room') } : {})   // room mode: open this page with ?room=ID
+            strategy: (document.getElementById('strategySelect') || {}).value || undefined,
+            ...((() => {
+                const r = (document.getElementById('roomIdInput')?.value.trim() || new URLSearchParams(location.search).get('room') || '').trim();
+                return r ? { room_id: r } : {};
+            })())
         };
 
         if (generation !== captureGeneration || websocket.readyState !== WebSocket.OPEN) { initBtn.disabled = false; return false; }
@@ -1026,6 +1035,8 @@ document.addEventListener('DOMContentLoaded', () => {
         setRouteStatus('Direction or voice changed. Initialize the selected route before Start.');
     };
     // Selection never silently starts model loading.
+    const strategySelectEl = document.getElementById('strategySelect');
+    if (strategySelectEl) strategySelectEl.addEventListener('change', invalidatePreparation);
     if (inputLanguageSelect) {
         inputLanguageSelect.addEventListener('change', invalidatePreparation);
     }
@@ -2077,6 +2088,78 @@ document.addEventListener('DOMContentLoaded', () => {
                 logActivity('Sidebar closed', 'info');
             }
         });
+    }
+
+    // Room mode broadcast UI wireup
+    const roomIdInput = document.getElementById('roomIdInput');
+    const copyRoomLinkBtn = document.getElementById('copyRoomLinkBtn');
+    const roomStatusInfo = document.getElementById('roomStatusInfo');
+    const roomListenerCount = document.getElementById('roomListenerCount');
+    const roomPreviewLink = document.getElementById('roomPreviewLink');
+
+    if (roomIdInput) {
+        const urlRoom = new URLSearchParams(location.search).get('room');
+        if (urlRoom) roomIdInput.value = urlRoom;
+
+        const updateRoomUI = () => {
+            const rid = roomIdInput.value.trim();
+            if (rid) {
+                if (roomStatusInfo) roomStatusInfo.style.display = 'block';
+                if (roomPreviewLink) roomPreviewLink.href = `/ui/listen/listen.html?room=${encodeURIComponent(rid)}`;
+            } else {
+                if (roomStatusInfo) roomStatusInfo.style.display = 'none';
+            }
+        };
+
+        roomIdInput.addEventListener('input', () => {
+            updateRoomUI();
+            invalidatePreparation();
+        });
+        updateRoomUI();
+
+        if (copyRoomLinkBtn) {
+            copyRoomLinkBtn.addEventListener('click', async () => {
+                const rid = roomIdInput.value.trim();
+                if (!rid) {
+                    showNotification('Enter a room code before copying the listener link.', 'warning');
+                    roomIdInput.focus();
+                    return;
+                }
+                const url = `${location.origin}/ui/listen/listen.html?room=${encodeURIComponent(rid)}`;
+                try {
+                    await navigator.clipboard.writeText(url);
+                    const oldText = copyRoomLinkBtn.textContent;
+                    copyRoomLinkBtn.textContent = 'Copied!';
+                    showNotification(`Copied audience link: ${url}`, 'success');
+                    setTimeout(() => { copyRoomLinkBtn.textContent = oldText; }, 2000);
+                } catch (e) {
+                    showNotification(`Share link: ${url}`, 'info');
+                }
+            });
+        }
+
+        // Periodic listener count update when room is configured
+        const pollRoomStatus = async () => {
+            const rid = roomIdInput.value.trim();
+            if (!rid) return;
+            const token = localStorage.getItem('userToken');
+            try {
+                const res = await fetch(`/api/room/${encodeURIComponent(rid)}`, {
+                    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (roomListenerCount) {
+                        const langsStr = Object.entries(data.languages || {})
+                            .map(([l, count]) => `${l.toUpperCase()}: ${count}`).join(', ');
+                        roomListenerCount.textContent = `${data.listeners} listener${data.listeners === 1 ? '' : 's'}${langsStr ? ' (' + langsStr + ')' : ''}`;
+                    }
+                }
+            } catch (err) {
+                // quiet background poll
+            }
+        };
+        setInterval(pollRoomStatus, 5000);
     }
 
     // Log initial page load

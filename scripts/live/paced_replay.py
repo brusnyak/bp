@@ -97,7 +97,7 @@ async def run(a):
 
     async with websockets.connect(url, ssl=ctx, max_size=None) as ws:
         await ws.send(json.dumps({"type": "config_update", "source_lang": a.src, "target_lang": a.tgt,
-                                  "tts_model_choice": a.tts, **({"room_id": a.room} if a.room else {})}))
+                                  "tts_model_choice": a.tts, **({"room_id": a.room} if a.room else {}), **({"strategy": a.strategy} if a.strategy else {})}))
         while True:
             m = json.loads(await asyncio.wait_for(ws.recv(), timeout=a.load_timeout))
             if m.get("type") == "error":
@@ -144,7 +144,7 @@ async def run(a):
         await asyncio.sleep(0.5)
         rx.cancel()
 
-    report = {"audio": a.audio, "seconds": a.seconds, "src": a.src, "tgt": a.tgt, "tts": a.tts,
+    report = {"strategy": a.strategy, "audio": a.audio, "seconds": a.seconds, "src": a.src, "tgt": a.tgt, "tts": a.tts,
               "input_end_s": round(end_media, 2), "rates": {}}
     for rate_arg in a.rates:
         rate = rate_arg if rate_arg == "adaptive" else float(rate_arg)
@@ -154,6 +154,10 @@ async def run(a):
             "segments": len(segs), "with_audio": len(lags),
             "first_audio_after_source_end_s": [s.get("first_audio_after_source_end") for s in segs],
             "lag_s": lags,
+            "lag_median_s": round(sorted(lags)[len(lags) // 2], 3) if lags else None,
+            "lag_p90_s": round(sorted(lags)[min(len(lags) - 1, int(0.9 * len(lags)))], 3) if lags else None,
+            "source_end_s": [round(s["source_end"], 3) for s in segs if "lag" in s],
+            "listen_start_s": [round(s["listen_start"], 3) for s in segs if "lag" in s],
             "lag_max_s": max(lags) if lags else None,
             "first_word_lag_s": [s.get("first_word_lag") for s in segs],
             "first_word_lag_max_s": max([s["first_word_lag"] for s in segs if "first_word_lag" in s] or [None]),
@@ -182,5 +186,6 @@ if __name__ == "__main__":
     p.add_argument("--settle", type=float, default=15)
     p.add_argument("--load-timeout", type=float, default=300)
     p.add_argument("--rates", nargs="+", default=["1.0", "1.25", "adaptive"])
+    p.add_argument("--strategy", choices=["phrase", "clause", "agree", "agree_short", "chunks"], help="speech cutting strategy sent to the server (see STRATEGIES in backend/main.py)")
     p.add_argument("--out")
     asyncio.run(run(p.parse_args()))

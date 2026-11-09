@@ -162,7 +162,26 @@
               <option value="piper_personal_v2">My English clone (fast)</option>
               <option value="omnivoice">OmniVoice clone (GPU, untested live)</option>
               <option value="xtts">XTTS (Custom Voice, slower)</option>
-            </select><p>Personal profiles need installed assets. GPU clones are research candidates; loading does not establish quality.</p></details>
+            </select><p>Personal profiles need installed assets. GPU clones are research candidates; loading does not establish quality.</p>
+            <label for="strategySelect">Speech cutting</label>
+            <select id="strategySelect" class="model-select" title="How your speech is cut into pieces for recognition">
+              <option value="phrase" selected>Phrase: wait for a pause (the demo)</option>
+              <option value="clause">Clause: pause or 4 s cap</option>
+              <option value="agree">Agreement: speak while you talk</option>
+              <option value="agree_short">Agreement, short pieces (fastest start)</option>
+              <option value="chunks">Fixed 2 s windows (old)</option>
+            </select></details>
+          </div>
+
+          <div class="control-group" id="room-broadcast-group">
+            <label for="roomIdInput">Audience broadcast (room mode)</label>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input id="roomIdInput" class="control-select" placeholder="Optional room code (e.g. demo1)" style="flex:1;">
+              <button id="copyRoomLinkBtn" type="button" class="btn btn-secondary" style="width:auto;white-space:nowrap;padding:0.4rem 0.8rem;" title="Copy audience listener link">Copy link</button>
+            </div>
+            <div id="roomStatusInfo" class="hint-text" style="display:none;margin-top:4px;">
+              <span id="roomListenerCount">0 listeners connected</span> &bull; <a id="roomPreviewLink" href="#" target="_blank" style="color:var(--accent,#C41E3A);">Open listener page</a>
+            </div>
           </div>
         </div>
 
