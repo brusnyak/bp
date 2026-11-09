@@ -1,0 +1,45 @@
+{
+ "source": "Kaggle kernel yegorby/bp-voxtral-vllm-t4 v3, log page read through BrowserOS Neo 2026-11-09 (the output download API was rate limited)",
+ "env": {
+  "gpu": "Tesla T4 x2 (one used)",
+  "vllm": "0.33.0",
+  "torch": "2.14.0+cu130",
+  "flags": "--dtype float16 --max-model-len 3584 --gpu-memory-utilization 0.92 --enforce-eager"
+ },
+ "graphs_mode": "did not start (240 s, engine core init failed); first run with --max-model-len 16384 failed in both modes: 5.72 GiB KV cache needed, 4.37 GiB free",
+ "cells": {
+  "eager|en_paced": {
+   "audio_s": 45.1,
+   "burst_decode_s_per_audio_s": 1.02,
+   "wer": 0.0104,
+   "paced": {
+    "wall_minus_audio_s": 1.6,
+    "lag_median_s": 0.08,
+    "lag_p90_s": 0.12,
+    "lag_max_s": 0.13
+   }
+  },
+  "eager|en_continuous": {
+   "audio_s": 38.9,
+   "burst_decode_s_per_audio_s": 1.043,
+   "wer": 0.0312,
+   "paced": {
+    "wall_minus_audio_s": 1.6,
+    "lag_median_s": 0.07,
+    "lag_p90_s": 0.12,
+    "lag_max_s": 0.67
+   }
+  },
+  "eager|de_paced": {
+   "audio_s": 36.9,
+   "burst_decode_s_per_audio_s": 1.021,
+   "wer": 0.0213,
+   "paced": {
+    "wall_minus_audio_s": 1.5,
+    "lag_median_s": 0.08,
+    "lag_p90_s": 0.12,
+    "lag_max_s": 0.21
+   }
+  }
+ }
+}
