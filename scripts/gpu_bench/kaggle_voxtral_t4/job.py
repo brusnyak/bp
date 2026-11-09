@@ -90,7 +90,8 @@ for name in ['en_paced', 'en_continuous', 'en_long', 'de_paced', 'de_continuous'
         lags = [p[1] for p in pieces if p[2].strip()]
         cell['streaming'] = {'wer': round(wer(ref, text), 4), 'wall_s': round(wall, 1), 'wall_minus_audio_s': round(wall - dur, 1),
                              'lag_median_s': round(float(np.median(lags)), 2) if lags else None, 'lag_p90_s': round(float(np.percentile(lags, 90)), 2) if lags else None,
-                             'lag_first_s': lags[0] if lags else None, 'lag_last_s': lags[-1] if lags else None, 'pieces': len(pieces), 'text': text[:300]}
+                             'lag_first_s': lags[0] if lags else None, 'lag_last_s': lags[-1] if lags else None, 'pieces': len(pieces), 'text': text[:300],
+                             'series': [[p[0], p[1]] for p in pieces if p[2].strip()]}   # (audio released so far, wall minus that) per text piece: where do the stalls sit?
         R['cells'][name] = cell; log('cell', name=name, **{k: v for k, v in cell.items() if k != 'audio_s'})
     except Exception:
         R['cells'][name] = {'error': traceback.format_exc()[-1500:]}; log('cell failed', name=name)
