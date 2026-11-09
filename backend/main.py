@@ -2154,8 +2154,9 @@ class _IncState:
         self.stream = None   # engine-native streaming state (VoxtralSTT.open_stream), None on Whisper
 
 
-async def _emit_fragment(websocket, session_config, client_info, session_data, text, span, source_onset_time=None):
+async def _emit_fragment(websocket, session_config, client_info, session_data, text, span, source_onset_time=None, hold_s=None):
     """Translate + voice one agreed fragment; ordered with all other segments by _run_pipeline_task."""
+    logging.info(f"INCR emit: hold={hold_s if hold_s is None else round(hold_s, 2)}s words={len(text.split())} span={span} text='{text[:60]}'")   # the fragment policy's share of the lag, greppable
     task = asyncio.create_task(_run_pipeline_task(
         websocket, np.zeros(1, dtype=np.float32), time.perf_counter(), True, session_config, client_info,
         pretranscribed=text, source_span=span, source_onset_time=source_onset_time))
@@ -2190,7 +2191,7 @@ async def _incremental_step(websocket, session_data, session_config, client_info
             _push_stream_words(inc, words, times[-1])
             text = inc.frag.pop(time.perf_counter())
             if text:
-                await _emit_fragment(websocket, session_config, client_info, session_data, text, inc.frag.span, inc.source_onset_time)
+                await _emit_fragment(websocket, session_config, client_info, session_data, text, inc.frag.span, inc.source_onset_time, inc.frag.hold_s)
             return
         async with session_data["model_call_lock"]:
             if inc.closed:
@@ -2214,7 +2215,7 @@ async def _incremental_step(websocket, session_data, session_config, client_info
             frames.trim(min(n, int(committed[-1][2] / frame_s) + 1))   # audio before the last agreed word is done
         text = inc.frag.pop(time.perf_counter())
         if text:
-            await _emit_fragment(websocket, session_config, client_info, session_data, text, inc.frag.span, inc.source_onset_time)
+            await _emit_fragment(websocket, session_config, client_info, session_data, text, inc.frag.span, inc.source_onset_time, inc.frag.hold_s)
     except Exception as e:
         logging.error(f"Backend: Session {client_info}: incremental step error (non-fatal): {e}")
     finally:
@@ -2242,7 +2243,7 @@ async def _incremental_close(websocket, session_config, client_info, session_dat
         _push_stream_words(inc, words, t_end)
     text = inc.frag.pop(time.perf_counter(), final=True)
     if text:
-        await _emit_fragment(websocket, session_config, client_info, session_data, text, inc.frag.span, inc.source_onset_time)
+        await _emit_fragment(websocket, session_config, client_info, session_data, text, inc.frag.span, inc.source_onset_time, inc.frag.hold_s)
     return inc.stream is not None or (inc.committed > 0 and len(frames) * (VAD_FRAME_DURATION / 1000.0) < 0.3)
 
 

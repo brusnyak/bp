@@ -36,6 +36,7 @@ class Fragmenter:
         self.pending, self.since = [], None
         self.t0 = self.t1 = None      # stream-clock span of the pending words
         self.span = None              # span of the last popped fragment
+        self.hold_s = None            # how long the oldest word of the last popped fragment waited in the buffer (the fragment policy's share of the lag)
 
     def push(self, words, now):
         for w in words:
@@ -59,6 +60,7 @@ class Fragmenter:
         if not ready:
             return None
         text = " ".join(self.pending)
+        self.hold_s = (now - self.since) if self.since is not None else 0.0
         self.span = (self.t0, self.t1)
         self.pending, self.since, self.t0, self.t1 = [], None, None, None
         return text
