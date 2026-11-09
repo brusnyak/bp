@@ -61,6 +61,18 @@ def run(name, langs):
         for _ in range(150):
             try: urllib.request.urlopen(f'http://127.0.0.1:{PORT}/', timeout=2); break
             except Exception: time.sleep(2)
+        def http(path, body=None, token=None):
+            req = urllib.request.Request(f'http://127.0.0.1:{PORT}{path}', data=json.dumps(body or {}).encode(), method='POST',
+                                         headers={'Content-Type': 'application/json', **({'Authorization': f'Bearer {token}'} if token else {})})
+            try: return json.loads(urllib.request.urlopen(req, timeout=20).read() or b'{}')
+            except urllib.error.HTTPError as e: return {'http_error': e.code}
+        if langs:   # 2026-11-09 room rules: a room is created by the speaker's account (listeners cannot create one) and only that account may publish into it
+            http('/api/register', {'username': 'paced', 'email': 'paced@bp.local', 'password': 'paced-pass-1234'})
+            tok = http('/api/login', {'email': 'paced@bp.local', 'password': 'paced-pass-1234'})
+            tok = tok.get('token') or tok.get('access_token')
+            made = http('/api/room', {}, tok); room = made.get('room_id')
+            log('room created', name=name, room=room, resp=str(made)[:120])
+            if not room: raise RuntimeError(f'room creation failed: {made}')
         lis = None
         if langs:
             lis = subprocess.Popen([sys.executable, 'scripts/live/room_listeners.py', '--base', f'http://127.0.0.1:{PORT}', '--room', room, '--langs', langs, '--seconds', '170', '--out', str(lj)],
