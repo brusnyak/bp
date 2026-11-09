@@ -166,8 +166,11 @@ def _effective_stt_engine(config: Dict[str, Any]) -> str:
     """Engine for this session. mlx_whisper has no Slovak fine-tune, so a Slovak source with BP_SK_STT_MODEL set
     (e.g. the converted kinit/whisper-large-v3-turbo-sk, 6.5% vs 10.7% plain turbo on FLEURS-sk) goes to faster-whisper."""
     engine = config.get("stt_engine", DEFAULT_STT_ENGINE)
-    if engine in ("voxtral", "voxtral_vllm"):   # no Slovak/Czech/...: those sources use Whisper (MLX on a Mac, faster-whisper elsewhere)
-        from backend.stt.voxtral_stt import LANGUAGES as VOX_LANGS
+    if engine in ("voxtral", "voxtral_vllm", "nemotron"):   # sources the model does not cover use Whisper (MLX on a Mac, faster-whisper elsewhere)
+        if engine == "nemotron":
+            from backend.stt.nemotron_stt import LANGUAGES as VOX_LANGS
+        else:
+            from backend.stt.voxtral_stt import LANGUAGES as VOX_LANGS
         src = str(config.get("source_lang", "en")).split("-")[0]
         engine = engine if src in VOX_LANGS or src == "auto" else ("mlx_whisper" if sys.platform == "darwin" else "faster_whisper")
     if engine == "mlx_whisper" and str(config.get("source_lang", "")).startswith("sk") and os.environ.get("BP_SK_STT_MODEL"):
@@ -2184,7 +2187,7 @@ async def _incremental_step(websocket, session_data, session_config, client_info
         if hasattr(stt, "open_stream"):   # recogniser built for streaming: push new audio only, words are final
             async with session_data["model_call_lock"]:
                 if inc.stream is None:
-                    inc.stream = await loop.run_in_executor(None, stt.open_stream)
+                    inc.stream = await loop.run_in_executor(None, stt.open_stream, None if src == "auto" else src)
                 _t = time.perf_counter()
                 words = await loop.run_in_executor(None, stt.stream_feed, inc.stream, audio)
                 logging.debug(f"INCR stream feed: {n*VAD_FRAME_DURATION/1000:.2f}s audio took {time.perf_counter()-_t:.2f}s")
@@ -2236,7 +2239,7 @@ async def _incremental_close(websocket, session_config, client_info, session_dat
         loop = asyncio.get_event_loop()
         async with session_data["model_call_lock"]:
             if inc.stream is None:
-                inc.stream = await loop.run_in_executor(None, stt.open_stream)
+                inc.stream = await loop.run_in_executor(None, stt.open_stream, (None if session_config.get("source_lang") == "auto" else session_config.get("source_lang")))
             tail = np.concatenate(frames) if len(frames) else np.zeros(0, dtype=np.float32)
             words = await loop.run_in_executor(None, lambda: stt.stream_feed(inc.stream, tail, True))
         t_end = frames.t[-1] if frames.t else time.perf_counter()

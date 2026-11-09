@@ -23,3 +23,17 @@ def test_engine_choice_falls_back_for_unsupported_source(monkeypatch):
     assert m._effective_stt_engine({"stt_engine": "voxtral", "source_lang": "sk"}) == "faster_whisper"   # no Slovak in Voxtral
     monkeypatch.setattr(m.sys, "platform", "darwin")
     assert m._effective_stt_engine({"stt_engine": "voxtral", "source_lang": "sk"}) == "mlx_whisper"
+
+
+def test_nemotron_prompt_key_follows_the_models_own_spelling():
+    from backend.stt.nemotron_stt import prompt_key
+    d = {"en-US": 0, "sk-SK": 1, "de-DE": 2, "cs": 3}
+    assert prompt_key(d, "sk") == "sk-SK" and prompt_key(d, "CS") == "cs" and prompt_key(d, "en") == "en-US"
+    assert prompt_key(d, "ja") is None and prompt_key(d, None) is None and prompt_key(None, "sk") is None   # unknown: the model default, never a wrong prompt
+
+
+def test_nemotron_covers_slovak_and_czech_but_voxtral_does_not(monkeypatch):
+    import backend.main as m
+    monkeypatch.setattr(m.sys, "platform", "darwin")
+    assert m._effective_stt_engine({"stt_engine": "nemotron", "source_lang": "sk"}) == "nemotron"
+    assert m._effective_stt_engine({"stt_engine": "voxtral", "source_lang": "sk"}) == "mlx_whisper"

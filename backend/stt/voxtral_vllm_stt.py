@@ -72,7 +72,7 @@ class VoxtralVllmSTT:
             ws.send(json.dumps({"type": "input_audio_buffer.append", "audio": base64.b64encode(pcm[i:i + CHUNK_BYTES]).decode()}))
 
     # --- streaming (incremental route in backend/main.py) ---
-    def open_stream(self) -> _VllmStream:
+    def open_stream(self, language=None) -> _VllmStream:
         return _VllmStream(self._open())
 
     def stream_feed(self, st: _VllmStream, audio: np.ndarray, final: bool = False) -> list:

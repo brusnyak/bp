@@ -245,6 +245,14 @@ def _voxtral_factory() -> Callable[..., object]:
     return make
 
 
+def _nemotron_factory() -> Callable[..., object]:
+    def make(**kwargs):
+        _ensure_repo_on_path()
+        from backend.stt.nemotron_stt import NemotronSTT
+        return NemotronSTT()
+    return make
+
+
 def _voxtral_vllm_factory() -> Callable[..., object]:
     def make(**kwargs):
         _ensure_repo_on_path()
@@ -382,6 +390,14 @@ def _register_defaults() -> None:
         license_note="Voxtral Mini 4B Realtime weights Apache 2.0; mlx-audio MIT",
         resource="Apple GPU: ~2.3 GB 4-bit via mlx-audio; NVIDIA: 8.25 GB fp16 via Transformers >= 5.22 (T4 ok); 13 languages, no Slovak",
         notes="streaming recogniser, ~0.5 s behind speech; set BP_STT_ENGINE=voxtral (other sources fall back to mlx_whisper)"))
+
+    register(Capability(
+        "nemotron", "stt", factory=_nemotron_factory(),
+        probe=_has_module("mlx_audio"), devices=("cpu",),
+        streaming=True, license="unknown",
+        license_note="NVIDIA Open Model License for the weights (not Apache: read before shipping); mlx-audio MIT",
+        resource="~0.64 GB at 8-bit on the Apple GPU; macOS arm64 only; 40 language-locales incl. German, Czech, Slovak",
+        notes="UNTESTED on this route (model card + mlx-audio API only, 2026-11-09): set BP_STT_ENGINE=nemotron after the first download; measure with scripts/live/route_check.py"))
 
     register(Capability(
         "voxtral_vllm", "stt", factory=_voxtral_vllm_factory(),

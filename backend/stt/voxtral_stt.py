@@ -51,7 +51,7 @@ class VoxtralSTT:
         self._model.generate(np.zeros(16000, dtype=np.float32))   # warm-up: kernels + weights
 
     # --- streaming (used by the incremental route in backend/main.py) ---
-    def open_stream(self) -> _Stream:
+    def open_stream(self, language=None) -> _Stream:
         return self._ex.submit(lambda: _Stream(self._model.create_streaming_session(transcription_delay_ms=self.delay_ms))).result()
 
     def stream_feed(self, st: _Stream, audio: np.ndarray, final: bool = False) -> list:
