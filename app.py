@@ -366,7 +366,7 @@ def create_app(db_session_local_override=None) -> FastAPI:
     @_app.post("/api/room", summary="Create a room (speaker side); listeners join /ws/listen?room=ID&lang=xx")
     async def room_create(current_user: User = Depends(backend_main.get_current_user)):
         from backend.room import get_room, new_room_id
-        rid = new_room_id(); get_room(rid)
+        rid = new_room_id(); get_room(rid).owner = current_user.id   # only this user's speaker session may publish into it
         return {"room_id": rid, "listen_path": f"/ui/listen/listen.html?room={rid}"}
 
     @_app.get("/api/room/{room_id}", summary="Room status: listeners per language")
@@ -393,7 +393,9 @@ def create_app(db_session_local_override=None) -> FastAPI:
         lang = (websocket.query_params.get("lang") or "en")[:8]
         if not room_id:
             await websocket.send_json({"type": "error", "message": "room is required"}); await websocket.close(); return
-        room = get_room(room_id)
+        room = get_room(room_id, create=False)     # listeners never create rooms (an id guess must not open one)
+        if room is None:
+            await websocket.send_json({"type": "error", "message": "no such room (the speaker has not started it, or it has ended)"}); await websocket.close(); return
         try:
             listener = room.add_listener(websocket, lang)
         except ValueError as e:

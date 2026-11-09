@@ -28,6 +28,7 @@ from backend import prosody
 log = logging.getLogger(__name__)
 MAX_LISTENERS = int(os.environ.get("BP_ROOM_MAX_LISTENERS", "50"))
 MAX_LANGS = int(os.environ.get("BP_ROOM_MAX_LANGS", "6"))
+SEND_TIMEOUT_S = float(os.environ.get("BP_ROOM_SEND_TIMEOUT_S", "3.0"))   # a listener that cannot take a phrase in this time is dropped, the others are not delayed
 
 Translate = Callable[[str, str, str], Awaitable[str]]
 Synth = Callable[[str, str], Awaitable[Tuple[np.ndarray, int]]]
@@ -60,6 +61,8 @@ class Room:
         self.channels: Dict[str, _Channel] = {}
         self.created = time.time()
         self.published = 0
+        self.owner: Optional[int] = None        # user id of the speaker who created the room (None: unowned, tests)
+        self.src_lang: Optional[str] = None     # language the speaker's session recognises, set at the first publish
 
     # -- membership ---------------------------------------------------------------------------------------------------
     def languages(self) -> set:
@@ -144,15 +147,23 @@ class Room:
             ch.sched.committed(len(audio) / sr - lead)
             import soundfile as sf
             buf = io.BytesIO(); sf.write(buf, audio, sr, format="WAV"); wav = buf.getvalue()
-        for lst in targets:
-            try:
+        await asyncio.gather(*(self._send(lst, caption, wav) for lst in targets))   # concurrent: one slow phone must not delay the rest
+
+    async def _send(self, lst: Listener, caption: dict, wav: Optional[bytes]) -> None:
+        try:
+            async def go():
                 await lst.ws.send_text(json.dumps(caption))
                 lst.captions += 1
                 if wav is not None:
                     await lst.ws.send_bytes(wav)
                     lst.audio_chunks += 1
+            await asyncio.wait_for(go(), SEND_TIMEOUT_S)
+        except Exception:                                     # dead or too slow: drop it, never stall the others
+            self.remove_listener(lst.id)
+            try:
+                await asyncio.wait_for(lst.ws.close(), 1.0)
             except Exception:
-                self.remove_listener(lst.id)                  # a dead socket must not stall the others
+                pass
 
 
 # -- default engines: shared across rooms, built on first use -----------------------------------------------------------------------------
@@ -203,3 +214,18 @@ def close_room(room_id: str) -> None:
     room = _ROOMS.pop(room_id, None)
     if room:
         room.close()
+
+
+async def end_room(room_id: str) -> None:
+    """The speaker left: tell every listener, close their sockets, free the room (a room id is not reusable by guessing)."""
+    room = _ROOMS.pop(room_id, None)
+    if room is None:
+        return
+    room.close()
+    for lst in list(room.listeners.values()):
+        try:
+            await asyncio.wait_for(lst.ws.send_text(json.dumps({"type": "room_closed"})), 1.0)
+            await asyncio.wait_for(lst.ws.close(), 1.0)
+        except Exception:
+            pass
+    room.listeners.clear()

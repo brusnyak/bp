@@ -1878,6 +1878,7 @@ async def _process_speech_segment_pipeline(
         if _rid:
             _r = _room.get_room(_rid, create=False)
             if _r and _r.listeners:
+                _r.src_lang = source_lang
                 _r.publish(transcribed_text.strip(), source_lang, onset=segment_start_time - audio_segment_np.size / AUDIO_SAMPLE_RATE)
 
         # Track last non-empty transcription for promoting to final if the tail segment is too short
@@ -2437,7 +2438,12 @@ async def handle_audio_stream(websocket: WebSocket, token: Optional[str] = None)
                                 session_config["strategy"] = data["strategy"]
                                 _apply_strategy(session_config)
                             if "room_id" in data:   # room mode: this session is the speaker of that room (listeners join /ws/listen)
-                                session_config["room_id"] = (str(data["room_id"])[:64] or None)
+                                _rid_new = str(data["room_id"])[:64] or None
+                                _r_new = _room.get_room(_rid_new, create=False) if _rid_new else None
+                                if _rid_new and (_r_new is None or (_r_new.owner is not None and _r_new.owner != user.id)):
+                                    logging.warning(f"Backend: Session {client_info}: room '{_rid_new}' does not exist or belongs to another user; speaker not attached.")
+                                    _rid_new = None
+                                session_config["room_id"] = _rid_new
                             logging.debug(f"Backend: Received config_update: {data}")
 
                             config_changed = (
@@ -2775,6 +2781,9 @@ async def handle_audio_stream(websocket: WebSocket, token: Optional[str] = None)
         # 3. Clean up session lock to prevent lock dictionary growth
         
         if client_info in active_sessions:
+            _rid_end = (active_sessions[client_info].get("session_config") or {}).get("room_id")
+            if _rid_end:
+                await _room.end_room(_rid_end)   # the speaker left: listeners are told and the room id is freed
             cleanup_session_models(client_info)
             session_data = active_sessions.pop(client_info)
 

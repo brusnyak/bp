@@ -109,3 +109,45 @@ def test_empty_text_and_empty_room_publish_nothing():
         room.add_listener(FakeWS(), "de"); assert room.publish("   ", "en") == 0
         room.close()
     run(go())
+
+
+class SlowWS:
+    """A phone on a bad connection: accepts a message only after `delay` seconds."""
+    def __init__(self, delay): self.delay, self.closed, self.texts = delay, False, []
+    async def send_text(self, t): await asyncio.sleep(self.delay); self.texts.append(t)
+    async def send_bytes(self, b): await asyncio.sleep(self.delay)
+    async def close(self): self.closed = True
+
+
+class OkWS:
+    def __init__(self): self.texts, self.closed = [], False
+    async def send_text(self, t): self.texts.append(json.loads(t))
+    async def send_bytes(self, b): pass
+    async def close(self): self.closed = True
+
+
+def test_one_slow_listener_is_dropped_and_does_not_delay_the_others(monkeypatch):
+    import time
+    monkeypatch.setattr(R, "SEND_TIMEOUT_S", 0.3)
+    async def go():
+        room = fresh(); good, slow = OkWS(), SlowWS(5.0)
+        room.add_listener(good, "de"); ls = room.add_listener(slow, "de")
+        t0 = time.time(); room.publish("hello", "en", translate=fake_translate, synth=fake_synth); await room.drain()
+        assert time.time() - t0 < 2.0                                   # not 5 s: the slow socket is cut off at the timeout
+        assert ls.id not in room.listeners and slow.closed and len(good.texts) == 1
+        room.close()
+    run(go())
+
+
+def test_end_room_notifies_listeners_closes_sockets_and_frees_the_id():
+    async def go():
+        room = R.get_room("endme"); w = OkWS(); room.add_listener(w, "de")
+        await R.end_room("endme")
+        assert w.texts == [{"type": "room_closed"}] and w.closed
+        assert R.get_room("endme", create=False) is None               # listeners cannot re-open it by guessing
+    run(go())
+
+
+def test_listener_lookup_never_creates_a_room():
+    assert R.get_room("never-made", create=False) is None
+    assert R.get_room("never-made", create=False) is None
