@@ -108,7 +108,7 @@ class VoxtralCudaSTT:
         self.transcribe_audio(np.zeros(16000, dtype=np.float32), 16000)   # warm-up
 
     # --- streaming ---
-    def open_stream(self) -> _HFStream:
+    def open_stream(self, language=None) -> _HFStream:
         return _HFStream(self)
 
     def stream_feed(self, st: _HFStream, audio: np.ndarray, final: bool = False) -> list:
