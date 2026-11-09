@@ -212,6 +212,36 @@ def pair_unavailable(src: str, tgt: str) -> Optional[str]:
         return None
 
 
+def listen_url(base_url: str, room_id: str, lan_ip: Optional[str] = None) -> str:
+    """The link a phone must open. A page opened as localhost gives a link no phone can reach, so localhost/127.0.0.1 is swapped for the machine's LAN address."""
+    from urllib.parse import quote, urlsplit, urlunsplit
+    parts = urlsplit(base_url)
+    host = parts.hostname or ""
+    if host in ("localhost", "127.0.0.1", "::1") and lan_ip:
+        parts = parts._replace(netloc=f"{lan_ip}:{parts.port}" if parts.port else lan_ip)
+    return urlunsplit((parts.scheme, parts.netloc, "/ui/listen/listen.html", f"room={quote(room_id)}", ""))
+
+
+def lan_address() -> Optional[str]:
+    """This machine's address on the local network (no packet is sent), None when offline."""
+    import socket
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sk:
+            sk.connect(("10.255.255.255", 1))
+            ip = sk.getsockname()[0]
+            return None if ip.startswith("127.") else ip
+    except Exception:
+        return None
+
+
+def qr_svg(url: str) -> str:
+    import io
+    import segno
+    buf = io.BytesIO()
+    segno.make(url, error="m").save(buf, kind="svg", scale=5, border=2, xmldecl=False, svgns=True)
+    return buf.getvalue().decode("utf-8")
+
+
 # -- registry -----------------------------------------------------------------------------------------------------------------------------
 _ROOMS: Dict[str, Room] = {}
 

@@ -9,11 +9,11 @@
    "preview": false,
    "raw": 0,
    "reviewed": 1.0,
-   "strings": 428
+   "strings": 432
   },
   {
    "code": "cs",
-   "coverage": 0.92,
+   "coverage": 0.91,
    "dir": "ltr",
    "drafts": 392,
    "machine_draft": true,
@@ -24,7 +24,7 @@
   },
   {
    "code": "de",
-   "coverage": 0.92,
+   "coverage": 0.91,
    "dir": "ltr",
    "drafts": 74,
    "machine_draft": false,
@@ -35,7 +35,7 @@
   },
   {
    "code": "es",
-   "coverage": 0.92,
+   "coverage": 0.91,
    "dir": "ltr",
    "drafts": 392,
    "machine_draft": true,
@@ -46,7 +46,7 @@
   },
   {
    "code": "fr",
-   "coverage": 0.92,
+   "coverage": 0.91,
    "dir": "ltr",
    "drafts": 392,
    "machine_draft": true,
@@ -57,7 +57,7 @@
   },
   {
    "code": "hu",
-   "coverage": 0.92,
+   "coverage": 0.91,
    "dir": "ltr",
    "drafts": 392,
    "machine_draft": true,
@@ -68,7 +68,7 @@
   },
   {
    "code": "pl",
-   "coverage": 0.92,
+   "coverage": 0.91,
    "dir": "ltr",
    "drafts": 392,
    "machine_draft": true,
@@ -79,7 +79,7 @@
   },
   {
    "code": "ro",
-   "coverage": 0.92,
+   "coverage": 0.91,
    "dir": "ltr",
    "drafts": 392,
    "machine_draft": true,
@@ -90,7 +90,7 @@
   },
   {
    "code": "sk",
-   "coverage": 0.92,
+   "coverage": 0.91,
    "dir": "ltr",
    "drafts": 74,
    "machine_draft": false,
@@ -101,7 +101,7 @@
   },
   {
    "code": "uk",
-   "coverage": 0.92,
+   "coverage": 0.91,
    "dir": "ltr",
    "drafts": 391,
    "machine_draft": true,

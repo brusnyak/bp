@@ -7,7 +7,7 @@ preload_pip_cuda_libs()  # pip-installed CUDA libraries on Linux (no-op elsewher
 load_dotenv()  # local .env (GOOGLE_CLIENT_ID etc.) — untracked, never committed
 
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -364,10 +364,21 @@ def create_app(db_session_local_override=None) -> FastAPI:
 
     # ----------------------------------------------------------------------- room mode
     @_app.post("/api/room", summary="Create a room (speaker side); listeners join /ws/listen?room=ID&lang=xx")
-    async def room_create(current_user: User = Depends(backend_main.get_current_user)):
-        from backend.room import get_room, new_room_id
+    async def room_create(request: Request, current_user: User = Depends(backend_main.get_current_user)):
+        from backend.room import get_room, new_room_id, listen_url, lan_address
         rid = new_room_id(); get_room(rid).owner = current_user.id   # only this user's speaker session may publish into it
-        return {"room_id": rid, "listen_path": f"/ui/listen/listen.html?room={rid}"}
+        host = os.environ.get("BP_HOST", "127.0.0.1")
+        return {"room_id": rid, "listen_path": f"/ui/listen/listen.html?room={rid}",
+                "listen_url": listen_url(str(request.base_url), rid, lan_address()),
+                "lan_ready": host not in ("127.0.0.1", "localhost", "::1")}   # False: the server only answers on this computer, phones cannot join (start with BP_HOST=0.0.0.0)
+
+    @_app.get("/api/room/{room_id}/qr", summary="QR code (SVG) of the listener link, speaker side")
+    async def room_qr(room_id: str, request: Request, current_user: User = Depends(backend_main.get_current_user)):
+        from backend.room import get_room, listen_url, lan_address, qr_svg
+        room = get_room(room_id, create=False)
+        if room is None or (room.owner is not None and room.owner != current_user.id):
+            raise HTTPException(status_code=404, detail="no such room")
+        return Response(qr_svg(listen_url(str(request.base_url), room_id, lan_address())), media_type="image/svg+xml")
 
     @_app.get("/api/room/{room_id}", summary="Room status: listeners per language")
     async def room_status(room_id: str, current_user: User = Depends(backend_main.get_current_user)):
