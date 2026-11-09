@@ -1,4 +1,5 @@
-"""Voxtral Mini 4B Realtime served by vLLM (CUDA graphs) on a Kaggle T4 (2026-11-09).
+"""(v2: max-model-len 3584, v1 failed: 16384 needs 5.72 GiB KV cache, a T4 leaves 4.37 GiB; one token = 80 ms so 3584 tokens = 4.8 min per session)
+Voxtral Mini 4B Realtime served by vLLM (CUDA graphs) on a Kaggle T4 (2026-11-09).
 Why: the Transformers loop decodes Voxtral at 1.0-1.1 x real time on a T4 (no headroom, lag drifts). vLLM is Mistral's recommended server.
 Does it decode faster than real time and hold a low lag? Same clips and metrics as kaggle_voxtral_t4.
 Per server config (A: piecewise CUDA graphs, B: eager) and clip: burst throughput (all audio sent at once, seconds of decode per second of audio)
@@ -62,7 +63,7 @@ async def transcribe(pcm16: bytes, paced: bool):
 def serve(tag, extra):
     slog = OUT / f'vllm_{tag}.log'
     env = {**os.environ, 'VLLM_DISABLE_COMPILE_CACHE': '1'}
-    p = subprocess.Popen(f'{VENV}/bin/vllm serve {MODEL} --dtype float16 --max-model-len 16384 --gpu-memory-utilization 0.92 --port 8000 {extra}', shell=True, env=env,
+    p = subprocess.Popen(f'{VENV}/bin/vllm serve {MODEL} --dtype float16 --max-model-len 3584 --gpu-memory-utilization 0.92 --port 8000 {extra}', shell=True, env=env,
                          stdout=open(slog, 'w'), stderr=subprocess.STDOUT, preexec_fn=os.setsid)
     for _ in range(240):
         if p.poll() is not None: return p, slog, False

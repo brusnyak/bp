@@ -245,6 +245,14 @@ def _voxtral_factory() -> Callable[..., object]:
     return make
 
 
+def _voxtral_vllm_factory() -> Callable[..., object]:
+    def make(**kwargs):
+        _ensure_repo_on_path()
+        from backend.stt.voxtral_vllm_stt import VoxtralVllmSTT
+        return VoxtralVllmSTT()
+    return make
+
+
 def _parakeet_onnx_factory() -> Callable[..., object]:
     def make(**kwargs):
         _ensure_repo_on_path()
@@ -374,6 +382,14 @@ def _register_defaults() -> None:
         license_note="Voxtral Mini 4B Realtime weights Apache 2.0; mlx-audio MIT",
         resource="Apple GPU: ~2.3 GB 4-bit via mlx-audio; NVIDIA: 8.25 GB fp16 via Transformers >= 5.22 (T4 ok); 13 languages, no Slovak",
         notes="streaming recogniser, ~0.5 s behind speech; set BP_STT_ENGINE=voxtral (other sources fall back to mlx_whisper)"))
+
+    register(Capability(
+        "voxtral_vllm", "stt", factory=_voxtral_vllm_factory(),
+        probe=_has_module("websockets"), devices=("cuda",),
+        streaming=True, license="commercial-ok",
+        license_note="Voxtral Mini 4B Realtime weights Apache 2.0; vLLM Apache 2.0",
+        resource="separate vLLM server process (own venv), ~15 GB GPU (T4 ok with --max-model-len 3584 --enforce-eager); 13 languages, no Slovak",
+        notes="T4 2026-11-09: lag 0.08 s median after the audio, no drift, error 1-3%; set BP_STT_ENGINE=voxtral_vllm and start the server (see backend/stt/voxtral_vllm_stt.py)"))
 
     register(Capability(
         "parakeet_onnx", "stt", factory=_parakeet_onnx_factory(),
