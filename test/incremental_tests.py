@@ -34,3 +34,12 @@ def test_fragmenter_flushes_on_clause_length_wait_and_final():
     assert f.pop(9.9, final=True) is None                      # nothing pending
     f.push(W(*"one two three four five six seven eight nine".split()), 10.0)
     assert f.pop(10.0).count(" ") == 8                         # max_words forces a flush
+
+
+def test_fragmenter_records_hold_of_oldest_word():
+    from backend.stt.incremental import Fragmenter
+    f = Fragmenter(min_words=2, max_words=9, max_wait_s=0.8)
+    f.push([("Good", 0.0, 0.3)], now=10.0)
+    f.push([("morning,", 0.3, 0.8)], now=10.5)
+    assert f.pop(10.9) == "Good morning,"         # clause end with >= 2 words
+    assert abs(f.hold_s - 0.9) < 1e-9             # waited since the first word was pushed
