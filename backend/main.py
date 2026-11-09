@@ -166,10 +166,10 @@ def _effective_stt_engine(config: Dict[str, Any]) -> str:
     """Engine for this session. mlx_whisper has no Slovak fine-tune, so a Slovak source with BP_SK_STT_MODEL set
     (e.g. the converted kinit/whisper-large-v3-turbo-sk, 6.5% vs 10.7% plain turbo on FLEURS-sk) goes to faster-whisper."""
     engine = config.get("stt_engine", DEFAULT_STT_ENGINE)
-    if engine == "voxtral":   # no Slovak/Czech/...: those sources use Whisper (MLX on a Mac, faster-whisper elsewhere)
+    if engine in ("voxtral", "voxtral_vllm"):   # no Slovak/Czech/...: those sources use Whisper (MLX on a Mac, faster-whisper elsewhere)
         from backend.stt.voxtral_stt import LANGUAGES as VOX_LANGS
         src = str(config.get("source_lang", "en")).split("-")[0]
-        engine = "voxtral" if src in VOX_LANGS or src == "auto" else ("mlx_whisper" if sys.platform == "darwin" else "faster_whisper")
+        engine = engine if src in VOX_LANGS or src == "auto" else ("mlx_whisper" if sys.platform == "darwin" else "faster_whisper")
     if engine == "mlx_whisper" and str(config.get("source_lang", "")).startswith("sk") and os.environ.get("BP_SK_STT_MODEL"):
         return "faster_whisper"
     return engine
