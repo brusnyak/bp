@@ -2123,15 +2123,38 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         updateRoomUI();
 
+        // Start room: the server creates the room for THIS account (a typed code is refused: listeners cannot create rooms, speakers cannot join others').
+        let roomListenUrl = '';
+        const startRoomBtn = document.getElementById('startRoomBtn');
+        if (startRoomBtn) {
+            startRoomBtn.addEventListener('click', async () => {
+                const auth = { Authorization: `Bearer ${localStorage.getItem('userToken') || ''}` };
+                try {
+                    const r = await fetch('/api/room', { method: 'POST', headers: auth });
+                    if (!r.ok) throw new Error(r.status === 401 ? 'Sign in (or use guest mode) first.' : `Server said ${r.status}`);
+                    const made = await r.json();
+                    roomIdInput.value = made.room_id; roomListenUrl = made.listen_url;
+                    updateRoomUI(); invalidatePreparation();
+                    document.getElementById('roomQrBox').style.display = 'block';
+                    document.getElementById('roomLinkText').textContent = made.listen_url;
+                    document.getElementById('roomLanWarn').style.display = made.lan_ready ? 'none' : 'block';
+                    const q = await fetch(`/api/room/${encodeURIComponent(made.room_id)}/qr`, { headers: auth });
+                    if (q.ok) document.getElementById('roomQr').innerHTML = await q.text();   // SVG from this server
+                    showNotification('Room started. Listeners scan the code or open the link.', 'success');
+                } catch (e) {
+                    showNotification(`Could not start a room: ${e.message}`, 'error');
+                }
+            });
+        }
+
         if (copyRoomLinkBtn) {
             copyRoomLinkBtn.addEventListener('click', async () => {
                 const rid = roomIdInput.value.trim();
                 if (!rid) {
-                    showNotification('Enter a room code before copying the listener link.', 'warning');
-                    roomIdInput.focus();
+                    showNotification('Press Start room first.', 'warning');
                     return;
                 }
-                const url = `${location.origin}/ui/listen/listen.html?room=${encodeURIComponent(rid)}`;
+                const url = roomListenUrl || `${location.origin}/ui/listen/listen.html?room=${encodeURIComponent(rid)}`;
                 try {
                     await navigator.clipboard.writeText(url);
                     const oldText = copyRoomLinkBtn.textContent;

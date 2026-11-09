@@ -440,7 +440,7 @@
 
     applyLocale(currentLocale);
 
-    let ws = null, ctx = null, gainNode = null, playAt = 0;
+    let ws = null, ctx = null, gainNode = null, playAt = 0, roomEnded = false;
 
     // Volume control
     $('volumeSlider').addEventListener('input', e => {
@@ -491,7 +491,7 @@
         ws.close();
         ws = null;
         $('go').textContent = loc.start;
-        $('state').textContent = loc.disconnected;
+        if (!roomEnded) $('state').textContent = loc.disconnected;   // keep "the speaker has ended this session"
         $('statusBadge').className = 'badge';
         $('badgeText').textContent = loc.disconnected;
         return;
@@ -546,6 +546,9 @@
         const m = JSON.parse(ev.data);
         if (m.type === 'error') {
           $('state').textContent = m.message;
+        } else if (m.type === 'room_closed') {
+          $('state').textContent = 'The speaker has ended this session.';
+          roomEnded = true;
         } else if (m.type === 'joined') {
           $('state').textContent = loc.listeningIn(m.lang.toUpperCase(), m.listeners);
         } else if (m.type === 'room_caption') {
