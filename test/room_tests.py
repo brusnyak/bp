@@ -151,3 +151,16 @@ def test_end_room_notifies_listeners_closes_sockets_and_frees_the_id():
 def test_listener_lookup_never_creates_a_room():
     assert R.get_room("never-made", create=False) is None
     assert R.get_room("never-made", create=False) is None
+
+
+def test_pair_unavailable_names_the_reason(monkeypatch):
+    import sys, types
+    mod = types.ModuleType("scripts.language_packs")
+    packs = [{"source": "en", "target": "de", "pair": "en-de"}, {"source": "en", "target": "fr", "pair": "en-fr"}]
+    mod.all_packs = lambda: packs
+    mod.resolve = lambda p: {"errors": ["missing ct2_models/en-fr"]} if p["target"] == "fr" else {"errors": []}
+    monkeypatch.setitem(sys.modules, "scripts.language_packs", mod)
+    assert R.pair_unavailable("en", "de") is None                       # installed
+    assert R.pair_unavailable("en", "en") is None                       # same language: captions only
+    assert "not installed" in R.pair_unavailable("en", "fr")            # declared, assets missing
+    assert "no en to ja route" in R.pair_unavailable("en", "ja")        # not declared

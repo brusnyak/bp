@@ -396,6 +396,10 @@ def create_app(db_session_local_override=None) -> FastAPI:
         room = get_room(room_id, create=False)     # listeners never create rooms (an id guess must not open one)
         if room is None:
             await websocket.send_json({"type": "error", "message": "no such room (the speaker has not started it, or it has ended)"}); await websocket.close(); return
+        from backend.room import pair_unavailable
+        why = pair_unavailable(room.src_lang, lang) if room.src_lang else None
+        if why:   # tell the listener now, instead of a room that stays silent for them
+            await websocket.send_json({"type": "error", "message": why}); await websocket.close(); return
         try:
             listener = room.add_listener(websocket, lang)
         except ValueError as e:

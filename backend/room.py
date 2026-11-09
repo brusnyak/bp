@@ -196,6 +196,22 @@ async def default_synth(text: str, lang: str) -> Tuple[np.ndarray, int]:
     return np.asarray(wav), int(sr)
 
 
+def pair_unavailable(src: str, tgt: str) -> Optional[str]:
+    """Why a listener in `tgt` cannot be served from a speaker in `src` (no declared pack, or its model assets are not installed); None when it can."""
+    if src == tgt:
+        return None
+    try:
+        from scripts.language_packs import all_packs, resolve
+        pack = next((p for p in all_packs() if p["source"] == src and p["target"] == tgt), None)
+        if pack is None:
+            return f"no {src} to {tgt} route is declared on this server"
+        errors = resolve(pack).get("errors") or []
+        return f"{src} to {tgt} is declared but not installed: {'; '.join(errors)[:160]}" if errors else None
+    except Exception as e:          # never block a room on a broken inventory: the delivery path still drops phrases it cannot translate
+        log.warning("room pair check failed: %s", e)
+        return None
+
+
 # -- registry -----------------------------------------------------------------------------------------------------------------------------
 _ROOMS: Dict[str, Room] = {}
 
