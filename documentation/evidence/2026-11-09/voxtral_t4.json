@@ -1,0 +1,291 @@
+{
+ "cells": {
+  "en_paced": {
+   "audio_s": 45.1,
+   "offline": {
+    "rtf": 1.005,
+    "wer": 0.0104,
+    "text": " Good morning, and welcome to this live demonstration of speech translation. I am speaking English, and you will hear German or Slovak within a second or two. The system listens through the microphone and decides when a phrase has ended. First the words are recognized, then they are translated, then"
+   },
+   "streaming": {
+    "wer": 0.0104,
+    "wall_s": 46.9,
+    "wall_minus_audio_s": 1.8,
+    "lag_median_s": 0.06,
+    "lag_p90_s": 0.27,
+    "lag_first_s": 0.05,
+    "lag_last_s": 0.5,
+    "pieces": 576,
+    "text": " Good morning, and welcome to this live demonstration of speech translation. I am speaking English, and you will hear German or Slovak within a second or two. The system listens through the microphone and decides when a phrase has ended. First the words are recognized, then they are translated, then"
+   }
+  },
+  "en_continuous": {
+   "audio_s": 38.9,
+   "offline": {
+    "rtf": 1.009,
+    "wer": 0.0417,
+    "text": " Good morning, and welcome to this live demonstration of speech translation. I am speaking English, and you will hear German or Slovak within a second or two. The system listens through the microphone, and the size where phrase has ended. First, the words are recognized, then they are translated. Th"
+   },
+   "streaming": {
+    "wer": 0.0417,
+    "wall_s": 40.8,
+    "wall_minus_audio_s": 1.9,
+    "lag_median_s": 0.05,
+    "lag_p90_s": 0.18,
+    "lag_first_s": 0.06,
+    "lag_last_s": 0.6,
+    "pieces": 498,
+    "text": " Good morning, and welcome to this live demonstration of speech translation. I am speaking English, and you will hear German or Slovak within a second or two. The system listens through the microphone, and the size where phrase has ended. First, the words are recognized, then they are translated. Th"
+   }
+  },
+  "en_long": {
+   "audio_s": 42.2,
+   "offline": {
+    "rtf": 1.009,
+    "wer": 0.2471,
+    "text": " Good morning. Today I want to show you three things. First, how the system listens. Second, how it translates. And third, why the pauses matter. When I stop speaking, the voice should stop too. And when I pause... You should hear a pause the meeting starts at nine forty five on the fourteenth of ma"
+   },
+   "streaming": {
+    "wer": 0.2471,
+    "wall_s": 43.9,
+    "wall_minus_audio_s": 1.7,
+    "lag_median_s": 0.04,
+    "lag_p90_s": 0.14,
+    "lag_first_s": 0.01,
+    "lag_last_s": 0.32,
+    "pieces": 540,
+    "text": " Good morning. Today I want to show you three things. First, how the system listens. Second, how it translates. And third, why the pauses matter. When I stop speaking, the voice should stop too. And when I pause... You should hear a pause the meeting starts at nine forty five on the fourteenth of ma"
+   }
+  },
+  "de_paced": {
+   "audio_s": 36.9,
+   "offline": {
+    "rtf": 1.008,
+    "wer": 0.0213,
+    "text": " Guten Morgen und willkommen zu dieser Live-Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach ein bis zwei Sekunden Deutsch oder Slowakisch. Das System hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, dann übersetzt und s"
+   },
+   "streaming": {
+    "wer": 0.0213,
+    "wall_s": 38.6,
+    "wall_minus_audio_s": 1.7,
+    "lag_median_s": 0.08,
+    "lag_p90_s": 0.14,
+    "lag_first_s": 0.02,
+    "lag_last_s": 0.31,
+    "pieces": 474,
+    "text": " Guten Morgen und willkommen zu dieser Live-Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach ein bis zwei Sekunden Deutsch oder Slowakisch. Das System hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, dann übersetzt und s"
+   }
+  },
+  "de_continuous": {
+   "audio_s": 32.1,
+   "offline": {
+    "rtf": 1.01,
+    "wer": 0.0213,
+    "text": " Guten Morgen und willkommen zu dieser Live-Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach ein bis zwei Sekunden Deutsch oder Slowakisch. Das System hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, dann übersetzt und s"
+   },
+   "streaming": {
+    "wer": 0.0213,
+    "wall_s": 33.8,
+    "wall_minus_audio_s": 1.7,
+    "lag_median_s": 0.08,
+    "lag_p90_s": 0.27,
+    "lag_first_s": 0.04,
+    "lag_last_s": 0.37,
+    "pieces": 414,
+    "text": " Guten Morgen und willkommen zu dieser Live-Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach ein bis zwei Sekunden Deutsch oder Slowakisch. Das System hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, dann übersetzt und s"
+   }
+  },
+  "de_long": {
+   "audio_s": 39.8,
+   "offline": {
+    "rtf": 1.049,
+    "wer": 0.1059,
+    "text": " Guten Morgen! Heute möchte ich Ihnen drei Dinge zeigen. Erstens, wie das System zuhört. Zweitens, wie es übersetzt. Und drittens, warum die Pausen wichtig sind. Wenn ich aufhöre zu sprechen, sollte die Stimme auch aufhören. Und wenn ich eine Pause mache, Sollten Sie eine Pause hören? Das Treffen be"
+   },
+   "streaming": {
+    "wer": 0.1059,
+    "wall_s": 44.8,
+    "wall_minus_audio_s": 5.0,
+    "lag_median_s": 1.04,
+    "lag_p90_s": 3.13,
+    "lag_first_s": 0.05,
+    "lag_last_s": 3.63,
+    "pieces": 510,
+    "text": " Guten Morgen! Heute möchte ich Ihnen drei Dinge zeigen. Erstens, wie das System zuhört. Zweitens, wie es übersetzt. Und drittens, warum die Pausen wichtig sind. Wenn ich aufhöre zu sprechen, sollte die Stimme auch aufhören. Und wenn ich eine Pause mache, Sollten Sie eine Pause hören? Das Treffen be"
+   }
+  }
+ },
+ "log": [
+  {
+   "t": 33.7,
+   "m": "pip",
+   "rc": 0,
+   "tail": "ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.\nydata-profiling 4.18.4 requires scipy<1.17,>=1.8, but you have scipy 1.18.1 which is incompatible.\n"
+  },
+  {
+   "t": 66.7,
+   "m": "env",
+   "gpu": "Tesla T4, 15360 MiB\nTesla T4, 15360 MiB",
+   "torch": "2.11.0+cu130",
+   "transformers": "5.22.2"
+  },
+  {
+   "t": 141.5,
+   "m": "model loaded",
+   "s": 61.9,
+   "vram_gb": 8.25
+  },
+  {
+   "t": 141.6,
+   "m": "audio found",
+   "n": 10,
+   "names": [
+    "de_continuous",
+    "de_long",
+    "de_paced",
+    "en_continuous",
+    "en_long",
+    "en_paced",
+    "owner_sk_script",
+    "sk_continuous",
+    "sk_long",
+    "sk_paced"
+   ]
+  },
+  {
+   "t": 248.3,
+   "m": "cell",
+   "name": "en_paced",
+   "offline": {
+    "rtf": 1.005,
+    "wer": 0.0104,
+    "text": " Good morning, and welcome to this live demonstration of speech translation. I am speaking English, and you will hear German or Slovak within a second or two. The system listens through the microphone and decides when a phrase has ended. First the words are recognized, then they are translated, then"
+   },
+   "streaming": {
+    "wer": 0.0104,
+    "wall_s": 46.9,
+    "wall_minus_audio_s": 1.8,
+    "lag_median_s": 0.06,
+    "lag_p90_s": 0.27,
+    "lag_first_s": 0.05,
+    "lag_last_s": 0.5,
+    "pieces": 576,
+    "text": " Good morning, and welcome to this live demonstration of speech translation. I am speaking English, and you will hear German or Slovak within a second or two. The system listens through the microphone and decides when a phrase has ended. First the words are recognized, then they are translated, then"
+   }
+  },
+  {
+   "t": 328.7,
+   "m": "cell",
+   "name": "en_continuous",
+   "offline": {
+    "rtf": 1.009,
+    "wer": 0.0417,
+    "text": " Good morning, and welcome to this live demonstration of speech translation. I am speaking English, and you will hear German or Slovak within a second or two. The system listens through the microphone, and the size where phrase has ended. First, the words are recognized, then they are translated. Th"
+   },
+   "streaming": {
+    "wer": 0.0417,
+    "wall_s": 40.8,
+    "wall_minus_audio_s": 1.9,
+    "lag_median_s": 0.05,
+    "lag_p90_s": 0.18,
+    "lag_first_s": 0.06,
+    "lag_last_s": 0.6,
+    "pieces": 498,
+    "text": " Good morning, and welcome to this live demonstration of speech translation. I am speaking English, and you will hear German or Slovak within a second or two. The system listens through the microphone, and the size where phrase has ended. First, the words are recognized, then they are translated. Th"
+   }
+  },
+  {
+   "t": 415.7,
+   "m": "cell",
+   "name": "en_long",
+   "offline": {
+    "rtf": 1.009,
+    "wer": 0.2471,
+    "text": " Good morning. Today I want to show you three things. First, how the system listens. Second, how it translates. And third, why the pauses matter. When I stop speaking, the voice should stop too. And when I pause... You should hear a pause the meeting starts at nine forty five on the fourteenth of ma"
+   },
+   "streaming": {
+    "wer": 0.2471,
+    "wall_s": 43.9,
+    "wall_minus_audio_s": 1.7,
+    "lag_median_s": 0.04,
+    "lag_p90_s": 0.14,
+    "lag_first_s": 0.01,
+    "lag_last_s": 0.32,
+    "pieces": 540,
+    "text": " Good morning. Today I want to show you three things. First, how the system listens. Second, how it translates. And third, why the pauses matter. When I stop speaking, the voice should stop too. And when I pause... You should hear a pause the meeting starts at nine forty five on the fourteenth of ma"
+   }
+  },
+  {
+   "t": 492.0,
+   "m": "cell",
+   "name": "de_paced",
+   "offline": {
+    "rtf": 1.008,
+    "wer": 0.0213,
+    "text": " Guten Morgen und willkommen zu dieser Live-Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach ein bis zwei Sekunden Deutsch oder Slowakisch. Das System hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, dann übersetzt und s"
+   },
+   "streaming": {
+    "wer": 0.0213,
+    "wall_s": 38.6,
+    "wall_minus_audio_s": 1.7,
+    "lag_median_s": 0.08,
+    "lag_p90_s": 0.14,
+    "lag_first_s": 0.02,
+    "lag_last_s": 0.31,
+    "pieces": 474,
+    "text": " Guten Morgen und willkommen zu dieser Live-Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach ein bis zwei Sekunden Deutsch oder Slowakisch. Das System hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, dann übersetzt und s"
+   }
+  },
+  {
+   "t": 558.8,
+   "m": "cell",
+   "name": "de_continuous",
+   "offline": {
+    "rtf": 1.01,
+    "wer": 0.0213,
+    "text": " Guten Morgen und willkommen zu dieser Live-Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach ein bis zwei Sekunden Deutsch oder Slowakisch. Das System hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, dann übersetzt und s"
+   },
+   "streaming": {
+    "wer": 0.0213,
+    "wall_s": 33.8,
+    "wall_minus_audio_s": 1.7,
+    "lag_median_s": 0.08,
+    "lag_p90_s": 0.27,
+    "lag_first_s": 0.04,
+    "lag_last_s": 0.37,
+    "pieces": 414,
+    "text": " Guten Morgen und willkommen zu dieser Live-Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach ein bis zwei Sekunden Deutsch oder Slowakisch. Das System hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, dann übersetzt und s"
+   }
+  },
+  {
+   "t": 645.7,
+   "m": "cell",
+   "name": "de_long",
+   "offline": {
+    "rtf": 1.049,
+    "wer": 0.1059,
+    "text": " Guten Morgen! Heute möchte ich Ihnen drei Dinge zeigen. Erstens, wie das System zuhört. Zweitens, wie es übersetzt. Und drittens, warum die Pausen wichtig sind. Wenn ich aufhöre zu sprechen, sollte die Stimme auch aufhören. Und wenn ich eine Pause mache, Sollten Sie eine Pause hören? Das Treffen be"
+   },
+   "streaming": {
+    "wer": 0.1059,
+    "wall_s": 44.8,
+    "wall_minus_audio_s": 5.0,
+    "lag_median_s": 1.04,
+    "lag_p90_s": 3.13,
+    "lag_first_s": 0.05,
+    "lag_last_s": 3.63,
+    "pieces": 510,
+    "text": " Guten Morgen! Heute möchte ich Ihnen drei Dinge zeigen. Erstens, wie das System zuhört. Zweitens, wie es übersetzt. Und drittens, warum die Pausen wichtig sind. Wenn ich aufhöre zu sprechen, sollte die Stimme auch aufhören. Und wenn ich eine Pause mache, Sollten Sie eine Pause hören? Das Treffen be"
+   }
+  },
+  {
+   "t": 645.7,
+   "m": "done"
+  }
+ ],
+ "env": {
+  "gpu": "Tesla T4, 15360 MiB\nTesla T4, 15360 MiB",
+  "torch": "2.11.0+cu130",
+  "transformers": "5.22.2"
+ }
+}

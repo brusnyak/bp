@@ -35,9 +35,15 @@ The accurate route (`BP_INCREMENTAL=1`: decode the growing buffer, commit words 
 - Fed in 0.64 s and 1.28 s pushes (standalone script, not through the server): lag stayed at or below 0.7 s for the whole 38 s. The engine default is now 0.64 s (`BP_VOXTRAL_STEP_S`). **This setting was never run through the real route** (the run was stopped), so the route result below is for the old 0.2 s default.
 - Real route (`paced_replay.py`, en to de, `agree_short`, 0.2 s pushes): all four automated criteria failed (median lag 8 s, recognition error 21.9%).
 
+**Kaggle T4 result, 2026-11-09 (`documentation/evidence/2026-11-09/voxtral_t4.json`, kernel `scripts/gpu_bench/kaggle_voxtral_t4`, Voxtral Mini 4B Realtime fp16 through Transformers 5.22.2, 8.25 GB VRAM, audio released at real time, generated English and German speech, one run each):**
+- Streaming holds real time: the run ends 1.7-1.9 s after the audio in 5 of 6 clips (one German clip ended 5.0 s after, with a p90 lag of 3.1 s: a single hiccup, not repeated or explained).
+- Text arrives 0.04-0.08 s median after the audio chunk that contains it, on top of the model's own delay of about 0.5 s (the metric excludes that delay), so the recogniser adds roughly 0.5-0.6 s where Whisper agreement adds 2.1 s or more.
+- Word error 1.0% (English paced), 4.2% (English continuous), 2.1% (German paced and continuous). The two "long" clips read 24.7% and 10.6% mostly because the model writes numbers as words ("nine forty five") and the script has digits: a scoring artefact, not mishearing (checked on the English text).
+- Not yet shown: the whole chain (recognition, translation, voice) with this recogniser, and the owner's own voice. The T4 engine is not in the repo yet: `backend/stt/voxtral_stt.py` uses mlx-audio (Mac only).
+
 **Needs a better processing unit (the work that is left):**
 1. Rerun the real route with Voxtral at 0.64 s pushes on a machine with a free GPU and spare memory (a 32 GB+ Apple Silicon Mac dedicated to the demo, or an NVIDIA box). `paced_replay.py processed/testaudio/en_paced.wav --strategy agree_short --src en --tgt de` then `score_success.py`. Pass = median lag at or under 3.0 s, early start at 50% or more.
-2. NVIDIA: Voxtral Realtime has vLLM and Transformers support; not tried in this repo. mlx-audio does not run on a T4, so it needs a separate engine file and a Kaggle notebook.
+2. NVIDIA: write the Transformers-based engine with the same `open_stream`/`stream_feed` interface as `voxtral_stt.py` (the T4 benchmark script already holds the chunking logic), then run `paced_replay.py` + `score_success.py` inside a Kaggle kernel.
 3. Voice: OmniVoice (`backend/tts/omni_tts.py`) already clones the speaker's voice (RTF 0.18-0.34 on a T4, about 0.8-1 on Apple MPS), so a separate voice-conversion stage is not needed on a GPU box. Copying the pitch contour across languages is research-grade and not planned. Not measured: whether OmniVoice plus Voxtral fit one T4.
 
 ## Not validated yet (next actions, in order)

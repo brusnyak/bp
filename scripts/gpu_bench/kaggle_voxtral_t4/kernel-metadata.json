@@ -1,5 +1,5 @@
 {
-  "id": "yegorby/bp-voxtral-t4",
+  "id": "yegorby/bp-voxtral-realtime-t4",
   "title": "BP Voxtral Realtime T4",
   "code_file": "job.py",
   "language": "python",
@@ -7,7 +7,9 @@
   "is_private": true,
   "enable_gpu": true,
   "enable_internet": true,
-  "dataset_sources": ["yegorby/bp-testaudio-20261108"],
+  "dataset_sources": [
+    "yegorby/bp-testaudio-20261108"
+  ],
   "competition_sources": [],
   "model_sources": [],
   "category_ids": [],
