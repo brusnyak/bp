@@ -8,6 +8,7 @@ Start here: [`../README.md`](../README.md) (what it is, install, configuration),
 | [`LANGUAGES.md`](LANGUAGES.md) | Best configuration per language and hardware, with measured quality and timing |
 | [`BENCHMARKS.md`](BENCHMARKS.md) | Method, results, negative results and limits; how to rerun on Kaggle |
 | [`NEAR_REALTIME_GOAL.md`](NEAR_REALTIME_GOAL.md) | The near real-time goal, the Google, Microsoft and OpenAI behaviour it copies, and the success test |
+| [`REALTIME_REVIEW_2026-11-09.md`](REALTIME_REVIEW_2026-11-09.md) | Are we measuring the right things; what Piper and OmniVoice need to behave like the big three; better instruments |
 | [`REALTIME_OPTIONS_2026-11-08.md`](REALTIME_OPTIONS_2026-11-08.md) | Hosted services and open models for near real-time, what was read and what was not |
 | [`DEMO.md`](DEMO.md) | A presentation test from a clean clone, including the room demo |
 | [`reading_script_multilingual.md`](reading_script_multilingual.md) | What to read when recording English, Slovak or German for scoring (`scripts/score_reading.py`) |

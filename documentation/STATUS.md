@@ -55,6 +55,8 @@ The accurate route (`BP_INCREMENTAL=1`: decode the growing buffer, commit words 
 3a. OmniVoice in the streaming route (design 2026-11-09): it is a non-autoregressive diffusion model (all frames per call, `num_step` iterations), not a streaming model, so streaming means one call per agreed piece. Knobs from its README and our T4 tests: `num_step` (12 for Slovak 4/5 by ear, 16 default, 8 degrades Slovak), `speed` and `duration` (cap, ratio 0.83-0.90), a reference clip of 3-10 s (ours was 12 s; longer slows inference), cached voice prompt (done), same-language reference for the best pronunciation. New: the route's rate follower (`length_scale`) now maps to OmniVoice `speed` (`test/omni_pace_tests.py`). Faster per-call latency: OmniVoice's FlashInfer path with CUDA graphs (README: 2.1x batch 1, 2.4x with graphs on an H100; needs a newer NVIDIA GPU, not tested on a T4). Not built: set `duration` from the source piece's span to match the speaker's pace exactly.
 3. Voice: OmniVoice (`backend/tts/omni_tts.py`) already clones the speaker's voice (RTF 0.18-0.34 on a T4, about 0.8-1 on Apple MPS), so a separate voice-conversion stage is not needed on a GPU box. Copying the pitch contour across languages is research-grade and not planned. Not measured: whether OmniVoice plus Voxtral fit one T4.
 
+Review of the measurement itself (four flaws found, one untried lever, better instruments): [`REALTIME_REVIEW_2026-11-09.md`](REALTIME_REVIEW_2026-11-09.md).
+
 ## Not validated yet (next actions, in order)
 
 1. Rerun `bp-fresh-install-t4` (installer, kinit conversion, CUDA preload, German and Slovak as input speech).
