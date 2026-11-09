@@ -77,11 +77,12 @@ class OmniVoiceTTS:
         return prompt
 
     def synthesize(self, text: str, language: str = "sk", speaker_wav_path: Optional[str] = None,
-                   output_path: Optional[str] = None) -> Tuple[np.ndarray, int, float]:
+                   output_path: Optional[str] = None, speed: Optional[float] = None) -> Tuple[np.ndarray, int, float]:
         t0 = time.perf_counter()
         kwargs = {"text": text, "language": language, "num_step": self.num_step}
-        if self.speed != 1.0:
-            kwargs["speed"] = self.speed
+        speed = self.speed if speed is None else speed
+        if speed != 1.0:
+            kwargs["speed"] = speed
         if speaker_wav_path:
             kwargs["voice_clone_prompt"] = self.prepare_voice(speaker_wav_path)
         with self._lock:
@@ -99,7 +100,11 @@ class OmniVoiceTTS:
     def synthesize_stream(self, text: str, language: str = "sk", speaker_wav_path: Optional[str] = None, **kwargs):
         """One chunk per clause-level phrase so the first audio leaves after the first clause."""
         from backend.tts.text_chunking import split_into_phrases
+        # The live route's rate follower (backend/prosody.py) passes Piper's length_scale (>1 = slower); OmniVoice's equivalent is speed (<1 = slower).
+        # Same control, no extra latency: the voice keeps the speaker's pace instead of drifting behind.
+        ls = kwargs.get("length_scale")
+        speed = max(0.8, min(1.3, self.speed / ls)) if ls else None
         for phrase in split_into_phrases(text):
-            wav, sr, _ = self.synthesize(phrase, language=language, speaker_wav_path=speaker_wav_path)
+            wav, sr, _ = self.synthesize(phrase, language=language, speaker_wav_path=speaker_wav_path, speed=speed)
             if wav is not None and len(wav) > 0:
                 yield wav
