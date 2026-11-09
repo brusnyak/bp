@@ -1036,7 +1036,13 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     // Selection never silently starts model loading.
     const strategySelectEl = document.getElementById('strategySelect');
-    if (strategySelectEl) strategySelectEl.addEventListener('change', invalidatePreparation);
+    if (strategySelectEl) {
+        strategySelectEl.addEventListener('change', invalidatePreparation);
+        // Server decides the default per machine class (BP_DEFAULT_STRATEGY in presets/*.env).
+        fetch('/api/auth/config').then((r) => r.json()).then((c) => {
+            if (c.default_strategy && [...strategySelectEl.options].some((o) => o.value === c.default_strategy)) strategySelectEl.value = c.default_strategy;
+        }).catch(() => {});
+    }
     if (inputLanguageSelect) {
         inputLanguageSelect.addEventListener('change', invalidatePreparation);
     }

@@ -22,3 +22,13 @@ def test_agree_short_sets_fragment_sizes_and_other_strategies_clear_them():
     assert cfg["incr_min_words"] == 2 and cfg["incr_max_wait_s"] == 0.8 and cfg["incremental"]
     cfg["strategy"] = "phrase"; _apply_strategy(cfg)
     assert "incr_min_words" not in cfg and not cfg["incremental"]
+
+
+def test_default_strategy_follows_env_and_rejects_unknown(monkeypatch):
+    from backend.main import default_strategy
+    monkeypatch.delenv("BP_DEFAULT_STRATEGY", raising=False)
+    assert default_strategy() == "phrase"
+    monkeypatch.setenv("BP_DEFAULT_STRATEGY", "agree_short")
+    assert default_strategy() == "agree_short"
+    monkeypatch.setenv("BP_DEFAULT_STRATEGY", "nonsense")
+    assert default_strategy() == "phrase"
