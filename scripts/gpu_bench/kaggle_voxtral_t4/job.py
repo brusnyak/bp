@@ -41,10 +41,12 @@ processor = VoxtralRealtimeProcessor.from_pretrained(REPO)
 model = VoxtralRealtimeForConditionalGeneration.from_pretrained(REPO, device_map='cuda', dtype=torch.float16)
 log('model loaded', s=round(time.time() - t, 1), vram_gb=round(torch.cuda.memory_allocated() / 2**30, 2))
 
+FILES = {p.stem: p for p in Path('/kaggle/input').rglob('*.wav')}   # the dataset mount path varies; find by name
+log('audio found', n=len(FILES), names=sorted(FILES)[:12])
 def load(name):
-    a, sr = sf.read(f'/kaggle/input/bp-testaudio-20261108/{name}.wav', dtype='float32'); a = a if a.ndim == 1 else a.mean(1)
+    a, sr = sf.read(str(FILES[name]), dtype='float32'); a = a if a.ndim == 1 else a.mean(1)
     if sr != 16000: a = ss.resample_poly(a, 16000, sr).astype('float32')
-    return a, json.load(open(f'/kaggle/input/bp-testaudio-20261108/{name}.json'))['text']
+    return a, json.load(open(FILES[name].with_suffix('.json')))['text']
 
 def offline(a):
     inputs = processor(a, return_tensors='pt').to(model.device); inputs = inputs.to(model.device, dtype=model.dtype)
