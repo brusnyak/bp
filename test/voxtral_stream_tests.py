@@ -14,3 +14,12 @@ def test_empty_and_whitespace_only():
     s = _Stream(None)
     assert s._words([]) == []
     assert s._words([" "]) == []
+
+
+def test_engine_choice_falls_back_for_unsupported_source(monkeypatch):
+    import backend.main as m
+    monkeypatch.setattr(m.sys, "platform", "linux")
+    assert m._effective_stt_engine({"stt_engine": "voxtral", "source_lang": "en"}) == "voxtral"
+    assert m._effective_stt_engine({"stt_engine": "voxtral", "source_lang": "sk"}) == "faster_whisper"   # no Slovak in Voxtral
+    monkeypatch.setattr(m.sys, "platform", "darwin")
+    assert m._effective_stt_engine({"stt_engine": "voxtral", "source_lang": "sk"}) == "mlx_whisper"
