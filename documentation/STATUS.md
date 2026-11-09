@@ -73,8 +73,8 @@ Room mode is built and unit-tested. It has not run with real models in front of 
 | 1 | Real-model room test (3 and 12 listeners, 3 languages): latency, ordering, no stalls | open (`bp-room-test-t4`) |
 | 2 | Listener joins from a link or QR code with no login (today the page asks for a guest token; untested on a fresh install) | open |
 | 3 | Speaker page creates a room and shows code, link and QR (code and link field exist in the working tree; no QR; not browser-tested) | open |
-| 4 | Room is freed when the speaker leaves; listeners cannot create rooms by guessing an id | open (`backend/room.py` never calls `close_room`) |
-| 5 | One slow listener must not delay the others (send timeout per listener) | open (`_deliver` sends in turn, no timeout) |
+| 4 | Room is freed when the speaker leaves; listeners cannot create rooms by guessing an id; a speaker cannot publish into another user's room | built 2026-11-09, unit-tested (`end_room` on speaker disconnect, listener lookup `create=False`, room owner check; `test/room_tests.py`); not run with real sockets |
+| 5 | One slow listener must not delay the others (send timeout per listener) | built 2026-11-09, unit-tested (concurrent sends, `BP_ROOM_SEND_TIMEOUT_S` default 3 s, slow listener dropped; `test/room_tests.py`) |
 | 6 | Room creation checks that each needed language pair and voice is installed and tells the speaker (a German speaker with a French listener has no `de-fr` model; today the phrase is dropped with a log line) | open |
 | 7 | LAN run for real phones: `BP_HTTPS=1 BP_HOST=0.0.0.0`, certificate warning on every phone; document a `mkcert` or tunnel path | open |
 | 8 | Listener page in the audience's language, readable on a phone at 390 px | built in the working tree, not reviewed on a device |
