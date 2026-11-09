@@ -974,7 +974,14 @@ async def login(request: Request, user_login: UserLogin, db: Session = Depends(g
 async def auth_config():
     """Lets the frontend decide whether to render the real Google button.
     Inert when GOOGLE_CLIENT_ID is unset — password login keeps working."""
-    return {"google_client_id": os.environ.get("GOOGLE_CLIENT_ID"), "guest_enabled": guest_enabled()}
+    return {"google_client_id": os.environ.get("GOOGLE_CLIENT_ID"), "guest_enabled": guest_enabled(),
+            "default_strategy": default_strategy()}
+
+
+def default_strategy() -> str:
+    """Speech cutting the live page preselects. Set per machine class by presets/*.env (BP_DEFAULT_STRATEGY); 'phrase' (the 2025-12 demo) when unset."""
+    v = os.environ.get("BP_DEFAULT_STRATEGY", "phrase")
+    return v if v in STRATEGIES else "phrase"
 
 
 GUEST_EMAIL = "guest@guest.local"
