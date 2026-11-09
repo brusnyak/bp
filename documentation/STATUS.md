@@ -71,12 +71,12 @@ Room mode is built and unit-tested. It has not run with real models in front of 
 | # | Requirement | State |
 |---|---|---|
 | 1 | Real-model room test (3 and 12 listeners, 3 languages): latency, ordering, no stalls | open (`bp-room-test-t4`) |
-| 2 | Listener joins from a link or QR code with no login (today the page asks for a guest token; untested on a fresh install) | open |
-| 3 | Speaker page creates a room and shows code, link and QR (code and link field exist in the working tree; no QR; not browser-tested) | open |
+| 2 | Listener joins from a link or QR code with no login | built: the listener page takes a guest token itself; join by guest token tested through the real app (`test/room_join_tests.py`, 2026-11-09); not tried on a phone |
+| 3 | Speaker page creates a room and shows code, link and QR | built 2026-11-09 ("Start room" button, server-made QR, link with the LAN address instead of localhost); viewed at 1440 px and 390 px in the browser, no horizontal overflow; typed room codes are no longer accepted (the speaker must press Start room) |
 | 4 | Room is freed when the speaker leaves; listeners cannot create rooms by guessing an id; a speaker cannot publish into another user's room | built 2026-11-09, unit-tested (`end_room` on speaker disconnect, listener lookup `create=False`, room owner check; `test/room_tests.py`); not run with real sockets |
 | 5 | One slow listener must not delay the others (send timeout per listener) | built 2026-11-09, unit-tested (concurrent sends, `BP_ROOM_SEND_TIMEOUT_S` default 3 s, slow listener dropped; `test/room_tests.py`) |
 | 6 | A listener whose language pair is not declared or not installed is told when joining (a German speaker with a French listener has no `de-fr` model) | built 2026-11-09 on the listener side, unit-tested (`pair_unavailable`, `test/room_tests.py`); the speaker is not yet told which listeners were refused; checks the pack's whole asset list, STT included |
-| 7 | LAN run for real phones: `BP_HTTPS=1 BP_HOST=0.0.0.0`, certificate warning on every phone; document a `mkcert` or tunnel path | open |
+| 7 | LAN run for real phones | partly built: start with `BP_HOST=0.0.0.0` (the page warns when the server is loopback-only); listeners need no microphone, so plain HTTP works on the same Wi-Fi; HTTPS and the certificate warning matter only for a speaker on a phone; not tried on a phone |
 | 8 | Listener page in the audience's language, readable on a phone at 390 px | built in the working tree, not reviewed on a device |
 | 9 | Speaker page layout: room controls must not crowd the live page; design review | open |
 | 10 | Fresh install passes on Linux (rerun), then Windows | open |
