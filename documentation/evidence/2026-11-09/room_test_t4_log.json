@@ -1,0 +1,7 @@
+{
+  "source": "Kaggle kernel yegorby/bp-room-test-t4 version 2, Logs tab 'Download logs' text, read through Neo 2026-11-09 (ran 658.9 s on GPU T4 x2; en script reading, Piper voices de/sk/fr, MT en-de/en-sk/en-fr)",
+  "baseline_no_room": {"speaker_lag_median_s": 1.84, "speaker_lag_p90_s": 2.96, "speaker_segments": 34, "speaker_with_audio": 24, "server_errors": 0, "wall_s": 90},
+  "room3_1_listener_per_language": {"speaker_lag_median_s": 5.64, "speaker_lag_p90_s": 6.74, "speaker_segments": 32, "speaker_with_audio": 22, "server_errors": 0, "captions_per_listener": 22, "identical_audio_within_language": {"de": true, "sk": true, "fr": true}, "first_caption_s": "23.25-23.38", "listener_errors": []},
+  "room12_4_listeners_per_language": {"speaker_lag_median_s": 7.31, "speaker_lag_p90_s": 8.67, "speaker_segments": 32, "speaker_with_audio": 22, "server_errors": 0, "captions_per_listener": 23, "identical_audio_within_language": {"de": true, "sk": true, "fr": true}, "first_caption_s": "23.94-24.09", "listener_errors": []},
+  "reading": "function passes (no errors, every listener received every caption, identical audio within a language); speaker lag grows with the number of target languages (1.84 -> 5.64 -> 7.31 s median), over the 3 s goal. STT engine of the run not recorded in the log."
+}
