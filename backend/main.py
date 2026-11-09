@@ -166,6 +166,10 @@ def _effective_stt_engine(config: Dict[str, Any]) -> str:
     """Engine for this session. mlx_whisper has no Slovak fine-tune, so a Slovak source with BP_SK_STT_MODEL set
     (e.g. the converted kinit/whisper-large-v3-turbo-sk, 6.5% vs 10.7% plain turbo on FLEURS-sk) goes to faster-whisper."""
     engine = config.get("stt_engine", DEFAULT_STT_ENGINE)
+    if engine == "voxtral":   # no Slovak/Czech/...: those sources use Whisper
+        from backend.stt.voxtral_stt import LANGUAGES as VOX_LANGS
+        src = str(config.get("source_lang", "en")).split("-")[0]
+        engine = "voxtral" if src in VOX_LANGS or src == "auto" else "mlx_whisper"
     if engine == "mlx_whisper" and str(config.get("source_lang", "")).startswith("sk") and os.environ.get("BP_SK_STT_MODEL"):
         return "faster_whisper"
     return engine
@@ -255,6 +259,31 @@ SILENCE_TIMEOUT = 0.25 # seconds (reduced from 1.0s for better responsiveness)
 # near-real-time feel while giving Whisper enough context for coherent phrases.
 # VAD itself runs on 20ms frames; this window only gates STT input.
 STREAMING_CHUNK_LENGTH = float(os.environ.get("BP_STREAMING_CHUNK_S", "2.0"))
+# BP_STREAM_CHUNKS=0: pause segmentation only (the 2025-12 demo behaviour): a phrase is sent to the recogniser whole when the speaker pauses
+# (SILENCE_TIMEOUT), never cut every STREAMING_CHUNK_LENGTH. Pair with BP_VAD_MAX_SEGMENT_S=15 (the demo's safety valve).
+STREAM_CHUNKS = os.environ.get("BP_STREAM_CHUNKS", "1") != "0"
+
+# Segmentation strategies the live page can pick per session (config_update "strategy"); env/pack defaults apply when the page sends none.
+#   phrase  the 2025-12 demo: send a phrase to the recogniser whole when the speaker pauses (0.3 s) or after 15 s
+#   clause  shorter units: pause of 0.2 s or a hard cap of 4 s, so continuous speech is cut into clauses, not 2 s windows
+#   agree   growing buffer decoded every 0.7 s, words two decodes agree on are translated and voiced while the speaker talks
+#   chunks  independent 2 s windows (the pre-2026-11-08 live route)
+STRATEGIES = {
+    "phrase": {"stream_chunks": False, "incremental": False, "vad_silence_timeout_s": 0.3, "vad_max_segment_s": 15.0},
+    "clause": {"stream_chunks": False, "incremental": False, "vad_silence_timeout_s": 0.2, "vad_max_segment_s": 4.0},
+    "agree":  {"stream_chunks": False, "incremental": True,  "vad_silence_timeout_s": 0.3, "vad_max_segment_s": 20.0},
+    "chunks": {"stream_chunks": True,  "incremental": False, "vad_silence_timeout_s": 0.25, "vad_max_segment_s": 3.0},
+    # agree + short fragments: voiced after 2-6 agreed words or 0.8 s (2026-11-08 Mac tuning: the only setting that passed the early-start test, 62%)
+    "agree_short": {"stream_chunks": False, "incremental": True, "vad_silence_timeout_s": 0.3, "vad_max_segment_s": 20.0,
+                    "incr_min_words": 2, "incr_max_words": 6, "incr_max_wait_s": 0.8},
+}
+
+def _apply_strategy(session_config: Dict[str, Any]) -> None:
+    preset = STRATEGIES.get(session_config.get("strategy") or "")
+    if preset:
+        for k in ("incr_min_words", "incr_max_words", "incr_max_wait_s"):
+            session_config.pop(k, None)
+        session_config.update(preset)
 
 # Pre-VAD Silence Detection Configuration
 # Threshold calibrated based on user testing:
@@ -829,6 +858,7 @@ async def initialize_all_models(client_info: str, source_lang: str, target_lang:
         "incremental": incremental,
         "language_pack": pack or {},
     })
+    _apply_strategy(session_data["session_config"])
 
     # Set and clear profile-only options even when a session already exists.
     config = session_data["session_config"]
@@ -1599,6 +1629,61 @@ def get_initialized_models(client_info: str, session_config: Dict[str, Any]) -> 
 
 # --- Core Speech Processing Pipeline ---
 _session_log_files: Dict[str, Any] = {}
+_session_stems: Dict[str, str] = {}
+_session_chunk_n: Dict[str, int] = {}
+
+def _log_stt_chunk(client_info: str, audio: np.ndarray, info: Dict[str, Any]):
+    """BP_LOG_SESSIONS=1: save the exact audio the recogniser received (16 kHz WAV, processed/sessions/<stem>_chunks/NNN.wav) and log the raw
+    recogniser output next to it, so a wrong transcript can be replayed offline with any engine instead of guessed at. Never raises."""
+    if os.environ.get("BP_LOG_SESSIONS") != "1":
+        return
+    try:
+        stem = _session_stems.get(client_info)
+        if not stem:
+            return
+        n = _session_chunk_n[client_info] = _session_chunk_n.get(client_info, 0) + 1
+        d = os.path.join("processed", "sessions", f"{stem}_chunks")
+        os.makedirs(d, exist_ok=True)
+        import soundfile as sf
+        sf.write(os.path.join(d, f"{n:03d}.wav"), np.asarray(audio, dtype=np.float32), AUDIO_SAMPLE_RATE)
+        _log_session_event(client_info, {"type": "stt_chunk", "chunk": n, "audio_s": round(len(audio) / AUDIO_SAMPLE_RATE, 3), **info})
+    except Exception as e:
+        logging.warning(f"Backend: stt chunk log failed (non-fatal): {e}")
+
+def _session_stem(client_info: str) -> str:
+    stem = _session_stems.get(client_info)
+    if not stem:
+        safe = "".join(c if c.isalnum() else "_" for c in (client_info or "unknown"))
+        stem = _session_stems[client_info] = f"{time.strftime('%Y%m%d-%H%M%S')}_{safe}"
+    return stem
+
+_session_full_audio: Dict[str, Any] = {}
+
+def _log_session_audio(client_info: str, audio: np.ndarray):
+    """BP_LOG_SESSIONS=1: the whole microphone stream as received (16 kHz float32, pauses included) -> processed/sessions/<stem>_full.wav at
+    session end, so every segmentation strategy can be replayed offline on the identical recording. Never raises."""
+    if os.environ.get("BP_LOG_SESSIONS") != "1":
+        return
+    try:
+        f = _session_full_audio.get(client_info)
+        if f is None:
+            os.makedirs(os.path.join("processed", "sessions"), exist_ok=True)
+            f = _session_full_audio[client_info] = open(os.path.join("processed", "sessions", f"{_session_stem(client_info)}_full.f32"), "ab")
+        f.write(np.asarray(audio, dtype=np.float32).tobytes())
+    except Exception as e:
+        logging.warning(f"Backend: full-audio log failed (non-fatal): {e}")
+
+def _close_session_audio(client_info: str):
+    f = _session_full_audio.pop(client_info, None)
+    if f is None:
+        return
+    try:
+        path = f.name; f.close()
+        import soundfile as sf
+        raw = np.fromfile(path, dtype=np.float32)
+        sf.write(path[:-4] + ".wav", raw, AUDIO_SAMPLE_RATE); os.remove(path)
+    except Exception as e:
+        logging.warning(f"Backend: full-audio close failed (non-fatal): {e}")
 
 def _log_session_event(client_info: str, event: Dict[str, Any]):
     """Append-only JSONL log per WebSocket session (transcripts, translations,
@@ -1610,10 +1695,8 @@ def _log_session_event(client_info: str, event: Dict[str, Any]):
     try:
         f = _session_log_files.get(client_info)
         if f is None or f.closed:
-            safe = "".join(c if c.isalnum() else "_" for c in (client_info or "unknown"))
             os.makedirs(os.path.join("processed", "sessions"), exist_ok=True)
-            stamp = time.strftime("%Y%m%d-%H%M%S")
-            f = open(os.path.join("processed", "sessions", f"{stamp}_{safe}.jsonl"), "a", encoding="utf-8")  # SANDBOX-FIX (2026-09-28): explicit UTF-8 -- stock Windows consoles default to cp1252 and any Slovak diacritic (č/š/ž) killed the write
+            f = open(os.path.join("processed", "sessions", f"{_session_stem(client_info)}.jsonl"), "a", encoding="utf-8")  # SANDBOX-FIX (2026-09-28): explicit UTF-8 -- stock Windows consoles default to cp1252 and any Slovak diacritic (č/š/ž) killed the write
             _session_log_files[client_info] = f
         f.write(json.dumps({"ts": time.time(), **event}, ensure_ascii=False) + "\n")
         f.flush()
@@ -1681,7 +1764,10 @@ async def _process_speech_segment_pipeline(
     client_info = f"{websocket.client.host}:{websocket.client.port}" if websocket.client else "unknown:unknown"
     _log_session_event(client_info, {"type": "session_config", "dir": "in",
         "source_lang": source_lang, "target_lang": target_lang,
-        "tts_model_choice": tts_model_choice, "speaker_wav_path": speaker_wav_path})
+        "tts_model_choice": tts_model_choice, "speaker_wav_path": speaker_wav_path,
+        "strategy": (session_config or {}).get("strategy"), "stream_chunks": (session_config or {}).get("stream_chunks", STREAM_CHUNKS),
+        "incremental": (session_config or {}).get("incremental"), "silence_s": (session_config or {}).get("vad_silence_timeout_s"),
+        "max_segment_s": (session_config or {}).get("vad_max_segment_s")})
     session_data = active_sessions.get(client_info)
     if not session_data:
         logging.error(f"Backend: Session {client_info} not found in active_sessions. Cannot process speech segment.")
@@ -1764,6 +1850,10 @@ async def _process_speech_segment_pipeline(
         transcribed_text = " ".join([s.text for s in transcribed_segments]) if transcribed_segments else ""
         if pretranscribed is not None:
             transcribed_text = pretranscribed
+        else:
+            _log_stt_chunk(client_info, audio_segment_np, {
+                "engine": type(stt_model_instance).__name__, "lang": source_lang, "text": transcribed_text.strip(), "stt_s": round(stt_total_time, 3),
+                "raw": getattr(stt_model_instance, "last_raw", None), "prompt": _stt_prompt(session_data), "is_final": is_final})
         logging.info(f"Backend: Session {client_info}: STT completed. Transcribed: {_log_text(transcribed_text)} (Detected Lang: {detected_source_lang}). Time: {stt_total_time:.2f}s. Input->STT Latency: {input_to_stt_latency:.2f}s")
 
         # Filter out transcriptions that are just periods/punctuation (background noise artifacts)
@@ -2042,17 +2132,19 @@ class _Frames(list):
 
 
 class _IncState:
-    def __init__(self, source_onset_time=None):
+    def __init__(self, source_onset_time=None, session_config=None):
+        cfg = session_config or {}
         self.source_onset_time = source_onset_time
         self.agree = Agreement()
-        self.frag = Fragmenter(min_words=int(os.environ.get("BP_INCR_MIN_WORDS", "4")),
-                               max_words=int(os.environ.get("BP_INCR_MAX_WORDS", "9")),
-                               max_wait_s=float(os.environ.get("BP_INCR_MAX_WAIT_S", "1.6")))
+        self.frag = Fragmenter(min_words=int(cfg.get("incr_min_words", os.environ.get("BP_INCR_MIN_WORDS", "4"))),
+                               max_words=int(cfg.get("incr_max_words", os.environ.get("BP_INCR_MAX_WORDS", "9"))),
+                               max_wait_s=float(cfg.get("incr_max_wait_s", os.environ.get("BP_INCR_MAX_WAIT_S", "1.6"))))
         self.busy = False
         self.closed = False
         self.last_step = 0.0
         self.committed = 0
         self.context = ""
+        self.stream = None   # engine-native streaming state (VoxtralSTT.open_stream), None on Whisper
 
 
 async def _emit_fragment(websocket, session_config, client_info, session_data, text, span, source_onset_time=None):
@@ -2061,6 +2153,13 @@ async def _emit_fragment(websocket, session_config, client_info, session_data, t
         websocket, np.zeros(1, dtype=np.float32), time.perf_counter(), True, session_config, client_info,
         pretranscribed=text, source_span=span, source_onset_time=source_onset_time))
     session_data["active_pipeline_task"] = task
+
+
+def _push_stream_words(inc, words, t):
+    if words:
+        logging.info(f"INCR stream: +{len(words)} words '{' '.join(words)[:90]}'")
+        inc.frag.push([(w, t, t) for w in words], time.perf_counter())
+        inc.committed += len(words)
 
 
 async def _incremental_step(websocket, session_data, session_config, client_info, frames, inc):
@@ -2073,6 +2172,19 @@ async def _incremental_step(websocket, session_data, session_config, client_info
         times = list(frames.t[:n])
         stt = session_data.get("stt_model")
         src = session_config.get("source_lang")
+        if hasattr(stt, "open_stream"):   # recogniser built for streaming: push new audio only, words are final
+            async with session_data["model_call_lock"]:
+                if inc.stream is None:
+                    inc.stream = await loop.run_in_executor(None, stt.open_stream)
+                _t = time.perf_counter()
+                words = await loop.run_in_executor(None, stt.stream_feed, inc.stream, audio)
+                logging.debug(f"INCR stream feed: {n*VAD_FRAME_DURATION/1000:.2f}s audio took {time.perf_counter()-_t:.2f}s")
+            frames.trim(n)
+            _push_stream_words(inc, words, times[-1])
+            text = inc.frag.pop(time.perf_counter())
+            if text:
+                await _emit_fragment(websocket, session_config, client_info, session_data, text, inc.frag.span, inc.source_onset_time)
+            return
         async with session_data["model_call_lock"]:
             if inc.closed:
                 return
@@ -2106,10 +2218,25 @@ async def _incremental_step(websocket, session_data, session_config, client_info
 async def _incremental_close(websocket, session_config, client_info, session_data, frames, inc):
     """Segment ended: voice any agreed-but-unflushed words first; return True if the remainder is too short to transcribe."""
     inc.closed = True
+    stt = session_data.get("stt_model")
+    if inc.stream is not None or hasattr(stt, "open_stream"):
+        for _ in range(300):   # an in-flight push owns the model thread; wait for it, then flush the model's delay window
+            if not inc.busy:
+                break
+            await asyncio.sleep(0.01)
+        loop = asyncio.get_event_loop()
+        async with session_data["model_call_lock"]:
+            if inc.stream is None:
+                inc.stream = await loop.run_in_executor(None, stt.open_stream)
+            tail = np.concatenate(frames) if len(frames) else np.zeros(0, dtype=np.float32)
+            words = await loop.run_in_executor(None, lambda: stt.stream_feed(inc.stream, tail, True))
+        t_end = frames.t[-1] if frames.t else time.perf_counter()
+        frames.clear()
+        _push_stream_words(inc, words, t_end)
     text = inc.frag.pop(time.perf_counter(), final=True)
     if text:
         await _emit_fragment(websocket, session_config, client_info, session_data, text, inc.frag.span, inc.source_onset_time)
-    return inc.committed > 0 and len(frames) * (VAD_FRAME_DURATION / 1000.0) < 0.3
+    return inc.stream is not None or (inc.committed > 0 and len(frames) * (VAD_FRAME_DURATION / 1000.0) < 0.3)
 
 
 async def _feed_captioner_task(websocket, session_data, client_info, audio_chunk):
@@ -2240,6 +2367,19 @@ async def handle_audio_stream(websocket: WebSocket, token: Optional[str] = None)
                         session_data["capture_active"] = True
                         session_data["capture_generation"] += 1
                         logging.info("Received 'start' command. Beginning transcription.")
+                        if session_data.get("stt_model") is None:
+                            logging.info(f"Backend: Session {client_info}: 'start' received before config_update. Auto-initializing default models...")
+                            await initialize_all_models(
+                                client_info,
+                                session_config["source_lang"], session_config["target_lang"], session_config["tts_model_choice"],
+                                stt_model_size=session_config.get("stt_model_size", DEFAULT_STT_MODEL_SIZE),
+                                speaker_wav_path=session_config.get("speaker_wav_path"),
+                                speaker_text=session_config.get("speaker_text"),
+                                speaker_lang=session_config.get("speaker_lang"),
+                                vad_enabled_param=session_config.get("vad_enabled", True),
+                                websocket=websocket
+                            )
+                            await websocket.send_text(json.dumps({"type": "models_loading_status", "fully_loaded": True, "route_status": session_data.get("route_status")}))
                         audio_queue.clear()
                         speech_frames.clear()
                         received_samples = 0
@@ -2271,6 +2411,8 @@ async def handle_audio_stream(websocket: WebSocket, token: Optional[str] = None)
                         pre_vad_buffer.clear()
                         pre_vad_threshold_met = False
                         await websocket.send_text(json.dumps({"type": "session_stopped"}))
+                    elif data["type"] == "client_event":   # browser playback timing; logged only (BP_LOG_SESSIONS=1)
+                        _log_session_event(client_info, {"dir": "in", **{k: v for k, v in data.items() if k in ("type", "event", "t_ms", "duration_s", "queued_s", "rate")}})
                     elif data["type"] == "config_update":
                         # THESIS NOTE: Use session lock to prevent race conditions when
                         # multiple config updates arrive concurrently for the same session
@@ -2283,6 +2425,9 @@ async def handle_audio_stream(websocket: WebSocket, token: Optional[str] = None)
                             new_speaker_text = data.get("speaker_text", session_config["speaker_text"])
                             new_speaker_lang = data.get("speaker_lang", session_config["speaker_lang"])
                             new_vad_enabled = data.get("vad_enabled", session_config["vad_enabled"]) # Get new VAD enabled state
+                            if data.get("strategy") in STRATEGIES:
+                                session_config["strategy"] = data["strategy"]
+                                _apply_strategy(session_config)
                             if "room_id" in data:   # room mode: this session is the speaker of that room (listeners join /ws/listen)
                                 session_config["room_id"] = (str(data["room_id"])[:64] or None)
                             logging.debug(f"Backend: Received config_update: {data}")
@@ -2379,6 +2524,7 @@ async def handle_audio_stream(websocket: WebSocket, token: Optional[str] = None)
                         logging.warning("Backend: Detected NaN or Inf in audio_np. Sanitizing to 0.")
                         audio_np = np.nan_to_num(audio_np, nan=0.0, posinf=0.0, neginf=0.0)
 
+                    _log_session_audio(client_info, audio_np)
                     logging.debug(f"Backend: Received {audio_np.size} audio samples from frontend. First 10 samples: {audio_np[:10]}")
                     if audio_np.size > 0:
                         logging.debug(f"Backend: audio_np min: {np.min(audio_np)}, max: {np.max(audio_np)}")
@@ -2480,7 +2626,7 @@ async def handle_audio_stream(websocket: WebSocket, token: Optional[str] = None)
                                     in_speech_segment = True
                                     utterance_onset_time = source_clock_origin + (
                                         received_samples - len(audio_queue) - frame_size_samples) / AUDIO_SAMPLE_RATE
-                                    inc = _IncState(utterance_onset_time) if session_config.get("incremental") else None
+                                    inc = _IncState(utterance_onset_time, session_config) if session_config.get("incremental") else None
                                     # T046 barge-in: only cancel a previous task if it's past STT+MT (lock released) —
                                     # i.e. it's in/about to enter TTS (the only phase where "two voices at once" is a
                                     # real problem) or already finished. If it's still inside STT/MT, let it finish:
@@ -2501,8 +2647,9 @@ async def handle_audio_stream(websocket: WebSocket, token: Optional[str] = None)
                                 max_segment_s = session_config.get("vad_max_segment_s", MAX_SEGMENT_S)
                                 if inc is not None:
                                     max_segment_s = max(max_segment_s, 20.0)   # fragments flush as words agree; the valve is a last resort
-                                    if (not inc.busy and time.perf_counter() - inc.last_step >= INCREMENTAL_STEP_S
-                                            and len(speech_frames) * (VAD_FRAME_DURATION / 1000.0) >= INCREMENTAL_MIN_AUDIO_S
+                                    _stt = session_data.get("stt_model")
+                                    if (not inc.busy and time.perf_counter() - inc.last_step >= getattr(_stt, "incr_step_s", INCREMENTAL_STEP_S)
+                                            and len(speech_frames) * (VAD_FRAME_DURATION / 1000.0) >= getattr(_stt, "incr_min_audio_s", INCREMENTAL_MIN_AUDIO_S)
                                             and session_data.get("stt_model") is not None):
                                         inc.busy = True
                                         asyncio.create_task(_incremental_step(websocket, session_data, session_config, client_info, speech_frames, inc))
@@ -2525,7 +2672,7 @@ async def handle_audio_stream(websocket: WebSocket, token: Optional[str] = None)
                                 # audio chunks during speech so STT starts mid-utterance instead of
                                 # waiting for segment close. RMS pre-filter blocks background noise.
                                 now = time.perf_counter()
-                                if (now - last_streaming_process_time >= STREAMING_CHUNK_LENGTH
+                                if (session_config.get("stream_chunks", STREAM_CHUNKS) and now - last_streaming_process_time >= STREAMING_CHUNK_LENGTH
                                         and len(speech_frames) > 0):
                                     # Collect streaming_chunk_samples worth of audio from speech_frames
                                     needed = streaming_chunk_samples
@@ -2662,6 +2809,8 @@ async def handle_audio_stream(websocket: WebSocket, token: Optional[str] = None)
         audio_queue.clear()
         speech_frames.clear()
         pre_vad_buffer.clear()
+        _close_session_audio(client_info)
+        _session_stems.pop(client_info, None); _session_chunk_n.pop(client_info, None)
         log_handle = _session_log_files.pop(client_info, None)
         if log_handle and not log_handle.closed:
             log_handle.close()

@@ -10,8 +10,8 @@ stop() is terminal: it bumps generation, revokes blob URLs and ignores stale eve
 */
 (function (root) {
     class SessionPlayback {
-        constructor({ makeAudio = url => new Audio(url), urls = URL, onError = () => {}, maxQueuedDurationS = 10, playbackRate = 1, adaptive = false } = {}) {
-            Object.assign(this, { makeAudio, urls, onError, maxQueuedDurationS, playbackRate, adaptive });
+        constructor({ makeAudio = url => new Audio(url), urls = URL, onError = () => {}, maxQueuedDurationS = 10, playbackRate = 1, adaptive = false, onEvent = () => {} } = {}) {
+            Object.assign(this, { makeAudio, urls, onError, maxQueuedDurationS, playbackRate, adaptive, onEvent });
             this.generation = 0;
             this.active = false;
             this.queue = [];   // { blob, url, audio, duration, sink, startTime }
@@ -46,6 +46,7 @@ stop() is terminal: it bumps generation, revokes blob URLs and ignores stale eve
                 return;
             }
             this.queue.push({ blob, duration, sink });
+            this.onEvent({ event: 'tts_received', duration_s: duration, queued_s: this.queue.reduce((t, it) => t + it.duration, 0) + (this.current ? this.current.duration : 0) });
             if (!this.current) this.playNext();
         }
         // Speed up only while behind; same table as scripts/live/paced_replay.py (pitch preserved).
@@ -55,22 +56,22 @@ stop() is terminal: it bumps generation, revokes blob URLs and ignores stale eve
         static _wavDuration(arrayBuffer) {
             try {
                 const dv = new DataView(arrayBuffer);
-                if (dv.getUint32(0, false) !== 0x46464952) return 0; // "RIFF"
-                if (dv.getUint32(8, false) !== 0x45564157) return 0; // "WAVE"
+                if (dv.getUint32(0, false) !== 0x52494646) return 0; // "RIFF"
+                if (dv.getUint32(8, false) !== 0x57415645) return 0; // "WAVE"
                 let sampleRate = 0, channels = 0, bitsPerSample = 0, dataSize = 0, audioFormat = 0;
                 let pos = 12;
                 while (pos + 8 <= dv.byteLength) {
                     const chunkId = dv.getUint32(pos, false);
                     const chunkSize = dv.getUint32(pos + 4, true);
                     const dataStart = pos + 8;
-                    if (chunkId === 0x20746d66) { // "fmt "
+                    if (chunkId === 0x666d7420) { // "fmt "
                         if (chunkSize >= 16) {
                             audioFormat = dv.getUint16(dataStart, true);
                             channels = dv.getUint16(dataStart + 2, true);
                             sampleRate = dv.getUint32(dataStart + 4, true);
                             bitsPerSample = dv.getUint16(dataStart + 14, true);
                         }
-                    } else if (chunkId === 0x61746164) { // "data"
+                    } else if (chunkId === 0x64617461) { // "data"
                         dataSize = chunkSize;
                     }
                     if (sampleRate && channels && bitsPerSample && dataSize) break;
@@ -116,6 +117,7 @@ stop() is terminal: it bumps generation, revokes blob URLs and ignores stale eve
                 if (generation !== this.generation) return;
                 this.current = null;
                 this.urls.revokeObjectURL(url);
+                this.onEvent({ event: 'tts_ended', duration_s: duration });
                 if (this.active && this.queue.length) this.playNext();
             };
             audio.onended = onEnd;
@@ -127,6 +129,7 @@ stop() is terminal: it bumps generation, revokes blob URLs and ignores stale eve
 
             try {
                 await audio.play();
+                this.onEvent({ event: 'tts_play_start', duration_s: duration, rate: audio.playbackRate, queued_s: this.queue.reduce((t, it) => t + it.duration, 0) });
             } catch (error) {
                 if (generation !== this.generation) return;
                 this.stop();

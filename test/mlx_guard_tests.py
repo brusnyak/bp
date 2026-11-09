@@ -29,3 +29,9 @@ def test_should_drop_stock_phrase_on_short_chunk_only():
     assert not should_drop("Thank you for listening, and I look forward to your questions.", 2.0)   # a real sentence
     assert not should_drop(" Thank you.", 4.0)                                                       # long chunk: probably real
     assert not should_drop("", 1.0) and not should_drop("   ", 1.0)
+
+
+def test_mlx_whisper_stt_imports_min_chunk_s():
+    import backend.stt.mlx_whisper_stt as m
+    assert hasattr(m, "MIN_CHUNK_S") and m.MIN_CHUNK_S > 0
+

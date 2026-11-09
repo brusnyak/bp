@@ -17,7 +17,7 @@ from typing import Optional, Tuple
 import numpy as np
 
 DEFAULT_REPO = "mlx-community/whisper-large-v3-turbo"
-from backend.stt.guards import GUARD, HALLUCINATIONS, SHORT_CHUNK_S, _norm, is_garbage  # noqa: F401  (shared with every engine; re-exported for tests)
+from backend.stt.guards import GUARD, HALLUCINATIONS, MIN_CHUNK_S, SHORT_CHUNK_S, _norm, is_garbage  # noqa: F401  (shared with every engine; re-exported for tests)
 
 
 class MLXWhisperSTT:
@@ -36,6 +36,8 @@ class MLXWhisperSTT:
 
     def _run(self, audio: np.ndarray, language, initial_prompt, word_timestamps):
         kw = dict(path_or_hf_repo=self.repo, condition_on_previous_text=False, no_speech_threshold=0.3, word_timestamps=bool(word_timestamps))
+        if os.environ.get("BP_STT_FALLBACK", "0") != "1":
+            kw["temperature"] = 0.0   # no temperature-fallback retries: on replayed live chunks they cost 4-5 s per junk chunk and did not improve the text (2026-11-08, 62 chunks: 43.6 s -> 17.8 s decode)
         if language:
             kw["language"] = language
         if initial_prompt:
@@ -51,12 +53,15 @@ class MLXWhisperSTT:
             import scipy.signal as ss
             audio = ss.resample_poly(audio, 16000, sample_rate).astype(np.float32)
         if len(audio) / 16000 < MIN_CHUNK_S:
+            self.last_raw = []
             return [], 0.0, language
         t0 = time.time()
         res = self._ex.submit(self._run, audio, language, initial_prompt, word_timestamps).result()
         dt = time.time() - t0
         segs = []
         chunk_s = len(audio) / 16000
+        self.last_raw = [{"text": x["text"], "no_speech": round(x.get("no_speech_prob", 0.0), 3), "logprob": round(x.get("avg_logprob", 0.0), 3),
+                          "ratio": round(x.get("compression_ratio", 0.0), 2)} for x in res.get("segments", [])]   # before the guards, for session logs
         for s in res.get("segments", []):
             if GUARD and is_garbage(s["text"], chunk_s, s.get("compression_ratio", 0.0)):
                 print(f"MLXWhisperSTT: dropped garbage {s['text'][:60]!r} (chunk {chunk_s:.2f}s, ratio {s.get('compression_ratio', 0):.1f})")
