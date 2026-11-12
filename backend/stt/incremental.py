@@ -30,6 +30,14 @@ class Agreement:
         return list(words[:n])
 
 
+def stream_end(frame_times, last_push_t):
+    """Stream-clock time at which a segment's words end. Never fall back to a wall clock: a flush after every frame was already trimmed once stamped
+    time.perf_counter() (about 117000 s of machine uptime) into a span that is read as stream time, which corrupted lag and drift in 4 of 9 saved runs."""
+    if frame_times:
+        return frame_times[-1]
+    return last_push_t if last_push_t is not None else 0.0
+
+
 class Fragmenter:
     def __init__(self, min_words=4, max_words=9, max_wait_s=1.6):
         self.min_words, self.max_words, self.max_wait_s = min_words, max_words, max_wait_s

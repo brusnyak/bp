@@ -32,8 +32,10 @@ def test_nemotron_prompt_key_follows_the_models_own_spelling():
     assert prompt_key(d, "ja") is None and prompt_key(d, None) is None and prompt_key(None, "sk") is None   # unknown: the model default, never a wrong prompt
 
 
-def test_nemotron_covers_slovak_and_czech_but_voxtral_does_not(monkeypatch):
+def test_nemotron_covers_czech_not_slovak_and_voxtral_covers_neither(monkeypatch):
+    """Slovak is routed away from Nemotron on purpose (41% word error on the saved sk->en route run, 2026-11-09 evidence)."""
     import backend.main as m
     monkeypatch.setattr(m.sys, "platform", "darwin")
-    assert m._effective_stt_engine({"stt_engine": "nemotron", "source_lang": "sk"}) == "nemotron"
+    assert m._effective_stt_engine({"stt_engine": "nemotron", "source_lang": "cs"}) == "nemotron"
+    assert m._effective_stt_engine({"stt_engine": "nemotron", "source_lang": "sk"}) == "mlx_whisper"
     assert m._effective_stt_engine({"stt_engine": "voxtral", "source_lang": "sk"}) == "mlx_whisper"

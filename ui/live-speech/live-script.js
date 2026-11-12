@@ -2135,12 +2135,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const made = await r.json();
                     roomIdInput.value = made.room_id; roomListenUrl = made.listen_url;
                     updateRoomUI(); invalidatePreparation();
-                    document.getElementById('roomQrBox').style.display = 'block';
-                    document.getElementById('roomLinkText').textContent = made.listen_url;
-                    document.getElementById('roomLanWarn').style.display = made.lan_ready ? 'none' : 'block';
-                    const q = await fetch(`/api/room/${encodeURIComponent(made.room_id)}/qr`, { headers: auth });
-                    if (q.ok) document.getElementById('roomQr').innerHTML = await q.text();   // SVG from this server
-                    showNotification('Room started. Listeners scan the code or open the link.', 'success');
+                    showNotification('Room started. Listeners join by link.', 'success');
                 } catch (e) {
                     showNotification(`Could not start a room: ${e.message}`, 'error');
                 }

@@ -1,0 +1,15 @@
+{
+  "id": "yegorby/bp-fish-s2-pro-t4g",
+  "title": "BP Fish S2-Pro T4g",
+  "code_file": "job.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [],
+  "competition_sources": [],
+  "model_sources": [],
+  "category_ids": [],
+  "keywords": []
+}

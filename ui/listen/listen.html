@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Listen: Live Translation</title>
+  <title>Listen — Live Translation</title>
   <style>
     :root {
       color-scheme: light dark;
@@ -27,236 +27,88 @@
         --acc: #e11d48;
         --acc-hover: #be123c;
         --green: #34d399;
-        --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.5);
+        --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.3);
       }
     }
     * { box-sizing: border-box; }
     body {
-      margin: 0;
-      font: 16px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--fg);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 24px 16px;
+      margin: 0; font: 16px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg); color: var(--fg);
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; padding: 24px 16px;
     }
     .container {
-      width: 100%;
-      max-width: 640px;
-      background: var(--card-bg);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: var(--shadow);
+      width: 100%; max-width: 560px;
+      background: var(--card-bg); border: 1px solid var(--line);
+      border-radius: 12px; padding: 24px; box-shadow: var(--shadow);
     }
     header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      border-bottom: 1px solid var(--line);
-      padding-bottom: 16px;
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 20px; border-bottom: 1px solid var(--line); padding-bottom: 16px;
     }
-    h1 {
-      font-size: 1.35rem;
-      margin: 0;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    h1 { font-size: 1.35rem; margin: 0; font-weight: 700; display: flex; align-items: center; gap: 8px; }
     .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.8rem;
-      padding: 4px 8px;
-      border-radius: 9999px;
-      background: var(--line);
-      color: var(--mut);
-      font-weight: 500;
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.8rem; padding: 4px 8px; border-radius: 9999px;
+      background: var(--line); color: var(--mut); font-weight: 500;
     }
-    .badge.active {
-      background: rgba(16, 185, 129, 0.15);
-      color: var(--green);
-    }
-    .badge .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: currentColor;
-    }
-    .dot.pulse {
-      animation: pulse 1.2s infinite;
-    }
+    .badge.active { background: rgba(16, 185, 129, 0.15); color: var(--green); }
+    .badge .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+    .dot.pulse { animation: pulse 1.2s infinite; }
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.4; transform: scale(1.3); }
     }
-    .field {
-      margin-bottom: 16px;
-    }
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--mut);
-    }
-    input, select {
-      width: 100%;
-      font: inherit;
-      padding: 10px 12px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--bg);
-      color: var(--fg);
-      outline: none;
-      transition: border-color 0.15s ease;
-    }
-    input:focus, select:focus {
-      border-color: var(--acc);
-    }
-    .slider-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .slider-row input[type="range"] {
-      flex: 1;
-      padding: 0;
-      accent-color: var(--acc);
-      cursor: pointer;
-    }
-    .slider-val {
-      font-size: 0.85rem;
-      color: var(--mut);
-      min-width: 44px;
-      text-align: right;
-    }
+    .field { margin-bottom: 16px; }
+    label { display: block; margin-bottom: 6px; font-size: 0.875rem; font-weight: 600; color: var(--mut); }
+    select { width: 100%; font: inherit; padding: 10px 12px; border: 1px solid var(--line);
+      border-radius: 8px; background: var(--bg); color: var(--fg); outline: none; }
     .btn-primary {
-      width: 100%;
-      background: var(--acc);
-      color: #fff;
-      font: inherit;
-      font-weight: 600;
-      padding: 12px 16px;
-      border: 0;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 8px;
-      transition: background 0.15s ease, opacity 0.15s ease;
+      width: 100%; background: var(--acc); color: #fff; font: inherit;
+      font-weight: 600; padding: 12px 16px; border: 0; border-radius: 8px;
+      cursor: pointer; margin-top: 8px;
     }
-    .btn-primary:hover:not(:disabled) {
-      background: var(--acc-hover);
-    }
-    .btn-primary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .btn-secondary {
-      background: transparent;
-      color: var(--mut);
-      font: inherit;
-      font-size: 0.85rem;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      padding: 6px 12px;
-      cursor: pointer;
-    }
-    .btn-secondary:hover {
-      color: var(--fg);
-      border-color: var(--fg);
-    }
+    .btn-primary:hover:not(:disabled) { background: var(--acc-hover); }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
     .state-notice {
-      margin: 16px 0;
-      padding: 10px 14px;
-      border-radius: 8px;
-      background: var(--bg);
-      border-left: 4px solid var(--acc);
-      color: var(--mut);
-      font-size: 0.875rem;
+      margin: 16px 0; padding: 10px 14px; border-radius: 8px;
+      background: var(--bg); border-left: 4px solid var(--acc);
+      color: var(--mut); font-size: 0.875rem;
     }
     .actions-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 24px;
-      margin-bottom: 12px;
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 24px; margin-bottom: 12px;
     }
-    .actions-bar h2 {
-      margin: 0;
-      font-size: 1.05rem;
-      font-weight: 600;
-    }
+    .actions-bar h2 { margin: 0; font-size: 1.05rem; font-weight: 600; }
     #caps {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      max-height: 480px;
-      overflow-y: auto;
-      padding-right: 4px;
+      display: flex; flex-direction: column; gap: 12px;
+      max-height: 480px; overflow-y: auto; padding-right: 4px;
     }
     .cap-card {
-      padding: 12px 16px;
-      background: var(--bg);
-      border: 1px solid var(--line);
-      border-radius: 8px;
+      padding: 12px 16px; background: var(--bg);
+      border: 1px solid var(--line); border-radius: 8px;
       animation: fadeIn 0.2s ease;
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-4px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .cap-trans {
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: var(--fg);
-      line-height: 1.4;
-      margin-bottom: 4px;
-    }
-    .cap-src {
-      font-size: 0.85rem;
-      color: var(--mut);
-    }
+    .cap-trans { font-size: 1.15rem; font-weight: 600; color: var(--fg); line-height: 1.4; margin-bottom: 4px; }
+    .cap-src { font-size: 0.85rem; color: var(--mut); }
+
     /* Presentation Fullscreen Mode */
-    body.presentation-mode {
-      padding: 0;
-      background: #000;
-    }
+    body.presentation-mode { padding: 0; background: #000; }
     body.presentation-mode .container {
-      max-width: 100vw;
-      height: 100vh;
-      border-radius: 0;
-      border: none;
-      display: flex;
-      flex-direction: column;
-      background: #040814;
-      padding: 32px;
+      max-width: 100vw; height: 100vh; border-radius: 0; border: none;
+      display: flex; flex-direction: column; background: #040814; padding: 32px;
     }
-    body.presentation-mode .controls-section {
-      display: none;
-    }
-    body.presentation-mode #caps {
-      max-height: none;
-      flex: 1;
-      justify-content: flex-end;
-    }
+    body.presentation-mode .controls-section { display: none; }
+    body.presentation-mode #caps { max-height: none; flex: 1; justify-content: flex-end; }
     body.presentation-mode .cap-card {
-      background: rgba(255, 255, 255, 0.05);
-      border-color: rgba(255, 255, 255, 0.1);
-      padding: 24px;
+      background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.1); padding: 24px;
     }
-    body.presentation-mode .cap-trans {
-      font-size: 2.2rem;
-      color: #38bdf8;
-    }
-    body.presentation-mode .cap-src {
-      font-size: 1.3rem;
-      color: #94a3b8;
-    }
+    body.presentation-mode .cap-trans { font-size: 2.2rem; color: #38bdf8; }
+    body.presentation-mode .cap-src { font-size: 1.3rem; color: #94a3b8; }
   </style>
 </head>
 <body>
@@ -271,11 +123,6 @@
 
     <div class="controls-section">
       <div class="field">
-        <label for="room" id="lblRoom">Room code</label>
-        <input id="room" placeholder="e.g. demo1" autocomplete="off">
-      </div>
-
-      <div class="field">
         <label for="lang" id="lblLang">My language</label>
         <select id="lang">
           <option value="en">English</option>
@@ -283,16 +130,7 @@
           <option value="sk">Slovenčina</option>
           <option value="cs">Čeština</option>
           <option value="fr">Français</option>
-          <option value="pl">Polski</option>
         </select>
-      </div>
-
-      <div class="field">
-        <label for="volumeSlider" id="lblVol">Audio volume</label>
-        <div class="slider-row">
-          <input type="range" id="volumeSlider" min="0" max="2" step="0.05" value="1.0">
-          <span class="slider-val" id="volVal">100%</span>
-        </div>
       </div>
 
       <button id="go" class="btn-primary">Start listening</button>
@@ -314,113 +152,83 @@
     const I18N = {
       en: {
         title: "Listen in your language",
-        room: "Room code",
         lang: "My language",
-        vol: "Audio volume",
         start: "Start listening",
-        stop: "Stop",
+        stop: "Stop listening",
         caps: "Live Subtitles",
         presentation: "Presentation view",
         exitPresentation: "Exit presentation view",
         notice: "Wear headphones or an earpiece. The translated voice plays here; captions appear below.",
         connectedWaiting: "Connected. Waiting for the speaker...",
         disconnected: "Disconnected.",
-        enterRoom: "Enter a room code.",
-        noToken: "Could not authenticate as guest.",
-        listeningIn: (lang, n) => `Listening in ${lang} (${n} in room)`
+        noToken: "Could not authenticate.",
+        listeningIn: (lang, n) => `Listening in ${lang}`,
       },
       de: {
         title: "In Ihrer Sprache zuhören",
-        room: "Raumcode",
         lang: "Meine Sprache",
-        vol: "Lautstärke",
         start: "Zuhören starten",
-        stop: "Stopp",
+        stop: "Zuhören beenden",
         caps: "Live-Untertitel",
         presentation: "Präsentationsansicht",
         exitPresentation: "Präsentationsansicht beenden",
         notice: "Tragen Sie Kopfhörer oder Ohrhörer. Die übersetzte Stimme wird hier abgespielt; Untertitel erscheinen unten.",
         connectedWaiting: "Verbunden. Warte auf den Sprecher...",
         disconnected: "Getrennt.",
-        enterRoom: "Geben Sie den Raumcode ein.",
-        noToken: "Gast-Authentifizierung fehlgeschlagen.",
-        listeningIn: (lang, n) => `Höre auf ${lang} (${n} im Raum)`
+        noToken: "Authentifizierung fehlgeschlagen.",
+        listeningIn: (lang, n) => `Höre auf ${lang}`,
       },
       sk: {
         title: "Počúvajte vo svojom jazyku",
-        room: "Kód miestnosti",
         lang: "Môj jazyk",
-        vol: "Hlasitosť zvuku",
         start: "Začať počúvať",
-        stop: "Zastaviť",
+        stop: "Zastaviť počúvanie",
         caps: "Živé titulky",
         presentation: "Režim prezentácie",
         exitPresentation: "Ukončiť režim prezentácie",
         notice: "Používajte slúchadlá. Preložený hlas sa prehráva tu; titulky sa zobrazujú nižšie.",
         connectedWaiting: "Pripojené. Čaká sa na rečníka...",
         disconnected: "Odpojené.",
-        enterRoom: "Zadajte kód miestnosti.",
-        noToken: "Nepodarilo sa prihlásiť ako hosť.",
-        listeningIn: (lang, n) => `Počúvam v ${lang} (${n} v miestnosti)`
+        noToken: "Nepodarilo sa prihlásiť.",
+        listeningIn: (lang, n) => `Počúvam v ${lang}`,
       },
       cs: {
         title: "Poslouchejte ve svém jazyce",
-        room: "Kód místnosti",
         lang: "Můj jazyk",
-        vol: "Hlasitost zvuku",
         start: "Začít poslouchat",
-        stop: "Zastavit",
+        stop: "Ukončit poslech",
         caps: "Živé titulky",
         presentation: "Režim prezentace",
         exitPresentation: "Ukončit režim prezentace",
         notice: "Používejte sluchátka. Přeložený hlas hraje zde; titulky se zobrazují níže.",
         connectedWaiting: "Připojeno. Čeká se na mluvčího...",
         disconnected: "Odpojeno.",
-        enterRoom: "Zadejte kód místnosti.",
-        noToken: "Nepodařilo se přihlásit jako host.",
-        listeningIn: (lang, n) => `Poslouchám v ${lang} (${n} v místnosti)`
+        noToken: "Nepodařilo se přihlásit.",
+        listeningIn: (lang, n) => `Poslouchám v ${lang}`,
       },
       fr: {
         title: "Écoutez dans votre langue",
-        room: "Code de salle",
         lang: "Ma langue",
-        vol: "Volume audio",
         start: "Commencer l'écoute",
-        stop: "Arrêter",
+        stop: "Arrêter l'écoute",
         caps: "Sous-titres en direct",
         presentation: "Mode présentation",
         exitPresentation: "Quitter le mode présentation",
         notice: "Portez des écouteurs. La voix traduite est diffusée ici; les sous-titres apparaissent ci-dessous.",
         connectedWaiting: "Connecté. En attente de l'orateur...",
         disconnected: "Déconnecté.",
-        enterRoom: "Entrez le code de la salle.",
-        noToken: "Impossible de s'authentifier en invité.",
-        listeningIn: (lang, n) => `Écoute en ${lang} (${n} dans la salle)`
+        noToken: "Authentification échouée.",
+        listeningIn: (lang, n) => `Écoute en ${lang}`,
       },
-      pl: {
-        title: "Słuchaj w swoim języku",
-        room: "Kod pokoju",
-        lang: "Mój język",
-        vol: "Głośność dźwięku",
-        start: "Rozpocznij słuchanie",
-        stop: "Zatrzymaj",
-        caps: "Napisy na żywo",
-        presentation: "Tryb prezentacji",
-        exitPresentation: "Zakończ tryb prezentacji",
-        notice: "Załóż słuchawki. Przetłumaczony głos jest odtwarzany tutaj; napisy pojawiają się poniżej.",
-        connectedWaiting: "Połączono. Oczekiwanie na mówcę...",
-        disconnected: "Rozłączono.",
-        enterRoom: "Wprowadź kod pokoju.",
-        noToken: "Błąd uwierzytelnienia gościa.",
-        listeningIn: (lang, n) => `Słucham w ${lang} (${n} w pokoju)`
-      }
     };
 
     const $ = id => document.getElementById(id);
     const qs = new URLSearchParams(location.search);
 
-    if (qs.get('room')) $('room').value = qs.get('room');
-    if (qs.get('lang')) $('lang').value = qs.get('lang');
+    // Room and language come from URL params or defaults — backend handles the rest.
+    const urlRoom = qs.get('room') || '';
+    const urlLang = qs.get('lang') || 'en';
+    $('lang').value = urlLang;
 
     let currentLocale = $('lang').value;
     if (!I18N[currentLocale]) currentLocale = 'en';
@@ -428,28 +236,21 @@
     function applyLocale(loc) {
       const t = I18N[loc] || I18N.en;
       $('titleTxt').textContent = t.title;
-      $('lblRoom').textContent = t.room;
       $('lblLang').textContent = t.lang;
-      $('lblVol').textContent = t.vol;
       $('lblCaptions').textContent = t.caps;
-      $('state').textContent = t.notice;
       $('togglePresentationBtn').textContent = document.body.classList.contains('presentation-mode') ? t.exitPresentation : t.presentation;
       if (!ws) $('go').textContent = t.start;
       else $('go').textContent = t.stop;
     }
-
     applyLocale(currentLocale);
 
     let ws = null, ctx = null, gainNode = null, playAt = 0, roomEnded = false;
 
-    // Volume control
-    $('volumeSlider').addEventListener('input', e => {
+    $('volumeSlider') && $('volumeSlider').addEventListener('input', e => {
       const v = parseFloat(e.target.value);
-      $('volVal').textContent = Math.round(v * 100) + '%';
       if (gainNode) gainNode.gain.value = v;
     });
 
-    // Presentation Mode toggle
     $('togglePresentationBtn').addEventListener('click', () => {
       document.body.classList.toggle('presentation-mode');
       const t = I18N[$('lang').value] || I18N.en;
@@ -473,54 +274,40 @@
         const t = Math.max(ctx.currentTime + 0.02, playAt);
         s.start(t);
         playAt = t + a.duration;
-
-        // Visual pulse while audio is actively playing
         const dot = document.querySelector('#statusBadge .dot');
         if (dot) dot.classList.add('pulse');
         setTimeout(() => {
           if (dot && ctx.currentTime >= playAt - 0.05) dot.classList.remove('pulse');
         }, a.duration * 1000);
-      }).catch(err => {
-        console.warn('Decode audio error:', err);
-      });
+      }).catch(err => console.warn('Decode audio error:', err));
     }
 
     $('go').onclick = async () => {
       const loc = I18N[$('lang').value] || I18N.en;
       if (ws) {
-        ws.close();
-        ws = null;
+        ws.close(); ws = null;
         $('go').textContent = loc.start;
-        if (!roomEnded) $('state').textContent = loc.disconnected;   // keep "the speaker has ended this session"
+        if (!roomEnded) $('state').textContent = loc.disconnected;
         $('statusBadge').className = 'badge';
         $('badgeText').textContent = loc.disconnected;
-        return;
-      }
-
-      const room = $('room').value.trim();
-      if (!room) {
-        $('state').textContent = loc.enterRoom;
-        $('room').focus();
         return;
       }
 
       ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
       if (!gainNode) {
         gainNode = ctx.createGain();
-        gainNode.gain.value = parseFloat($('volumeSlider').value);
+        gainNode.gain.value = 1.0;
         gainNode.connect(ctx.destination);
       }
       await ctx.resume();
       playAt = 0;
 
       const tk = await token();
-      if (!tk) {
-        $('state').textContent = loc.noToken;
-        return;
-      }
+      if (!tk) { $('state').textContent = loc.noToken; return; }
 
       const scheme = location.protocol === 'https:' ? 'wss://' : 'ws://';
-      const url = `${scheme}${location.host}/ws/listen?room=${encodeURIComponent(room)}&lang=${$('lang').value}&token=${encodeURIComponent(tk)}`;
+      // Room from URL param; backend handles room creation/lookup.
+      const url = `${scheme}${location.host}/ws/listen?room=${encodeURIComponent(urlRoom)}&lang=${$('lang').value}&token=${encodeURIComponent(tk)}`;
       ws = new WebSocket(url);
       ws.binaryType = 'arraybuffer';
 
@@ -540,9 +327,7 @@
       };
 
       ws.onmessage = ev => {
-        if (typeof ev.data !== 'string') {
-          return play(ev.data);
-        }
+        if (typeof ev.data !== 'string') { return play(ev.data); }
         const m = JSON.parse(ev.data);
         if (m.type === 'error') {
           $('state').textContent = m.message;
@@ -550,23 +335,20 @@
           $('state').textContent = 'The speaker has ended this session.';
           roomEnded = true;
         } else if (m.type === 'joined') {
-          $('state').textContent = loc.listeningIn(m.lang.toUpperCase(), m.listeners);
+          $('state').textContent = loc.listeningIn(m.lang.toUpperCase());
         } else if (m.type === 'room_caption') {
           const card = document.createElement('div');
           card.className = 'cap-card';
-
           const trans = document.createElement('div');
           trans.className = 'cap-trans';
           trans.textContent = m.translated;
           card.appendChild(trans);
-
           if (m.source && m.source !== m.translated) {
             const src = document.createElement('div');
             src.className = 'cap-src';
             src.textContent = m.source;
             card.appendChild(src);
           }
-
           $('caps').prepend(card);
         }
       };

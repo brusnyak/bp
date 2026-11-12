@@ -14,7 +14,9 @@ import numpy as np
 from backend.stt.voxtral_stt import VoxtralSTT, _Stream
 
 DEFAULT_REPO = "mlx-community/nemotron-3.5-asr-streaming-0.6b-8bit"
-LANGUAGES = frozenset("en es de fr it ar ja ko pt ru hi zh vi he nl cs da pl no sv th tr bg el et fi hr hu lt lv ro sk uk mt sl".split())
+# Slovak is left out on purpose: the model lists it, but the saved sk->en route run scored 41% word error (documentation/evidence/2026-11-09) against 6.4% for the
+# Slovak fine-tune (documentation/evidence/2026-11-10 strategy matrix), so a Slovak source falls back to Whisper (see _effective_stt_engine in backend/main.py).
+LANGUAGES = frozenset("en es de fr it ar ja ko pt ru hi zh vi he nl cs da pl no sv th tr bg el et fi hr hu lt lv ro uk mt sl".split())
 
 
 def prompt_key(prompt_dictionary, lang: Optional[str]) -> Optional[str]:

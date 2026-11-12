@@ -98,7 +98,7 @@ class Room:
             ch = self.channels.setdefault(lang, _Channel())
             if ch.task is None or ch.task.done():
                 ch.task = asyncio.get_running_loop().create_task(self._worker(lang, ch))
-            ch.queue.put_nowait((text, src_lang, onset, translate or default_translate, synth or default_synth, now))
+            ch.queue.put_nowait((text, src_lang, onset, translate or default_translate, synth or default_synth, now, now()))
             n += 1
         self.published += 1
         return n
@@ -126,7 +126,8 @@ class Room:
                 ch.queue.task_done()
 
     async def _deliver(self, lang: str, ch: _Channel, item: tuple) -> None:
-        text, src_lang, onset, translate, synth, now = item
+        text, src_lang, onset, translate, synth, now, queued_at = item
+        t_start = now()
         targets: List[Listener] = [l for l in self.listeners.values() if l.lang == lang]
         if not targets:
             return
@@ -136,18 +137,25 @@ class Room:
         if lang == src_lang:                                  # the listener understands the speaker: captions only, no synthetic voice
             caption["translated"] = text
         else:
+            t_mt = now()
             translated = (await translate(text, src_lang, lang)).strip()
+            mt_s = now() - t_mt
             if not translated:
                 return
             caption["translated"] = translated
+            t_tts = now()
             audio, sr = await synth(translated, lang)
+            tts_s = now() - t_tts
             lead = ch.sched.lead_silence(onset, now()) if (prosody.ENABLED and onset is not None) else 0.0
             if lead > 0:
                 audio = np.concatenate([np.zeros(int(sr * lead), dtype=np.asarray(audio).dtype), np.asarray(audio)])
             ch.sched.committed(len(audio) / sr - lead)
             import soundfile as sf
             buf = io.BytesIO(); sf.write(buf, audio, sr, format="WAV"); wav = buf.getvalue()
+        t_send = now()
         await asyncio.gather(*(self._send(lst, caption, wav) for lst in targets))   # concurrent: one slow phone must not delay the rest
+        if wav is not None:   # where a phrase's time went in this language, so a room run explains its own lag (queue = waited behind earlier phrases of the same language)
+            log.info("ROOMPARTS lang=%s seq=%d listeners=%d queue=%.2f mt=%.2f tts=%.2f send=%.2f", lang, ch.seq, len(targets), t_start - queued_at, mt_s, tts_s, now() - t_send)
 
     async def _send(self, lst: Listener, caption: dict, wav: Optional[bytes]) -> None:
         try:

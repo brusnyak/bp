@@ -1,9 +1,12 @@
-# Documentation index (current as of 2026-11-07)
+# Documentation index (current as of 2026-11-10)
 
-Start here: [`../README.md`](../README.md) (what it is, install, configuration), then:
+Start here: [`../README.md`](../README.md) (what it is, install, configuration), then the current plan, then the rest:
 
 | Read | When |
 |---|---|
+| [`PLAN_2026-11-10.md`](PLAN_2026-11-10.md) | **Current plan and decisions** (2 s goal, Slovak-input result, voice options, ordered actions, owner decisions). Wins over older pages where they disagree |
+| [`HANDOFF_2026-11-10.md`](HANDOFF_2026-11-10.md) | **Start a new session here**: decisions, measured state, Kaggle kernels, ordered next steps |
+| [`evidence/2026-11-10/`](evidence/2026-11-10/) | Receipts for the plan: strategy matrix on generic audio, TTS latency probes |
 | [`STATUS.md`](STATUS.md) | Where the project stands: what works, what is measured but not built, what is not built, decisions |
 | [`LANGUAGES.md`](LANGUAGES.md) | Best configuration per language and hardware, with measured quality and timing |
 | [`BENCHMARKS.md`](BENCHMARKS.md) | Method, results, negative results and limits; how to rerun on Kaggle |

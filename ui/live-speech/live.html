@@ -177,16 +177,10 @@
             <label for="roomIdInput">Audience broadcast (room mode)</label>
             <div style="display:flex;gap:8px;align-items:center;">
               <input id="roomIdInput" class="control-select" placeholder="Press Start room" readonly style="flex:1;">
-              <button id="startRoomBtn" type="button" class="btn btn-secondary" style="width:auto;white-space:nowrap;padding:0.4rem 0.8rem;" title="Create a room; listeners join by link or QR code">Start room</button>
-              <button id="copyRoomLinkBtn" type="button" class="btn btn-secondary" style="width:auto;white-space:nowrap;padding:0.4rem 0.8rem;" title="Copy audience listener link">Copy link</button>
-            </div>
-            <div id="roomQrBox" style="display:none;margin-top:8px;">
-              <div id="roomQr" style="width:160px;max-width:100%;background:#fff;padding:6px;border-radius:6px;" role="img" aria-label="QR code with the listener link"></div>
-              <div id="roomLinkText" class="hint-text" style="margin-top:4px;word-break:break-all;"></div>
-              <div id="roomLanWarn" class="hint-text" style="display:none;margin-top:4px;color:var(--warn,#b45309);">Phones cannot reach this computer yet: restart the server with <code>BP_HOST=0.0.0.0</code> (and the same Wi-Fi), then press Start room again.</div>
+              <button id="startRoomBtn" type="button" class="btn btn-secondary" style="width:auto;white-space:nowrap;padding:0.4rem 0.8rem;" title="Create a room; listeners join by link">Start room</button>
             </div>
             <div id="roomStatusInfo" class="hint-text" style="display:none;margin-top:4px;">
-              <span id="roomListenerCount">0 listeners connected</span> &bull; <a id="roomPreviewLink" href="#" target="_blank" style="color:var(--accent,#C41E3A);">Open listener page</a>
+              <span id="roomListenerCount">0 listeners connected</span>
             </div>
           </div>
         </div>

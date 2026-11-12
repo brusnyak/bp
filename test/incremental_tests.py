@@ -43,3 +43,10 @@ def test_fragmenter_records_hold_of_oldest_word():
     f.push([("morning,", 0.3, 0.8)], now=10.5)
     assert f.pop(10.9) == "Good morning,"         # clause end with >= 2 words
     assert abs(f.hold_s - 0.9) < 1e-9             # waited since the first word was pushed
+
+
+def test_stream_end_never_uses_a_wall_clock():
+    from backend.stt.incremental import stream_end
+    assert stream_end([1.0, 2.5], 9.0) == 2.5       # frames left: their newest time
+    assert stream_end([], 7.25) == 7.25             # all trimmed: the last pushed stream time, not time.perf_counter()
+    assert stream_end([], None) == 0.0
