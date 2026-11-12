@@ -22,7 +22,7 @@ Google Meet speech translation requires an eligible plan: Google AI Pro or Ultra
 
 English spoken, Slovak or German heard; generated reading and the owner's English recording; scored with `scripts/live/score_success.py` on a `scripts/live/paced_replay.py` run, recognition error with `scripts/live/strategy_lab.py`:
 
-1. Lag behind the speech position: median at most 3.0 s, p90 at most 4.5 s.
+1. Lag behind the speech position: median at most 2.0 s (owner 2026-11-10, was 3.0 s), p90 at most 4.5 s (unchanged; owner has not restated it).
 2. Early start: of sentences with 8 or more words, at least half have the voice of their first clause start before the sentence ends.
 3. No drift: lag grows by at most 0.5 s per minute of speech.
 4. Quality: English recognition error at most 8% on whole phrases of the owner's recording; translation not worse than the Opus-MT baseline; no dropped phrase.

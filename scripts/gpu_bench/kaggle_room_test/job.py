@@ -50,12 +50,12 @@ def prefix_wer(hyp_text):
 
 
 PORT = 8013
-PLAN = [('baseline', None), ('room3', 'de,sk,fr'), ('room12', 'de,de,de,de,sk,sk,sk,sk,fr,fr,fr,fr')]
-def run(name, langs):
+PLAN = [('baseline', None, {}), ('room3', 'de,sk,fr', {}), ('room3_mtgpu', 'de,sk,fr', {'BP_MT_DEVICE': 'cuda'}), ('room12', 'de,de,de,de,sk,sk,sk,sk,fr,fr,fr,fr', {})]   # room3_mtgpu: is the lag CPU contention (MT on the CPU for every language)?
+def run(name, langs, extra_env):
     slog = OUT / f'server_{name}.log'; out_json = OUT / f'replay_{name}.json'; lj = OUT / f'listeners_{name}.json'; room = f'kagroom{name}'
     env = {**base_env, 'BP_NO_SSL': '1', 'BP_PORT': str(PORT), 'BP_ENABLE_RATE_LIMIT': '0', 'BP_DEVICE': 'cuda', 'BP_COMPUTE_TYPE': 'float16', 'BP_STT_MODEL': 'large-v3-turbo',
            'BP_MT_DEVICE': 'cpu', 'BP_PROSODY': '1', 'BP_SILENCE_RMS': '0', 'BP_INCREMENTAL': '1', 'BP_INCR_STEP_S': '1.0', 'JWT_SECRET': secrets.token_urlsafe(32),
-           'BP_LOG_PATH': str(OUT / f'applog_{name}.log')}
+           'BP_LOG_PATH': str(OUT / f'applog_{name}.log'), **extra_env}
     srv = subprocess.Popen([sys.executable, 'app.py'], cwd=BP, env=env, stdout=open(slog, 'w'), stderr=subprocess.STDOUT)
     try:
         for _ in range(150):
@@ -85,6 +85,11 @@ def run(name, langs):
         d = json.loads(out_json.read_text()); r = d['rates']['1.0']; lag = r['lag_s']
         rec = {'speaker_lag_median_s': round(st.median(lag), 2), 'speaker_lag_p90_s': round(sorted(lag)[int(.9 * len(lag))], 2), 'speaker_segments': r['segments'], 'speaker_with_audio': r['with_audio'],
                'server_errors': len(re.findall(r'Traceback|ERROR', slog.read_text(errors='ignore'))), 'wall_s': round(time.time() - t)}
+        parts = [dict(re.findall(r'(\w+)=([\w.]+)', m)) for m in re.findall(r'ROOMPARTS .*', slog.read_text(errors='ignore') + (OUT / f'applog_{name}.log').read_text(errors='ignore') if (OUT / f'applog_{name}.log').exists() else slog.read_text(errors='ignore'))]
+        if parts:   # per language: where the room's time went (queue = waited behind earlier phrases, mt, tts, send), medians over phrases
+            by = {}
+            for q in parts: by.setdefault(q['lang'], []).append(q)
+            rec['room_parts_median_s'] = {l: {k: round(st.median(float(x[k]) for x in v), 2) for k in ('queue', 'mt', 'tts', 'send')} | {'phrases': len(v)} for l, v in by.items()}
         if lis:
             try: lis.wait(timeout=240)
             except Exception: lis.kill()
@@ -103,5 +108,6 @@ def run(name, langs):
         try: srv.wait(timeout=20)
         except Exception: srv.kill()
         time.sleep(3)
-for n_, l_ in PLAN: run(n_, l_)
+R['env']['cpus'] = os.cpu_count()
+for n_, l_, e_ in PLAN: run(n_, l_, e_)
 R['status'] = 'done'; log('done', wall_s=round(time.time() - T0))

@@ -1933,7 +1933,9 @@ async def _process_speech_segment_pipeline(
 
     # Emit in segment order: STT/MT are FIFO under model_call_lock, but TTS runs unlocked, so a short
     # later segment could otherwise interleave its audio ahead of a longer earlier one.
+    order_wait_s = 0.0   # time this piece's voice waited for the previous piece's voice to finish (one share of the lag)
     if tts_seq:
+        _ow0 = time.perf_counter()
         events = session_data.setdefault("tts_events", {})
         previous = events.setdefault(tts_seq - 1, asyncio.Event())
         try:
@@ -1941,6 +1943,7 @@ async def _process_speech_segment_pipeline(
         except asyncio.TimeoutError:
             logging.warning(f"Backend: Session {client_info}: segment {tts_seq - 1} did not finish in 20 s; not waiting further.")
         events.pop(tts_seq - 1, None)
+        order_wait_s = time.perf_counter() - _ow0
 
     # --- TTS ---
     # Standard non-streaming synthesis (Piper or fallback)
@@ -2069,6 +2072,9 @@ async def _process_speech_segment_pipeline(
         first_audio_sent_time - source_onset_time
         if first_audio_sent_time is not None and source_onset_time is not None else None)
     metrics_payload["source_onset_time"] = source_onset_time
+    metrics_payload["order_wait_s"] = round(order_wait_s, 3)
+    metrics_payload["tts_first_audio_s"] = round(first_audio_sent_time - tts_start_time, 3) if first_audio_sent_time is not None else None
+    logging.info(f"LAGPARTS stt={stt_total_time:.2f} mt={mt_total_time:.2f} order_wait={order_wait_s:.2f} tts_first={metrics_payload['tts_first_audio_s']} tts_total={tts_total_time:.2f}")   # with `INCR emit: hold=` one grep shows where a piece's lag went
     metrics_payload["first_audio_sent_time"] = first_audio_sent_time
     if is_final:
         metrics_payload["total_latency"] = stt_total_time + mt_total_time + tts_total_time
@@ -2118,7 +2124,7 @@ async def _run_pipeline_task(websocket, audio_segment_np, segment_start_time, is
 # captioner_lock — a chunk is dropped, never queued, if the previous call hasn't returned yet, so
 # this can never build backlog the way the old always-full-pipeline streaming path did.
 # ---- Incremental (simultaneous) mode ------------------------------------------------------------
-from backend.stt.incremental import Agreement, Fragmenter
+from backend.stt.incremental import Agreement, Fragmenter, stream_end
 
 INCREMENTAL_STEP_S = float(os.environ.get("BP_INCR_STEP_S", "0.7"))      # min new audio between hypotheses
 INCREMENTAL_MIN_AUDIO_S = float(os.environ.get("BP_INCR_MIN_AUDIO_S", "1.0"))
@@ -2157,6 +2163,7 @@ class _IncState:
         self.committed = 0
         self.context = ""
         self.stream = None   # engine-native streaming state (VoxtralSTT.open_stream), None on Whisper
+        self.last_push_t = None   # stream-clock time of the newest audio pushed to the engine (the flush time when no frames are left)
 
 
 async def _emit_fragment(websocket, session_config, client_info, session_data, text, span, source_onset_time=None, hold_s=None):
@@ -2193,6 +2200,7 @@ async def _incremental_step(websocket, session_data, session_config, client_info
                 words = await loop.run_in_executor(None, stt.stream_feed, inc.stream, audio)
                 logging.debug(f"INCR stream feed: {n*VAD_FRAME_DURATION/1000:.2f}s audio took {time.perf_counter()-_t:.2f}s")
             frames.trim(n)
+            inc.last_push_t = times[-1]
             _push_stream_words(inc, words, times[-1])
             text = inc.frag.pop(time.perf_counter())
             if text:
@@ -2243,7 +2251,7 @@ async def _incremental_close(websocket, session_config, client_info, session_dat
                 inc.stream = await loop.run_in_executor(None, stt.open_stream, (None if session_config.get("source_lang") == "auto" else session_config.get("source_lang")))
             tail = np.concatenate(frames) if len(frames) else np.zeros(0, dtype=np.float32)
             words = await loop.run_in_executor(None, lambda: stt.stream_feed(inc.stream, tail, True))
-        t_end = frames.t[-1] if frames.t else time.perf_counter()
+        t_end = stream_end(frames.t, inc.last_push_t)
         frames.clear()
         _push_stream_words(inc, words, t_end)
     text = inc.frag.pop(time.perf_counter(), final=True)

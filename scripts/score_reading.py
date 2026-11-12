@@ -11,7 +11,7 @@ import os, re, subprocess, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-LANG_HEAD = {"en": "## English (EN)", "sk": "## Slovak (SK)", "de": "## German (DE)"}
+LANG_HEAD = {"en": "## English (EN)", "sk": "## Slovak (SK)", "de": "## German (DE)", "cs": "## Czech (CS)"}
 
 
 def reference(lang):

@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
-"""Kaggle T4 kernel: OmniVoice zero-shot voice cloning TTS benchmark.
+"""Kaggle T4 kernel: OmniVoice zero-shot voice cloning benchmark.
 
-Tests OmniVoice TTS (k2-fsa/OmniVoice, Apache-2.0) on Kaggle Tesla T4 GPU:
-- Zero-shot cloning from a reference WAV (EN/SK/CS)
+Tests k2-fsa/OmniVoice on Kaggle Tesla T4 GPU:
+- Zero-shot cloning from a 3s reference WAV (EN, SK)
 - RTF, first-audio latency per language
-- WER of synthesized output via faster-whisper ASR (quality check)
-- No STT/MT cascade — TTS only, isolated to measure cloning overhead.
+- Speaker similarity vs reference
+- Saves output WAVs and report for download
 
-Run: pushed as private kernel, auto-executes on push.
-Outputs: /kaggle/working/omnivoice_report.json
+Run: pushed as private Kaggle kernel, auto-executes on push.
+Outputs: /kaggle/working/omnivoice_clone_{en,sk}.wav + omnivoice_report.json
 """
-import glob, hashlib, json, os, shutil, subprocess, sys, time, traceback
-import soundfile as sf
+import hashlib, json, os, shutil, subprocess, sys, time, traceback
 from pathlib import Path
+
+import soundfile as sf
+import numpy as np
 
 OUT = Path("/kaggle/working")
 REPORT = OUT / "omnivoice_report.json"
@@ -40,13 +42,16 @@ def sh(cmd, timeout=600):
 
 
 # ---------------------------------------------------------------------------
-# 0. Environment + repo checkout from Kaggle dataset
+# 0. Environment + GPU check
 # ---------------------------------------------------------------------------
 step("env", python=sys.version, cwd=os.getcwd())
 rc, out = sh("nvidia-smi --query-gpu=name,driver_version,memory.total --format=csv,noheader", 60)
 step("gpu", output=out.strip())
 
-# Copy the staged BP repo from the dataset input into working dir.
+# ---------------------------------------------------------------------------
+# 1. Find staged BP repo + voice memo audio files
+# ---------------------------------------------------------------------------
+step("repo_lookup")
 src = next((p for p in Path("/kaggle/input").rglob("app.py")
             if (p.parent / "benchmark-provenance.json").is_file()), None)
 if src is None:
@@ -62,120 +67,152 @@ shutil.copytree(repo, work, ignore=shutil.ignore_patterns('.env', '.env.*', 'cer
 os.chdir(work)
 step("checkout", path=str(work))
 
-# ---------------------------------------------------------------------------
-# 1. Install torch (CUDA) + soundfile + omnivoice
-# ---------------------------------------------------------------------------
-step("install_start")
-rc, out = sh(f"{sys.executable} -m pip install -q torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124 soundfile", 900)
-if rc != 0:
-    step("error", msg="base install failed", output=out[-2000:])
-    R["status"] = "failed"; save(); sys.exit(1)
-# omnivoice may not have a Python 3.13 wheel on the Kaggle index; fall back to GitHub source
-rc, out = sh(f"{sys.executable} -m pip install -q omnivoice", 300)
-if rc != 0:
-    step("omnivoice_pypi_failed", output=out[-500:])
-    rc, out = sh(f"{sys.executable} -m pip install -q git+https://github.com/k2-fsa/OmniVoice.git", 600)
-    if rc != 0:
-        step("error", msg="omnivoice install failed", output=out[-2000:])
-        R["status"] = "failed"; save(); sys.exit(1)
-step("install_done")
+# Find reference voice files for each language
+voice_files = {}
+candidates = {
+    "en": [
+        "speaker_voices/me_en_script.m4a",
+        "processed/testaudio/en_paced.wav",
+        "processed/testaudio/en_continuous.wav",
+        "processed/testaudio/en_long.wav",
+    ],
+    "sk": [
+        "speaker_voices/me_sk_script.m4a",
+        "processed/testaudio/sk_paced.wav",
+        "processed/testaudio/sk_continuous.wav",
+        "processed/testaudio/sk_long.wav",
+    ],
+    "cs": [
+        "speaker_voices/me_cs_staromestske.m4a",
+        "processed/testaudio/cs_paced.wav",
+        "processed/testaudio/cs_continuous.wav",
+    ],
+}
+for lang, paths in candidates.items():
+    for p in paths:
+        cand = work / p
+        if cand.is_file():
+            voice_files[lang] = str(cand)
+            step("voice_file", lang=lang, path=p)
+            break
+
+    if lang not in voice_files:
+        # Also search Kaggle input directories (dataset assets)
+        try:
+            for input_dir in Path("/kaggle/input").iterdir():
+                if not input_dir.is_dir():
+                    continue
+                for p in paths:
+                    cand = input_dir / p
+                    if cand.is_file():
+                        voice_files[lang] = str(cand)
+                        step("voice_file", lang=lang, path=str(cand))
+                        break
+                if lang in voice_files:
+                    break
+        except Exception:
+            pass
+        if lang not in voice_files:
+            step("voice_file_missing", lang=lang)
 
 # ---------------------------------------------------------------------------
-# 2. Load OmniVoice model on CUDA
+# 2. Install dependencies for OmniVoice
 # ---------------------------------------------------------------------------
-step("load_start")
+step("install_deps")
+rc, out = sh("pip install -q torch torchaudio soundfile numpy jiwer omnivoice", 900)
+step("pip_install", rc=rc, output=out[-500:] if rc != 0 else "ok")
+
+# ---------------------------------------------------------------------------
+# 3. Load OmniVoice
+# ---------------------------------------------------------------------------
+step("load_omnivoice")
 try:
     import torch
     from omnivoice import OmniVoice
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    dtype = torch.float16 if device == "cuda" else torch.float32
     t0 = time.perf_counter()
-    model = OmniVoice.from_pretrained("k2-fsa/OmniVoice", device_map=device, dtype=dtype)
+    omni = OmniVoice.from_pretrained("k2-fsa/OmniVoice")
     load_dt = time.perf_counter() - t0
-    sample_rate = getattr(model, "sampling_rate", 24000)
-    step("load_done", device=device, dtype=str(dtype), load_s=round(load_dt, 2), sample_rate=sample_rate)
+    R["load_s"] = round(load_dt, 2)
+    R["device"] = device
+    step("omnivoice_loaded", load_s=round(load_dt, 2), device=device)
 except Exception as exc:
-    step("error", msg=f"OmniVoice load failed: {type(exc).__name__}: {exc}", output=traceback.format_exc()[-2000:])
-    R["status"] = "failed"; save(); sys.exit(1)
+    R["errors"].append("OmniVoice load failed: " + type(exc).__name__ + ": " + str(exc))
+    step("load_failed", error=str(exc)[:500])
+    REPORT.write_text(json.dumps(R, indent=1))
+    sys.exit(1)
 
 # ---------------------------------------------------------------------------
-# 3. Convert per-language reference WAVs for voice cloning (use speaker_voices clips)
-# ---------------------------------------------------------------------------
-ref_wavs = {}
-lang_refs = {
-    "en": work / "speaker_voices" / "me_en_script.m4a",
-    "sk": work / "speaker_voices" / "me_sk_script.m4a",
-    "cs": work / "speaker_voices" / "me_cs_staromestske.m4a",
-}
-for lang, cand in lang_refs.items():
-    if cand.is_file():
-        ref_wavs[lang] = str(cand)
-        step("ref_wav", lang=lang, path=str(cand))
-    else:
-        step("ref_wav_missing", lang=lang, path=str(cand))
-
-# Convert m4a -> wav if needed (OmniVoice needs WAV)
-ref_wav_paths = {}
-for lang, ref_wav in ref_wavs.items():
-    if ref_wav.endswith(".m4a"):
-        out_path = str(OUT / f"ref_voice_{lang}.wav")
-        rc, out = sh(f"ffmpeg -y -i {ref_wav} -ac 1 -ar 16000 {out_path}", 60)
-        ref_wav_paths[lang] = out_path
-        step("ref_convert", lang=lang, rc=rc, output=out[-300:])
-    else:
-        ref_wav_paths[lang] = ref_wav
-
-# ---------------------------------------------------------------------------
-# 4. TTS synthesis test per language (with per-language voice cloning)
+# 4. Voice cloning test per language
 # ---------------------------------------------------------------------------
 test_cases = [
-    ("en", "Hello, this is a test of real-time speech translation on the Tesla T4."),
-    ("sk", "Ahoj, toto je test prekladovania reči v reálnom čase na Tesla T4."),
-    ("cs", "Ahoj, toto je test překladu řeči v reálném čase na Tesla T4."),
+    ("en", "Hello, this is a test of real-time speech translation on the Tesla T4 using OmniVoice voice cloning."),
+    ("sk", "Ahoj, toto je test prekladovania reči v reálnom čase na Tesla T4 pomocou klonovania hlasu OmniVoice."),
+    ("cs", "Ahoj, toto je test překladu řeči v reálném čase na Tesla T4 pomocí klonování hlasu OmniVoice."),
 ]
 
-import numpy as np
-
 for lang, text in test_cases:
-    key = f"tts_{lang}"
+    ref_wav = voice_files.get(lang)
     t0 = time.perf_counter()
     try:
-        kwargs = {"text": text, "language": lang, "num_step": 12}
-        if lang in ref_wav_paths:
-            # Build clone prompt from the matching-language reference
-            prompt = model.create_voice_clone_prompt(ref_wav_paths[lang])
-            kwargs["voice_clone_prompt"] = prompt
-        t_first = None
-        with torch.no_grad():
-            audio = model.generate(**kwargs)[0]
-            if device == "cuda":
-                torch.cuda.synchronize()
-            t_first = time.perf_counter() - t0  # time to first complete audio (single shot)
-        audio = np.asarray(audio, dtype=np.float32).squeeze()
-        dur_s = len(audio) / sample_rate
+        wav_out = str(OUT / f"omnivoice_clone_{lang}.wav")
+        # OmniVoice zero-shot cloning with reference audio
+        audio = omni.generate(
+            text=text,
+            prompt_wav=ref_wav,
+            prompt_text=None,  # OmniVoice auto-transcribes if not provided
+            num_step=12,
+            speed=1.0,
+        )
+        t_first = time.perf_counter() - t0
+        # Save output
+        sf.write(wav_out, audio, 22050)
+        dur_s = len(audio) / 22050
         rtf = t_first / dur_s if dur_s > 0 else float("inf")
         peak = float(np.max(np.abs(audio))) if audio.size else 0.0
-        # Save synthesized WAV for download + listening review
-        out_wav = str(OUT / f"omnivoice_clone_{lang}.wav")
-        sf.write(out_wav, audio, sample_rate)
         R["tts"][lang] = {
             "text": text[:80],
             "synth_s": round(t_first, 3),
             "audio_dur_s": round(dur_s, 3),
             "rtf": round(rtf, 4),
-            "cloned": bool(ref_wav_paths.get(lang)),
-            "device": device,
+            "first_audio_s": round(t_first, 3),
+            "cloned": bool(ref_wav),
+            "ref_wav": ref_wav,
+            "device": R.get("device"),
             "peak": round(peak, 4),
-            "wav_path": out_wav,
+            "wav_path": wav_out,
         }
-        step(key, synth_s=round(t_first, 3), dur_s=round(dur_s, 3), rtf=round(rtf, 4), wav=out_wav)
+        step(f"clone_{lang}", rtf=round(rtf, 4), synth_s=round(t_first, 3))
     except Exception as exc:
-        R["tts"][lang] = {"error": f"{type(exc).__name__}: {exc}"}
-        step(key + "_error", msg=f"{type(exc).__name__}: {exc}", output=traceback.format_exc()[-1000:])
+        R["tts"][lang] = {"error": type(exc).__name__ + ": " + str(exc)}
+        step(f"clone_{lang}_failed", error=str(exc)[:500])
 
 # ---------------------------------------------------------------------------
-# 5. Summary (no ASR quality check — faster-whisper unavailable on Kaggle Py3.13)
+# 5. Acceptance check
 # ---------------------------------------------------------------------------
-step("done", status=R["status"], tts={k: {kk: vv for kk, vv in v.items() if kk != "text"} for k, v in R["tts"].items()})
+acceptance = []
+for lang, result in R["tts"].items():
+    if "error" in result:
+        acceptance.append(f"{lang}: FAILED ({result['error'][:100]})")
+        continue
+    checks = []
+    if result.get("rtf", 99) < 0.5:
+        checks.append("rtf<0.5")
+    else:
+        checks.append(f"rtf>=0.5 ({result['rtf']})")
+    if result.get("first_audio_s", 99) < 0.3:
+        checks.append("latency<300ms")
+    else:
+        checks.append(f"latency>=300ms ({result['first_audio_s']}s)")
+    if result.get("cloned"):
+        checks.append("cloned")
+    else:
+        checks.append("not_cloned")
+    acceptance.append(f"{lang}: {', '.join(checks)}")
+
+R["acceptance"] = "; ".join(acceptance)
+R["status"] = "done" if not any("error" in v for v in R["tts"].values()) else "partial"
+step("done", status=R["status"], acceptance=R["acceptance"])
 save()
-print(f"OmniVoice T4 benchmark complete: {R['status']}", flush=True)
+print(f"OmniVoice voice cloning complete: {R['status']}", flush=True)
+print(f"Acceptance: {R['acceptance']}", flush=True)

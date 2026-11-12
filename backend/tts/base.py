@@ -45,6 +45,22 @@ try:
     from backend.tts.omni_tts import OmniVoiceTTS
 except ImportError:
     OmniVoiceTTS = None
+try:
+    from backend.tts.f5_tts import F5TTSWrapper
+except ImportError:
+    F5TTSWrapper = None
+try:
+    from backend.tts.e2_tts import E2TTSWrapper
+except ImportError:
+    E2TTSWrapper = None
+try:
+    from backend.tts.fish_audio_tts import FishAudioTTS
+except ImportError:
+    FishAudioTTS = None
+try:
+    from backend.tts.higgs_audio_tts import HiggsAudioTTS
+except ImportError:
+    HiggsAudioTTS = None
 
 
 def _piper_factory() -> PiperTTS:
@@ -124,6 +140,22 @@ def _omnivoice_factory() -> OmniVoiceTTS:
     return OmniVoiceTTS(device=hardware.detect_backend("tts_clone"))
 
 
+def _f5_tts_factory() -> F5TTSWrapper:
+    return F5TTSWrapper(device=hardware.detect_backend("tts_clone"))
+
+
+def _e2_tts_factory() -> E2TTSWrapper:
+    return E2TTSWrapper(device=hardware.detect_backend("tts_clone"))
+
+
+def _fish_audio_factory() -> FishAudioTTS:
+    return FishAudioTTS(device=hardware.detect_backend("tts_clone"))
+
+
+def _higgs_audio_factory() -> HiggsAudioTTS:
+    return HiggsAudioTTS(device=hardware.detect_backend("tts_clone"))
+
+
 TTS_ENGINES: Dict[str, Callable[[], object]] = {
     "piper": _piper_factory,
     "piper_personal": _piper_personal_factory,
@@ -140,5 +172,13 @@ if HybridTTS is not None:
     TTS_ENGINES["hybrid"] = _hybrid_factory
 if OmniVoiceTTS is not None:
     TTS_ENGINES["omnivoice"] = _omnivoice_factory
+if F5TTSWrapper is not None:
+    TTS_ENGINES["f5_tts"] = _f5_tts_factory
+if E2TTSWrapper is not None:
+    TTS_ENGINES["e2_tts"] = _e2_tts_factory
+if FishAudioTTS is not None:
+    TTS_ENGINES["fish_audio"] = _fish_audio_factory
+if HiggsAudioTTS is not None:
+    TTS_ENGINES["higgs_audio"] = _higgs_audio_factory
 if CoquiTTS is not None:
     TTS_ENGINES["xtts"] = _xtts_factory

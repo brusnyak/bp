@@ -47,6 +47,22 @@ def wav_seconds(b):
         return w.getnframes() / w.getframerate()
 
 
+def _robust_drift_slope(points):
+    """Least-squares slope of lag vs segment index (seconds per segment).
+    Robust to outliers vs naive last-minus-first; positive = lag growing over time."""
+    if len(points) < 2:
+        return 0.0
+    n = len(points)
+    sum_x = sum(p[0] for p in points)
+    sum_y = sum(p[1] for p in points)
+    sum_xy = sum(p[0] * p[1] for p in points)
+    sum_xx = sum(p[0] * p[0] for p in points)
+    denom = n * sum_xx - sum_x * sum_x
+    if denom == 0:
+        return 0.0
+    return (n * sum_xy - sum_x * sum_y) / denom
+
+
 def adaptive_rate(backlog_s):
     """Same table as ui/live-speech/session-playback.js: speed up only while behind (pitch preserved)."""
     return 1.0 if backlog_s < 1.0 else 1.15 if backlog_s < 2.5 else 1.3 if backlog_s < 4.0 else 1.45
@@ -163,7 +179,7 @@ async def run(a):
             "first_word_lag_s": [s.get("first_word_lag") for s in segs],
             "first_word_lag_max_s": max([s["first_word_lag"] for s in segs if "first_word_lag" in s] or [None]),
             "segment_s": [s.get("segment_s") for s in segs],
-            "lag_growth_s": (lags[-1] - lags[0]) if len(lags) > 1 else 0.0,
+            "lag_growth_s": _robust_drift_slope(list(enumerate(lags))) if len(lags) > 2 else (lags[-1] - lags[0] if len(lags) > 1 else 0.0),
             "last_listen_end_vs_input_end_s": round(max([s.get("listen_end", 0) for s in segs] + [0]) - end_media, 2)}
     report["tts_messages"] = sum(e["type"] == "tts_audio" for e in events)
     report["events"] = events

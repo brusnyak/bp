@@ -1,0 +1,16 @@
+{
+  "id": "yegorby/bp-piper-cs-finetune-t4",
+  "title": "BP Piper CS Finetune T4",
+  "code_file": "job.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [],
+  "competition_sources": [],
+  "kernel_sources": ["yegorby/bp-cs-voice-data-t4"],
+  "model_sources": [],
+  "category_ids": [],
+  "keywords": []
+}

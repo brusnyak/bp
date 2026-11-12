@@ -1,7 +1,7 @@
 """Pins for the engine registry + licence gate (spec 003, T007/T008).
 
 The load-bearing invariant: every engine the live pipeline can actually build MUST be
-registered, so no engine runs un-gated. The rest pins the fail-closed gate behaviour.
+registered, so no engine runs un-gated. The rest pins the warn-only licence policy (a label warns, never blocks).
 """
 import pytest
 
@@ -17,22 +17,28 @@ def test_every_live_tts_engine_is_registered():
     assert not missing, f"live TTS engines with no registry manifest: {sorted(missing)}"
 
 
-def test_gate_blocks_noncommercial_by_default():
+def test_noncommercial_engine_is_warned_not_blocked(caplog):
+    """Owner 2026-11-10: the project is a middleman, users own their licence compliance. A label warns, never blocks."""
     for stage, name in (("tts", "xtts"), ("mt", "nllb")):
         cap = reg.get(stage, name)
         if cap.license != "non-commercial":       # nllb factory may be absent, label still stands
             continue
-        with pytest.raises(PermissionError):
-            reg.select(stage, name)
-        assert reg.select(stage, name, allow_noncommercial=True) is cap
+        caplog.clear()
+        try:
+            assert reg.select(stage, name) is cap
+        except RuntimeError:                      # declared but not installed here: not a licence refusal
+            pass
+        assert any("licence compliance" in r.message for r in caplog.records)
 
 
-def test_gate_fails_closed_on_unknown_licence():
+def test_unknown_licence_is_warned_not_blocked(caplog):
     cap = reg.get("tts", "omnivoice")
     assert cap.license == "unknown"
-    with pytest.raises(PermissionError):
-        reg.select("tts", "omnivoice")
-    assert reg.select("tts", "omnivoice", allow_unknown=True) is cap
+    try:
+        assert reg.select("tts", "omnivoice") is cap
+    except RuntimeError:                          # not installed here
+        pass
+    assert any("licence compliance" in r.message for r in caplog.records)
 
 
 def test_gate_allows_commercial_engines():

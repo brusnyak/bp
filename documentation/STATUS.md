@@ -1,5 +1,7 @@
 # Where the project stands (2026-11-07, end of session)
 
+> **Update 2026-11-10: read [`PLAN_2026-11-10.md`](PLAN_2026-11-10.md) first.** It supersedes this page where they differ: the lag goal is now 2.0 s median (was 3.0 s); the Mac recogniser is Nemotron streaming (en to sk median lag 0.5-0.6 s on generated English, drift 1.2 s per minute in one setting) rather than Whisper turbo at 3.0-3.6 s; OmniVoice is batch/QC only, not a live voice (per-piece 0.66 s on a T4); Slovak speech input is about 2.8 s at 6-8% word error with the Slovak fine-tune (no engine reaches 2 s and 8%); the licence block on non-commercial engines is removed (warn only). The tables below are history and are not edited.
+
 **Verdict:** one speaker can run live translation on their own machine today (English to Slovak, Czech, German). German is validated end to end through the real server on a Kaggle T4. Room mode (one speaker, many listeners, one language each) is **built and unit-tested but not yet run with real models**. The installer's GPU profile had two bugs found by a fresh-install test on a clean Linux box; both are fixed and the retest is pending. It is a measured, working base for a technical person, not a finished product.
 
 ## Works today (each line says how it was checked)
@@ -145,10 +147,11 @@ Diagnostics for the next live test (`BP_LOG_SESSIONS=1`): every recognised chunk
 
 ## Not built
 
-1. **Cloned voice for other people.** Only a Slovak fine-tune exists (local, not distributable). Cloning needs a GPU and the weights carry non-commercial licences.
+1. **Cloned voice for other people.** Only a Slovak fine-tune exists (local, not distributable). Cloning needs a GPU and the weights carry non-commercial licences. OmniVoice zero-shot clone is the current candidate — measured RTF 0.42–0.45 on Kaggle T4, ear-checked as "good". Fish Audio S2-Pro and Higgs TTS 3 are researched (SK/CZ support, zero-shot clone, streaming) but **cannot run on Kaggle T4** — both require the SGLang-Omni serving stack, which depends on `sglang`, which requires the `outlines_core` Rust extension that cannot compile on Kaggle's Python 3.13.16 (no Rust toolchain, no pre-built wheel). They also cannot run on the Mac (require CUDA/NVIDIA). To test them, a NVIDIA box (≥6 GB VRAM, ≥16 GB RAM) with Python 3.10–3.12 is needed. OmniVoice remains the only voice-clone engine validated on Kaggle T4.
 2. **Room-mode polish:** see the table above; plus authentication beyond the room code and a capacity ceiling per GPU.
 3. **Operations for shared use:** retention, monitoring, a support owner.
 4. The old `/ws/meeting` scaffold (`backend/session_manager.py`) is a separate, unvalidated pipeline with one target language per speaker. Room mode does not use it.
+5. **SK input under 2s:** Not viable on Mac. Whisper turbo-sk ~0.7s/call (padded to 30s window), measured 3.88–5.59s even with clean generic Piper Slovak. Czech fallback works (1.18s median). SK input needs GPU or streaming-native recogniser.
 
 ## Licences (owner decision 2026-11-07)
 

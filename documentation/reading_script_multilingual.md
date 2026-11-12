@@ -45,22 +45,38 @@ A5. Všetko beží na tomto počítači, bez cloudovej služby.
 A6. Oneskorenie je čas medzi mojimi slovami a hlasom, ktorý počujete.
 A7. Naším cieľom je oneskorenie dosť krátke na prirodzený rozhovor.
 A8. Tichá miestnosť je dôležitejšia ako drahý mikrofón.
-A9. Hovorte, prosím, rovnomerným tempom a s krátkymi prestávkami medzi vetami.
-A10. Mená, čísla a odborné výrazy vyžadujú osobitnú pozornosť.
-A11. Otázky z publika sa prekladajú opačným smerom.
-A12. Ďakujem za pozornosť a teším sa na vaše otázky.
-B1. Stretnutie sa začína o 9:45 štrnásteho marca v miestnosti 2.17.
-B2. Pán Novák z Bratislavy predstaví výsledky 3 250 meraní.
-B3. Cieľové oneskorenie je 800 milisekúnd a chybovosť musí zostať pod desať percent.
-B4. Naše servery bežia na CUDA 12 s grafickou kartou Tesla T4 so 16 gigabajtmi pamäte.
-B5. Pošlite, prosím, správu do kancelárie CERN v Ženeve do piatka.
-B6. Model má 600 miliónov parametrov a beží dvakrát rýchlejšie ako v reálnom čase.
-C1. Dobré ráno. // Dnes vám chcem ukázať tri veci. / Po prvé, / ako systém počúva. // Po druhé, / ako prekladá. // A po tretie, / prečo záleží na prestávkach. // Keď prestanem hovoriť, / hlas by mal prestať tiež. // A keď spravím pauzu, / mali by ste počuť pauzu.
-D1. Počujete ma?
-D2. O koľkej sa začína relácia?
-D3. Mohli by ste to, prosím, zopakovať?
-D4. Myslím, že potrebujeme krátku prestávku.
-D5. Dovoľte mi to vysvetliť na príklade.
+A9. Hovorte, prosím, rovnomerným tempom a s krátkymi prestávkami medzi vetami.  
+A10. Mená, čísla a odborné výrazy vyžadujú osobitnú pozornosť.  
+A11. Otázky z publika sa prekladajú opačným smerom.  
+A12. Ďakujem za pozornosť a teším sa na vaše otázky.  
+B1. Stretnutie sa začína o 9:45 štrnásteho marca v miestnosti 2.17.  
+B2. Pán Novák z Bratislavy predstaví výsledky 3 250 meraní.  
+B3. Cieľové oneskorenie je 800 milisekúnd a chybovosť musí zostať pod desať percent.  
+B4. Naše servery bežia na CUDA 12 s grafickou kartou Tesla T4 so 16 gigabajtmi pamäte.  
+B5. Pošlite, prosím, správu do kancelárie CERN v Ženeve do piatka.  
+B6. Model má 600 miliónov parametrov a beží dvakrát rýchlejšie ako v reálnom čase.  
+C1. Dobré ráno. // Dnes vám chcem ukázať tri veci. / Po prvé, / ako systém počúva. // Po druhé, / ako prekladá. // A po tretie, / prečo záleží na prestávkach. // Keď prestanem hovoriť, / hlas by mal prestať tiež. // A keď spravím pauzu, / mali by ste počuť pauzu.  
+D1. Počujete ma?  
+D2. O koľkej sa začína relácia?  
+D3. Mohli by ste to, prosím, zopakovať?  
+D4. Myslím, že potrebujeme krátku prestávku.  
+D5. Dovoľte mi to vysvetliť na príklade.  
+
+
+## Czech (CS)
+
+A1. Dobré ráno a vítejte u této živé ukázky překladu řeči.
+A2. Mluvím anglicky a za vteřinu či dvě uslyšíte němčinu nebo slovenštinu.
+A3. Systém poslouchá přes mikrofon a určuje, kdy věta skončila.
+A4. Nejprve se slova rozpoznají, poté se přeloží a nakonec se znovu vysloví.
+A5. Vše probíhá na tomto počítači, bez cloudové služby.
+A6. Zpoždění je časový odstup mezi mými slovy a hlasem, který slyšíte.
+A7. Naším cílem je, aby zpoždění bylo dostatečně krátké pro přirozený rozhovor.
+A8. Tichá místnost je důležitější než drahý mikrofon.
+B1. Schůzka začíná ve 9:45 čtrnáctého března v místnosti 2.17.
+B2. Pan Novák z Bratislavy představí výsledky 3 250 měření.
+B3. Cílové zpoždění je 800 milisekund a chybovost musí zůstat pod deset procent.
+C1. Dobré ráno. // Dnes vám chci ukázat tři věci. / Za prvé, / jak systém poslouchá. // Za druhé, / jak překládá. // A za třetí, / proč záleží na pauzách. // Když přestanu mluvit, / hlas by měl přestat také. // A když udělám pauzu, / měli byste slyšet pauzu.
 
 ## German (DE)
 

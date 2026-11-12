@@ -1,5 +1,14 @@
 # Kaggle T4 Setup — BP Full-Route Benchmark
 
+> **Practice as of 2026-11-10 (read this first; the sections below describe the older CPU-only full-route kernel).**
+> - Push: `kaggle kernels push -p <kernel dir> --accelerator NvidiaTeslaT4 -t <seconds>`; status: `kaggle kernels status yegorby/<slug>`.
+> - Inputs: private datasets (`kaggle datasets create -p <dir>`, wait for `ready`), or the output of another kernel through `kernel_sources` in `kernel-metadata.json` (no download).
+> - **Models and checkpoints go to `/tmp`; only small JSON, logs, clips and ONNX files go to `/kaggle/working`.** A kernel that wrote 1.5 GB there made `kaggle kernels output` hang (lesson logged 2026-11-10).
+> - Fetch results: `timeout 90 kaggle kernels output <slug> -p <dir> -q --file-pattern '<file>.json'`. Browser fallback (Neo, Logs tab) only if the CLI hangs.
+> - A kernel ships `job.py` only: embed any helper script in it. `python -m venv` fails on Kaggle; install into the main environment.
+> - Check an installed library's signature before the first push (OpenVoice rejected an argument I assumed; two pushes lost).
+> - Kernels in use: `bp-strategy-matrix-t4` (recognition by cutting strategy), `bp-tts-probe-t4` (per-piece TTS latency), `bp-cs-voice-data-t4` (Czech clone data), `bp-piper-cs-finetune-t4` (timed Piper fine-tune), `bp-room-test-t4` (room mode).
+
 Kernel: `scripts/gpu_bench/kaggle_full_route/` (`job.py`, pushed as `yegorby/bp-full-route-t4`)
 
 ## Why Kaggle

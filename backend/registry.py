@@ -9,13 +9,12 @@ licence gate. Selection by config (T010) and gate tests (T009) build on this.
     cap = instantiate("tts", "piper")            # gate + availability + build
     cap = select("tts", "xtts", allow_noncommercial=True)
 
-Licence policy (documentation/s2s_landscape_2026-10-18.md §8) — FAIL CLOSED:
-  commercial-ok    ships in the default profile
-  non-commercial   blocked unless allow_noncommercial=True  (XTTS v2, NLLB)
-  unknown          blocked unless allow_unknown=True         (confirm the model card first)
-
-`select` answers "may this ship"; `instantiate` additionally requires the engine to be
-installed here. Both raise instead of silently passing an unlabelled engine.
+Licence policy (owner 2026-11-10): the project is a middleman; users install and configure engines
+themselves and are responsible for their own licence compliance. A licence label is a warning, never a block:
+  commercial-ok / gpl-3.0   no message
+  non-commercial / unknown  `select` logs a warning and still returns the engine
+`select` answers "which engine"; `instantiate` additionally requires the engine to be installed here.
+Both raise for an engine that is not declared, not implemented or not installed.
 """
 from __future__ import annotations
 

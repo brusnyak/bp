@@ -15,7 +15,7 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(ROOT / "scripts"))
-VOICE = {"sk": "sk_SK-lili-medium", "en": "en_US-john-medium", "de": "de_DE-thorsten-medium"}
+VOICE = {"sk": "sk_SK-lili-medium", "en": "en_US-john-medium", "de": "de_DE-thorsten-medium", "cs": "cs_CZ-jirka-medium"}
 SR = 16000
 
 
@@ -25,9 +25,9 @@ def lines(lang):
 
 
 def raw_c1(lang):
-    head = {"sk": "## Slovak (SK)", "en": "## English (EN)", "de": "## German (DE)"}[lang]
+    head = {"sk": "## Slovak (SK)", "en": "## English (EN)", "de": "## German (DE)", "cs": "## Czech (CS)"}[lang]
     t = (ROOT / "documentation" / "reading_script_multilingual.md").read_text(encoding="utf-8")
-    block = t[t.index(head):]; nxt = [block.find(h, 5) for h in ("## Slovak", "## English", "## German") if block.find(h, 5) > 0]
+    block = t[t.index(head):]; nxt = [block.find(h, 5) for h in ("## Slovak", "## English", "## German", "## Czech") if block.find(h, 5) > 0]
     block = block[: min(nxt)] if nxt else block
     m = re.search(r"^C1\.\s+(.*)$", block, re.M)
     return m.group(1) if m else ""
@@ -46,7 +46,7 @@ def scenario(lang, name):
 
 
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument("--langs", nargs="+", default=["sk", "en", "de"]); ap.add_argument("--scenarios", nargs="+", default=["paced", "continuous", "long"])
+    ap = argparse.ArgumentParser(); ap.add_argument("--langs", nargs="+", default=["sk", "cs", "en", "de"]); ap.add_argument("--scenarios", nargs="+", default=["paced", "continuous", "long"])
     a = ap.parse_args(); import soundfile as sf, scipy.signal as ss
     from backend.tts.piper_tts import PiperTTS
     out = ROOT / "processed" / "testaudio"; out.mkdir(parents=True, exist_ok=True)

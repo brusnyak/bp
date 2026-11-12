@@ -36,14 +36,14 @@ The goal is to match what the three ship, not to beat it: the translated voice s
 | | Google (Gemini 3.5 Live Translate) | Microsoft (Teams Interpreter) | OpenAI (gpt-realtime-translate) | This project |
 |---|---|---|---|---|
 | Design | One speech-to-speech model; keeps the speaker's intonation, pacing and pitch | Cascade: recognition, English text, translation, voice; can simulate the speaker's voice | Streaming speech-to-speech model | Cascade: recognition, translation, voice (same design as Microsoft) |
-| Lag | "a few seconds behind" (no number published) | not stated | not stated | 3.0-3.6 s median on an M1 Pro, goal 3.0 s; about 2.3-2.9 s on a Kaggle T4 simulation at 6-17% word error (`documentation/STATUS.md`) |
+| Lag | "a few seconds behind" (no number published) | not stated | not stated | 3.0-3.6 s median on an M1 Pro, goal 2.0 s (owner 2026-11-10, was 3.0 s); about 2.3-2.9 s on a Kaggle T4 simulation at 6-17% word error (`documentation/STATUS.md`) |
 | Slovak | On the Meet language list | not read | On the language list | Output and input work; Slovak input needs the Slovak fine-tune (17.7% vs 45% plain turbo on the owner's speech) |
 | Access | Meet: paid Google plan; developers: Live API preview | Copilot or Teams Premium licence, guests excluded | API, usage-priced | Runs on your own machine; no cloud, licence or per-minute fee; you supply the hardware |
-| Voice | Replicated inside the model (Google's docs call consistency uneven in the API) | Simulated voice | not read | Your voice cloned zero-shot by OmniVoice on a GPU; Piper voices otherwise; pitch contour is not carried across languages |
+| Voice | Replicated inside the model (Google's docs call consistency uneven in the API) | Simulated voice | not read | Piper voices live; a cloned voice is being re-evaluated (OmniVoice clones zero-shot on a GPU but does not stream, so it is batch/QC only, owner 2026-11-10); pitch contour is not carried across languages |
 
 **Where it competes:** same behaviour (mid-sentence start, lag of a few seconds, on the best settings measured so far), same architecture as Microsoft's, and it is the only one of the four that runs without a cloud account, subscription or licence, with your own audio staying local.
 
-**Where it does not:** no side-by-side test against the three exists (spending on OpenAI or Google is not authorised), so "comparable" means the same behaviour class, not the same quality. On a 16 GB M1 Pro the lag sits about 0.6 s above the 3 s goal; the streaming recogniser (Voxtral Realtime) that should remove that floor is wired in but not yet proven and needs a GPU machine (`documentation/STATUS.md`, "Mac ceiling"). Pitch and intonation transfer across languages is not built.
+**Where it does not:** no side-by-side test against the three exists (spending on OpenAI or Google is not authorised), so "comparable" means the same behaviour class, not the same quality. On a 16 GB M1 Pro the lag sits 1.0-1.6 s above the 2 s goal (3.0-3.6 s measured); the streaming recogniser (Voxtral Realtime) that should remove that floor is wired in but not yet proven and needs a GPU machine (`documentation/STATUS.md`, "Mac ceiling"). Pitch and intonation transfer across languages is not built.
 
 ## Quick start
 

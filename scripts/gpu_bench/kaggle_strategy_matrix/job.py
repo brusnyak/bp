@@ -74,7 +74,7 @@ def dec_whisper(model):
     return f
 ENGINES = {'turbo': dec_whisper(turbo)}
 try:
-    out = '/kaggle/working/ct2-kinit-turbo-sk'
+    out = '/tmp/ct2-kinit-turbo-sk'
     rc, o = sh(f'ct2-transformers-converter --model kinit/whisper-large-v3-turbo-sk --output_dir {out} --copy_files preprocessor_config.json --quantization float16 --force')
     if rc != 0: rc, o = sh(f'ct2-transformers-converter --model kinit/whisper-large-v3-turbo-sk --output_dir {out} --quantization float16 --force')
     try: import shutil; shutil.copy(hf_hub_download('kinit/whisper-large-v3-turbo-sk', 'tokenizer.json'), f'{out}/tokenizer.json')
@@ -83,7 +83,7 @@ try:
     if rc == 0: ENGINES['kinit'] = dec_whisper(WhisperModel(out, device='cuda', compute_type='float16'))
 except Exception as e: log('kinit_fail', err=str(e)[:200])
 try:
-    pdir = snapshot_download('istupakov/parakeet-tdt-0.6b-v3-onnx', local_dir='/kaggle/working/parakeet-v3-onnx')
+    pdir = snapshot_download('istupakov/parakeet-tdt-0.6b-v3-onnx', local_dir='/tmp/parakeet-v3-onnx')
     pk = onnx_asr.load_model('nemo-parakeet-tdt-0.6b-v3', pdir, providers=['CUDAExecutionProvider', 'CPUExecutionProvider']).with_timestamps()
     def dec_parakeet(a, lang):
         r = pk.recognize(a); words, cur = [], None

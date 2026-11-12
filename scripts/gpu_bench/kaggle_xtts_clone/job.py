@@ -81,8 +81,25 @@ for lang, paths in candidates.items():
             voice_files[lang] = str(cand)
             step("voice_file", lang=lang, path=p)
             break
+
     if lang not in voice_files:
-        step("voice_file_missing", lang=lang)
+        # Also search Kaggle input directories (dataset assets)
+        try:
+            for input_dir in Path("/kaggle/input").iterdir():
+                if not input_dir.is_dir():
+                    continue
+                for p in paths:
+                    cand = input_dir / p
+                    if cand.is_file():
+                        voice_files[lang] = str(cand)
+                        step("voice_file", lang=lang, path=str(cand))
+                        break
+                if lang in voice_files:
+                    break
+        except Exception:
+            pass
+        if lang not in voice_files:
+            step("voice_file_missing", lang=lang)
 
 # ---------------------------------------------------------------------------
 # 2. Install torch CUDA + Coqui TTS (XTTS v2)
