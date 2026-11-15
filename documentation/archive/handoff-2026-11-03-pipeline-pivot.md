@@ -1,7 +1,7 @@
 # Handoff: BP Pipeline Pivot — Next Session
 
 **Source:** Roast: Pipeline Reconsideration + Kaggle v6 results (T4, 16GB, 278s)
-**Project:** `~/Documents/STU/BP` (main = `origin/main` = `faf68ff`)
+**Project:** `~/bp` (main = `origin/main` = `faf68ff`)
 **Status:** Uncommitted changes exist (AGENTS.md, app.py, backend/main.py, registry.py, test/vad_tests.py, live-script.js, live.html, live-style.css)
 
 ---
@@ -62,7 +62,7 @@
 3. **EN output TTS**: Kokoro (RTF 0.03, 1.33GB VRAM on T4)
 4. **SK output TTS**: Piper (CPU, RTF 0.04)
 
-**Questions for owner:**
+**Questions for maintainer:**
 1. Confirm pivot: Canary AST for SK→EN + Kokoro for EN TTS + Piper for SK TTS?
 2. Authorize Kaggle retry of Canary AST with `pytorch-lightning`?
 3. Proceed with documentation cleanup (remove stale OmniVoice/XTTS/F5/Coqui references)?
@@ -75,7 +75,7 @@
 |---|------|--------|------------|------------|
 | 1 | Builder | 1 day | Kaggle creds | Retry Canary AST on T4 with `pytorch-lightning`; test `kinit/parakeet-tdt-0.6b-v3-sk` and `kinit/whisper-medium-sk` |
 | 2 | Builder | 2 hours | none | Remove stale OmniVoice/XTTS/F5 doc references; document Kokoro + Piper split |
-| 3 | Owner | Decide | Kaggle results | Confirm Canary AST path or accept SK→EN experimental-only |
+| 3 | maintainer | Decide | Kaggle results | Confirm Canary AST path or accept SK→EN experimental-only |
 
 ---
 
@@ -107,4 +107,4 @@ Verdict becomes "Ship with caveats" if Canary AST or tuned `kinit/whisper-large-
 
 ---
 
-**Not yet committed.** Nothing pushed to `origin/main`. Owner approval required before any push (constitution + AGENTS.md hard rule).
+**Not yet committed.** Nothing pushed to `origin/main`. maintainer approval required before any push (constitution + AGENTS.md hard rule).

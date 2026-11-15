@@ -17,7 +17,7 @@ Every number carries exactly one label. Unlabelled numbers do not exist here.
 - `PROJECTED` — derived from a measured rate plus a stated multiplier.
 - `UNKNOWN` — nobody has measured it; the cell says what test would fill it.
 
-Thesis §5 may cite `MEASURED` rows only. Everything else is direction, not evidence.
+technical report §5 may cite `MEASURED` rows only. Everything else is direction, not evidence.
 
 Research date: 2026-10-01. Web sources are listed in §9.
 
@@ -29,12 +29,12 @@ worst turn latency. English STT is solved (Parakeet EN `MEASURED` WER 0.023).
 
 | Model                                                               | SK?                                                     | License                           | Size / runtime                                              | Key number                                                                                                                                                                                                                                                                                                                                                                                  | Verdict                                                                                                                                                                         |
 | ------------------------------------------------------------------- | ------------------------------------------------------- | --------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| whisper-small-sk (incumbent, NaiveNeuron, CT2 int8)                 | native SK fine-tune                                     | MIT                               | ~500 MB, faster-whisper CPU                                 | `MEASURED` WER 0.13 FLEURS-sk / 0.26 owner mic; ~2.4 s per 7 s clip, RTF 0.33 (`model_evaluation_2026-09.md`)                                                                                                                                                                                                                                                                               | Keep as SK default until a challenger beats it on owner mic                                                                                                                     |
+| whisper-small-sk (incumbent, NaiveNeuron, CT2 int8)                 | native SK fine-tune                                     | MIT                               | ~500 MB, faster-whisper CPU                                 | `MEASURED` WER 0.13 FLEURS-sk / 0.26 maintainer mic; ~2.4 s per 7 s clip, RTF 0.33 (`model_evaluation_2026-09.md`)                                                                                                                                                                                                                                                                               | Keep as SK default until a challenger beats it on maintainer mic                                                                                                                     |
 | whisper base (EN rung)                                              | n/a (EN)                                                | MIT                               | 142 MB                                                      | `MEASURED` WER 0.077, 0.52 s per 115 s clip (`processed/stt_baseline.json`)                                                                                                                                                                                                                                                                                                                 | Keep for EN                                                                                                                                                                     |
-| large-v3-turbo                                                      | 99 langs incl SK                                        | MIT                               | 1.6 GB                                                      | `MEASURED` WER 0.12 FLEURS-sk but 0.41–0.52 on owner mic, ~7–9 s/clip (`model_evaluation_2026-09.md`, documentation/archive/2026-11-07-stale/PLAN.md 2026-09-29: definitive negative)                                                                                                                                                                                                                                              | Rejected: distillation cost it low-resource capacity                                                                                                                            |
-| Parakeet-TDT v3 0.6B                                                | 25 EU langs incl SK, auto-detect                        | CC-BY-4.0                         | 680 MB INT8 ONNX, sherpa-onnx CPU                           | `VENDOR` 6.34% avg WER, 3332× realtime on leaderboard GPU; `MEASURED` on owner SK mic WER 0.58–0.63, FLEURS-sk int8 0.20 (`model_evaluation_2026-09.md`); `COMMUNITY` 17–26× realtime on server CPU (gauravvij/parakeet-optimization)                                                                                                                                                       | Speed proven, Slovak accuracy not: leading theory is training-data SK share, not quantisation (fp32 measured worse than int8 on owner mic). Retest only if a v4 changes SK data |
+| large-v3-turbo                                                      | 99 langs incl SK                                        | MIT                               | 1.6 GB                                                      | `MEASURED` WER 0.12 FLEURS-sk but 0.41–0.52 on maintainer mic, ~7–9 s/clip (`model_evaluation_2026-09.md`, documentation/archive/2026-11-07-stale/PLAN.md 2026-09-29: definitive negative)                                                                                                                                                                                                                                              | Rejected: distillation cost it low-resource capacity                                                                                                                            |
+| Parakeet-TDT v3 0.6B                                                | 25 EU langs incl SK, auto-detect                        | CC-BY-4.0                         | 680 MB INT8 ONNX, sherpa-onnx CPU                           | `VENDOR` 6.34% avg WER, 3332× realtime on leaderboard GPU; `MEASURED` on maintainer SK mic WER 0.58–0.63, FLEURS-sk int8 0.20 (`model_evaluation_2026-09.md`); `COMMUNITY` 17–26× realtime on server CPU (gauravvij/parakeet-optimization)                                                                                                                                                       | Speed proven, Slovak accuracy not: leading theory is training-data SK share, not quantisation (fp32 measured worse than int8 on maintainer mic). Retest only if a v4 changes SK data |
 | Parakeet Unified EN 0.6B                                            | EN only                                                 | CC-BY-4.0                         | 631 MB INT8                                                 | `VENDOR` SoTA EN 6.05%                                                                                                                                                                                                                                                                                                                                                                      | EN-side candidate if Parakeet-v3 EN ever regresses; not an SK answer                                                                                                            |
-| **Nemotron 3.5 ASR streaming 0.6B (BENCHED 2026-10-01 — negative)** | SK in broad-coverage tier; CZ same tier                 | OpenMDW (open, commercial-use OK) | W8A8 C runtime, whole-file streaming decode                 | `MEASURED` owner mic: SK WER **0.86/0.75** (trhove_b/script, sk-SK prompt; auto-prompt worse at 0.98), EN WER 0.19 — vs small-sk 0.23–0.35 and Parakeet-int8 0.58–0.63 on the same SK mic. RTF 0.33, same speed band as small-sk. Failure mode: language drift (RU/UK/SL tokens, `<sl-SI>` tag mid-stream). `processed/new_models/nemotron_matrix.json`, script `scripts/bench_nemotron.py` | Rejected for SK: streaming partials are moot this far behind on accuracy. Broad-coverage tier means what it says. Do not retest without a version change or SK fine-tune        |
+| **Nemotron 3.5 ASR streaming 0.6B (BENCHED 2026-10-01 — negative)** | SK in broad-coverage tier; CZ same tier                 | OpenMDW (open, commercial-use OK) | W8A8 C runtime, whole-file streaming decode                 | `MEASURED` maintainer mic: SK WER **0.86/0.75** (trhove_b/script, sk-SK prompt; auto-prompt worse at 0.98), EN WER 0.19 — vs small-sk 0.23–0.35 and Parakeet-int8 0.58–0.63 on the same SK mic. RTF 0.33, same speed band as small-sk. Failure mode: language drift (RU/UK/SL tokens, `<sl-SI>` tag mid-stream). `processed/new_models/nemotron_matrix.json`, script `scripts/bench_nemotron.py` | Rejected for SK: streaming partials are moot this far behind on accuracy. Broad-coverage tier means what it says. Do not retest without a version change or SK fine-tune        |
 | Canary-1B / Flash / 180M (MEASURED on Kaggle T4 2026-11-03)         | 25 EU langs incl SK; also does speech translation (AST) | NVIDIA CC-BY-4.0                  | 1B / Flash / 180M, NeMo + Transformers                      | `MEASURED` ASR SK WER 0.0477 (b5), CS 0.0922, EN 0.0498 on 80 FLEURS clips each (`confirm-canary-v1/`); AST SK→EN chrF++ 52.49 mean / CS→EN 50.05 (n=80 each, English references present but marked `semantic_review_pending` — not a quality gate pass); cold first-call 4.6s on 7s clip | AST collapses STT+MT for SK→EN but chrF++ ~50 is below commercial bar; keep as speed path, not quality path. Flash/180M untested. |
 | Kyutai STT 1B                                                       | EN/FR only, no SK                                       | open (Kyutai)                     | 500 ms fixed delay, 400 parallel streams on H100 (`VENDOR`) | n/a for SK                                                                                                                                                                                                                                                                                                                                                                                  | Architecture reference only (delayed-streams modeling)                                                                                                                          |
 | Zipformer / Moonshine / Cohere-transcribe                           | no SK/CZ coverage                                       | various                           | CPU-light                                                   | documentation/archive/2026-11-07-stale/PLAN.md 2026-09-29: killed / deprioritised with reasons                                                                                                                                                                                                                                                                                                                                     | Dead, do not retest                                                                                                                                                             |
@@ -45,7 +45,7 @@ negatives on the exact mic and script that matter. Nemotron is a different
 architecture (cache-aware streaming FastConformer-RNNT vs offline TDT), a
 different training set (530 k hours lineage), and it changes the latency model
 itself (streaming partials vs faster offline chunks). One bench settles it:
-owner SK mic → WER vs small-sk + turn-latency delta.
+maintainer SK mic → WER vs small-sk + turn-latency delta.
 
 ## 2. MT — machine translation
 
@@ -56,11 +56,11 @@ bad transcripts (STT output is noisy) at equal-or-better speed, not raw BLEU.
 | Model                                               | SK↔EN?                                    | License                                                     | Size / runtime                                                                                 | Key number                                                                                                                            | Verdict                                                                                                                                                                                                      |
 | --------------------------------------------------- | ----------------------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Opus-MT sk-en / en-sk (incumbent, CT2 int8)         | dedicated pair models                     | CC-BY-4.0                                                   | ~100–300 MB per direction, CTranslate2 CPU                                                     | `MEASURED` 0.5 s per 18 sentences chunked; `COMMUNITY` 696 tok/s int8 CPU, fastest in DEEP bench (57 s vs 870 s MADLAD on same set)   | Keep. Speed crown is unchallenged and the pipeline needs speed more than +2 chrF                                                                                                                             |
-| NLLB-200-distilled-600M                             | 200+ langs incl SK                        | CC-BY-NC (non-commercial — thesis/education OK, product no) | 600M, transformers/CT2                                                                         | `MEASURED` by others on Romance/Germanic: trades wins with Opus per pair (arxiv 2607.26286); `COMMUNITY` 2026 review: edge-deployable | The honest quality challenger for SK; NC license fits a thesis but poisons any commercial follow-up. Bench it, keep Opus default unless the gap is large                                                     |
+| NLLB-200-distilled-600M                             | 200+ langs incl SK                        | CC-BY-NC (non-commercial — technical report/education OK, product no) | 600M, transformers/CT2                                                                         | `MEASURED` by others on Romance/Germanic: trades wins with Opus per pair (arxiv 2607.26286); `COMMUNITY` 2026 review: edge-deployable | The honest quality challenger for SK; NC license fits a technical report but poisons any commercial follow-up. Bench it, keep Opus default unless the gap is large                                                     |
 | NLLB-1.3B distilled                                 | same                                      | CC-BY-NC                                                    | 1.3B                                                                                           | `VENDOR`/community: best chrF on several EU pairs                                                                                     | Only if 600M shows a quality gap worth chasing with 2× compute                                                                                                                                               |
 | **MADLAD-400-3B-CT2 (NEW, ready to bench)**         | 400+ langs incl SK                        | Apache-2.0 (commercial-safe)                                | 3B, ready CT2 export `santhosh/madlad400-3b-ct2`; MLX INT4/INT8 builds exist for Apple Silicon | `COMMUNITY` best open translator in DEEP bench (BLEU 36.0 vs NLLB 33.6 vs Opus 30.0 on news test) at ~15× Opus wall time on CPU       | Top MT experiment: Apache-2.0 removes the NLLB license trap. Question is purely speed on short sentences with beam 1 — 3B may still fit the 0.2 s budget on CUDA while failing it on CPU. Bench both devices |
 | M2M100-1.2B-CT2                                     | 100 langs incl SK                         | MIT                                                         | 1.2B, ready CT2 (`entai2965/m2m100-1.2B-ctranslate2`)                                          | `COMMUNITY` DEEP bench: weakest of the group (BLEU 27.7)                                                                              | Fallback only; MIT license is its best feature                                                                                                                                                               |
-| EuroLLM 1.7B/9B/22B                                 | 24 EU langs incl SK                       | fully open (EU)                                             | 1.7B–22B, LLM inference                                                                        | `COMMUNITY` DEEP bench: 1.7B slow and weak for MT; 22B competitive but thesis-irrelevant size                                         | Related-work citation (EU open alternative), not a pipeline candidate                                                                                                                                        |
+| EuroLLM 1.7B/9B/22B                                 | 24 EU langs incl SK                       | fully open (EU)                                             | 1.7B–22B, LLM inference                                                                        | `COMMUNITY` DEEP bench: 1.7B slow and weak for MT; 22B competitive but technical report-irrelevant size                                         | Related-work citation (EU open alternative), not a pipeline candidate                                                                                                                                        |
 | riva-translate 1.6B/4B (NVIDIA NIM)                 | dozens of langs (verify SK before citing) | NIM container terms                                         | GPU container, batch 32/64 profiles                                                            | `UNKNOWN` on SK                                                                                                                       | Server-side option only if a CUDA box materialises; docker + NGC, never the Mac                                                                                                                              |
 | Small LLM translators (qwen2.5:14b etc. via Ollama) | yes                                       | various                                                     | 3B–14B, seconds per sentence on CPU                                                            | `COMMUNITY` within ~1–5 chrF of dedicated MT on some pairs (arxiv 2607.26286)                                                         | Watch: the gap is closing, but per-sentence seconds on CPU kill live use today. Revisit yearly                                                                                                               |
 
@@ -73,7 +73,7 @@ on CUDA.
 ## 3. TTS — text to speech, including voice cloning
 
 Two separate jobs: (1) fast clean SK/EN output for the live pipeline (Piper
-owns this, RTF ~0.04 `MEASURED`), (2) producing the owner's voice. Job 2 splits
+owns this, RTF ~0.04 `MEASURED`), (2) producing the test speaker's voice. Job 2 splits
 further into bulk generation (slow is fine, quality is everything) and the
 trainable voice itself.
 
@@ -87,10 +87,10 @@ trainable voice itself.
 | MagpieTTS multilingual 357M (NEW)                   | 12 langs (ar de en es fr hi it ja ko pt vi zh) — no SK                                                                                                                                                                     | NVIDIA Open Model License                                              | NeMo + `NeMo-Speech.cpp`, GGUF builds                                                                                                                                       | n/a for SK                                                                                                                                                                                                   | Out for SK. Note for EN-side bulk variety only                                                                                                               |
 | XTTS / F5 / CosyVoice-older                         | no SK or CUDA-bound                                                                                                                                                                                                        | various                                                                | —                                                                                                                                                                           | `tts_landscape_2026-09.md` + documentation/archive/2026-11-07-stale/PLAN.md rejections stand                                                                                                                                                        | Dead, do not retest                                                                                                                                          |
 | Kyutai Pocket TTS 100M (NEW, watch)                 | multilingual (verify SK before citing)                                                                                                                                                                                     | open (Kyutai)                                                          | 100M, faster than realtime on CPU, one-line code (`VENDOR` kyutai.org 2026)                                                                                                 | `UNKNOWN` on SK                                                                                                                                                                                              | If SK is covered it becomes the low-end live-engine candidate overnight. One lookup + one synth test                                                         |
-| IndexTTS2 MLX (NEW, Mac-side candidate)             | clone path is language-agnostic (identity-first)                                                                                                                                                                           | Apache-2.0                                                             | native MLX on Apple Silicon (`COMMUNITY` soniqo.audio)                                                                                                                      | `UNKNOWN` on owner voice                                                                                                                                                                                     | Candidate for Mac-local bulk generation alongside OmniVoice: no fine-tune, emotion/rate controls, stays on-device. A/B against omni-zeroshot on the v2b refs |
+| IndexTTS2 MLX (NEW, Mac-side candidate)             | clone path is language-agnostic (identity-first)                                                                                                                                                                           | Apache-2.0                                                             | native MLX on Apple Silicon (`COMMUNITY` soniqo.audio)                                                                                                                      | `UNKNOWN` on maintainer voice                                                                                                                                                                                     | Candidate for Mac-local bulk generation alongside OmniVoice: no fine-tune, emotion/rate controls, stays on-device. A/B against omni-zeroshot on the v2b refs |
 | Qwen3-TTS 0.6B/1.7B                                 | no SK — EN output only                                                                                                                                                                                                     | Apache-2.0                                                             | 4-8 GB VRAM, 97 ms first-packet                                                                                                                                             | `VENDOR` 3-second zero-shot voice clone, EN-focused 10 langs                                                                                                                                                 | **EN zero-shot cloning on GPU**; no Slovak output. Optional GPU engine, declared in registry.                                                               |
 
-Training economics (the handler argument in one table):
+Training economics (the reviewer argument in one table):
 
 | Step                                        | Mac M1 Pro 16 GB                       | Hypothetical CUDA box                                                                                             |
 | ------------------------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
@@ -101,18 +101,18 @@ Training economics (the handler argument in one table):
 
 ## 4. S2S — end-to-end speech to speech
 
-No S2S model covers Slovak today. This section exists so the thesis can say so
+No S2S model covers Slovak today. This section exists so the technical report can say so
 with citations instead of silence.
 
 | Model                                            | SK?                                                       | Note                                                                                                                                                                                                                              |
 | ------------------------------------------------ | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | SeamlessM4T v2 (spiked 2026-09-29, `.venv-eval`) | 101 speech-in langs (SK in), 35 speech-out                | `MEASURED` RTF 0.77–0.99 chunked, chrF 39–50, one "willow→fur coat" slip; full-clip inference OOMs 16 GB into 14 GB swap. Verdict stands: quality reference + offline-voice potential, not a live path (3× cascade compute)       |
-| Hibiki-Zero 3B (Kyutai, 2026-02)                 | FR/ES/PT/DE→EN only, no SK                                | `VENDOR` SoTA on its pairs; RL-without-aligned-data method adapts to a new input language with <1000 h speech (arxiv 2602.11072). That sentence is the thesis future-work paragraph: SK S2S is a data project, not a model search |
+| Hibiki-Zero 3B (Kyutai, 2026-02)                 | FR/ES/PT/DE→EN only, no SK                                | `VENDOR` SoTA on its pairs; RL-without-aligned-data method adapts to a new input language with <1000 h speech (arxiv 2602.11072). That sentence is the technical report future-work paragraph: SK S2S is a data project, not a model search |
 | Hibiki-Zero MLX build                            | same 4 pairs                                              | `COMMUNITY` runs on Apple Silicon INT4 (~75 ms/step on M2 Max) — proves the architecture fits a laptop, just not our language                                                                                                     |
 | Moshi / Unmute / Kyutai TTS+STT pair             | EN/FR dialogue                                            | Architecture reference for full-duplex design (200 ms practical, Mimi codec 12.5 Hz). The project's word-window streaming plan is the pragmatic Hibiki-shape on stages that cover SK                                              |
 | Canary AST mode                                  | 25 EU langs incl SK | `MEASURED` on Kaggle T4 2026-11-03: SK→EN chrF++ 52.49 mean (n=80, range 19.8–78.2), CS→EN 50.05 (n=80, range 17.0–81.6); English references present but flagged `semantic_review_pending` — below commercial bar (~50 mean, 39–52% of sentences <50 chrF++). AST collapses STT+MT into one step; speed path, not quality path. |
 
-The honest thesis sentence: simultaneous S2S with voice transfer exists and
+The honest technical report sentence: simultaneous S2S with voice transfer exists and
 runs on laptops, but every open implementation speaks four Western languages
 into English. The cascade (STT→MT→TTS) is not a legacy choice — for Slovak in
 2026 it is the only choice, and the work is making the cascade stream.
@@ -136,7 +136,7 @@ math from published rates (`PROJECTED`).
 | Hibiki-Zero 3B                                         | MLX build exists but no SK pair        | no (needs GPU RAM)      | no (needs 8–12 GB) | borderline           | yes                              |
 | STT sweep _during_ a train                             | no (16 GB ceiling, runbook forbids)    | no                      | yes                | yes                  | yes                              |
 
-Minimum useful spec to name to the handler: **any NVIDIA card with ≥6 GB VRAM
+Minimum useful spec to name to the reviewer: **any NVIDIA card with ≥6 GB VRAM
 and a machine with ≥16 GB RAM**. That unlocks training (~2–3 h), MADLAD bench,
 Turbo test, and parallel eval. 8 GB (e.g. RTX 4060 laptop) adds comfort and the
 Hibiki borderline; 12 GB adds batch S2S experiments. Below 6 GB VRAM the only
@@ -145,10 +145,10 @@ CPU-only loan hardware is still useful as a third portability target (Linux
 pass, `linux_setup_and_test.md`) but changes no research speed.
 
 Server alternative: ~15 GPU-h covers the whole 2-week plan (5–6 trains + bulk +
-spikes) at `PROJECTED` ~$3–5 on RTX 3060-class rentals, or free on a university
-box. Constraint: personal voice clips leave the Mac — fine under university
+spikes) at `PROJECTED` ~$3–5 on RTX 3060-class rentals, or free on a shared deployment
+box. Constraint: personal voice clips leave the Mac — fine under shared deployment
 control, needs one disclosure sentence for rented hardware (constitution
-local-first covers the pipeline, not training, but the thesis should say where
+local-first covers the pipeline, not training, but the technical report should say where
 the data went).
 
 ## 6. Recommended eval order (first bench first)
@@ -166,30 +166,30 @@ Deliberately not queued: Parakeet v3 retest (two owned negatives), EuroLLM
 Kokoro / Qwen3-TTS / Chatterbox are EN-side GPU TTS candidates (no SK weights) —
 declared as optional engines in `backend/registry.py`, validated on T4 pending.
 
-## 7. What the handler funds (justification in one page)
+## 7. What the reviewer funds (justification in one page)
 
 The product already hits its latency target on a 2020 CPU laptop — the report
 must never ask for hardware as a demo fix. It funds three things:
 
 1. **Throughput: ~1 voice model/day → ~4–6/day.** The train is 95% of
    iteration wall-clock (`MEASURED` §2 baseline in `documentation/archive/2026-11-07-stale/compute_capacity_report_2026-09.md`).
-   A thesis chapter with one trained voice is a report; with an ablation over
+   A technical report chapter with one trained voice is a report; with an ablation over
    steps × base voice it is an experiment.
 2. **Quality unlocks, not speedups:** the step-count ablation, the MADLAD
    quality question, and the Turbo live-engine question are all untestable on
-   the Mac in reasonable time. Each is a thesis result, not a faster demo.
+   the Mac in reasonable time. Each is a technical report result, not a faster demo.
 3. **The demo he liked (EN mic → SK over speakers)** already works on the Mac
    (`demo_conversation.py`, Lab conference-playback section). New hardware
    buys more voices to play through it and the streaming upgrades (Nemotron
    partials, word-window MT) that make it feel simultaneous.
 
-Ask order: university server access first (free, no third-party data), NVIDIA
+Ask order: processing server access first (free, no third-party data), NVIDIA
 loan laptop second (minimum useful spec §5), rented CUDA never unless both
 fail — $3–5 covers the plan but moves voice data to a third party.
 
 ## 8. Repo evidence index (every MEASURED claim above, by file)
 
-- STT rungs + MT chrF on owner mic: `documentation/model_evaluation_2026-09.md`,
+- STT rungs + MT chrF on maintainer mic: `documentation/model_evaluation_2026-09.md`,
   `processed/sk_direction/sk_direction_matrix.json`
 - Live turn latencies + honest gaps: `processed/conversation_sim.json`,
   `processed/meeting/meeting_timeline.json`, `processed/stream_audit/`
@@ -197,7 +197,7 @@ fail — $3–5 covers the plan but moves voice data to a third party.
   `processed/engine_ab/matrix_omnihq.json`, `processed/machine_listen.json`
 - Bulk corpus QC: `processed/omni_hq_sk/manifest.json`,
   `processed/omni_hq_en/manifest.json`
-- Ear grades (machine advisories + owner slots): `processed/ear_grades.json`
+- Ear grades (machine advisories + maintainer slots): `processed/ear_grades.json`
   via `scripts/grade_library.py`; Lab display in `ui/voice-lab/library.json`
 - Train cost: `processed/overnight_hq_2026-09-30.log`,
   `documentation/archive/2026-11-07-stale/compute_capacity_report_2026-09.md` §2–§3
@@ -245,14 +245,14 @@ fail — $3–5 covers the plan but moves voice data to a third party.
 
 ## 10. Addendum 2026-10-02 — new leads (research only, nothing benched yet)
 
-Labels as in §0. Rows marked `MEASURED` have been run on the owner's SK clips or Kaggle T4; `VENDOR`/`UNKNOWN` rows await `scripts/bench_new_models.py`.
+Labels as in §0. Rows marked `MEASURED` have been run on the test speaker's SK clips or Kaggle T4; `VENDOR`/`UNKNOWN` rows await `scripts/bench_new_models.py`.
 
 | Model | SK/CZ? | License | Size / runtime | Key number | Verdict |
 | --- | --- | --- | --- | --- | --- |
-| **X-Voice 0.4B** (F5-TTS lineage, flow-matching DiT, IPA input; arxiv 2605.05611, `github.com/sunnyxrxrx/X-Voice`, weights `XRXRX/X-Voice`) | **SK and CZ both listed** among 30 langs (paper tables 5-6) | code MIT, **weights CC-BY-NC** (thesis OK, product no) | 0.4B, PyTorch; README lists Apple Silicon install variant, MPS/CPU speed `UNKNOWN`; no fine-tune recipe in README | `VENDOR` RTF 0.073 on RTX 4090; trained on 420k h + 40k h synthetic; claims cross-lingual cloning on par with billion-scale Qwen3-TTS | **Top new TTS test.** The only candidate found that is small, open, cross-lingual cloning *and* lists SK natively. Bench: zero-shot from `me_sk` refs → ASR-WER via small-sk + F0/speaker-sim, RTF on MPS. Beats OmniVoice only if QC WER ≤0.05 at RTF ≤1 |
-| VoxCPM2 2B (openbmb; arxiv 2606.06928) | **No SK/CZ** (30 langs: Polish yes, Czech/Slovak no) | Apache-2.0 | ~8 GB VRAM, CUDA ≥12; Mac path not documented | `VENDOR` RTF 0.30 on 4090 (0.13 w/ Nano-vLLM); LoRA fine-tune from 5–10 min of audio | Out for SK output. Reference for *what a LoRA clone recipe looks like* (5–10 min fits the owner's recording budget). Only a CZ-proxy test if a CUDA box appears |
+| **X-Voice 0.4B** (F5-TTS lineage, flow-matching DiT, IPA input; arxiv 2605.05611, `github.com/sunnyxrxrx/X-Voice`, weights `XRXRX/X-Voice`) | **SK and CZ both listed** among 30 langs (paper tables 5-6) | code MIT, **weights CC-BY-NC** (technical report OK, product no) | 0.4B, PyTorch; README lists Apple Silicon install variant, MPS/CPU speed `UNKNOWN`; no fine-tune recipe in README | `VENDOR` RTF 0.073 on RTX 4090; trained on 420k h + 40k h synthetic; claims cross-lingual cloning on par with billion-scale Qwen3-TTS | **Top new TTS test.** The only candidate found that is small, open, cross-lingual cloning *and* lists SK natively. Bench: zero-shot from `me_sk` refs → ASR-WER via small-sk + F0/speaker-sim, RTF on MPS. Beats OmniVoice only if QC WER ≤0.05 at RTF ≤1 |
+| VoxCPM2 2B (openbmb; arxiv 2606.06928) | **No SK/CZ** (30 langs: Polish yes, Czech/Slovak no) | Apache-2.0 | ~8 GB VRAM, CUDA ≥12; Mac path not documented | `VENDOR` RTF 0.30 on 4090 (0.13 w/ Nano-vLLM); LoRA fine-tune from 5–10 min of audio | Out for SK output. Reference for *what a LoRA clone recipe looks like* (5–10 min fits the test speaker's recording budget). Only a CZ-proxy test if a CUDA box appears |
 | OmniVoice (incumbent bulk) | 600+ langs | Apache-2.0 | — | `VENDOR` claims 40× realtime on GPU | Already in use; see §3 |
-| SloPalSpeech Whisper fine-tunes (small/medium/large-v3/turbo, `NaiveNeuron/*`; arxiv 2509.19270) | native SK | open | medium ~1.5 GB, turbo 1.6 GB | `VENDOR` medium: FLEURS 7.6, CV21 18.0; turbo: FLEURS 6.4, CV21 13.2 | Small-sk is already this lineage. Turbo was measured and rejected on owner mic (§1). Medium-sk is untested here but is slower than small; only worth a bench if owner-mic WER 0.26 is the blocker, not latency |
+| SloPalSpeech Whisper fine-tunes (small/medium/large-v3/turbo, `NaiveNeuron/*`; arxiv 2509.19270) | native SK | open | medium ~1.5 GB, turbo 1.6 GB | `VENDOR` medium: FLEURS 7.6, CV21 18.0; turbo: FLEURS 6.4, CV21 13.2 | Small-sk is already this lineage. Turbo was measured and rejected on maintainer mic (§1). Medium-sk is untested here but is slower than small; only worth a bench if maintainer-mic WER 0.26 is the blocker, not latency |
 | COMPASS (arxiv 2606.03241) | n/a | — | benchmark framework, 46 metrics → 10 | `VENDOR` finding: single-metric rankings mislead; best-vs-worst gaps >30% on naturalness / speaker preservation while translation quality differs by a few points | Use as the eval design reference: report translation, naturalness, speaker-similarity and latency as separate columns, never one score |
 | Gemini Live Translate (Google, cloud) | 70+ langs | proprietary | cloud | `VENDOR` streaming S2S, intonation/pitch preserved, a few seconds behind speaker | QC / ceiling reference only (constitution III). Not a pipeline candidate |
 
@@ -275,12 +275,12 @@ Same text, same SK reference clip family and same scorer as `scripts/engine_ab.p
 - Intelligibility: best of every engine tested on this text; first attempt scored 0.243 because the reference text covered 2 sentences but the audio was clipped to 12 s (ref words leaked into the output). Fixed by cropping the ref to 7 s with its exact sentence. Lesson: a mismatched ref text is the most likely way to get a false negative from F5-lineage models.
 - Speed: ~4.2 s of compute per second of audio on MPS, 3–4× slower than OmniVoice, ~100× slower than Piper. Not a live engine on the Mac. Marginal RTF = (131.8 s wall for 24.06 s audio − 35.8 s wall for a 1.45 s clip) / 22.6 s; model load cancels out.
 - Pace: 24 s of audio for text OmniVoice says in 17 s and Piper in 11–13 s → speech is slow/padded at `speed=1.0`. Stage 2 + SpeedPredictor (shipped in the same repo) not tried.
-- NOT measured: speaker similarity to the owner, ear grade (trembling was the kill reason for both earlier personal voices), CPU/CUDA speed, long-form stability. WER from a Whisper model rewards clean articulation; it is not a naturalness or identity score.
+- NOT measured: speaker similarity to the maintainer, ear grade (trembling was the kill reason for both earlier personal voices), CPU/CUDA speed, long-form stability. WER from a Whisper model rewards clean articulation; it is not a naturalness or identity score.
 - Verdict: **quality candidate, not a Mac candidate.** It converts the "voice in near real time" question into a pure compute question — which is what a GPU answers. The only vendor speed number is RTX 4090 (RTF 0.073); no number exists for 6–8 GB cards, so "4090 required" is unsupported and "any CUDA GPU would make this testable" is what the evidence allows. Ask for a CUDA slot, then measure.
 
 ### 10.2 First GPU measurement — Colab free T4, 2026-10-02 (`MEASURED`, n=1, `processed/gpu_bench/colab_T4.json`)
 
-Same reference clips and method as the Mac numbers (`scripts/gpu_bench/gpu_bench.py`; refs = 5–7 s clips of the owner, EN/SK/CS). T4 = Tesla T4 15.6 GB, torch 2.11 + CUDA 13. X-Voice fp32, nfe 32, layered CFG (repo defaults); OmniVoice fp16, 16 steps.
+Same reference clips and method as the Mac numbers (`scripts/gpu_bench/gpu_bench.py`; refs = 5–7 s clips of the maintainer, EN/SK/CS). T4 = Tesla T4 15.6 GB, torch 2.11 + CUDA 13. X-Voice fp32, nfe 32, layered CFG (repo defaults); OmniVoice fp16, 16 steps.
 
 | Engine | Mac M1 Pro (MPS) | Colab T4 | Speed-up |
 |---|---|---|---|
@@ -304,7 +304,7 @@ Second, independent run on a free Kaggle Tesla T4 (scripted: `scripts/gpu_bench/
 | OmniVoice RTF, ~17 s text | 0.80 | 0.14–0.16 | **0.145–0.169** |
 | OmniVoice RTF, ~1 s phrase | 2.7 | 0.40–0.65 | **0.45–0.77** |
 
-**SeamlessM4T v2 speech→speech on the T4** (fp16, owner's 5–7 s clips; Slovak has no speech output in M4T v2, so EN→SK is not possible, EN→CS is):
+**SeamlessM4T v2 speech→speech on the T4** (fp16, maintainer's 5–7 s clips; Slovak has no speech output in M4T v2, so EN→SK is not possible, EN→CS is):
 
 | Direction | Input | Generation | RTF vs input | Text check (ASR of the output) |
 |---|---|---|---|---|
@@ -316,28 +316,28 @@ Second, independent run on a free Kaggle Tesla T4 (scripted: `scripts/gpu_bench/
 
 **What this proves and does not prove**
 - Proven (two T4 runs): the speed wall is the Mac, not the models. A free-tier GPU makes OmniVoice cloning ~5× faster than real-time on long text and ~0.7 s for a one-second phrase; Seamless S2ST translates a 7 s utterance in ~1 s.
-- Not proven: that the cloned voice sounds like the owner and is free of the tremble that killed the Piper voices. That needs the ear: the 9 clips are in the Voice Lab section "GPU clones + speech-to-speech" and are the only evidence that decides whether Piper training can be dropped.
+- Not proven: that the cloned voice sounds like the maintainer and is free of the tremble that killed the Piper voices. That needs the ear: the 9 clips are in the Voice Lab section "GPU clones + speech-to-speech" and are the only evidence that decides whether Piper training can be dropped.
 - Not tested: any card faster than a T4 (Modal's GPUs need a payment method; no result for L4/L40S/4090), latency of a full live cascade with a GPU engine, streaming.
 
-### 10.4 Owner ear verdict on the GPU clips (2026-10-02, chat, qualitative — no numeric grades recorded)
+### 10.4 Listening verdict on the GPU clips (2026-10-02, chat, qualitative — no numeric grades recorded)
 
-Reported by the owner after listening in the Voice Lab: **the OmniVoice and X-Voice clones (EN/SK/CS, Kaggle T4) are good**; the only generic (non-cloned) voices were the **SeamlessM4T clips** (`kaggle_T4/seamless_{cs_to_eng,en_to_ces,sk_to_eng}`) and the two older `seamless-chunked30_*` spikes. Not recorded: per-clip grade, tremor/hiss, similarity score (ratings made in the browser were not synced to `processed/ear_grades.json`; log in on `https://localhost:8000` or export "Download my ratings (JSON)" to capture them).
+Reported by the maintainer after listening in the Voice Lab: **the OmniVoice and X-Voice clones (EN/SK/CS, Kaggle T4) are good**; the only generic (non-cloned) voices were the **SeamlessM4T clips** (`kaggle_T4/seamless_{cs_to_eng,en_to_ces,sk_to_eng}`) and the two older `seamless-chunked30_*` spikes. Not recorded: per-clip grade, tremor/hiss, similarity score (ratings made in the browser were not synced to `processed/ear_grades.json`; log in on `https://localhost:8000` or export "Download my ratings (JSON)" to capture them).
 
 What follows, and what does not:
-- **Speed + ear verdict together** (two T4 runs + owner ear): on a modest GPU the cascade STT → MT → **OmniVoice clone** is a viable way to speak in the owner's voice, with no per-voice training. Seamless S2ST is fast (RTF 0.15–0.19) but speaks in a stock voice, so it is a translation reference, not the voice path.
+- **Speed + ear verdict together** (two T4 runs + maintainer ear): on a modest GPU the cascade STT → MT → **OmniVoice clone** is a viable way to speak in the test speaker's voice, with no per-voice training. Seamless S2ST is fast (RTF 0.15–0.19) but speaks in a stock voice, so it is a translation reference, not the voice path.
 - **Piper fine-tuning is not needed on a GPU machine.** It stays the only option for CPU-only machines (Windows laptop, Mac live path): its job there is speed (RTF ~0.04), not quality. The two Piper personal voices are still kill-graded for tremble, so on CPU the live voice remains the generic/`omni`-trained one until a better fine-tune exists.
 - **Still unmeasured:** a full live cascade on a GPU (STT + MT + clone TTS) with turn-by-turn timeline, and anything faster than a T4 (Modal GPUs need a payment method). Next step: run the meeting simulation (`scripts/meeting_sim.py` / `demo_conversation.py`) with OmniVoice as the TTS on a GPU, then a live run on the presentation machine.
 
 ## 11. Addendum 2026-11-05 — session findings (research + live fixes)
 
-Labels as in §0. `MEASURED` = run on owner's SK clips or Kaggle T4 this session; `VENDOR`/`UNKNOWN` = awaiting `scripts/bench_new_models.py`.
+Labels as in §0. `MEASURED` = run on maintainer's SK clips or Kaggle T4 this session; `VENDOR`/`UNKNOWN` = awaiting `scripts/bench_new_models.py`.
 
 ### 11.1 STT — whisper-large-v3-turbo-sk now the SK quality tier
 
 | Model | SK/CZ? | License | Size / runtime | Key number | Verdict |
 | --- | --- | --- | --- | --- | --- |
-| **kinit/whisper-large-v3-turbo-sk** (new) | native SK fine-tune | MIT | ~809M, ~6GB VRAM GPU, faster-whisper CT2 | `VENDOR` WER 5.60% internal / 9.29% CV24 SK (model card); `MEASURED` not yet on owner mic | **Replaces whisper-small-sk as the SK quality tier.** `BP_SK_STT_MODEL=kinit/whisper-large-v3-turbo-sk` now selectable (`local_stt_source` fixed to accept HF names). Untested on owner mic — Kaggle T4 or CUDA box needed |
-| whisper-small-sk (incumbent) | native SK fine-tune | MIT | ~500 MB, faster-whisper CPU | `MEASURED` WER 0.13 FLEURS-sk / 0.26 owner mic; ~2.4s per 7s clip, RTF 0.33 | Keep as SK default on CPU-only machines until turbo-sk is verified |
+| **kinit/whisper-large-v3-turbo-sk** (new) | native SK fine-tune | MIT | ~809M, ~6GB VRAM GPU, faster-whisper CT2 | `VENDOR` WER 5.60% internal / 9.29% CV24 SK (model card); `MEASURED` not yet on maintainer mic | **Replaces whisper-small-sk as the SK quality tier.** `BP_SK_STT_MODEL=kinit/whisper-large-v3-turbo-sk` now selectable (`local_stt_source` fixed to accept HF names). Untested on maintainer mic — Kaggle T4 or CUDA box needed |
+| whisper-small-sk (incumbent) | native SK fine-tune | MIT | ~500 MB, faster-whisper CPU | `MEASURED` WER 0.13 FLEURS-sk / 0.26 maintainer mic; ~2.4s per 7s clip, RTF 0.33 | Keep as SK default on CPU-only machines until turbo-sk is verified |
 
 ### 11.2 TTS / voice cloning — new EN-side zero-shot options
 
@@ -410,7 +410,7 @@ User ran live E2E on Mac M1 Pro CPU (EN→CS, `me_en_script.m4a`, 115s). Pipelin
 
 | Item | Why | Path |
 | --- | --- | --- |
-| whisper-large-v3-turbo-sk on owner mic | WER + latency on real audio | Download model (~800MB), run on Kaggle T4 or CUDA box |
+| whisper-large-v3-turbo-sk on maintainer mic | WER + latency on real audio | Download model (~800MB), run on Kaggle T4 or CUDA box |
 | OmniVoice on Kaggle T4 | Kernel complete — RTF 0.42–0.45 confirmed | Results in `omnivoice_report.json` |
 | Qwen3-TTS / Chatterbox on T4 | EN zero-shot cloning options | Kernels not yet created |
 | Real-mic E2E on Mac | Microphone-to-ear incl. capture + playback | User running live test; `scripts/live/batch_stream_test.py` available |

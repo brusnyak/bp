@@ -69,7 +69,7 @@ Every 0.3s audio chunk from the WebSocket:
 | Whisper STT | `backend/stt/faster_whisper_stt.py` |
 | MT engine | `backend/mt/ctranslate2_mt.py` |
 | TTS engines | `backend/tts/base.py` (registry), `backend/tts/piper_tts.py` |
-| WebSocket handler | `app.py` (`/ws`) |
+| WebSocket reviewer | `app.py` (`/ws`) |
 | Hardware auto-config | `backend/hardware_scan.py` |
 | Meeting session manager | `backend/session_manager.py` |
 

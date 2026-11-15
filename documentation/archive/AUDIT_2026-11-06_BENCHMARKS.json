@@ -3,7 +3,7 @@
   "scope": "Re-audit saved receipts and artifacts; no new inference, no listening grades",
   "routes": [
     {
-      "path": "~/Documents/STU/BP/route_receipt.json",
+      "path": "<checkout>/route_receipt.json",
       "sha256": "c45aaf8879516a275df92a2e9a9c8821a3b86072787ef344f87afaffbe57ffb7",
       "metric": "server first successful WAV send completion minus ingress-anchored first voiced sample",
       "gpu_inventory": "Tesla T4, 580.178.04, 15360 MiB\nTesla T4, 580.178.04, 15360 MiB",

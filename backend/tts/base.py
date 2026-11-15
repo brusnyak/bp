@@ -101,7 +101,7 @@ def _piper_sk_personal_factory() -> PiperTTS:
 def _piper_sk_omni_factory() -> PiperTTS:
     # SK voice fine-tuned on the OmniVoice HQ corpus (2026-09-30, 2500 steps,
     # small-sk WER 0.19 vs 0.54 for sk_personal). Ear verdict pending — not
-    # the default until the owner picks it in the Voice Lab.
+    # the default until the maintainer picks it in the Voice Lab.
     return _piper("me_omni_piper_sk", "sk_SK-lili-medium")
 
 

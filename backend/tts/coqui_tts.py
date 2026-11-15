@@ -17,7 +17,7 @@ from backend import hardware
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # ============================================================================
-# THESIS NOTE: Performance Optimizations for Real-Time Voice Cloning
+# Performance Optimizations for Real-Time Voice Cloning
 # ============================================================================
 # This module implements several optimizations to reduce XTTS v2 latency:
 # 1. Speaker Embedding Caching - Reduces redundant computation
@@ -42,7 +42,7 @@ class CoquiTTS:
                                     If None, attempts to auto-detect (cuda -> mps -> cpu).
             enable_warmup (bool): Whether to run warmup synthesis during init.
         
-        THESIS NOTE: Device detection logic added. While MPS has limited operator support
+        Device detection logic added. While MPS has limited operator support
         for XTTS v2, it's included for future compatibility or other models.
         """
         # OPTIMIZATION 1: Device detection and fallback
@@ -62,12 +62,12 @@ class CoquiTTS:
         self.sample_rate = 24000  # XTTS v2 uses 24kHz
         
         # OPTIMIZATION 2: Speaker embedding cache
-        # THESIS NOTE: Caching embeddings eliminates redundant computation,
+        # Caching embeddings eliminates redundant computation,
         # providing 30-50% latency reduction on subsequent synthesis calls
         self.speaker_embedding_cache: Dict[str, Tuple[torch.Tensor, torch.Tensor]] = {}
         
         # OPTIMIZATION 3: Configurable inference parameters
-        # THESIS NOTE: Optimization - Inference Parameters
+        # Optimization - Inference Parameters
         # Research-based tuning to prevent end-of-sentence artifacts:
         # - Low temperature (0.2) reduces hallucinations and unstable outputs
         # - High repetition_penalty (10.0) prevents stuttering and prolonged sounds
@@ -91,7 +91,7 @@ class CoquiTTS:
             logging.info("CoquiTTS: XTTS v2 model loaded successfully.")
             
             # OPTIMIZATION 4: Model warmup
-            # THESIS NOTE: Warmup eliminates JIT compilation overhead on first call
+            # Warmup eliminates JIT compilation overhead on first call
             if enable_warmup:
                 self._warmup()
                 
@@ -103,7 +103,7 @@ class CoquiTTS:
         """
         Warm up the model with a dummy synthesis to eliminate first-run overhead.
         
-        THESIS NOTE: First synthesis includes JIT compilation and optimization.
+        First synthesis includes JIT compilation and optimization.
         Warmup ensures consistent latency from the first user-facing request.
         """
         logging.info("CoquiTTS: Running model warmup...")
@@ -142,7 +142,7 @@ class CoquiTTS:
         Returns:
             torch.Tensor: Cached speaker embedding, or None on error.
             
-        THESIS NOTE: Speaker embedding extraction is the most expensive part
+        Speaker embedding extraction is the most expensive part
         of voice cloning. Caching allows reuse across multiple synthesis calls.
         """
         # Check cache first
@@ -201,7 +201,7 @@ class CoquiTTS:
         Returns:
             tuple: (audio_waveform, sample_rate, tts_time)
             
-        THESIS NOTE: This method implements cached synthesis for improved performance.
+        This method implements cached synthesis for improved performance.
         """
         if self.model is None:
             logging.error("CoquiTTS: Model not initialized. Cannot synthesize speech.")
@@ -227,7 +227,7 @@ class CoquiTTS:
                     use_cache = False
             
             if use_cache and embeddings is not None:
-                # THESIS NOTE: Cached synthesis path - significantly faster
+                # Cached synthesis path - significantly faster
                 # Use the synthesizer's internal inference method which accepts embeddings directly
                 gpt_cond_latent, speaker_embedding = embeddings
                 
@@ -242,7 +242,7 @@ class CoquiTTS:
                 # inference returns dict with 'wav' key containing numpy array
                 wav = output['wav'].squeeze()
             else:
-                # THESIS NOTE: Direct synthesis path - slower but works without cache
+                # Direct synthesis path - slower but works without cache
                 wav = self.model.tts(
                     text=text,
                     speaker_wav=speaker_wav_path,
@@ -272,7 +272,7 @@ class CoquiTTS:
         """
         Stream audio synthesis by yielding chunks as they are generated.
         
-        THESIS NOTE: For short texts (<200 chars), we synthesize in one shot to avoid
+        For short texts (<200 chars), we synthesize in one shot to avoid
         chunk boundary artifacts. For longer texts, we use sentence-level streaming.
         
         Args:
@@ -288,7 +288,7 @@ class CoquiTTS:
         try:
             start_time = time.perf_counter()
             
-            # THESIS NOTE: Hybrid Strategy
+            # Hybrid Strategy
             # Short texts: synthesize in one shot (no chunk boundaries = no artifacts)
             # Long texts: use streaming for lower latency
             if len(text) < 200:
@@ -303,7 +303,7 @@ class CoquiTTS:
                     **kwargs
                 )
                 
-                # THESIS NOTE: Intelligent Energy-Based Trimming
+                # Intelligent Energy-Based Trimming
                 # Instead of fixed-duration trimming, we analyze the audio energy to detect
                 # where actual speech ends and the artifact begins. This preserves all speech
                 # while removing only the trailing noise.

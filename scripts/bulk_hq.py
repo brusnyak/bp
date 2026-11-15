@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""OmniVoice HQ corpus generation: zero-shot clones of the owner's me_* voices.
+"""OmniVoice HQ corpus generation: zero-shot clones of the test speaker's me_* voices.
 
 15 varied ~30s passages (meeting-style + transcript continuations) per language
 for the future Piper training corpus. Slow one-time job: run ALONE in the background

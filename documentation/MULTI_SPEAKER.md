@@ -48,7 +48,7 @@ Each speaker is assigned a voice at join time:
 | Voice Type | Source | Use case |
 |------------|--------|----------|
 | Generic Piper | sk_SK-lili, en_US-john, cs_CZ-jirka | Default, no enrollment needed |
-| Personal Piper | sk_SK-personal-male, en_US-personal-v2 | Owner's cloned voice |
+| Personal Piper | sk_SK-personal-male, en_US-personal-v2 | Test speaker's cloned voice |
 | Zero-shot OmniVoice | reference WAV | GPU only, any speaker |
 
 The voice is chosen from `speaker_voices/` (user-uploaded) or defaults. Each speaker's TTS output uses their assigned voice, so listeners hear each speaker in a distinct voice.
@@ -122,13 +122,13 @@ Enforced by `max_concurrent_sessions` from hardware auto-config.
 
 ---
 
-## 6. LHC Integration Fit
+## 6. conference-room Integration Fit
 
-| LHC scenario | BP v2 fit |
+| conference-room scenario | BP v2 fit |
 |-------------|-----------|
 | One remote person, EN↔SK | ✅ Single speaker, one listener, direct route |
 | Per-seat earbuds (each own language) | ✅ N listeners, each picks target language |
 | Remote room join | ⚠️ Needs room audio capture (virtual cable) |
 | Accenture platform integration | ❌ Unknown API — not promised |
 
-The LHC room audio contract (mic input, return channels, DSP/mixer) must be confirmed before deployment.
+The conference-room room audio contract (mic input, return channels, DSP/mixer) must be confirmed before deployment.

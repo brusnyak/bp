@@ -18,10 +18,10 @@ Kernel `yegorby/bp-incr-t4-20261104` v1 (private, COMPLETE per `kaggle kernels s
 ## Not proven / caveats
 
 - No listening grade, no WER; hypotheses flicker (B log: "sunlight's dry", "sunlit strikes rainbows"), STT quality of incremental vs segment mode ungraded. Mid-span delay for A overstates delay slightly (summarize_replay's own note), so A's lead is if anything conservative.
-- Piper SK is a generic voice, CPU; not the owner's voice, not OmniVoice. Result applies to a fast TTS where TTS is not the bottleneck.
+- Piper SK is a generic voice, CPU; not the test speaker's voice, not OmniVoice. Result applies to a fast TTS where TTS is not the bottleneck.
 - One 90 s EN->SK input; other languages and speakers untested. Route stays `route_unverified`.
 - Deviations on the Kaggle copy only: `INCR step` log gets `dt=`; requirements relaxed for Python 3.13 (SQLAlchemy>=2.0.36); client `config_update` extended in-process with `stt_model_size=small.en` (`paced_replay.py` untouched). No licence edit needed.
 
 ## Files (gitignored private dir)
 
-`~/Documents/STU/BP/documentation/implementation-2026-11-04/kaggle-route-private/`: `incr-report.json`, `paced-{A,B,C,D}.json`, `server-{A,B,C,D}.log`. Job: `~/Documents/STU/BP/scripts/gpu_bench/kaggle_incr/{job.py,kernel-metadata.json,build_package.py}`. New private dataset `yegorby/bp-incr-code-20261104` (code + 90 s owner voice + public lili Piper voice); existing datasets untouched.
+`<checkout>/documentation/implementation-2026-11-04/kaggle-route-private/`: `incr-report.json`, `paced-{A,B,C,D}.json`, `server-{A,B,C,D}.log`. Job: `<checkout>/scripts/gpu_bench/kaggle_incr/{job.py,kernel-metadata.json,build_package.py}`. New private dataset `yegorby/bp-incr-code-20261104` (code + 90 s maintainer voice + public lili Piper voice); existing datasets untouched.

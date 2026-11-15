@@ -56,17 +56,17 @@ choices second. Built from `ui/global-styles.css` (the contract) + the
 
 ## Product name
 
-**Real-Time Speech Translation** (owner decision 2026-11-05: keep the name). The top bar shows "Speech Translation".
-The manifest and Voice Lab still say "Hlas"; rename them only if the owner asks.
+**Real-Time Speech Translation**. The top bar shows "Speech Translation".
+The manifest and Voice Lab still say "Hlas"; rename them only as an explicit product change.
 
-## Change protocol (added 2026-11-05 after a redesign the owner rejected as generic)
+## Change protocol
 
 1. **Purpose first.** Every page states the product in one sentence taken from `PRODUCT.md`:
-   live translation in the speaker's own voice, English and Slovak in both directions. A page that could
+   local speech translation and captions, with experimental personal voices and Slovak input clearly labelled. A page that could
    describe any speech tool has failed.
-2. **Keep-list before any edit.** List what the owner already likes on each page (left section rail, boxed
+2. **Keep-list before any edit.** List the established elements on each page (left section rail, boxed
    +/- FAQ cards, footer with signature and social icons, feature cards, latency chart) and keep it unless the
-   owner says remove it. Removal is a question, not a side effect of a refactor.
+   change scope explicitly removes it. Removal requires explicit review before a refactor.
 3. **Baseline pair.** Screenshot the current and the previous version (git tag or backup) at 1440 and 500 px
    before touching code, and compare them side by side after. No "before" means no redesign.
 4. **One signature motif.** (Shipped 2026-11-05: hero line that follows the visitor's microphone locally, a small wave mark under every section title, language chips read from the server.) The voice line: a single berry waveform that runs from the speaker's English words
@@ -76,5 +76,5 @@ The manifest and Voice Lab still say "Hlas"; rename them only if the owner asks.
    (claim, status proven or target, evidence file, copy to show while it is not proven). Persuasive framing is
    allowed: lead with the best true number and name the goal as a target. An unmeasured claim is never stated as fact.
 6. **Languages.** Nothing lists a language by hand. Interface locales come from `ui/i18n/*.json` (`scripts/ui_manifest.py` writes `ui/i18n/index.json`); speech routes from the server (`ui/shared/caps.js`: `/api/capabilities`, else `/api/routes`, else `ui/shared/manifest.json`). One picker (`ui/shared/lang-picker.js`) for both. Names are rendered with `Intl.DisplayNames` and marked `translate="no"`. New copy goes through keys (en, sk, de) from the start. Legal pages stay in one reviewed language until a lawyer checks a translation.
-7. **Owner check.** The owner views the desktop and phone screenshots of home, live and one document page
+7. **Visual review.** A reviewer views the desktop and phone screenshots of home, live and one document page
    before the change is called done.

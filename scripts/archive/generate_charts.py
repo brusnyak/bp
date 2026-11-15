@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Coqui TTS Chart Generation Script
-Generates comprehensive visualizations for thesis documentation.
+Generates comprehensive visualizations for technical report documentation.
 """
 
 import json

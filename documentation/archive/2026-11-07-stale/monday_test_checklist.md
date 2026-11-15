@@ -1,6 +1,6 @@
 # Monday demo test checklist (2026-09-28)
 
-Owner runs this live; every row is pass/fail with an artifact. Session logs land in
+maintainer runs this live; every row is pass/fail with an artifact. Session logs land in
 `processed/sessions/*.jsonl` automatically (no setup) for post-demo review.
 
 ## A. Accuracy (measured, not eyeballed)
@@ -18,8 +18,8 @@ Owner runs this live; every row is pass/fail with an artifact. Session logs land
 
 ## B. Voice (ears + numbers)
 
-- [ ] **SK voice in owner's voice** (Piper fine-tune `sk_SK-personal-male-medium`): listen — identity? artifacts? trembling?
-- [ ] **EN voice** (Piper `en_US-ryan-medium` or owner fine-tune): same.
+- [ ] **SK voice in maintainer's voice** (Piper fine-tune `sk_SK-personal-male-medium`): listen — identity? artifacts? trembling?
+- [ ] **EN voice** (Piper `en_US-ryan-medium` or custom fine-tune): same.
 - [ ] **Latency**: first-call vs repeat-call TTS RTF noted out loud. Piper RTF ~0.04 on CPU.
 
 ## C. Live system (both laptops)
@@ -32,7 +32,7 @@ Owner runs this live; every row is pass/fail with an artifact. Session logs land
 - [ ] Google login button renders real GIS (needs Console localhost origin); password login fallback works.
 - [ ] PWA installs (Chrome/Edge); self-signed cert accepted.
 
-## D. Handler narrative (continued work, not finished product)
+## D. reviewer narrative (continued work, not finished product)
 
 Show in order: live EN→SK → PiP → Voice Lab (voices/QC/plan) → PLAN.md + tasks.
 Say out loud: SK→EN STT is the measured bottleneck (0.63), fix path funded by evidence,

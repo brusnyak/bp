@@ -3,9 +3,9 @@
 **Feature Branch**: `002-pwa-pip-demo`
 **Created**: 2026-09-25
 **Status**: Draft
-**Input**: Owner direction 2026-09-25 — the "app" is a PWA control-room + floating PiP
+**Input**: maintainer direction 2026-09-25 — the "app" is a PWA control-room + floating PiP
 subtitle window + virtual-mic routing, not a native shell. Demo target: Monday 2026-09-28,
-owner's Mac + AMD Windows laptop, live with handler if required, both EN→SK and SK→EN.
+maintainer's Mac + AMD Windows laptop, live with reviewer if required, both EN→SK and SK→EN.
 
 ## Vehicle decision (settled 2026-09-25)
 
@@ -29,7 +29,7 @@ in-page strip; closes/reopens without breaking the WS session; unsupported brows
 a clear message, not silence.
 
 ### User Story 2 — Monday demo runs both directions (Priority: P1) 🎯 demo
-EN→SK live in owner's Hybrid-cloned voice with projected subtitles; SK→EN path proven
+EN→SK live in maintainer's Hybrid-cloned voice with projected subtitles; SK→EN path proven
 as far as hardware allows without the SK recording (generic Piper SK base + Hybrid
 fallback), fully live once the quiet-room SK session lands.
 
@@ -39,7 +39,7 @@ EN output through the same chain.
 take on hotkey through the identical pipeline; VAD re-tuned at soundcheck.
 
 ### User Story 3 — Lab tracks the build (Priority: P2)
-Voice Lab gains a plan toggle rendering `PLAN.md` live (zero drift) so owner + handler
+Voice Lab gains a plan toggle rendering `PLAN.md` live (zero drift) so maintainer + reviewer
 see done/now/next without asking.
 
 ### Edge Cases
@@ -58,9 +58,9 @@ see done/now/next without asking.
 ## Success Criteria
 - **SC-001**: PiP opens, updates, survives app-switching on the demo Mac AND the AMD Windows laptop (Chrome/Edge).
 - **SC-002**: Monday script (5–6 sentences EN→SK) runs end-to-end live with subtitles projected.
-- **SC-003**: Handler sees continued work: Lab page + plan + voices + PiP in one sitting.
+- **SC-003**: reviewer sees continued work: Lab page + plan + voices + PiP in one sitting.
 
 ## Assumptions
-- Owner's voice recordings gate only SK→EN liveness and final voice QC — not PiP, plan panel, DESIGN.md, or EN→SK demo.
-- Product name shortlist (owner decides): **Hlas** (SK "voice", recommended — short, own, handler-friendly) · LIVO · VoxBridge. Manifest currently ships Hlas.
-- Monday honesty rule: demo shows what is real (EN→SK Hybrid in owner's voice from existing EN clips, captions/PiP, Lab, plan) and labels what is pending (SK→EN live, sk_SK-personal quality voice). Continued-work showcase, not a finished-product claim.
+- Test speaker's voice recordings gate only SK→EN liveness and final voice QC — not PiP, plan panel, DESIGN.md, or EN→SK demo.
+- Product name shortlist (maintainer decides): **Hlas** (SK "voice", recommended — short, own, reviewer-friendly) · LIVO · VoxBridge. Manifest currently ships Hlas.
+- Monday honesty rule: demo shows what is real (EN→SK Hybrid in maintainer's voice from existing EN clips, captions/PiP, Lab, plan) and labels what is pending (SK→EN live, sk_SK-personal quality voice). Continued-work showcase, not a finished-product claim.

@@ -9,7 +9,7 @@ translation has none of the speaker's rhythm. Three pure, model-free pieces (uni
 2. trailing_pause_s  - short silence after a comma-level phrase, longer after a sentence end, inside one translation.
 3. RateFollower      - smoothed ratio source_speech_duration / tts_duration -> Piper length_scale in [0.85, 1.15].
 
-Default pause sizes come from the owner's reading of the bilingual script (53 pauses >=0.12 s, median 0.46 s;
+Default pause sizes come from the test speaker's reading of the bilingual script (53 pauses >=0.12 s, median 0.46 s;
 the 18 sentence-end pauses were 0.8-2.4 s). Disable everything with BP_PROSODY=0.
 """
 from __future__ import annotations

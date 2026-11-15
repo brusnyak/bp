@@ -54,7 +54,7 @@
 **Yes.** The new voice reduces STT WER by 71 % (0.5405 → 0.1892) and brings the system to the level of the generic lili voice — while keeping a personal identity. The live SK→EN pipeline uses real user speech, so voice choice does not affect recognition of human speakers. However, any **synthesized** SK path (e.g., offline loops or demo material) will benefit from this change.
 
 ## What to do next
-1. **Ear‑QC call:** The owner should audition the new voice and decide whether to:
+1. **Ear‑QC call:** the maintainer should audition the new voice and decide whether to:
    - Keep the current product default (`sk_SK-personal-male-medium`), or
    - Switch to `me_omni_piper_sk` (engine entry `piper_sk_omni` can be registered if chosen).
 2. **Add the new engine to the UI** (backend/tts/base.py) as a registered option — already built the `piper_sk_omni` registration skeleton.

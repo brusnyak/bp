@@ -4,18 +4,18 @@
 **Created**: 2026-10-18
 **Status**: Draft
 **Supersedes**: `001-realtime-cross-platform-translation`, `002-pwa-pip-demo` (archived to `specs/_archive/`; their still-open work is fused below — see §Source map)
-**Input**: Owner direction 2026-10-18 — "the project has to be able to handle any language, cloning and more, run on server, semi-production-grade ready… easy CLI plug-and-play, able to swap whatever whenever for a better version… the rest for Path B and beyond should be set." Thesis-complete **and** product-grade, because the handler may want a collaboration on their own custom system.
+**Input**: maintainer direction 2026-10-18 — "the project has to be able to handle any language, cloning and more, run on server, semi-production-grade ready… easy CLI plug-and-play, able to swap whatever whenever for a better version… the rest for Path B and beyond should be set." technical report-complete **and** product-grade, because the reviewer may want a collaboration on their own custom system.
 
 ## Context
 
 Two earlier specs each drifted: 001 (cross-platform pipeline) left portability, per-OS
 audio routing and the shared model pool open; 002 (PWA + PiP demo) was a demo sprint.
-This spec is the single completion line. It turns the bachelor prototype into a system
+This spec is the single completion line. It turns the research prototype into a system
 that (a) supports any language pair through a declared, tested "language pack", (b) lets
 every pipeline stage be swapped for a better engine behind one interface, (c) installs
 and runs with one CLI command on any OS, (d) can run as a server for multiple users, and
 (e) can be used in a real call (system audio in, virtual mic out, floating captions).
-The cascade stays the thesis contribution; a unified speech-to-speech engine is optional,
+The cascade stays the technical report contribution; a unified speech-to-speech engine is optional,
 pluggable, and never required (evidence: `documentation/s2s_landscape_2026-10-18.md`).
 
 ## User Scenarios & Testing *(mandatory)*
@@ -28,7 +28,7 @@ direction(s), TTS voice, script hints) in one config/manifest file, run
 against a fixed clip, and reports WER/chrF/latency. If the test passes, `pl` appears as
 **verified**; if it fails, it appears as **experimental** with the failing metric.
 
-**Why this priority**: everything the supervisor's "any language" request means reduces
+**Why this priority**: everything the reviewer's "any language" request means reduces
 to this one flow. Without it, every language is bespoke code.
 
 **Independent Test**: Add `cs` (files already exist: `bootstrap_cz/`,
@@ -102,7 +102,7 @@ An operator runs the backend on a shared box. Auth is real (no unauthenticated
 WebSocket), sessions are isolated, models are pooled (one copy per stage, not per
 session), and health/metrics endpoints exist for monitoring.
 
-**Why this priority**: the supervisor's "run on server" and any hosted demo need this.
+**Why this priority**: the reviewer's "run on server" and any hosted demo need this.
 `T018` (shared model pool) and the security audit items live here.
 
 **Independent Test**: Two authenticated clients translate concurrently; model memory is
@@ -144,7 +144,7 @@ captions shown over the call window and translated audio presented to a virtual 
 A collaborator integrates the pipeline into their own app with no UI: import the
 pipeline, configure stages, stream in, stream out. A thin REST/WS contract + Python API.
 
-**Why this priority**: the collaboration hook; also the most realistic non-thesis value.
+**Why this priority**: the collaboration hook; also the most realistic non-technical report value.
 
 **Independent Test**: A ~30-line script drives one utterance end-to-end and prints text
 + writes audio, importing only the public package surface.
@@ -267,7 +267,7 @@ translated audio + text; the cascade remains the default.
 ## Out of scope
 
 - New model training (Piper fine-tune workflow stays as-is unless US2 needs it).
-- A SaaS/billing product. This spec targets a great thesis + a collaborator-usable system.
+- A SaaS/billing product. This spec targets a great technical report + a collaborator-usable system.
 - Beating cloud accuracy on spontaneous speech; the goal is a trustworthy local system,
   not a leaderboard win.
 

@@ -22,7 +22,7 @@ Prefer adapting and correctly configuring existing, working open-source componen
 
 ## Operating Mode
 
-Decide and execute well-evidenced, reversible steps directly rather than re-litigating settled decisions in conversation — this project moved to Spec Kit specifically so scope lives in versioned files, not chat history. Still stop and ask before genuinely destructive/irreversible actions or anything with shared/social visibility (pushing to the remote, submitting the thesis).
+Decide and execute well-evidenced, reversible steps directly rather than re-litigating settled decisions in conversation — this project moved to Spec Kit specifically so scope lives in versioned files, not chat history. Still stop and ask before genuinely destructive/irreversible actions or anything with shared/social visibility (pushing to the remote, submitting the technical report).
 
 ## Governance
 

@@ -1,7 +1,7 @@
 # BP Pipeline SDK — REST/WS Contract & Python Facade
 
 **Version**: 0.1.0 (contract clarified 2026-11-04)
-**Status**: Experimental — API may change before 1.0. Full university/commercial route acceptance is pending.
+**Status**: Experimental — API may change before 1.0. Full shared deployment/commercial route acceptance is pending.
 
 **November 4 runtime contract:** authenticate `/ws?token=<JWT>` before any session/model loading; connection alone does not prepare models. Send `config_update`, wait for `models_loading_status` and its `route_status`, then `start`. `stop` cancels session work and suppresses late output; subsequent bytes are ignored until a new `start`. Already-running native worker inference may finish but its stale output is not sent. Missing runtime models/tokenizers fail with setup-required errors rather than downloading. `/api/routes` reports declared routes and installed assets without inference. Private research media/library paths are denied; speaker assets require ownership or an explicit public-demo receipt. Optional streaming captions require an explicitly provisioned local profile.
 
@@ -152,8 +152,8 @@ tts = instantiate("tts", "piper_sk_personal")
 | MT | `nllb` | non-commercial | 🔒 | NLLB-200 (CC-BY-NC-4.0) |
 | MT | `hybrid-mt` | unknown | 🔒 | Component licences must be verified |
 | TTS | `piper` | commercial-ok | ✅ | CPU baseline, ~60MB/voice |
-| TTS | `piper_sk_personal` | commercial-ok | ✅ | Owner's fine-tuned SK voice |
-| TTS | `piper_personal` | commercial-ok | ✅ | Owner's fine-tuned EN voice |
+| TTS | `piper_sk_personal` | commercial-ok | ✅ | Test speaker's fine-tuned SK voice |
+| TTS | `piper_personal` | commercial-ok | ✅ | Test speaker's fine-tuned EN voice |
 | TTS | `omnivoice` | unknown | 🔒 | Cloning, needs GPU (~5.8GB VRAM) |
 | TTS | `xtts` | non-commercial | 🔒 | Coqui XTTS v2 (CPML) |
 | TTS | `hybrid` | unknown | 🔒 | Inherits component licences |
@@ -338,9 +338,9 @@ Models are stored in `ct2_models/Helsinki-NLP--opus-mt-<src>-<tgt>/` with `model
 ### Piper Personal Voices (CPU, fast)
 
 Fine-tuned Piper voices in `backend/tts/piper_models/`:
-- `en_US-personal-medium.onnx` — Owner's EN voice
+- `en_US-personal-medium.onnx` — Test speaker's EN voice
 - `en_US-personal-v2.onnx` — v2 EN voice
-- `sk_SK-personal-male-medium.onnx` — Owner's SK voice (demo default)
+- `sk_SK-personal-male-medium.onnx` — Test speaker's SK voice (demo default)
 
 Training: `scripts/finetune_personal_voice.py` (separate venv, ~hours on GPU).
 

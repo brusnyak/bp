@@ -25,13 +25,13 @@ Result: **46 passed, 1 deselected**. Deselected test makes an external HF reques
 
 No real browser, microphone, playback, conference routing, cloned-voice quality, full-load or remote Kaggle test ran here. Private research media is intentionally unavailable through the shared app until a sanitized public demo/export or a proper research authorization model is provided. CLI component resolution retains its historical fetchable-size semantics; `/api/routes` overrides STT availability with local-only checks. SDK STT also resolves local assets/cache only; its no-model pool test uses a stubbed installed source.
 
-Roast: corrected configuration and passing mocked tests prove the repaired contracts, not the complete LHC meeting product. Cheapest failure remains real audio routing/capture under continuous speech; smallest next check is the parent's authenticated browser sound-check → continuous use → Stop rehearsal on installed assets.
+Roast: corrected configuration and passing mocked tests prove the repaired contracts, not the complete conference-room meeting product. Cheapest failure remains real audio routing/capture under continuous speech; smallest next check is the parent's authenticated browser sound-check → continuous use → Stop rehearsal on installed assets.
 
 ## Follow-up: real-model VAD gate repaired
 
 Parent's first full suite found three VAD failures: the old harness fed bytes without the newly required Start, fed trailing silence instantaneously despite a wall-clock VAD close timer, and used disconnect as an implicit final transcription flush. Production now treats disconnect/Stop as cancellation.
 
-`test/vad_tests.py` now emits Start, sends PCM at its actual frame duration, and waits for normally VAD-triggered pipeline tasks while the mock client remains connected. Original transcript/translation assertions remain unchanged. The auth fixture now uses in-memory SQLite rather than writing a test identity into the owner's default database. Removed obsolete DIAG3 per-chunk WARNING output and downgraded normal all-zero VAD frame notices to DEBUG. `hf_model_info` now honors `HF_HUB_OFFLINE=1` before stdlib urllib so the offline suite cannot bypass the flag.
+`test/vad_tests.py` now emits Start, sends PCM at its actual frame duration, and waits for normally VAD-triggered pipeline tasks while the mock client remains connected. Original transcript/translation assertions remain unchanged. The auth fixture now uses in-memory SQLite rather than writing a test identity into the test speaker's default database. Removed obsolete DIAG3 per-chunk WARNING output and downgraded normal all-zero VAD frame notices to DEBUG. `hf_model_info` now honors `HF_HUB_OFFLINE=1` before stdlib urllib so the offline suite cannot bypass the flag.
 
 Fresh checks:
 

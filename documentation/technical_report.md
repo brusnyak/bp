@@ -1,25 +1,15 @@
 # Real-time Speech Translation System
 
-**Author:** Yehor Brusniak
-**Date:** 2025/2026
-**Supervisor:** Ing. Ivan Minárik
-**Faculty:** Fakulta elektrotechniky a informatiky
-**University:** Slovenská technická univerzita v Bratislave
-**Program:** Informačné a komunikačné technológie
-**Field:** IKT
-**Department:** Ústav multimediálnych informačných a komunikačných technológií
-**Thesis Type:** Bakalárska práca
-**ID:** FEI-XXXX-XXXXX
 **Keywords:** real-time, speech-to-text, machine translation, text-to-speech, voice cloning, FastAPI, WebSockets, Apple Silicon
 
 **Abstract:**
-This bachelor's thesis presents the design, implementation, and evaluation of a real-time live speech translation system. The project addresses the growing need for seamless cross-lingual communication, particularly in dynamic environments such as international conferences. Leveraging state-of-the-art open-source models for Speech-to-Text (STT), Machine Translation (MT), and Text-to-Speech (TTS), the system aims to provide low-latency, high-quality translation. Optimized for Apple Silicon (M1/M2/M3) hardware, the system features a modular architecture with a FastAPI backend and a responsive web-based user interface. Key functionalities include real-time transcription, translation, and speech synthesis, dynamic language switching, voice activity detection, and real-time latency visualization. The thesis details the system's architecture, implementation specifics, experimental setup, and performance results, demonstrating its capability to achieve target latencies of 2-3 seconds for standard TTS and 2.5-3.5 seconds for voice cloning. Future enhancements and potential optimizations are also discussed.
+This research prototype presents the design, implementation, and evaluation of a real-time live speech translation system. The project addresses the growing need for seamless cross-lingual communication, particularly in dynamic environments such as international conferences. Leveraging state-of-the-art open-source models for Speech-to-Text (STT), Machine Translation (MT), and Text-to-Speech (TTS), the system aims to provide low-latency, high-quality translation. Optimized for Apple Silicon (M1/M2/M3) hardware, the system features a modular architecture with a FastAPI backend and a responsive web-based user interface. Key functionalities include real-time transcription, translation, and speech synthesis, dynamic language switching, voice activity detection, and real-time latency visualization. The technical report details the system's architecture, implementation specifics, experimental setup, and performance results, demonstrating its capability to achieve target latencies of 2-3 seconds for standard TTS and 2.5-3.5 seconds for voice cloning. Future enhancements and potential optimizations are also discussed.
 
 # 1. Introduction
 
 ### 1.1 Background and Motivation
 
-The rapid expansion of global digital collaboration has made real-time cross-lingual communication an essential requirement in academic and professional settings. Within the context of the department of Multimedia Information and Communication Technologies (ÚMIKT), there is a specific interest in integrating high-quality speech translation into hybrid teleconferencing systems. Conventional solutions often rely on proprietary cloud APIs, which introduce variable network latency, ongoing costs, and data privacy concerns. This project is motivated by the potential of optimizing state-of-the-art open-source models (STT, MT, and TTS) to run locally on Apple Silicon hardware. By leveraging a unified memory architecture (M1/M2/M3 chips), we can achieve low-latency performance suitable for live streaming without external dependencies.
+The rapid expansion of global digital collaboration has made real-time cross-lingual communication an essential requirement in academic and professional settings. Meeting participants need captions and translated speech from one local pipeline. Conventional solutions often rely on proprietary cloud APIs, which introduce variable network latency, ongoing costs, and data privacy concerns. This project is motivated by the potential of optimizing state-of-the-art open-source models (STT, MT, and TTS) to run locally on Apple Silicon hardware. By leveraging a unified memory architecture (M1/M2/M3 chips), we can achieve low-latency performance suitable for live streaming without external dependencies.
 
 ### 1.2 Problem Statement
 
@@ -27,7 +17,7 @@ Developing a real-time speech translation pipeline requires a complex orchestrat
 
 ### 1.3 Goals and Objectives
 
-The objective of this thesis is to demonstrate a viable real-time speech translation system optimized for local execution. The specific goals are:
+The objective of this technical report is to demonstrate a viable real-time speech translation system optimized for local execution. The specific goals are:
 
 - **Low-Latency Inference**: Targeting end-to-end latency below 1.5s for fast-path TTS (Piper) and below 3.5s for zero-shot voice cloning (XTTS v2), bridging the gap between automated transcription and natural conversation.
 - **Hardware-Targeted Optimization**: Leveraging Apple Silicon's unified memory for efficient model switching and tensor operations using `CTranslate2` and `Faster-Whisper`.
@@ -35,9 +25,9 @@ The objective of this thesis is to demonstrate a viable real-time speech transla
 - **Full-Duplex Communication**: Utilizing WebSockets and FastAPI to manage continuous audio buffering and minimize I/O overhead.
 - **Empirical Evaluation**: Conducting a comparative benchmark of Slovak TTS performance (speed vs. quality) across several candidates including Piper, XTTS, and OpenVoice V2.
 
-### 1.4 Thesis Structure
+### 1.4 technical report Structure
 
-This thesis is organized into the following chapters:
+This technical report is organized into the following chapters:
 
 - **Chapter 1: Introduction** provides an overview of the project, its motivation, the problem it addresses, and its objectives.
 - **Chapter 2: Theoretical Background** reviews the fundamental concepts and technologies underpinning speech-to-text, machine translation, and text-to-speech systems.
@@ -72,7 +62,7 @@ The choice of `faster-whisper` as the primary STT engine was driven by several k
 
 - **Original OpenAI Whisper (PyTorch):** While highly accurate, the original PyTorch implementation is significantly slower and more resource-intensive, making it less suitable for real-time streaming applications where low latency is critical.
 - **`whisper.cpp`:** This is another highly optimized C++ port of Whisper. It offers excellent performance, especially on CPU. However, `faster-whisper` provides a more direct Python API integration, which aligns better with the FastAPI backend, and its CTranslate2 backend offers competitive performance on Apple Silicon and GPUs.
-- **Other ASR APIs (e.g., Google Cloud Speech-to-Text, AWS Transcribe):** Cloud-based APIs offer high accuracy and scalability but introduce network latency, incur costs, and require an internet connection, which might not be ideal for all deployment scenarios or for a bachelor's project focused on local model execution.
+- **Other ASR APIs (e.g., Google Cloud Speech-to-Text, AWS Transcribe):** Cloud-based APIs offer high accuracy and scalability but introduce network latency, incur costs, and require an internet connection, which might not be ideal for all deployment scenarios or for a research prototype focused on local model execution.
 
 The decision to use `faster-whisper` strikes an optimal balance between accuracy, speed, resource efficiency, and ease of integration for this real-time speech translation system.
 
@@ -97,8 +87,8 @@ The combination of `CTranslate2` as an inference engine and `Helsinki-NLP Opus-M
 **Alternatives Considered:**
 
 - **Hugging Face Transformers (PyTorch/TensorFlow):** While offering immense flexibility and access to a vast array of NMT models, running inference directly with the full `transformers` library can be slower and more memory-intensive than `CTranslate2` for production-grade real-time applications, especially without dedicated GPU acceleration.
-- **Cloud MT APIs (e.g., Google Translate API, DeepL API):** These services offer high-quality translations and scalability. However, they introduce network latency, incur costs per translation, and require continuous internet connectivity. For a bachelor's project focused on local model execution and minimizing external dependencies, a self-hosted solution was preferred.
-- **SeamlessM4T v2:** While a promising unified speech-to-speech translation model, its complexity and resource requirements were deemed too high for the initial scope of a bachelor's project, which prioritizes a modular pipeline with distinct STT, MT, and TTS components for clearer evaluation and optimization.
+- **Cloud MT APIs (e.g., Google Translate API, DeepL API):** These services offer high-quality translations and scalability. However, they introduce network latency, incur costs per translation, and require continuous internet connectivity. For a research prototype focused on local model execution and minimizing external dependencies, a self-hosted solution was preferred.
+- **SeamlessM4T v2:** While a promising unified speech-to-speech translation model, its complexity and resource requirements were deemed too high for the initial scope of a research prototype, which prioritizes a modular pipeline with distinct STT, MT, and TTS components for clearer evaluation and optimization.
 
 The choice of `CTranslate2` with `Opus-MT` provides a robust, efficient, and flexible machine translation solution that aligns perfectly with the real-time and performance objectives of this project.
 
@@ -315,7 +305,7 @@ Conference Application (Meet/Zoom/Teams) - Uses virtual device as mic input
 The system is composed of several interconnected modules, each specialized for a particular function.
 
 - **Frontend (UI):**
-  - `ui/home/home.html`: Main HTML structure, including dual-mode layout (default/thesis), header, footer, and content sections.
+  - `ui/home/home.html`: Main HTML structure, including dual-mode layout (default/technical report), header, footer, and content sections.
   - `ui/home/home.css`: Styling for home page elements, navigation, and mode-specific adjustments.
   - `ui/home/home.js`: JavaScript for dynamic UI behavior, header scroll, hamburger menu, theme switching, mode switching, bubble navigation, Chart.js initialization, and code snippet copy functionality.
   - `ui/live-speech/audio-processor.js`: Web Audio Worklet for efficient, off-main-thread audio processing.
@@ -356,10 +346,10 @@ The system is composed of several interconnected modules, each specialized for a
 
 #### 3.4.1 Technology Stack Justification
 
-The selection of specific technologies and tools across frontend, backend, and deployment categories was made to ensure the system is robust, performant, scalable, and maintainable, while leveraging open-source solutions suitable for a bachelor's project.
+The selection of specific technologies and tools across frontend, backend, and deployment categories was made to ensure the system is robust, performant, scalable, and maintainable, while leveraging open-source solutions suitable for a research prototype.
 
 - **HTML, CSS, JavaScript (Frontend Core):**
-  - **Justification:** These are the foundational technologies for web development, offering universal browser compatibility and flexibility. For a bachelor's project, they provide a direct and understandable way to build a responsive UI without the added complexity of a heavy frontend framework (like React, Angular, Vue), which would introduce a steeper learning curve and additional build steps.
+  - **Justification:** These are the foundational technologies for web development, offering universal browser compatibility and flexibility. For a research prototype, they provide a direct and understandable way to build a responsive UI without the added complexity of a heavy frontend framework (like React, Angular, Vue), which would introduce a steeper learning curve and additional build steps.
   - **Alternatives Considered:** Modern JavaScript frameworks (React, Vue, Angular) offer component-based development and state management, but were deemed overkill for the current UI complexity and would divert focus from the core AI pipeline.
 - **Web Audio API (Frontend Audio Processing):**
   - **Justification:** Provides powerful, low-level control over audio processing directly in the browser. It enables efficient microphone capture, real-time manipulation (e.g., resampling, chunking via Web Audio Worklets), and playback of synthesized audio without relying on server-side processing for these client-specific tasks. This is crucial for minimizing frontend-induced latency.
@@ -396,25 +386,25 @@ This chapter delves into the technical implementation of the real-time speech tr
 
 The frontend is a modern web application built with standard web technologies (HTML, CSS, JavaScript) to ensure broad compatibility and a rich user experience, following the UI/UX design guidance inspired by "Lingonberry Mail".
 
-- **HTML Structure (`ui/home/home.html`):** The main HTML file defines the dual-mode layout, including the header, footer, and distinct content sections for "Default Mode" and "Thesis Mode." It incorporates placeholders for dynamic content such as interactive charts (using `<canvas>` elements for Chart.js) and data tables.
+- **HTML Structure (`ui/home/home.html`):** The main HTML file defines the dual-mode layout, including the header, footer, and distinct content sections for "Default Mode" and "technical report Mode." It incorporates placeholders for dynamic content such as interactive charts (using `<canvas>` elements for Chart.js) and data tables.
 - **CSS Styling (`ui/home/home.css`, `ui/global-styles.css`, `styles.css`):**
   - `ui/global-styles.css` and `styles.css` define global CSS variables for consistent theming (day/night mode), typography, and base element styling. The color palette is adapted from "Lingonberry Mail" with specific variables for light and dark themes (e.g., `--primary-color`, `--background-color-start`, `--text-color`).
-  - `ui/home/home.css` provides specific styles for the home page, including responsive design for the header, navigation (hamburger menu, bubble navigation), and distinct visual treatments for each section in both default and thesis modes.
+  - `ui/home/home.css` provides specific styles for the home page, including responsive design for the header, navigation (hamburger menu, bubble navigation), and distinct visual treatments for each section in both default and technical report modes.
   - **Layout & Structure Principles:**
     - **Full-Screen Sections:** Each major section (Hero, About, Features, How-To, Demo, About, FAQ) occupies `min-h-screen` and is designed as a distinct "slide" with smooth scrolling behavior. Content within sections is centered horizontally using responsive containers.
     - **"Floating Container" for Content:** Content within sections resides in a "floating container" (e.g., `div` with `bg-surface-color`, `p-8`, `rounded-xl`, `shadow-lg`, `border border-border-color`) for visual separation.
     - **Header:** Fixed at the top (`fixed w-full top-0 z-40`), with dynamic visibility (hides on scroll down, reappears on scroll up in default mode). Uses `font-montserrat` for navigation links and buttons, and a theme toggle icon.
     - **Footer:** A distinct section at the bottom (`p-8 text-center text-text-color font-montserrat`) with copyright information.
     - **Floating Sidebar Navigation:** Small, circular "bubbles" (`w-5 h-5 rounded-full`) fixed on the left side (`fixed left-8 top-1/2 -translate-y-1/2 z-30`). Hidden in the Hero section, visible otherwise, with smooth transitions and active states.
-  - Custom styles are applied for elements like `.hero-illustration`, `.feature-icon`, `.step-icon`, `.section-subtitle`, `.thesis-figure`, `.thesis-table-container`, `.data-table`, and `.code-snippet-container` to achieve the desired aesthetic and Notion-like code block styling.
+  - Custom styles are applied for elements like `.hero-illustration`, `.feature-icon`, `.step-icon`, `.section-subtitle`, `.technical report-figure`, `.technical report-table-container`, `.data-table`, and `.code-snippet-container` to achieve the desired aesthetic and Notion-like code block styling.
 - **JavaScript Logic (`ui/home/home.js`, `ui/live-speech/audio-processor.js`, `ui/theme-toggle.js`):**
   - `ui/home/home.js` manages core UI interactivity:
-    - **Header Behavior:** Implements logic for the header to hide on scroll down and reappear on scroll up in default mode, and to be completely hidden in thesis mode.
+    - **Header Behavior:** Implements logic for the header to hide on scroll down and reappear on scroll up in default mode, and to be completely hidden in technical report mode.
     - **Hamburger Menu:** Controls the opening and closing of the mobile navigation menu.
     - **Theme-Dependent Images:** Dynamically switches signature images in the footer based on the active theme.
-    - **Mode Switching:** Handles the logic for toggling between "Default Mode" and "Thesis Mode," including content visibility and smooth scrolling to the top.
+    - **Mode Switching:** Handles the logic for toggling between "Default Mode" and "technical report Mode," including content visibility and smooth scrolling to the top.
     - **Bubble Navigation:** Manages active states and smooth scrolling for the `section-nav` elements.
-    - **Chart.js Integration:** Initializes and updates interactive charts (e.g., `architectureChart`, `performanceChart`) for visualizing system metrics in thesis mode.
+    - **Chart.js Integration:** Initializes and updates interactive charts (e.g., `architectureChart`, `performanceChart`) for visualizing system metrics in technical report mode.
     - **Code Snippet Copy Functionality:** Provides a `copyCode` function to allow users to easily copy code blocks to their clipboard.
   - `ui/live-speech/audio-processor.js` implements a Web Audio Worklet for efficient, off-main-thread audio processing. This ensures that audio capture and preprocessing (e.g., resampling, chunking) do not block the main UI thread, contributing to low latency.
   - `ui/theme-toggle.js` handles the day/night mode switching logic, persisting user preferences.
@@ -668,7 +658,7 @@ The primary objective was to achieve low end-to-end latency. The system's UI inc
 
 #### 5.2.2 Accuracy Evaluation
 
-- **STT Accuracy (WER) — measured on owner's real recordings (M1 Pro):**
+- **STT Accuracy (WER) — measured on maintainer's real recordings (M1 Pro):**
 
   | Model | Language | WER | CER | Notes |
   | :---- | :------- | :-- | :-- | :---- |
@@ -691,8 +681,8 @@ The primary objective was to achieve low end-to-end latency. The system's UI inc
 
 - **TTS Quality:**
   - **Piper TTS (generic):** RTF 0.033 (gate threshold 0.1) — **PASSED**; natural, clear, low latency
-  - **Piper personal (SK):** Owner's fine-tuned voice; F0 range ~half of generic (11–13Hz vs 22Hz) — "robotic" quantified
-  - **OmniVoice (GPU):** RTF 0.14–0.17 (T4, 12 steps); owner ear: clones good, 12 steps 4/5 vs 16 steps 2/5
+  - **Piper personal (SK):** Test speaker's fine-tuned voice; F0 range ~half of generic (11–13Hz vs 22Hz) — "robotic" quantified
+  - **OmniVoice (GPU):** RTF 0.14–0.17 (T4, 12 steps); maintainer ear: clones good, 12 steps 4/5 vs 16 steps 2/5
   - **OmniVoice (CPU/MPS):** RTF 2.5–2.9 — autoregressive-bound, not compute-bound
 
 #### 5.2.3 TTS Quality Comparison
@@ -830,7 +820,7 @@ Subjective listening tests confirmed that Coqui TTS successfully clones voice ch
 
 #### 5.2.5 Decision-Making Documentation
 
-This section documents the key technical decisions made during development, along with their rationale. Per supervisor feedback, documenting the "why" behind each decision is critical for understanding the project's evolution.
+This section documents the key technical decisions made during development, along with their rationale. Per reviewer feedback, documenting the "why" behind each decision is critical for understanding the project's evolution.
 
 ##### Selection of XTTS v2
 
@@ -851,7 +841,7 @@ During development, **XTTS v2** was selected for voice cloning based on its prom
 - **MPS Instability:** Initial tests on Apple Silicon's MPS backend revealed stability issues (crashes).
 - **Mitigation:** As detailed in Section 5.2.6, the system was configured to force CPU execution for XTTS v2, prioritizing stability over raw inference speed.
 
-**Trade-off:** While CPU execution results in higher latency (RTF ~1.72) compared to theoretical GPU performance, the stability and consistent quality improvements justified this trade-off for the bachelor's thesis demonstration.
+**Trade-off:** While CPU execution results in higher latency (RTF ~1.72) compared to theoretical GPU performance, the stability and consistent quality improvements justified this trade-off for a research prototype demonstration.
 
 ##### Parameter Tuning and Optimization
 
@@ -906,11 +896,11 @@ Despite Apple Silicon's MPS backend offering potential GPU acceleration:
     - CUDA acceleration on NVIDIA GPUs (Windows deployment) is planned for future work.
     - Expected RTF improvement from 1.72 (CPU) to 0.3-0.5 (GPU), reducing latency to <1s.
 
-**Decision:** Prioritize stability and consistency over raw performance for the thesis demonstration.
+**Decision:** Prioritize stability and consistency over raw performance for the technical report demonstration.
 
 #### 5.2.6 Errors Faced and Solutions
 
-This section documents the major errors encountered during development and the solutions implemented. Per supervisor feedback, documenting failures and debugging processes is as important as documenting successes.
+This section documents the major errors encountered during development and the solutions implemented. Per reviewer feedback, documenting failures and debugging processes is as important as documenting successes.
 
 ##### Error 1: MPS Backend Crashes
 
@@ -1368,7 +1358,7 @@ The latency analysis confirms that end-to-end translation can be achieved within
 
 Accuracy evaluations show high performance for STT, with a WER of 0.0 for tested English phrases. The MT component also demonstrated functional accuracy in translating between English and Slovak.
 
-The detailed optimization process for Coqui TTS XTTS v2, including artifact elimination through intelligent energy-based trimming and parameter tuning, was crucial for achieving high-quality, natural-sounding voice-cloned output. The decision to force CPU execution for XTTS v2 on Apple Silicon, prioritizing stability over raw MPS performance, proved effective for the thesis demonstration, with future GPU acceleration expected to further reduce latency.
+The detailed optimization process for Coqui TTS XTTS v2, including artifact elimination through intelligent energy-based trimming and parameter tuning, was crucial for achieving high-quality, natural-sounding voice-cloned output. The decision to force CPU execution for XTTS v2 on Apple Silicon, prioritizing stability over raw MPS performance, proved effective for the technical report demonstration, with future GPU acceleration expected to further reduce latency.
 
 Scalability testing revealed that the current architecture, with per-user model instantiation, can reliably support up to 12 concurrent users on an M1 Pro with 16GB RAM. Beyond this, memory and CPU saturation become bottlenecks. This highlights the need for architectural improvements like model sharing and request queuing for production deployments, or vertical scaling with more powerful hardware. The system's ability to handle 12 concurrent users on consumer-grade hardware is a notable achievement, exceeding typical requirements for small-group meetings.
 
@@ -1378,7 +1368,7 @@ Overall, the project successfully validated the feasibility of building a high-p
 
 ### 6.1 Summary of Achievements
 
-This bachelor's thesis successfully designed, implemented, and evaluated a real-time live speech translation system, demonstrating a robust solution for seamless cross-lingual communication. The project achieved its primary objectives by integrating state-of-the-art open-source models for Speech-to-Text (STT), Machine Translation (MT), and Text-to-Speech (TTS) into a low-latency pipeline. Key accomplishments include:
+This research prototype successfully designed, implemented, and evaluated a real-time live speech translation system, demonstrating a robust solution for seamless cross-lingual communication. The project achieved its primary objectives by integrating state-of-the-art open-source models for Speech-to-Text (STT), Machine Translation (MT), and Text-to-Speech (TTS) into a low-latency pipeline. Key accomplishments include:
 
 - **Real-time Performance:** The system demonstrated the capability to achieve target end-to-end latencies (1.09s for Piper TTS, 1.84s for Coqui XTTS for short utterances), making it suitable for live interactive scenarios.
 - **Modular and Optimized Architecture:** A flexible client-server architecture with a FastAPI backend and a responsive web frontend was developed, optimized for efficient execution on Apple Silicon hardware.
@@ -1414,7 +1404,7 @@ Building upon the current foundation, several key areas for future work have bee
 ## Deklarácia k využitiu UI (povinná časť, DRAFT — vlastník doplní a overí pred odovzdaním)
 
 Vypracované podľa Pravidiel používania AI v ŠP B-IKT zo dňa 14.09.2026 (nadstavba nad
-Opatrením rektora STU č. 1/2024 – O). Každému bodu autor rozumie, vie ho vysvetliť a vie
+Opatrením rektora project č. 1/2024 – O). Každému bodu autor rozumie, vie ho vysvetliť a vie
 uviesť zdroj publikovanej informácie a jeho relevanciu.
 
 - **Teoretické kapitoly (STT/MT/TTS/VAD):** AI slúžilo ako vyhľadávací a sumarizačný

@@ -198,7 +198,7 @@ Each speaker selects their input device:
 1. **Server deployment:** Docker container vs systemd service vs cloud VM?
 2. **Room persistence:** In-memory (lost on restart) vs database-backed rooms?
 3. **Authentication:** JWT per user (already built) or anonymous room access?
-4. **Max concurrent speakers:** Enforced by hardware auto-config, but what's the default for a university server?
+4. **Max concurrent speakers:** Enforced by hardware auto-config, but what's the default for a processing server?
 5. **Presenter flow:** Does the presenter also need to hear translated audience questions (reverse direction)?
 
 ---

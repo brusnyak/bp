@@ -133,7 +133,7 @@
             "defects": {
               "steadiness": 3
             },
-            "note": "trembling in voice, not worth using in simulation (EN test). Owner chat review 2026-10-01. Machine: intelligibility fixed (WER 0.19) but naturalness fails; HNR -10dB vs +4 generic."
+            "note": ""
           }
         },
         {
@@ -153,7 +153,7 @@
             "defects": {
               "steadiness": 3
             },
-            "note": "trembling in voice, not worth using in simulation (SK test). Owner chat review 2026-10-01. Machine: intelligibility fixed (WER 0.19) but naturalness fails; HNR -10dB vs +4 generic."
+            "note": ""
           }
         },
         {
@@ -508,7 +508,7 @@
             "keep": "kill",
             "sim": null,
             "defects": {},
-            "note": "robotic trembling throughout, mumbling in parts; source recording decent, degradation is in the old model weights (owner chat review 2026-10-01)"
+            "note": ""
           }
         },
         {
@@ -610,7 +610,7 @@
             "keep": "kill",
             "sim": null,
             "defects": {},
-            "note": "recognizably the owner but processed trembling in TTS output; unusable as demo fallback (owner chat review 2026-10-01)"
+            "note": ""
           }
         },
         {
@@ -631,7 +631,7 @@
             "keep": "kill",
             "sim": null,
             "defects": {},
-            "note": "bad synth; garbage STT→MT (\"creepy eyeball\"); evidence of old-voice unrecognizability, unusable as demo fallback (owner chat review 2026-10-01)"
+            "note": ""
           }
         }
       ]
@@ -684,7 +684,7 @@
             "keep": "kill",
             "sim": null,
             "defects": {},
-            "note": "entire sim bad quality; playbacks use the old personal voices, regen with me_omni_piper_sk pending (owner chat review 2026-10-01)"
+            "note": ""
           }
         },
         {
@@ -715,7 +715,7 @@
             "keep": "kill",
             "sim": null,
             "defects": {},
-            "note": "entire sim bad quality; playbacks use the old personal voices, regen with me_omni_piper_sk pending (owner chat review 2026-10-01)"
+            "note": ""
           }
         },
         {
@@ -746,7 +746,7 @@
             "keep": "kill",
             "sim": null,
             "defects": {},
-            "note": "entire sim bad quality; playbacks use the old personal voices, regen with me_omni_piper_sk pending (owner chat review 2026-10-01)"
+            "note": ""
           }
         },
         {
@@ -777,7 +777,7 @@
             "keep": "kill",
             "sim": null,
             "defects": {},
-            "note": "entire sim bad quality; playbacks use the old personal voices, regen with me_omni_piper_sk pending (owner chat review 2026-10-01)"
+            "note": ""
           }
         },
         {
@@ -808,7 +808,7 @@
             "keep": "kill",
             "sim": null,
             "defects": {},
-            "note": "entire sim bad quality; playbacks use the old personal voices, regen with me_omni_piper_sk pending (owner chat review 2026-10-01)"
+            "note": ""
           }
         }
       ]
@@ -1627,7 +1627,7 @@
             "keep": "keep",
             "sim": null,
             "defects": {},
-            "note": "very good; WER 0.054 backs the ear (owner chat review 2026-10-01)"
+            "note": ""
           }
         },
         {
@@ -1802,7 +1802,7 @@
     },
     {
       "id": "gpu_clones",
-      "title": "GPU clones + speech-to-speech (cloned from the owner's 5-7 s refs)",
+      "title": "GPU clones + speech-to-speech (cloned from the test speaker's 5-7 s refs)",
       "items": [
         {
           "name": "kaggle_T4/omni_cs",

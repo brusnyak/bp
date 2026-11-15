@@ -32,4 +32,4 @@ Streaming recogniser (Voxtral on vLLM: T4 lag 0.08 s after the audio) -> piece p
 1. Built: `INCR emit: hold=...` lines in the server log (fragment hold per piece, `Fragmenter.hold_s`, `test/incremental_tests.py`) and `scripts/live/replay_whatif.py` (offline playback-rate sweep and TTS/source ratio on any saved replay). Still to build: MT and TTS-start times in the same record, so one log line takes a lag apart.
 2. Reference word times for the source (offline alignment, run once per test clip) so every engine is scored against the same clock.
 3. Done for en to de on the Whisper run (ratio 1.32); repeat for en to sk and on the vLLM and OmniVoice runs when they land.
-4. A real two-person recording and an ear panel for seams and pace (owner), scored with the existing `score_success.py`.
+4. A real two-person recording and an ear panel for seams and pace (maintainer), scored with the existing `score_success.py`.

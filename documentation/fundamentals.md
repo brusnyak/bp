@@ -1,4 +1,4 @@
-# Voice-AI fundamentals for the owner (BP companion)
+# Voice-AI fundamentals for the maintainer (BP companion)
 
 Goal: no blind execution. Every component in our pipeline maps to a concept below,
 each with the file where it lives. Read top to bottom once; then use as reference.
@@ -100,7 +100,7 @@ Protocol (same for all): fixed SK v2b clips → WER/CER + RTF + device, recorded
 ## 8. How to read a model card (5-minute checklist)
 
 1. Params + precision (FP16/INT8/INT4) → rough RAM: params × bytes-per-weight.
-2. License (Apache/MIT = free; CC-BY-NC = thesis-ok, product-no; Coqui/XTTS = non-commercial).
+2. License (Apache/MIT = free; CC-BY-NC = research-only, product-no; Coqui/XTTS = non-commercial).
 3. Language list → SK? else CZ/multilingual (proxy rule, §6)?
 4. Architecture family (§3) → predicts the latency shape before you run it.
 5. Reported RTF + on WHAT hardware (H100 numbers are fiction for us; M1 CPU/MPS only).

@@ -1,6 +1,6 @@
 # Licence inventory (commercial use)
 
-Read 2026-11-04 from each voice's MODEL_CARD at `huggingface.co/rhasspy/piper-voices` and the dataset licence pages. "Verified" = the licence text or card was read in this session. Not legal advice; the owner should confirm before selling anything.
+Read 2026-11-04 from each voice's MODEL_CARD at `huggingface.co/rhasspy/piper-voices` and the dataset licence pages. "Verified" = the licence text or card was read in this session. Not legal advice; the maintainer should confirm before selling anything.
 
 ## Piper voices
 | Voice | Role | Dataset licence | Commercial use | Notes |
@@ -14,7 +14,7 @@ Read 2026-11-04 from each voice's MODEL_CARD at `huggingface.co/rhasspy/piper-vo
 | `en_US-libritts_r-medium` | EN multi-speaker | CC BY 4.0 | Yes, with attribution | Card read, not tested |
 | `en_US-ryan-medium` | old EN default | CC BY-NC-SA 4.0 | **No** | Removed from defaults. Do not ship |
 | `en_US-lessac-medium` | - | Blizzard 2013 licence (research use, licence granted to the named recipient) | **No** (treat as non-commercial) | Voices fine-tuned from lessac (amy, joe, arctic, kusal, sam, jenny_dioco) inherit this risk |
-| `en_US-personal-*`, `sk_SK-personal-male-medium` | owner's own fine-tunes | owner's recordings, but `personal-v2` was warm-started from `ryan` (CC BY-NC-SA) | **No until retrained** | Retrain from a clean base (`john`/`kristin`, `lili`, `jirka`) before shipping. `personal-v2` base confirmed in `documentation/personal_voice_bootstrap_2026-08-19.md`; SK personal base not checked |
+| `en_US-personal-*`, `sk_SK-personal-male-medium` | maintainer's own fine-tunes | maintainer's recordings, but `personal-v2` was warm-started from `ryan` (CC BY-NC-SA) | **No until retrained** | Retrain from a clean base (`john`/`kristin`, `lili`, `jirka`) before shipping. `personal-v2` base confirmed in `documentation/personal_voice_bootstrap_2026-08-19.md`; SK personal base not checked |
 
 Piper voices as published are listed under MIT at the repository level; the dataset licence above is the one that matters.
 

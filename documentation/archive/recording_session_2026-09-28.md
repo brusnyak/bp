@@ -61,7 +61,7 @@ Files: `eval_data/recording_set_v2/en_00.wav … en_74.wav`.
 
 ## Block D — Czech passage, 3 paragraphs · OPTIONAL (~5 min)
 
-Only worth it if you want a personal Czech voice (nothing in the EN↔SK thesis path
+Only worth it if you want a personal Czech voice (nothing in the EN↔SK technical report path
 needs it). We QC the takes first and drop them if the accent metric is bad.
 
 **Paragraph 1**
@@ -83,7 +83,7 @@ needs it). We QC the takes first and drop them if the accent metric is bad.
 
 ## Pronunciation policy (non-native speaker caveat)
 
-- **Training (your voice):** your own accent is part of *your* voice — the thesis claim is
+- **Training (your voice):** your own accent is part of *your* voice — the technical report claim is
   "a clone of me", so accented Slovak is honest and correct. The QC loop (record → WER →
   redo flagged) catches real mistakes; it does not require native perfection.
 - **Evaluation (system accuracy):** native speech stays covered by the public FLEURS-sk

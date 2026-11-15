@@ -1,6 +1,6 @@
 # Voice + app direction — 2026-09-19
 
-Owner requirements: (1) one recorded voice, registered like a Piper voice, fast and reliable,
+maintainer requirements: (1) one recorded voice, registered like a Piper voice, fast and reliable,
 no slow zero-shot path in the live loop; record however long is needed, system handles the rest.
 (2) Multilingual from that single recording — EN↔SK both ways (plus other pairs), fast.
 (3) Runs on any OS (mac, linux, windows), works anywhere (web, zoom, other apps) with
@@ -9,14 +9,14 @@ subtitles across windows — i.e. a desktop app, not a browser tab.
 Project status: core pipeline completed earlier (STT→MT→TTS, Hybrid sub-real-time cloning,
 non-blocking pipeline + barge-in T043–T047). Remaining work is polish + packaging, not research.
 
-## 1. Zadanie mapping (FEI-184458-129117, deadline 05.06.2026)
+## 1. Zadanie mapping (project-184458-129117, deadline 05.06.2026)
 
 The assignment asks for: tech survey (STT/MT/TTS for EN + chosen language) → architecture +
 prototype with suitable tools → simple test UI (subtitles or playback) → accuracy/latency
 analysis in a typical conference setting. Backend focus, prototype bar. The current browser
 pipeline already satisfies every numbered task. A desktop app with system-wide subtitles and
 automated virtual-mic routing is above the assignment bar — Track B below, not required
-for defense. Thesis language: Slovak.
+for defense. technical report language: Slovak.
 
 ## 2. Voice decision: Hybrid registered profile is the default, Piper fine-tune is optional
 
@@ -47,7 +47,7 @@ Resolution (spec US5 revision, same day):
 
 ### 2b. Sanctioned build path, added 2026-09-19: one recording → per-language Piper voices
 
-Nothing in the toolchain prevents what the owner actually wants, once it is stated per-language
+Nothing in the toolchain prevents what the maintainer actually wants, once it is stated per-language
 instead of as one bilingual model: record once → cross-lingual clone generates the target-language
 corpus in the user's voice → fine-tune one Piper voice per target language → each registers in
 `TTS_ENGINES` and ships as a standard Piper pair (`.onnx` + `.onnx.json`, same layout as any
@@ -84,7 +84,7 @@ not for a quality fine-tune — volume comes from step 2, identity from steps 3+
 - Flow: record/upload via existing voice modal → `scripts/prepare_voice_corpus.py` normalize +
   dedupe → profile entry + embedding cached → selectable in TTS dropdown as the fast cloned
   voice for any target language. No manual checkpoint hunting, no venv juggling.
-- Recording commitment 2026-09-19: no SK recording of the owner exists yet; owner will record
+- Recording commitment 2026-09-19: no SK recording of the maintainer exists yet; maintainer will record
   on demand. Plan: one EN top-up session (varied sentences, 2–3 min total with existing clips)
   + one SK read session (varied, 2–3 min). SK session doubles as real anchor data for step 3
   of the §2b build (real SK oversampling beats EN-anchored synthetic-only) and as the future
@@ -92,15 +92,15 @@ not for a quality fine-tune — volume comes from step 2, identity from steps 3+
 
 ## 4. App-ification: two tracks
 
-- **Track A (thesis-sufficient, now):** browser UI + virtual-mic select + rendered
+- **Track A (prototype-ready, now):** browser UI + virtual-mic select + rendered
   `caption_partial` streaming captions + latency charts. Covers zadanie task 3–4 as written.
 - **Track B (post-defense unless time allows):** desktop shell (Tauri/Electron) hosting the
   same FastAPI backend: autostart daemon, per-OS audio capture (BlackHole / WASAPI loopback /
   PipeWire null-sink) automated per constitution principle V, always-on-top caption overlay
   across windows, one-click virtual-mic routing into Zoom/Meet/Teams. No pipeline model
-  changes — packaging only. Must not be promised to the handler as thesis content.
+  changes — packaging only. Must not be promised to the reviewer as technical report content.
 
-## 5. Open items before handler meeting
+## 5. Open items before reviewer meeting
 - Push the 9 unpushed local commits (T043–T047) so the remote matches the demo.
 - Render `caption_partial` in `ui/live-speech/` (backend plumbing exists, frontend missing).
 - One blind listening test (Hybrid SK vs fine-tuned EN vs XTTS) to close the similarity gap

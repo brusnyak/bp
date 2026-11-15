@@ -1,6 +1,6 @@
-"""Czech voice data for a Piper fine-tune (2026-11-10): OmniVoice clones the owner's Czech voice over FLEURS Czech sentences, a Czech Whisper pass
+"""Czech voice data for a Piper fine-tune (2026-11-10): OmniVoice clones the test speaker's Czech voice over FLEURS Czech sentences, a Czech Whisper pass
 rejects clips that are not intelligible, survivors become a Piper training set (22050 Hz mono wav + `file|text` csv, peak -3 dB, edges trimmed).
-Why: the owner's own recordings carry background noise; the clone is clean and can be multiplied. Output goes to /kaggle/working/data (read by the
+Why: the test speaker's own recordings carry background noise; the clone is clean and can be multiplied. Output goes to /kaggle/working/data (read by the
 fine-tune kernel through kernel_sources, never downloaded). Writes /kaggle/working/data_report.json after every step; models stay in /tmp.
 Gate: Czech word error per clip <= 10%, duration 1.5-14 s."""
 import glob, json, os, re, subprocess, sys, time, traceback
@@ -16,7 +16,7 @@ def sh(c, t=1800):
 N_SENT = 800; STEPS = 16
 R['env']['gpu'] = sh('nvidia-smi --query-gpu=name --format=csv,noheader')[1].strip()
 
-# ---- reference: the cleanest 10 s window of the owner's Czech reading (highest p90/p10 frame-energy ratio) ----
+# ---- reference: the cleanest 10 s window of the test speaker's Czech reading (highest p90/p10 frame-energy ratio) ----
 src = next(Path('/kaggle/input').rglob('me_cs_staromestske.m4a'))
 rc, o = sh(f'ffmpeg -y -v error -i {src} -ac 1 -ar 24000 /tmp/cs_full.wav'); log('decode', rc=rc)
 import soundfile as sf

@@ -1,4 +1,4 @@
-.PHONY: install run test test-ui i18n demo-check demo-audio lab clean help check-docs
+.PHONY: install run test test-ui i18n demo-check demo-audio lab clean help check-docs check-public
 
 # Same commands on every OS; the real work lives in scripts/setup.py.
 ifeq ($(OS),Windows_NT)
@@ -18,6 +18,9 @@ run: ## Run the server on http://localhost:8000 (loopback only; BP_HOST=0.0.0.0 
 test: ## Run the backend test suite.
 	export BP_DISABLE_RATE_LIMIT=1; $(VENV_PY) -m pytest test/hardware_test.py test/hardware_scan_tests.py test/vad_tests.py test/mt_model_tests.py test/backend_api_tests.py test/backend_auth_tests.py test/strategy_tests.py test/security_tests.py test/config_tests.py test/readiness_regression_test.py test/language_evidence_test.py test/incremental_tests.py test/crossfade_tests.py test/lag_trace_tests.py test/ui_manifest_test.py test/prosody_tests.py test/mlx_guard_tests.py test/onnx_parakeet_words_test.py test/setup_plan_test.py test/tts_route_registry_test.py test/cuda_libs_test.py test/room_tests.py test/voxtral_stream_tests.py test/voxtral_vllm_tests.py test/omni_pace_tests.py test/room_join_tests.py -q
 
+
+check-public: ## Check tracked text for private project framing.
+	$(PYTHON) scripts/check_public_tree.py
 
 check-docs: ## Fail if a number quoted in the docs differs from the saved benchmark receipt (<!-- claim:ID -->value<!-- /claim -->).
 	$(PYTHON) scripts/check_readme_claims.py

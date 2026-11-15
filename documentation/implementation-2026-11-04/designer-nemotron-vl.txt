@@ -22,7 +22,7 @@
 
 ### Roast
 
-The current homepage is a thesis graveyard: walls of text, exaggerated production claims, and a live page that feels like a debug console. You’re asking users to trust a speech translation system with JWT mismatches, resuming stops, and rejected virtual inputs while advertising cloned voices that don’t exist yet. The mic pauses during playback—imagine trying to speak while the system talks over you. Async sink routing is broken, and private voice evidence is somehow public. This isn’t a product; it’s a liability with a berry-colored button. Fix the plumbing before you paint the walls.
+The current homepage is a technical report graveyard: walls of text, exaggerated production claims, and a live page that feels like a debug console. You’re asking users to trust a speech translation system with JWT mismatches, resuming stops, and rejected virtual inputs while advertising cloned voices that don’t exist yet. The mic pauses during playback—imagine trying to speak while the system talks over you. Async sink routing is broken, and private voice evidence is somehow public. This isn’t a product; it’s a liability with a berry-colored button. Fix the plumbing before you paint the walls.
 
 ---
 
@@ -39,7 +39,7 @@ The current homepage is a thesis graveyard: walls of text, exaggerated productio
 ### Concrete Copy
 
 **Homepage Hero**
-> **Heading (Playfair Display):** Local Speech Translation for Hybrid University Meetings  
+> **Heading (Playfair Display):** Local Speech Translation for Hybrid hybrid meetings
 > **Body (Montserrat):** Real-time captions and translation for EN, SK, and Czech. Generic TTS baseline. Voice cloning readiness subject to hardware and route qualification.  
 > **CTA (Berry #C41E3A):** Start Speech Translation  
 > **Secondary:** View Research Lab →

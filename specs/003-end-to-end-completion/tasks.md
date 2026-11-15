@@ -18,7 +18,7 @@ Rule: each task ends with a shown check; no claim without a record.
       `specs/_archive/README.md`. T023 is moot — `requirements.txt` carries only `piper-tts==1.3.0`,
       coqui is never installed by setup. T024 not carried: xtts is non-commercial + non-default +
       absent from the reference `.venv`.
-- [x] T003 Add a `LICENSE` (owner decides terms). Check: file exists, no "all rights reserved"
+- [x] T003 Add a `LICENSE` (maintainer decides terms). Check: file exists, no "all rights reserved"
       ambiguity.
       DONE 2026-10-18: MIT (`LICENSE`, © 2026 Yegor Brusnyak) + a third-party note flagging
       the CC-BY-NC traps (Seamless/NLLB). One-line change if a different licence is wanted.
@@ -127,25 +127,25 @@ Rule: each task ends with a shown check; no claim without a record.
 
 - [ ] T024 Public `Pipeline` facade + `documentation/sdk.md` (REST/WS contract).
       Check: a ~30-line external script runs one utterance end-to-end.
-      **ROAST P1**: no SDK facade, no contract doc — supervisor can't embed.
+      **ROAST P1**: no SDK facade, no contract doc — reviewer can't embed.
 - [ ] T025 One unified-engine adapter behind `UnifiedEngine` (local Qwen3-Omni **or** a cloud
       adapter), non-default, offline-first respected. Check: adapter produces text+audio;
       cascade remains default; licence recorded.
-- [ ] T026 Handbook for the supervisor's custom system: how to add a language, an engine, and
-      embed the SDK; the same content as the thesis' practical chapter. Check: doc builds, links live.
+- [ ] T026 Handbook for the reviewer's custom system: how to add a language, an engine, and
+      embed the SDK; the same content as the technical report' practical chapter. Check: doc builds, links live.
 
-## Phase 5 — Thesis + evidence
+## Phase 5 — technical report + evidence
 
-- [ ] T027 Update `documentation/thesis_draft.md` numbers to measured; fill the `[DOPLNIŤ]`
-      marker; align the §4.1 AI-use declaration. Check: no unmeasured number in the thesis.
-      **ROAST P2**: thesis draft has `[DOPLNIŤ]` markers; measured numbers from load_tests_2026-10.md and model_landscape_2026-10.md not reflected.
+- [ ] T027 Update `documentation/technical_report.md` numbers to measured; fill the `[DOPLNIŤ]`
+      marker; align the §4.1 AI-use declaration. Check: no unmeasured number in the technical report.
+      **ROAST P2**: technical report draft has `[DOPLNIŤ]` markers; measured numbers from load_tests_2026-10.md and model_landscape_2026-10.md not reflected.
 - [ ] T028 Re-run the three demo gates + `interrupt_smoke_test.py`; record in the runbook.
       Check: all green, dated.
 - [ ] T028b Move `test/backend_vad_stt_test.py` and `test/piper_pipeline_test.py` to `scripts/live/` or add `pytest.mark.skipif` so `make test` stays clean. **ROAST P2**.
 
 ## Phase 6 — Polish (roast-driven)
 
-- [ ] T029 RVC-MLX model prep: train owner voice via Applio (rented GPU), drop `.pth` + `.index` in `models/rvc/`, register as `rvc-mlx` engine. Check: `bp engine check tts rvc-mlx` passes.
+- [ ] T029 RVC-MLX model prep: train maintainer voice via Applio (rented GPU), drop `.pth` + `.index` in `models/rvc/`, register as `rvc-mlx` engine. Check: `bp engine check tts rvc-mlx` passes.
 - [ ] T030 `bp engine gate` implementation: per-stage thresholds (STT WER, MT chrF, TTS RTF+similarity, VAD timing), writes `processed/engine_gate/`. Check: `bp engine gate tts piper` passes.
       DONE 2026-10-20: thresholds for STT (WER<0.15, latency<8s), MT (chrF>0.6, latency<0.5s), TTS Piper (RTF<0.1), VAD (false_start<0.05). All 4 gates pass.
 - [ ] T031 `/health` + `/metrics` HTTP routes: per-stage readiness, engine+version, live sessions, pool stats. Check: `curl /api/health` + `curl -H "Authorization: Bearer <token>" /api/metrics`.

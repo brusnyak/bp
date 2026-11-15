@@ -27,7 +27,7 @@ Scope: `app.py`, `backend/`, dependency set, repository contents, setup tooling.
 - No rate limiting on `/login` and `/register`; registration is open. Same mitigation.
 - The whole uploaded body is read into memory before the 50 MB check.
 
-## Repository hygiene (action required from the owner)
+## Repository hygiene (action required from the maintainer)
 
 The public history contains material that cannot be removed by a normal commit:
 

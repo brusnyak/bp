@@ -11,5 +11,5 @@ Updated 2026-11-05. Source: documentation/implementation-2026-11-04/*, README.md
 | 4 | Near real time: mean 2.5 s per word, 0.6-0.8 s to first sound | proven, one speaker, one Mac | streaming-findings.md lines 41-62 | 10-minute continuous rehearsal, 3 speakers, p50/p95 speech-end to first audio, max queue delay | Show the numbers with "ear-voice span of human interpreters is about 2-4 s (unverified)" |
 | 5 | Alternating English and Slovak in one session | unproven; T4 load test shows 8-11 s backlog | load_tests_2026-10.md | Add a swap-direction control, then a 10-minute alternating run | "Switch direction between turns" without latency claim |
 | 6 | Many simultaneous sessions | unknown | none | Concurrent-session load test (1, 2, 4, 8) on intended hardware | "One session measured" |
-| 7 | Works in a hybrid meeting room (LHC) | unknown | PRODUCT.md integration hypothesis only | Rehearsal on the real room audio path | "Prototype; room integration not tested" |
+| 7 | Works in a hybrid meeting room (conference-room) | unknown | PRODUCT.md integration hypothesis only | Rehearsal on the real room audio path | "Prototype; room integration not tested" |
 | 8 | Personal data stays local | proven by code for audio; recordings stored on the server | privacy.html, backend/main.py | Retention and deletion test | as in the privacy page |

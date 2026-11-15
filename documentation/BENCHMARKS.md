@@ -28,7 +28,7 @@ Heavy and repeated tests run on Kaggle, not on a laptop. Run a kernel with `kagg
 | 2.0 s | 720 ms | 174 ms | 147 ms |
 | 3.0 s | 722 ms | 177 ms | 224 ms |
 
-Consequence: on a Mac, shortening chunks with turbo makes the delay worse (calls queue up). Live route, 60 s of your English reading, delay after a segment ends: 2.0 s chunks median 1.19 s; 1.5 s chunks 3.21 s; 1.0 s chunks 3.11 s with 35% word error.
+Consequence: on a Mac, shortening chunks with turbo makes the delay worse (calls queue up). Live route, 60 s of the test speaker's English reading, delay after a segment ends: 2.0 s chunks median 1.19 s; 1.5 s chunks 3.21 s; 1.0 s chunks 3.11 s with 35% word error.
 
 **2. Streaming strategies, Kaggle T4 simulation** (latency = time from a word being spoken until committed; error vs the script):
 
@@ -53,7 +53,7 @@ No setting reached under 1 s with under 10% error. The accurate route trades abo
 | English to Slovak, 2 s chunks | <!-- claim:route:en-sk|chunk2:lag -->1.97<!-- /claim --> s | 2.88 s | <!-- claim:route:en-sk|chunk2:fw -->4.05<!-- /claim --> s | <!-- claim:route:en-sk|chunk2:wer -->23.8<!-- /claim -->% | works |
 | English to Slovak, agreement every 1.0 s | <!-- claim:route:en-sk|agree10:lag -->1.89<!-- /claim --> s | 3.10 s | <!-- claim:route:en-sk|agree10:fw -->3.92<!-- /claim --> s | <!-- claim:route:en-sk|agree10:wer -->23.0<!-- /claim -->% | same as chunks |
 
-Zero server errors and zero stock-phrase segments in all five runs. The transcript error through the real route (21-24%) is about four times the offline simulation (5.0% for the same settings): the route adds voice-activity cuts and chunk edges, and your recording is quiet. That gap is an open item, not a settled number.
+Zero server errors and zero stock-phrase segments in all five runs. The transcript error through the real route (21-24%) is about four times the offline simulation (5.0% for the same settings): the route adds voice-activity cuts and chunk edges, and the recording is quiet. That gap is an open item, not a settled number.
 
 First route run (before fixes) found two bugs that no component benchmark could: German crashed with `no engine 'piper_generic_de'` (voice never registered), and 10 of 34 faster-whisper segments were invented stock phrases ("Thank you.") that were translated, spoken and padded until the queue reached an 8 s delay. Both are fixed and covered by tests (`test/tts_route_registry_test.py`, `test/mlx_guard_tests.py`).
 
@@ -63,7 +63,7 @@ First route run (before fixes) found two bugs that no component benchmark could:
 
 ## Limits of these numbers
 
-- FLEURS is clean read speech; conversation, noise and accents are harder. The owner's own recording is the only real-voice test, one speaker.
+- FLEURS is clean read speech; conversation, noise and accents are harder. The test speaker's recording is the only real-voice test, one speaker.
 - The simulation uses engine timestamps, not audio playback; add 0.3-0.6 s for translation and voice in the live route.
 - Translation chrF on opus-100 is relative (subtitle-like text), not an absolute quality score; no human review was done.
-- Slovak on the owner's recording is one 134 s file (about 190 words): differences of one point are two words.
+- Slovak on the test speaker's recording is one 134 s file (about 190 words): differences of one point are two words.

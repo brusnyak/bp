@@ -6,7 +6,7 @@
 
 ## Summary
 
-Fix the pipeline's hardcoded, Mac-only hardware-acceleration default and formalize a per-stage, runtime-detected backend chain so the existing STT→MT→TTS architecture (validated — S2S is ruled out, see Constitution Principle II) actually delivers on the "works the same everywhere" requirement. Layer SSBD-style speculative decoding on top as the thesis's research contribution once the foundation is fixed.
+Fix the pipeline's hardcoded, Mac-only hardware-acceleration default and formalize a per-stage, runtime-detected backend chain so the existing STT→MT→TTS architecture (validated — S2S is ruled out, see Constitution Principle II) actually delivers on the "works the same everywhere" requirement. Layer SSBD-style speculative decoding on top as the technical report's research contribution once the foundation is fixed.
 
 ## Technical Context
 
@@ -26,7 +26,7 @@ Fix the pipeline's hardcoded, Mac-only hardware-acceleration default and formali
 
 **Constraints**: No dedicated GPU assumed as baseline; must run on 16GB RAM class hardware; no platform-exclusive dependency (MLX, CUDA-only) as a required-path default
 
-**Scale/Scope**: Single-user thesis demo is the hard requirement (User Stories 1–2); documented-not-necessarily-solved concurrency ceiling is a secondary goal (User Story 3, currently 12 concurrent users per `documentation/PERFORMANCE_TEST_RESULTS.md`)
+**Scale/Scope**: Single-user technical report demo is the hard requirement (User Stories 1–2); documented-not-necessarily-solved concurrency ceiling is a secondary goal (User Story 3, currently 12 concurrent users per `documentation/PERFORMANCE_TEST_RESULTS.md`)
 
 ## Constitution Check
 

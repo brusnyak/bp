@@ -5,7 +5,7 @@ M1 Pro whatever the clip length (measured 2026-11-07: 0.5 s window 787 ms, 3 s w
 81 ms for 0.5 s, 96 ms for 1 s, 147 ms for 2 s, 224 ms for 3 s (CPU). That makes 0.3 s decoding steps affordable, which the
 incremental route needs to commit words without waiting for a 2 s chunk.
 Trade-offs measured: accuracy is below turbo for cs/pl/de-on-T4 and equal for fr/sk; the language is auto-detected (the `language`
-argument is ignored; on the owner's non-native Slovak it picked the wrong language, WER 80.7%).
+argument is ignored; on the test speaker's non-native Slovak it picked the wrong language, WER 80.7%).
 Env: BP_PARAKEET_PROVIDERS (comma list, default CUDA if present else CPU), BP_PARAKEET_ONNX_DIR (model dir), BP_PARAKEET_INT8 (default 1 on CPU).
 """
 from __future__ import annotations

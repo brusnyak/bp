@@ -247,7 +247,7 @@ def _detect_tts(target: str) -> str | None:
              if n.endswith(".onnx") and n.startswith(f"{target}_")]
     if not names:
         return None
-    # prefer the owner's personal / omni voice over a generic one of the same language
+    # prefer the test speaker's personal / omni voice over a generic one of the same language
     for pref in ("personal", "omni"):
         for n in names:
             if pref in n:

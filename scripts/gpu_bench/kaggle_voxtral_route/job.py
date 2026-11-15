@@ -1,4 +1,4 @@
-"""Voxtral Realtime through the REAL route on a Kaggle T4 (2026-11-09): start app.py with BP_STT_ENGINE=voxtral, replay the owner's English reading at 1x
+"""Voxtral Realtime through the REAL route on a Kaggle T4 (2026-11-09): start app.py with BP_STT_ENGINE=voxtral, replay the test speaker's English reading at 1x
 with scripts/live/paced_replay.py, score lag, transcript accuracy and defects. Same replay and metrics as kaggle_route_test, so the Whisper control
 (same kernel, same strategy) is directly comparable. Runs: voxtral + agree_short / agree (en->de), voxtral + agree_short (en->sk), whisper + agree_short (en->de).
 Transformers is upgraded to >= 5.22 AFTER the translation models are converted with the pinned 4.57.6 (Voxtral Realtime needs 5.x; the Opus-MT tokenizer on 5.x is itself under test).

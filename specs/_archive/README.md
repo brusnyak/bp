@@ -3,10 +3,10 @@
 These are kept for history, not for execution. The single active spec is
 `specs/003-end-to-end-completion/`.
 
-## Why archived (2026-10-18, owner)
+## Why archived (2026-10-18, maintainer)
 
 001 and 002 had drifted and their open tasks were being confused with current scope.
-Per owner direction, the still-open, still-relevant work was **fused** into
+Per maintainer direction, the still-open, still-relevant work was **fused** into
 `specs/003-end-to-end-completion/spec.md` (§Source map) rather than tracked in two places.
 
 | Archived | What it was | Still-open work now lives in 003 as |

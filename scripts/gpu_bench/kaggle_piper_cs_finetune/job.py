@@ -1,4 +1,4 @@
-"""Piper fine-tune of the male Czech voice cs_CZ-jirka-medium on the owner's cloned Czech data, timed (2026-11-10).
+"""Piper fine-tune of the male Czech voice cs_CZ-jirka-medium on the test speaker's cloned Czech data, timed (2026-11-10).
 Uses OHF-voice/piper1-gpl (`python -m piper.train fit`, maintained; rhasspy/piper is archived). Recipe from its docs/TRAINING.md: warm start from the Piper
 checkpoint (`--model.warmstart_ckpt`: weights copied, fresh optimizer, epoch 0), batch 32, lr anneal derived from --trainer.max_epochs.
 Phase 1 measures seconds per epoch on this T4 (4 epochs, then 8, cache warm). Phase 2 picks the epoch count that fits the time budget

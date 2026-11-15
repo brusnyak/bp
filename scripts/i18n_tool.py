@@ -122,7 +122,7 @@ def draft(code):
     print(f"wrote ui/i18n/{code}.json with {len(keys)} raw machine strings; run scripts/ui_manifest.py")
 
 
-PRODUCT_TERMS = "Piper, Opus-MT, CTranslate2, faster-whisper, WebSocket, BlackHole, VB-Cable, GPU, CPU, Mac M1, Tesla T4, OmniVoice, STU FEI, Chrome, Edge, ffmpeg, Python, GitHub"
+PRODUCT_TERMS = "Piper, Opus-MT, CTranslate2, faster-whisper, WebSocket, BlackHole, VB-Cable, GPU, CPU, Mac M1, Tesla T4, OmniVoice, Chrome, Edge, ffmpeg, Python, GitHub"
 NIM_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
 
 

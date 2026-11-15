@@ -1,4 +1,4 @@
-Demo pre-flight -- repo: ~/Documents/STU/BP
+Demo pre-flight -- repo: <checkout>
 
 REQUIRED (demo cannot start without these)
   PASS  certs/cert.pem  --  HTTPS/WSS certificate (else: make certs)

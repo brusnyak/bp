@@ -2,7 +2,7 @@
 
 **Spec**: `specs/002-pwa-pip-demo/spec.md` | **Date**: 2026-09-25
 **Vehicle**: PWA (control-room page + PiP overlay + virtual-mic routing). No native shell.
-**Demo**: Mon 2026-09-28, owner's Mac + AMD Windows laptop, offline-capable, both EN→SK and SK→EN.
+**Demo**: Mon 2026-09-28, maintainer's Mac + AMD Windows laptop, offline-capable, both EN→SK and SK→EN.
 
 ## Approach
 

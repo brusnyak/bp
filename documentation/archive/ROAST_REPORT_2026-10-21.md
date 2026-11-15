@@ -6,7 +6,7 @@
 
 ## JOB
 
-What this project must achieve for the **grumpy professor / picky old man** who wants:
+What this project must achieve for the **grumpy professor / meeting participant** who wants:
 - Set once, forget forever
 - Plug-and-play for occasional lectures/meetings
 - EN↔SK reliable, other languages swappable
@@ -57,7 +57,7 @@ What this project must achieve for the **grumpy professor / picky old man** who 
 **Evidence**: `documentation/linux_setup_and_test.md` exists but no record of execution. `.github/workflows/` empty.
 **Fix**: Run on Ubuntu VM/GitHub Actions; add CI workflow.
 
-### P1 · SDK / public API missing (supervisor can't embed)
+### P1 · SDK / public API missing (reviewer can't embed)
 **Evidence**: No `Pipeline` facade, no `documentation/sdk.md`, no REST/WS contract doc.
 **Fix**: Implement `class Pipeline` with `translate(audio, src, tgt)` + doc.
 
@@ -139,7 +139,7 @@ What this project must achieve for the **grumpy professor / picky old man** who 
 - [ ] Implement `Pipeline` facade + `documentation/sdk.md`
 - [ ] Update all documentation to match actual implemented features
 - [ ] Remove claims of unimplemented features from docs
-- [ ] Tag release, push to origin (with owner approval)
+- [ ] Tag release, push to origin (with maintainer approval)
 - [ ] Fresh clone test on clean machine
 - [ ] Test on Linux (VM or CI)
 

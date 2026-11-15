@@ -3,7 +3,7 @@
 #   bash scripts/train_status.sh
 # Exit codes: 0 = running, 10 = finished+exported, 20 = idle/crashed, 30 = never started
 LOG=${1:-/tmp/overnight_hq.log}
-REPO=~/Documents/STU/BP
+REPO=<checkout>
 CKPT_DIR=/tmp/piper_finetune_work_sk/out/lightning_logs/version_0/checkpoints
 ONNX=$REPO/backend/tts/piper_models/me_omni_piper_sk.onnx
 

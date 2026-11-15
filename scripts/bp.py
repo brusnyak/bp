@@ -56,7 +56,7 @@ def cmd_bench(args):
 
 
 def cmd_stt(args):
-    """STT model × language matrix on the owner's real recordings.
+    """STT model × language matrix on the test speaker's real recordings.
 
     The question it answers: which STT rung for which language, with numbers.
     Ground truth: EN = script sentences; SK = proofread SK column.

@@ -9,106 +9,106 @@
    "preview": false,
    "raw": 0,
    "reviewed": 1.0,
-   "strings": 384
+   "strings": 385
   },
   {
    "code": "cs",
    "coverage": 0.88,
    "dir": "ltr",
-   "drafts": 339,
+   "drafts": 340,
    "machine_draft": true,
    "preview": false,
    "raw": 0,
    "reviewed": 0.0,
-   "strings": 339
+   "strings": 340
   },
   {
    "code": "de",
    "coverage": 0.9,
    "dir": "ltr",
-   "drafts": 72,
+   "drafts": 75,
    "machine_draft": false,
    "preview": false,
    "raw": 0,
-   "reviewed": 0.72,
-   "strings": 347
+   "reviewed": 0.71,
+   "strings": 348
   },
   {
    "code": "es",
    "coverage": 0.88,
    "dir": "ltr",
-   "drafts": 339,
+   "drafts": 340,
    "machine_draft": true,
    "preview": false,
    "raw": 0,
    "reviewed": 0.0,
-   "strings": 339
+   "strings": 340
   },
   {
    "code": "fr",
    "coverage": 0.88,
    "dir": "ltr",
-   "drafts": 339,
+   "drafts": 340,
    "machine_draft": true,
    "preview": false,
    "raw": 0,
    "reviewed": 0.0,
-   "strings": 339
+   "strings": 340
   },
   {
    "code": "hu",
    "coverage": 0.88,
    "dir": "ltr",
-   "drafts": 339,
+   "drafts": 340,
    "machine_draft": true,
    "preview": false,
    "raw": 0,
    "reviewed": 0.0,
-   "strings": 339
+   "strings": 340
   },
   {
    "code": "pl",
    "coverage": 0.88,
    "dir": "ltr",
-   "drafts": 339,
+   "drafts": 340,
    "machine_draft": true,
    "preview": false,
    "raw": 0,
    "reviewed": 0.0,
-   "strings": 339
+   "strings": 340
   },
   {
    "code": "ro",
    "coverage": 0.88,
    "dir": "ltr",
-   "drafts": 339,
+   "drafts": 340,
    "machine_draft": true,
    "preview": false,
    "raw": 0,
    "reviewed": 0.0,
-   "strings": 339
+   "strings": 340
   },
   {
    "code": "sk",
    "coverage": 0.9,
    "dir": "ltr",
-   "drafts": 72,
+   "drafts": 75,
    "machine_draft": false,
    "preview": false,
    "raw": 0,
-   "reviewed": 0.72,
-   "strings": 347
+   "reviewed": 0.71,
+   "strings": 348
   },
   {
    "code": "uk",
    "coverage": 0.88,
    "dir": "ltr",
-   "drafts": 338,
+   "drafts": 339,
    "machine_draft": true,
    "preview": false,
    "raw": 0,
    "reviewed": 0.0,
-   "strings": 339
+   "strings": 340
   }
  ]
 }

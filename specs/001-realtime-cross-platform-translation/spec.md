@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: Rescope of the existing STT→MT→TTS pipeline to be genuinely cross-platform (Windows/macOS/Linux), keep Slovak as a hard requirement, drop the S2S (speech-to-speech) direction after hands-on evaluation, and add speculative decoding as the thesis's novel contribution.
+**Input**: Rescope of the existing STT→MT→TTS pipeline to be genuinely cross-platform (Windows/macOS/Linux), keep Slovak as a hard requirement, drop the S2S (speech-to-speech) direction after hands-on evaluation, and add speculative decoding as the technical report's novel contribution.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -45,7 +45,7 @@ A user on any of the three major OSes installs the tool and it runs at usable sp
 
 Multiple simultaneous conference sessions (or multiple speakers) can run against the backend without one session's load degrading another's, up to the concurrency the reference hardware can sustain.
 
-**Why this priority**: Already a documented, measured bottleneck (`documentation/PERFORMANCE_TEST_RESULTS.md` shows the pipeline saturating at 12 concurrent users on the reference M1 Pro 16GB) — but it's not blocking for a single-user thesis demo, so P2 not P1.
+**Why this priority**: Already a documented, measured bottleneck (`documentation/PERFORMANCE_TEST_RESULTS.md` shows the pipeline saturating at 12 concurrent users on the reference M1 Pro 16GB) — but it's not blocking for a single-user technical report demo, so P2 not P1.
 
 **Independent Test**: Load-test with N simulated concurrent sessions on the reference machine; verify graceful degradation (documented ceiling, no crash) rather than silent failure past the ceiling.
 
@@ -55,11 +55,11 @@ Multiple simultaneous conference sessions (or multiple speakers) can run against
 
 ---
 
-### User Story 4 - Translation feels faster via speculative decoding (Priority: P3, thesis research contribution)
+### User Story 4 - Translation feels faster via speculative decoding (Priority: P3, technical report research contribution)
 
 The system reduces perceived/actual translation latency using a self-speculative biased decoding (SSBD) approach layered on the existing Opus-MT calls, without requiring new training data or a GPU cluster.
 
-**Why this priority**: This is the thesis's novel research angle, not required for the product to function — the pipeline works without it. Scoped as P3 explicitly so it doesn't block the MVP.
+**Why this priority**: This is the technical report's novel research angle, not required for the product to function — the pipeline works without it. Scoped as P3 explicitly so it doesn't block the MVP.
 
 **Independent Test**: A/B the existing Opus-MT translation path against the SSBD-augmented path on the same input stream; measure latency delta and translation-quality delta independently.
 
@@ -137,4 +137,4 @@ The user records their own voice once; thereafter, for any language they've prov
 - The existing Piper + XTTS v2 TTS split stays architecturally as-is (per Constitution Principle VI) — this rescope is about hardware-backend selection and platform support, not swapping the TTS engine. User Story 5 adds a third tier (personal fine-tuned Piper voices) on top of this split rather than replacing either existing engine — still no new TTS engine introduced.
 - User Story 5's fine-tuned-voice fast path is per-language: it requires the user to record reference audio in each target language they want it for (confirmed EN and SK at minimum). Languages without a fine-tuned model keep using XTTS zero-shot at current latency — this is a stated, accepted trade-off, not a gap to silently paper over.
 - S2S (Hibiki-class) models are out of scope for this feature and are not revisited without new evidence (Constitution Principle II, `documentation/s2s_translation_research_2026-08.md`).
-- SSBD (User Story 4) is a research/thesis-value addition, not a blocking requirement for the MVP defined by User Stories 1–2.
+- SSBD (User Story 4) is a research-value addition, not a blocking requirement for the MVP defined by User Stories 1–2.

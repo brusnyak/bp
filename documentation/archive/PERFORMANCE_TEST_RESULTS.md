@@ -53,7 +53,7 @@ This document presents the results of concurrent performance testing for the Liv
 | MT Time     | 1.36s   | 0.16s  | 4.39s  | 1.28s   |
 | TTS Time    | 1.03s   | 0.35s  | 1.96s  | 0.62s   |
 
-![Timeline Gantt Chart - 12 Users](file://~/Documents/STU/BP/test_output/performance_tests/run_20251128_111937/timeline_gantt_12_users.png)
+![Timeline Gantt Chart - 12 Users](file://<checkout>/test_output/performance_tests/run_20251128_111937/timeline_gantt_12_users.png)
 
 **Analysis:**
 
@@ -61,7 +61,7 @@ This document presents the results of concurrent performance testing for the Liv
 - Latency increased significantly (avg 29s) compared to 5 users (avg 10s), indicating heavy queuing
 - STT processing time increased to ~3.6s avg, confirming CPU saturation
 
-![Latency Distributions - 12 Users](file://~/Documents/STU/BP/test_output/performance_tests/run_20251128_111937/latency_distributions_12_users.png)
+![Latency Distributions - 12 Users](file://<checkout>/test_output/performance_tests/run_20251128_111937/latency_distributions_12_users.png)
 
 ---
 
@@ -76,7 +76,7 @@ This document presents the results of concurrent performance testing for the Liv
 | MT Time     | 1.82s   | 1.20s  | 2.38s  | 0.48s   |
 | TTS Time    | 1.41s   | 1.38s  | 1.44s  | 0.02s   |
 
-![Timeline Gantt Chart - 15 Users](file://~/Documents/STU/BP/test_output/performance_tests/run_20251128_111937/timeline_gantt_15_users.png)
+![Timeline Gantt Chart - 15 Users](file://<checkout>/test_output/performance_tests/run_20251128_111937/timeline_gantt_15_users.png)
 
 **Analysis:**
 

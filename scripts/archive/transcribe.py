@@ -10,8 +10,8 @@ import subprocess
 import argparse
 from pathlib import Path
 
-VIDEO_FILE = "~/Documents/STU/BP/Screen Recording 2026-04-25 at 18.16.30.mov"
-OUTPUT_DIR = "~/Documents/STU/BP/transcription_output"
+VIDEO_FILE = "Screen Recording 2026-04-25 at 18.16.30.mov"
+OUTPUT_DIR = "transcription_output"
 AUDIO_FILE = os.path.join(OUTPUT_DIR, "audio.m4a")
 CHUNK_DIR = os.path.join(OUTPUT_DIR, "chunks")
 TRANSCRIPT_DIR = os.path.join(OUTPUT_DIR, "transcripts")

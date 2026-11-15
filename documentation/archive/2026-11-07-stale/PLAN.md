@@ -1,13 +1,13 @@
 # BP Dev Plan — where we are, what's ahead
 
-> Current repair state (2026-11-04): start with `PRODUCT.md`, `documentation/implementation-2026-11-04/RESULTS.md` and `documentation/HANDOFF_NEXT_SESSION.md`. Earlier dated counts, readiness claims, media-access behavior and Kaggle failure explanations below are historical. Current contracts require authenticated explicit preparation, offline assets, target-language TTS, terminal Stop and reviewed full-route evidence. Full cloned-speech/LHC/commercial acceptance remains pending.
+> Current repair state (2026-11-04): start with `PRODUCT.md`, `documentation/implementation-2026-11-04/RESULTS.md` and `documentation/HANDOFF_NEXT_SESSION.md`. Earlier dated counts, readiness claims, media-access behavior and Kaggle failure explanations below are historical. Current contracts require authenticated explicit preparation, offline assets, target-language TTS, terminal Stop and reviewed full-route evidence. Full cloned-speech/conference-room/commercial acceptance remains pending.
 
 Branch: `main` + `merge/windows-amd-cpu` (2026-09-28, verified: Windows CPU-setup work
 merged, `main` fast-forwards onto it). Two machines: Mac M1 Pro (reference) and the
 Windows 11 AMD CPU-only laptop. Docs: `documentation/voice_and_app_direction_2026-09.md`,
 `documentation/demo_runbook_2026-09-28.md`, `AGENTS.md`.
-Thesis rules: faculty guide + §4.1 AI rules → `Deklarácia k využitiu UI` skeleton lives in
-`documentation/thesis_draft.md` (one `[DOPLNIŤ]` marker left).
+technical report rules: faculty guide + §4.1 AI rules → `Deklarácia k využitiu UI` skeleton lives in
+`documentation/technical_report.md` (one `[DOPLNIŤ]` marker left).
 
 ## Done
 
@@ -91,7 +91,7 @@ Next action items to explore and benchmark:
 
 ## Measured 2026-10-01 (Nemotron streaming bench — negative)
 
-- **Nemotron 3.5 ASR streaming 0.6B on owner mic** (`scripts/bench_nemotron.py` →
+- **Nemotron 3.5 ASR streaming 0.6B on maintainer mic** (`scripts/bench_nemotron.py` →
   `processed/new_models/nemotron_matrix.json`, pure-C W8A8 runtime, sk-SK prompt):
   SK WER 0.864 (trhove_b) / 0.750 (script) with RU/UK/SL language drift;
   EN rainbow 0.188; RTF 0.32–0.33 (same speed band as small-sk).
@@ -115,7 +115,7 @@ Next action items to explore and benchmark:
   `ui/voice-lab/charts/` from measured JSONs; `library.json` gained `charts`, `stt_input`, `zeroshot`,
   `demo_audio` sections with matching `lab.js` renderers. Gates 2026-09-29: `make test` 33 passed,
   lab serves all 8 sections.
-- **Showcase curation (owner review 2026-09-29)**: QC visible = SK A/B pair + `enpers_v2` +
+- **Showcase curation (listening review 2026-09-29)**: QC visible = SK A/B pair + `enpers_v2` +
   `male_alldata_denoised`; default-voice renders and superseded fine-tunes hidden from the page but kept
   with numbers. Zero-shot section shows only the 2 v2b clones (legacy hello/thirty_second + `ref_*` heads
   excluded). Voices section features the 3 v2b takes; `sk_direction` source audio behind a toggle.
@@ -131,7 +131,7 @@ Next action items to explore and benchmark:
   generic-voiced orphans removed (backups in /tmp). Charts/labels adapted: new schema records STT only as
   batch direction totals, so STT bars are honestly-labeled means (EN incl. model load). Note: the sim's SK
   STT rung is generic `small`, not live's `small-sk` — open inconsistency.
-- **STT input length effect (owner hypothesis confirmed) 2026-09-29** (`processed/synth_lengths/stt_by_length.json`,
+- **STT input length effect (maintainer hypothesis confirmed) 2026-09-29** (`processed/synth_lengths/stt_by_length.json`,
   clean generic-voice synth): base WER 0.82 (7s) → 0.65 (17s) → 0.55 (24s); small-sk 0.36 → 0.32 → 0.28.
   Short clips starve Whisper of context — 7s input is measurably worst for both rungs.
 - **Scripted meeting sim** (`scripts/meeting_sim.py` → `processed/meeting/`): 4 alternating turns read by the
@@ -150,7 +150,7 @@ Next action items to explore and benchmark:
   style; record modal cut to en/sk/cs with tabs+select synced (removed stale XTTS list, malformed tags, and
   a simulated consent-translator that fought the passage tabs); sidebar voice rows gained a Play button
   backed by new `GET /voices/file` (auth-aware, `_voice_path`-guarded). Speaker/headphone routing still
-  needs the owner's console lines — the `setSinkId` path looks right.
+  needs the test speaker's console lines — the `setSinkId` path looks right.
 - **Console-log round (2026-09-29)**: PiP root cause was a blank canvas (no frame = no metadata) — `drawPip()`
   now paints before capture, script cache-busted; outputs re-enumerate after mic grant (pre-permission
   deviceIds are empty); sinkId mismatch falls back to default with a notice; `play()` failures notify;
@@ -179,7 +179,7 @@ Next action items to explore and benchmark:
   first translated word 58–136ms, first audio 0.16–0.25s, playback ~0.4–0.5s after speech end. Stitched
   `meeting_mix.wav` (46s) + chapters = the whole conversation in one player; Gantt shows speech, live-STT
   overlap, markers, and cross-lane playback.
-- **Chunked-streaming rework (2026-09-29, owner review)**: sentence chunks are now pipelined while the
+- **Chunked-streaming rework (2026-09-29, listening review)**: sentence chunks are now pipelined while the
   speaker continues — chunk playbacks audibly overlap later speech (simultaneous interpretation, not
   turn-then-translate). All 4 turns stream (first audio lands mid-speech); Gantt shows per-chunk playback
   bars overlapping speech; turn cards carry a ✓-streams flag. Turns 2–3 extended to 2 sentences so every
@@ -192,7 +192,7 @@ Next action items to explore and benchmark:
   OOMs 16GB into 14GB swap — playbook rule: never full-clip transformers here). trhove: RTF 0.99,
   chrF 49.7; script_reading: RTF 0.77, chrF 39.5. Fluent, one "willow→fur coat" slip. Verdict: quality
   reference + offline-voice potential, NOT a live path (3× cascade compute). Next: STT rungs.
-- **Chatterbox-Czech spike (2026-09-29, pushed)**: gated `t3_cs` weights (owner HF login) + pl-proxy
+- **Chatterbox-Czech spike (2026-09-29, pushed)**: gated `t3_cs` weights (maintainer HF login) + pl-proxy
   language tag + v2b voice prompt → small-sk WER **0.054** / CER 0.015, base 0.432 — a quality TIE with
   omni-zeroshot (errors only on Ľuba/syry edges). RTF 6.7 vs omni 1.2. Verdict: MIT + openly
   trainable = strategically interesting, but bulk generation stays OmniVoice (5× faster, equal
@@ -214,7 +214,7 @@ Next action items to explore and benchmark:
       split ≈ −1.5 GB venv −1.6 GB browsers; `ct2_models/` out of git −225 MB)
 - [ ] Linux pass on a third machine → fill `documentation/linux_setup_and_test.md` (setup,
       6-gate ladder, record sheet, unknowns)
-- [ ] Thesis numbers corrected to measured + `[DOPLNIŤ]` marker filled
+- [ ] technical report numbers corrected to measured + `[DOPLNIŤ]` marker filled
 - [ ] Stage-demo dry run on the real machine: runbook → `documentation/demo_runbook_2026-09-28.md`
       (pre-flight, script, fallback ladder, timings); checklist → `documentation/monday_test_checklist.md`
 - [ ] Delete `test/full_pipeline_test.py` (dead F5 leftover, breaks `pytest test/` collection)
@@ -239,10 +239,10 @@ Next action items to explore and benchmark:
 | `.venv/bin/python scripts/vad_close_probe.py` | Trailing-silence VAD probe (needs `make run`) |
 | `.venv/bin/python scripts/assemble_train_corpus.py --lang sk\|en` | `omni_hq_<lang>` manifest → Piper train corpus dir |
 
-## Handler deliverable (deadline ~2026-10-13, draft due 2026-10-05)
+## reviewer deliverable (deadline ~2026-10-13, draft due 2026-10-05)
 
 - `documentation/compute_capacity_report_2026-09.md` — Mac vs NVIDIA laptop vs
-  university server, every figure labelled `MEASURED` / `PROJECTED`.
+  processing server, every figure labelled `MEASURED` / `PROJECTED`.
 - To add before sending: the completed 2500-step result, the ear-QC verdict for
   `me_omni_piper_sk`, and a sweep of new STT/MT/TTS releases.
 

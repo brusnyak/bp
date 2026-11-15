@@ -1,4 +1,4 @@
-"""Room mode on a Kaggle T4: one speaker (the owner's English reading through the real /ws route, English to German for the speaker's own session),
+"""Room mode on a Kaggle T4: one speaker (the test speaker's English reading through the real /ws route, English to German for the speaker's own session),
 N listeners on /ws/listen in several languages. Measures what each listener receives, that listeners of one language get identical audio,
 how the speaker's own delay changes with a room attached, and how cost scales with listeners (3 vs 12) at a fixed 3 languages.
 Writes /kaggle/working/room_test.json after every run."""

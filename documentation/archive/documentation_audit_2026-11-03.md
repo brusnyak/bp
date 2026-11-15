@@ -23,7 +23,7 @@ EN↔{SK,CZ} with a pluggable architecture, and strengthens the "any language" c
 
 **SK-CZ similarity:** CZ data is more abundant than SK; models transfer between them.
 Adding CZ is low-effort, high-value, de-risks the "any language" claim, and gives the
-handler a working two-direction demo (SK + CZ).
+reviewer a working two-direction demo (SK + CZ).
 
 ---
 
@@ -51,14 +51,14 @@ handler a working two-direction demo (SK + CZ).
 | `documentation/verification_omni_piper_sk_2026-09-30.md` | Historical | Voice kill-graded (trembling), numbers stand. | None (historical record). |
 | `documentation/piper_training_runbook.md` | ? | Not yet read. | Read and assess. |
 | `documentation/security_audit_2026-09.md` | ? | Not yet read. | Read and assess. |
-| `documentation/thesis_draft.md` | Has `[DOPLNIŤ]` | One marker left; AI-declaration skeleton. | Fill marker; update SK→EN honest numbers. |
+| `documentation/technical_report.md` | Has `[DOPLNIŤ]` | One marker left; AI-declaration skeleton. | Fill marker; update SK→EN honest numbers. |
 | `documentation/demo_report_2026-09.md` | Historical | Measured demo numbers (2026-09). | None (historical record). |
 | `documentation/progress_since_the_break.md` | Historical | Narrative progress log. | None. |
 | `documentation/concurrency_accuracy_2026-08-21.md` | Old | Pre-lite era. | Archive or mark historical. |
 | `documentation/footprint_audit_2026-09-28.md` | Historical | Ranked cut list; open items (delete legacy venvs). | Check if open items done. |
 | `documentation/teams_auth_ticket_2026-10-14.md` | Historical | Auth ticket. | None. |
 | `documentation/personal_voice_bootstrap_2026-08-19.md` | Historical | Voice bootstrap. | None. |
-| `documentation/fundamentals.md` / `fundamentals_deep.md` | Theory chapters | Fundamentals §9 connectors, §10 ground basics. | None (thesis theory). |
+| `documentation/fundamentals.md` / `fundamentals_deep.md` | Theory chapters | Fundamentals §9 connectors, §10 ground basics. | None (technical report theory). |
 | `AGENTS.md` §8–9 | **Stale** | OmniVoice GPU path, load-test next steps, Kaggle/Modal cleanup — superseded by pivot. | Update to GPU-oriented model harness + CZ direction. |
 | `PLAN.md` | Current | Live dev plan. Next steps need re-scoping for CZ + GPU harness. | Add CZ direction + model harness phase. |
 | `DESIGN.md` | Current | UI contract. | None. |
@@ -78,12 +78,12 @@ handler a working two-direction demo (SK + CZ).
    - Optional GPU engines behind the registry: Canary AST (SK→EN, collapses STT+MT), Kokoro (EN TTS, RTF 0.03, 1.33 GB), Qwen3-TTS / Chatterbox (EN voice cloning, 4–8 GB), SeamlessM4T v2 (S2S quality reference, CC-BY-NC, ~6 GB).
    - The model test harness (new `scripts/model_harness/`) bounds every candidate to 8 GB VRAM and reports WER/chrF/RTF/VRAM/latency on fixed SK/CZ/EN clips.
 
-3. **"Your own voice" scope** (thesis already includes this): For SK output, no open ZS-TTS supports SK. Path = Piper fine-tune (CPU, works, low intelligibility per engine_ab) + optional voice-conversion layer (RVC/Applio, train once on GPU, apply to any TTS). For EN output, ZS cloning works (Chatterbox/Qwen3-TTS/XTTS on GPU).
+3. **"Your own voice" scope** (technical report already includes this): For SK output, no open ZS-TTS supports SK. Path = Piper fine-tune (CPU, works, low intelligibility per engine_ab) + optional voice-conversion layer (RVC/Applio, train once on GPU, apply to any TTS). For EN output, ZS cloning works (Chatterbox/Qwen3-TTS/XTTS on GPU).
 
 4. **Commercial-readiness for zero-knowledge users:** accurate docs (root README rewrite), one-command setup, clear verified-vs-experimental status, no stale claims, `/health`+`/metrics` documented, `bp language` CLI wired, `selftest` in `setup.py`.
 
 ### What stays the same
-- Cascade (STT→MT→TTS) is the thesis contribution — inspectable, measurable per stage, CPU-runnable.
+- Cascade (STT→MT→TTS) is the technical report contribution — inspectable, measurable per stage, CPU-runnable.
 - Local-first, no cloud in pipeline; cloud only as QC reference.
 - Fail-closed licence gate (non-commercial engines blocked by default).
 - FastAPI + WebSocket + plain HTML/CSS/JS UI.
@@ -115,7 +115,7 @@ handler a working two-direction demo (SK + CZ).
 2. **CZ as verified second direction?** Ship CZ alongside SK in the demo/runbook/checklist.
 3. **Model harness as new `scripts/model_harness/` directory?** Or extend existing `bench/` + `scripts/gpu_bench/`?
 4. **Canary/Kokoro as optional GPU skeletons now, or wait for Kaggle result first?**
-5. **Thesis title stays as-is** (approved by faculty); "own voice" scope already in thesis outline — confirmed no title change.
+5. **technical report title stays as-is** (approved by faculty); "own voice" scope already in technical report outline — confirmed no title change.
 
 Constitution reminder: I won't commit or push without your explicit yes. All changes stay uncommitted for review.
 

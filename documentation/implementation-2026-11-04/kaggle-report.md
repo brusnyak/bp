@@ -39,7 +39,7 @@ because their corpus/reference content is private; do not commit them.
 
 Files: `scripts/gpu_bench/kaggle_session/{job.py,kernel-metadata.json,test_replay.py,README.md}`.
 Reused known `OmniVoice.from_pretrained/create_voice_clone_prompt/generate` API and
-existing reference dataset; no new owner audio upload, cloud pipeline change,
+existing reference dataset; no new maintainer audio upload, cloud pipeline change,
 secret exposure, paid compute or repository push.
 
 The remote job normalizes reference format, prepares/warm-ups one cloned prompt per

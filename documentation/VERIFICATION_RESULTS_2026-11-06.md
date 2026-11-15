@@ -7,7 +7,7 @@
 
 ## Fix applied this session: STT window size (root cause of the "weird word-at-a-time" translation)
 
-**Problem:** `STREAMING_CHUNK_LENGTH = 0.5s` in `backend/main.py:224`. Each 0.5s audio chunk went through STT→MT→TTS independently. Whisper-base on 0.5s fragments cannot transcribe accurately — the UI log (`~/Downloads/bplog.txt`) shows transcriptions like "Alright.", "No, Liz.", "Thanks.", "Good job." instead of the user's actual sentence ("For the sake of the test and quality, I'll say only one thing at a time."). Each wrong fragment was immediately translated and spoken — that's the "right after me each word at a time, low accuracy, sounds weird" effect.
+**Problem:** `STREAMING_CHUNK_LENGTH = 0.5s` in `backend/main.py:224`. Each 0.5s audio chunk went through STT→MT→TTS independently. Whisper-base on 0.5s fragments cannot transcribe accurately — the UI log (`bplog.txt`, a local diagnostic log) shows transcriptions like "Alright.", "No, Liz.", "Thanks.", "Good job." instead of the user's actual sentence ("For the sake of the test and quality, I'll say only one thing at a time."). Each wrong fragment was immediately translated and spoken — that's the "right after me each word at a time, low accuracy, sounds weird" effect.
 
 **Fix:** Changed `STREAMING_CHUNK_LENGTH` from hardcoded `0.5` to `float(os.environ.get("BP_STREAMING_CHUNK_S", "2.0"))` — 2.0s windows give Whisper sentence-level context while staying near real-time (~2s first audio including STT+MT+TTS).
 
@@ -22,7 +22,7 @@ With 2.0s windows, EN→SK transcription is now coherent: "Good morning. And wel
 
 ---
 
-## 1. EN → SK (presentation direction — owner's use case)
+## 1. EN → SK (presentation direction — maintainer's use case)
 
 **Route status:** Resolved, verified, trusted.
 
@@ -101,17 +101,17 @@ With 2.0s windows, EN→SK transcription is now coherent: "Good morning. And wel
 - kaggle CLI v2.2.4 authenticated as user `yegorby`, auth_method=OAUTH (re-authenticated 2026-11-06)
 - `kaggle kernels list` works — 16 kernels visible
 - `kaggle kernels output yegorby/bp-production-ws-cs-en-default-vs-low-latency` → route_receipt.json retrieved with p50/p95 numbers
-- Ready to push/run additional T4 kernels if needed (owner approval already given)
+- Ready to push/run additional T4 kernels if needed (maintainer approval already given)
 
 ---
 
-## 5. What is NOT verified (open gates for commercial / LHC use)
+## 5. What is NOT verified (open gates for commercial / conference-room use)
 
 Per `PRODUCT.md` acceptance and `RESULTS.md` commercial gates:
 
 1. **Human bilingual listening/identity grades** — clone outputs (Piper personal SK, personal EN) not yet human-graded for meaning, pronunciation, or identity.
 2. **Continuous full-route rehearsal** — no sustained p50/p95 speech-end→first-audio measurement with queue-delay budget on actual meeting-length audio.
-3. **LHC room audio contract** — mic input, return channels, echo isolation, virtual audio routing (BlackHole/VB-Cable), device loss/reconnect not tested against an actual LHC system.
+3. **conference-room room audio contract** — mic input, return channels, echo isolation, virtual audio routing (BlackHole/VB-Cable), device loss/reconnect not tested against an actual conference-room system.
 4. **Per-OS clean-machine setup** — verified on Mac only; Windows CPU-only and Linux not re-verified after recent changes.
 5. **Privacy/retention + licence inventory** — piper-tts is GPL-3.0-or-later (not MIT as previously stated); OmniVoice HF licence to confirm; no full licence audit completed.
 6. **WebSocket E2E through the browser UI** — native WebSocket verification needed (Python harness blocked by uvicorn ping keepalive).
@@ -169,4 +169,4 @@ Soak test and component benchmarks from the prior session run:
 
 **Route quality gate:**
 - SK→EN experimental only — `whisper-small-sk` WER 0.25–0.32 > 0.2 gate, Czech-like hallucinations
-- Thesis numbers to update: STT ~100–150ms (Parakeet EN), MT ~30–80ms, TTS ~40–150ms (Piper), total ~200–350ms
+- technical report numbers to update: STT ~100–150ms (Parakeet EN), MT ~30–80ms, TTS ~40–150ms (Piper), total ~200–350ms

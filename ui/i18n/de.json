@@ -25,7 +25,6 @@
  "Select Speaker Voice": "Sprecherstimme wählen",
  "Select speaker voice for cloning": "Sprecherstimme zum Klonen wählen",
  "Live captions and translated speech for meetings and lectures. English and Slovak work in both directions, and English to Czech works too.": "Live-Untertitel und übersetzte Sprache für Besprechungen und Vorlesungen. Englisch und Slowakisch funktionieren in beide Richtungen, Englisch → Tschechisch ebenfalls.",
- "No account needed to try it. Research prototype from a bachelor’s thesis (STU FEI): translation quality is not yet scored by listeners, and it has not been used in a live meeting.": "Zum Ausprobieren ist kein Konto nötig. Forschungsprototyp aus einer Bachelorarbeit (STU FEI): Die Übersetzungsqualität wurde noch nicht von Hörern bewertet, und er wurde noch nicht in einer echten Besprechung eingesetzt.",
  "Try it now": "Jetzt ausprobieren",
  "Learn more": "Mehr erfahren",
  "A recording of the live page, and example output from the 2026-11-04 English to Slovak test.": "Eine Aufnahme der Live-Seite und Beispielausgaben aus dem Test Englisch → Slowakisch vom 2026-11-04.",
@@ -107,7 +106,6 @@
  "Clips play in order on the chosen device; speed rises while playback is behind": "Clips werden der Reihe nach auf dem gewählten Gerät abgespielt; die Geschwindigkeit steigt, solange die Wiedergabe hinterherhinkt",
  "Processing path for one segment. An experimental word-by-word mode (off by default) sends partial transcripts to translation earlier but measured slower.": "Verarbeitungsweg eines Segments. Ein experimenteller Wort-für-Wort-Modus (standardmäßig aus) sendet Teiltranskripte früher zur Übersetzung, war aber messbar langsamer.",
  "About the Project": "Über das Projekt",
- "This Bachelor's thesis develops a real-time speech translation system for online conferences. The solution integrates speech recognition, machine translation, and text-to-speech synthesis to enable seamless cross-lingual communication.": "Diese Bachelorarbeit entwickelt ein Echtzeit-Sprachübersetzungssystem für Online-Konferenzen. Die Lösung verbindet Spracherkennung, maschinelle Übersetzung und Sprachsynthese für reibungslose sprachübergreifende Kommunikation.",
  "Key emphases include:": "Schwerpunkte:",
  "Emphasis": "Schwerpunkt",
  "Description": "Beschreibung",
@@ -123,7 +121,6 @@
  "Frequently Asked Questions": "Häufig gestellte Fragen",
  "Short answers, with the limits stated.": "Kurze Antworten, mit genannten Grenzen.",
  "What is Real-Time Speech Translation?": "Was ist Echtzeit-Sprachübersetzung?",
- "An application that translates spoken language during meetings and lectures: it listens, shows captions of what was said, and speaks the translation. It started as a bachelor’s thesis and is a research prototype.": "Eine Anwendung, die gesprochene Sprache in Besprechungen und Vorlesungen übersetzt: Sie hört zu, zeigt Untertitel des Gesagten und spricht die Übersetzung. Sie entstand als Bachelorarbeit und ist ein Forschungsprototyp.",
  "Do I need an account?": "Brauche ich ein Konto?",
  "No. Open the live page and a guest session starts by itself. An account is only needed if you want to record your own voice, so that it is saved securely on the server under your name and not in your browser.": "Nein. Öffnen Sie die Live-Seite, und eine Gastsitzung startet automatisch. Ein Konto brauchen Sie nur, wenn Sie Ihre eigene Stimme aufnehmen möchten, damit sie sicher auf dem Server unter Ihrem Namen gespeichert wird und nicht in Ihrem Browser.",
  "Which languages work?": "Welche Sprachen funktionieren?",
@@ -363,7 +360,6 @@
  "Open menu": "Menü öffnen",
  "Menu": "Menü",
  "Page sections": "Seitenabschnitte",
- "Research prototype · STU FEI thesis": "Forschungsprototyp · Abschlussarbeit an der STU FEI",
  "Speak once.": "Einmal sprechen.",
  "Be heard in another language.": "In einer anderen Sprache gehört werden.",
  "Live captions and translated speech for meetings and lectures. It runs on your own machine, and you can try it without an account.": "Live-Untertitel und übersetzte Sprache für Meetings und Vorlesungen. Läuft auf Ihrem eigenen Rechner, und Sie können es ohne Konto ausprobieren.",
@@ -422,7 +418,6 @@
  "Select the same cable as the microphone": "Wählen Sie dasselbe Kabel als Mikrofon",
  "in your meeting software.": "in Ihrer Meeting-Software.",
  "Meeting-room use has not been tested yet.": "Der Einsatz im Besprechungsraum wurde noch nicht getestet.",
- "A bachelor’s thesis at STU FEI by Yegor Brusnyak: speech recognition, machine translation and speech synthesis chained into one live pipeline, built to break language barriers in online meetings.": "Eine Bachelorarbeit an der STU FEI von Yegor Brusnyak: Spracherkennung, maschinelle Übersetzung und Sprachsynthese in einer Live-Pipeline, gebaut, um Sprachbarrieren in Online-Meetings abzubauen.",
  "Source code": "Quellcode",
  "More about the project": "Mehr zum Projekt",
  "Send feedback": "Feedback senden",
@@ -508,9 +503,7 @@
  "What happened, what you expected, and the route you used.": "Was passiert ist, was Sie erwartet haben und welche Route Sie genutzt haben.",
  "Open email draft": "E-Mail-Entwurf öffnen",
  "About · Real-Time Speech Translation": "Über · Echtzeit-Sprachübersetzung",
- "A thesis project that turns spoken English into Slovak or Czech captions and speech.": "Ein Abschlussprojekt, das gesprochenes Englisch in slowakische oder tschechische Untertitel und Sprache umwandelt.",
  "What it is": "Was es ist",
- "Real-Time Speech Translation turns spoken English into Slovak or Czech captions and speech while the speaker is still talking. It began as a bachelor’s thesis at the Slovak University of Technology (STU FEI) and targets hybrid university meetings, where listeners need captions and translated speech from a single source.": "Echtzeit-Sprachübersetzung wandelt gesprochenes Englisch in slowakische oder tschechische Untertitel und Sprache um, während der Sprecher noch spricht. Es begann als Bachelorarbeit an der Slowakischen Technischen Universität (STU FEI) und richtet sich an hybride Universitätsbesprechungen, bei denen Zuhörer Untertitel und übersetzte Sprache aus einer einzigen Quelle benötigen.",
  "Status: research prototype, not yet used in a live meeting.": "Status: Forschungsprototyp, noch nicht in einer Live-Besprechung eingesetzt.",
  "Where it stands": "Aktueller Stand",
  "Area": "Bereich",
@@ -566,7 +559,6 @@
  "_meta": {
   "raw_keys": [],
   "draft_keys": [
-   "A thesis project that turns spoken English into Slovak or Czech captions and speech.",
    "About 0.6–0.8 s from the end of a pause to the first translated sound on an M-series Mac. Listener delay per word is higher: a mean of 2.5 s on the same Mac in a dated benchmark.",
    "About · Real-Time Speech Translation",
    "Area",
@@ -599,7 +591,6 @@
    "Opus-MT",
    "Piper",
    "Privacy request (access, correction, deletion)",
-   "Real-Time Speech Translation turns spoken English into Slovak or Czech captions and speech while the speaker is still talking. It began as a bachelor’s thesis at the Slovak University of Technology (STU FEI) and targets hybrid university meetings, where listeners need captions and translated speech from a single source.",
    "STT:",
    "Sessions",
    "Slovak",
@@ -639,7 +630,12 @@
    "through CTranslate2 for translation.",
    "to cut speech into segments.",
    "yourname",
-   "Čeština"
+   "Čeština",
+   "Translate speech during meetings and presentations on your own machine. Speech recognition, machine translation and speech generation produce live captions and translated audio; Slovak input and personal voice cloning remain experimental.",
+   "Local speech translation · Research prototype",
+   "Created by Yegor Brusnyak, MIT licence.",
+   "A research prototype that turns spoken English into Slovak or Czech captions and speech.",
+   "Real-Time Speech Translation turns spoken English into Slovak or Czech captions and speech while the speaker is still talking. It is a local-first research prototype for meetings and presentations, where listeners need captions and translated speech from a single source."
   ],
   "engine_llm": "nvidia/nemotron-3-ultra-550b-a55b",
   "generated": "2026-11-05"
@@ -663,5 +659,10 @@
  "Connecting…": "Verbindung wird hergestellt…",
  "Open audience link": "Zuhörerlink öffnen",
  "Copy audience link": "Zuhörerlink kopieren",
- "Microphone is open. Use headphones or isolated audio to avoid feedback.": "Das Mikrofon ist aktiv. Verwenden Sie Kopfhörer oder getrennte Audiokanäle, um Rückkopplungen zu vermeiden."
+ "Microphone is open. Use headphones or isolated audio to avoid feedback.": "Das Mikrofon ist aktiv. Verwenden Sie Kopfhörer oder getrennte Audiokanäle, um Rückkopplungen zu vermeiden.",
+ "Translate speech during meetings and presentations on your own machine. Speech recognition, machine translation and speech generation produce live captions and translated audio; Slovak input and personal voice cloning remain experimental.": "Übersetzen Sie Sprache bei Besprechungen und Präsentationen auf Ihrem eigenen Rechner. Spracherkennung, maschinelle Übersetzung und Sprachausgabe erzeugen Live-Untertitel und übersetztes Audio; slowakische Spracheingabe und das Klonen persönlicher Stimmen bleiben experimentell.",
+ "Local speech translation · Research prototype": "Lokale Sprachübersetzung · Forschungsprototyp",
+ "Created by Yegor Brusnyak, MIT licence.": "Erstellt von Yegor Brusnyak, MIT-Lizenz.",
+ "A research prototype that turns spoken English into Slovak or Czech captions and speech.": "Ein Forschungsprototyp, der gesprochenes Englisch in slowakische oder tschechische Untertitel und Sprache umwandelt.",
+ "Real-Time Speech Translation turns spoken English into Slovak or Czech captions and speech while the speaker is still talking. It is a local-first research prototype for meetings and presentations, where listeners need captions and translated speech from a single source.": "Real-Time Speech Translation wandelt gesprochenes Englisch in slowakische oder tschechische Untertitel und Sprache um, während die Person noch spricht. Der lokal arbeitende Forschungsprototyp ist für Besprechungen und Präsentationen gedacht, bei denen Zuhörende Untertitel und übersetzte Sprache aus einer Quelle benötigen."
 }

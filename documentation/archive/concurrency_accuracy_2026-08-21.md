@@ -81,7 +81,7 @@ through the entire sweep).
   goes idle, or scale with observed STT time from `final_metrics`) instead of a hardcoded value —
   needed before N≥10 accuracy numbers from this harness can be trusted. Not implemented this pass
   (flagged, not fixed — see task additions below).
-- Per project convention (see [[project_bp_translation_thesis]]/`tasks.md`), T018 (shared model
+- Per project convention (see [[project_speech_translation]]/`tasks.md`), T018 (shared model
   pool refactor) is the standing, previously-identified concurrency fix and remains untouched —
   explicitly out of scope for this pass per direct instruction (demo stays single-person-use for
   now; multi-user meeting scaling deferred).

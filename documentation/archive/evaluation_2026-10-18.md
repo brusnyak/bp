@@ -66,7 +66,7 @@ score intelligibility (`processed/engine_ab/matrix_tts_swap_all.json`):
 | **piper_personal (`sk_SK-personal-male-medium`)** | 0.030 | 0.865 | **0.595** |
 
 - Every Piper voice runs at **RTF ≈ 0.03 on CoreML** — TTS is never the bottleneck.
-- **The owner's personal fine-tuned voice is the least intelligible of all five**
+- **the test speaker's personal fine-tuned voice is the least intelligible of all five**
   (WER 0.595 vs 0.270 for the generic Piper voice). Voice identity and STT
   intelligibility trade off directly.
 - OmniVoice zero-shot scores best on this cached-WER table (0.054) but is **batch/QC only** — RTF 0.40–0.65 on short phrases on T4, not real-time. It is not the live TTS engine (Piper CPU RTF ~0.04 is).
@@ -90,7 +90,7 @@ Recorded as a task, not silently skipped: MT quality cannot be compared until it
 | `language_packs.load/add/remove` used `sys.exit` | module not importable/testable | raise; CLI wrapper converts to exit |
 | `cmd_add` hardcoded `license: commercial-ok` | would have shipped a false licence claim for NLLB/CC-BY-NC | licence inferred from the HF model card (verified: en-sk→apache-2.0→`commercial-ok`, NLLB→`non-commercial`); `--license` override; unverifiable (HTTP 401) is warned |
 | `cmd_add` assumed the opus-mt model exists | silent broken pack | HF existence check + warning |
-| `_detect_tts` picked the alphabetically-first voice | a pack for `sk` would get the generic voice, not the owner's | prefers `personal`/`omni` voices |
+| `_detect_tts` picked the alphabetically-first voice | a pack for `sk` would get the generic voice, not the test speaker's | prefers `personal`/`omni` voices |
 | `HF_WHISPER` hardcoded list | stale (missed `large-v3-turbo`) | runtime discovery via `faster_whisper.utils.available_models()` |
 
 `make test` = **38/38** after all of the above (`bp selftest` PASSED).
@@ -134,7 +134,7 @@ Avoid: `svc-develop-team/so-vits-svc` (AGPL-3.0, archived 2023).
 
 **Recommendation:** add a **voice-conversion layer** (Applio, MIT, active). Train one
 voice model once on a rented GPU (~1 h), then every TTS engine — including swappable
-ones — speaks in the owner's voice with no per-engine training, and it doubles as the
+ones — speaks in the test speaker's voice with no per-engine training, and it doubles as the
 Path B voice-changer. The per-engine Piper fine-tune stays as a fallback for CPU-only.
 
 ## 8. Next: GPU
