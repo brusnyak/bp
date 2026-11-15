@@ -6,39 +6,69 @@
 <meta name="description" content="Local speech translation and live captions. Install on your own machine, choose a language, and route translated speech to headphones or a meeting.">
 <meta name="color-scheme" content="light dark">
 <title>Live Speech Translation — local audio and captions</title>
+<link rel="stylesheet" href="../../ui/tokens.css">
 <style>$css</style>
 </head>
 <body>
 <a class="skip" href="#content">Skip to content</a>
-<header>
-<h1>Live Speech Translation</h1>
-<p>Speak in one language. Hear translated speech and read live captions.</p>
-<p>Recognition, translation and voice run locally on your own machine.</p>
-<p>Use a browser to control it, headphones to listen, or an audio cable to feed a meeting.</p>
-<nav aria-label="Get started"><a href="#quick-start">Install and run</a><a href="#routes">Check your language</a><a href="../INTEGRATION.md">Connect a room</a><a href="https://github.com/brusnyak/bp">Source on GitHub</a></nav>
+<header class="bp-header">
+  <div class="bp-header-inner">
+    <a class="bp-brand" href="#content" aria-label="BP — top of page">
+      <span class="bp-mark">BP</span>
+      <span>BP · Live Speech Translation</span>
+    </a>
+    <nav class="bp-nav" aria-label="Sections">
+      <a href="#what">What it is</a>
+      <a href="#speed">Speed</a>
+      <a href="#routes">Languages</a>
+      <a href="#voices">Voices</a>
+      <a href="#hardware">Hardware</a>
+      <a href="#room">Room mode</a>
+      <a href="#test">Test it</a>
+      <a href="../INTEGRATION.md">Integration</a>
+    </nav>
+    <div class="bp-actions">
+      <a href="http://localhost:8000" class="btn btn-primary">Try it locally</a>
+      <a href="https://github.com/brusnyak/bp" class="btn btn-ghost">Source on GitHub</a>
+    </div>
+  </div>
 </header>
 <main id="content">
 <nav aria-label="On this page"><a href="#what">What it is</a><a href="#speed">Speed</a><a href="#voices">Voices</a><a href="#hardware">Hardware</a><a href="#room">Conference rooms</a><a href="#test">Test it</a><a href="#licences">Licences</a><a href="#limits">Limits</a></nav>
-<section id="what">
-<h2>What it is</h2>
-<p>A standalone tool for translated speech and captions during calls and presentations. Install the models once; the default pipeline then runs without a cloud speech service.</p>
-<ol class="pipeline" aria-label="All-local audio pipeline"><li><span>Mic</span></li><li><span>VAD</span></li><li><span>Speech recognition</span></li><li><span>Translation</span></li><li><span>Voice</span></li><li><span>Speakers / captions</span></li></ol>
-<p class="small">VAD detects speech and pauses. The processing host handles every stage; room listeners receive audio and captions over your network.</p>
+<!-- Hero -->
+<section id="what" class="hero">
+  <h1>Live Speech Translation</h1>
+  <p class="bp-sub">Speak in one language. Hear translated speech and read live captions. Recognition, translation and voice run locally on your own machine — no cloud speech service. Install the models once; the default pipeline then runs offline.</p>
+  <div class="tiles">
+    <div class="tile"><span class="tile-label">Median lag</span><span class="tile-value">$lag s</span><span class="tile-note">end of speech to translated audio</span></div>
+    <div class="tile"><span class="tile-label">p90 lag</span><span class="tile-value">$p90 s</span><span class="tile-note">nine of ten fragments at or below</span></div>
+    <div class="tile"><span class="tile-label">Recognition WER</span><span class="tile-value">$wer%</span><span class="tile-note">word error vs reference</span></div>
+    <div class="tile"><span class="tile-label">Lag drift</span><span class="tile-value">$drift s/min</span><span class="tile-note">negative means not growing</span></div>
+  </div>
+  <p class="small">Measured Mac M1 Pro · English to Slovak · Nemotron streaming recognition + Piper voice · generated audio, one run each. Short runs do not establish room performance. The handler message quotes around 0.8 s — consistent with the measured median.</p>
 </section>
+
+<!-- Pipeline -->
+<section id="pipeline">
+  <h2>All-local audio pipeline</h2>
+  <ol class="pipeline" aria-label="Pipeline stages"><li><span>Mic</span></li><li><span>VAD</span></li><li><span>Speech recognition</span></li><li><span>Translation</span></li><li><span>Voice</span></li><li><span>Speakers / captions</span></li></ol>
+  <p class="small">VAD detects speech and pauses. The processing host handles every stage; room listeners receive audio and captions over your network.</p>
+</section>
+<!-- Quick start -->
 <section id="quick-start">
-<h2>Quick start</h2>
-<p>Requires Python 3.11 or 3.12, Git, ffmpeg and internet access for installation. Setup downloads dependencies and model weights. Start with generic Piper voices; personal recordings are not included.</p>
-<ol class="steps">
-<li>Clone the repository.<pre><code>git clone https://github.com/brusnyak/bp.git
+  <h2>Quick start</h2>
+  <p>Requires Python 3.11 or 3.12, Git, ffmpeg and internet access for installation. Setup downloads dependencies and model weights. Start with generic Piper voices; personal recordings are not included.</p>
+  <ol class="steps">
+    <li>Clone the repository.<pre><code>git clone https://github.com/brusnyak/bp.git
 cd bp</code></pre></li>
-<li>Set up the profile for your machine. This example installs Czech, Slovak and German with English.<pre><code>python3.11 scripts/setup.py --profile mac --langs cs,sk,de</code></pre><p class="small">Apple Silicon: <code>mac</code>. NVIDIA CUDA: replace it with <code>nvidia</code>. Other laptops: use <code>cpu</code>. On Windows use your Python 3.11 executable.</p></li>
-<li>Run with the matching profile.<pre><code>make run PRESET=mac</code></pre><p class="small">Use <code>PRESET=nvidia</code> or <code>PRESET=cpu</code> for the other profiles. Windows: run <code>.venv\Scripts\python.exe app.py</code>; the Makefile's preset loader requires a POSIX shell.</p></li>
-<li>Open <a href="http://localhost:8000">http://localhost:8000</a> in Chrome or Edge. Select the languages, choose <strong>Microphone</strong> and <strong>Output</strong>, use <strong>Test microphone</strong>, wear headphones and press <strong>Start</strong> (it prepares the route and begins capture).</li>
-</ol>
-<p class="source">Commands: <a href="../../README.md#quick-start">README quick start</a>, <a href="../../Makefile">Makefile</a>, <a href="../../scripts/setup.py">setup.py</a>. The standard Mac installer prepares Whisper; the Nemotron result below uses a separately provisioned streaming engine.</p>
+    <li>Set up the profile for your machine. This example installs Czech, Slovak and German with English.<pre><code>python3.11 scripts/setup.py --profile mac --langs cs,sk,de</code></pre><p class="small">Apple Silicon: <code>mac</code>. NVIDIA CUDA: replace it with <code>nvidia</code>. Other laptops: use <code>cpu</code>. On Windows use your Python 3.11 executable.</p></li>
+    <li>Run with the matching profile.<pre><code>make run PRESET=mac</code></pre><p class="small">Use <code>PRESET=nvidia</code> or <code>PRESET=cpu</code> for the other profiles. Windows: run <code>.venv\Scripts\python.exe app.py</code>.</p></li>
+    <li>Open <a href="http://localhost:8000">http://localhost:8000</a> in Chrome or Edge. Select languages, choose <strong>Microphone</strong> and <strong>Output</strong>, use <strong>Test microphone</strong>, wear headphones and press <strong>Start</strong>.</li>
+  </ol>
+  <p class="source">Commands: <a href="../../README.md#quick-start">README quick start</a> · <a href="../../Makefile">Makefile</a> · <a href="../../scripts/setup.py">setup.py</a>.</p>
 </section>
 <section id="routes">
-<h2>What works today</h2>
+<h2>Language routes</h2>
 <p>Choose a route, then check the installed assets. A declared language pack or a recognition score alone does not establish translation quality.</p>
 <div class="table-wrap" role="region" aria-label="Language routes, scroll horizontally on small screens" tabindex="0"><table class="routes"><thead><tr><th>Direction</th><th>Use today</th><th>Evidence and boundary</th></tr></thead><tbody>
 <tr><td>English → Slovak</td><td>Live laptop route; Slovak output remains experimental</td><td>Generated English replay measured below. <a href="../evidence/2026-11-15/D_wait05.json">Route receipt</a>; human meaning and listening review still needed.</td></tr>
