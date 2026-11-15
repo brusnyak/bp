@@ -16,6 +16,8 @@ from __future__ import annotations
 
 import os
 
+import numpy as np
+
 ENABLED = os.environ.get("BP_PROSODY", "1") != "0"
 MAX_LEAD_S = float(os.environ.get("BP_PROSODY_MAX_LEAD_S", "2.0"))
 MIN_LEAD_S = 0.08
@@ -53,7 +55,7 @@ class PlayoutScheduler:
         self.play_end = 0.0        # estimated end of everything queued so far
         self._start = 0.0
 
-    def lead_silence(self, src_onset: float | None, now: float) -> float:
+    def lead_silence(self, src_onset: float | None, now: float, continuation: bool = False) -> float:
         ready = max(now, self.play_end)
         if src_onset is None:
             lead = 0.0
@@ -64,6 +66,8 @@ class PlayoutScheduler:
             lead = min(self.max_lead_s, max(0.0, src_onset + self.lag - ready))
             if lead < self.min_lead_s:
                 lead = 0.0
+        if continuation:
+            lead = 0.0
         self._start = ready + lead
         return lead
 
@@ -83,3 +87,37 @@ class RateFollower:
             target = min(RATE_MAX, max(RATE_MIN, (source_speech_s / tts_speech_s) * self.scale))
             self.scale = (1 - self.alpha) * self.scale + self.alpha * target
         return self.scale
+
+
+def fade_fragment(audio, sample_rate, fade_in_ms=5, fade_out_ms=0):
+    """Copy mono floating PCM and taper its edges; never change length or input."""
+    out = np.asarray(audio, dtype=np.float32).copy()
+    for ms, at_start in ((fade_in_ms, True), (fade_out_ms, False)):
+        n = min(len(out), max(0, round(sample_rate * ms / 1000)))
+        if n:
+            ramp = np.linspace(0, 1, n) if at_start else (np.linspace(1, 0, n) if n > 1 else np.zeros(1))
+            if at_start:
+                out[:n] *= ramp
+            else:
+                out[-n:] *= ramp
+    return out
+
+
+def crossfade_audio(left, right, sample_rate, crossfade_ms=60):
+    """Equal-power overlap, peak-limited for correlated PCM. Length = L + R - overlap.
+
+    The caller retains an unsent tail: previously sent samples must never be replayed.
+    Zero disables overlap. Inputs are mono floating PCM in [-1, 1].
+    """
+    left, right = np.asarray(left, dtype=np.float32), np.asarray(right, dtype=np.float32)
+    n = min(len(left), len(right), max(0, round(sample_rate * crossfade_ms / 1000)))
+    if not n:
+        return np.concatenate((left, right))
+    theta = np.linspace(0, np.pi / 2, n) if n > 1 else np.array([np.pi / 4])
+    outgoing, incoming = np.cos(theta), np.sin(theta)
+    mixed = left[-n:] * outgoing + right[:n] * incoming
+    # Smooth headroom envelope: correlated full-scale signals must not clip,
+    # and a single peak must not introduce a gain step at either overlap edge.
+    peak_bound = np.max(np.abs(left[-n:])) * outgoing + np.max(np.abs(right[:n])) * incoming
+    mixed /= np.maximum(1.0, peak_bound)
+    return np.concatenate((left[:-n], mixed, right[n:])).astype(np.float32)
