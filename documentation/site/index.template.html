@@ -33,8 +33,7 @@
 cd bp</code></pre></li>
 <li>Set up the profile for your machine. This example installs Czech, Slovak and German with English.<pre><code>python3.11 scripts/setup.py --profile mac --langs cs,sk,de</code></pre><p class="small">Apple Silicon: <code>mac</code>. NVIDIA CUDA: replace it with <code>nvidia</code>. Other laptops: use <code>cpu</code>. On Windows use your Python 3.11 executable.</p></li>
 <li>Run with the matching profile.<pre><code>make run PRESET=mac</code></pre><p class="small">Use <code>PRESET=nvidia</code> or <code>PRESET=cpu</code> for the other profiles. Windows: run <code>.venv\Scripts\python.exe app.py</code>; the Makefile's preset loader requires a POSIX shell.</p></li>
-<li>Open <a href="http://localhost:8000">http://localhost:8000</a> in Chrome or Edge. Use <strong>Try it as a guest</strong> or sign in.</li>
-<li>Select the languages, prepare the route, choose <strong>Microphone</strong> and <strong>Output</strong>, then use <strong>Test microphone</strong>. Wear headphones and press <strong>Start</strong>.</li>
+<li>Open <a href="http://localhost:8000">http://localhost:8000</a> in Chrome or Edge. Select the languages, choose <strong>Microphone</strong> and <strong>Output</strong>, use <strong>Test microphone</strong>, wear headphones and press <strong>Start</strong> (it prepares the route and begins capture).</li>
 </ol>
 <p class="source">Commands: <a href="../../README.md#quick-start">README quick start</a>, <a href="../../Makefile">Makefile</a>, <a href="../../scripts/setup.py">setup.py</a>. The standard Mac installer prepares Whisper; the Nemotron result below uses a separately provisioned streaming engine.</p>
 </section>
