@@ -383,9 +383,9 @@ def download_weights():
         try:
             weights[key] = hf_hub_download("XRXRX/X-Voice", name,
                                            cache_dir="/tmp/xvoice-hf")
-            step("weight", name=name, path=weights[key])
+            step("weight", file=name, path=weights[key])
         except Exception as exc:
-            error("weight", exc, name=name)
+            error("weight", exc, file=name)
     R["weights"] = weights
     save()
 
