@@ -1,0 +1,15 @@
+{
+  "id": "yegorby/bp-fish-s2-pro-t4-v2",
+  "title": "BP Fish Audio S2-Pro T4 v2",
+  "code_file": "job.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": ["yegorby/bp-t4-assets-20261105"],
+  "competition_sources": [],
+  "model_sources": [],
+  "category_ids": [],
+  "keywords": []
+}
