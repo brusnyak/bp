@@ -6,6 +6,47 @@
 <meta name="description" content="Local speech translation and live captions. Install on your own machine, choose a language, and route translated speech to headphones or a meeting.">
 <meta name="color-scheme" content="light dark">
 <title>Live Speech Translation — local audio and captions</title>
+<link rel="stylesheet" href="../../ui/tokens.css">
+<style>:root{color-scheme:light dark;--ink:#222;--muted:#505966;--bg:#fff;--surface:#f8fafc;--line:#cbd5e1;--accent:#1d4ed8;--tint:#eef6ff;--focus:#1d4ed8;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+@media(prefers-color-scheme:dark){:root{--ink:#e8edf5;--muted:#b5c0d0;--bg:#10151d;--surface:#19222f;--line:#46556a;--accent:#9bc3ff;--tint:#172c48;--focus:#9bc3ff}}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:1rem}body{margin:0;background:var(--bg);color:var(--ink);font-size:1rem;line-height:1.65}main,header,footer{max-width:1060px;margin:auto;padding:1.5rem}header{padding-top:3rem;border-bottom:1px solid var(--line)}h1{font-size:clamp(2rem,6vw,3rem);line-height:1.1;letter-spacing:-.025em;margin:0 0 1rem}h2{font-size:1.55rem;line-height:1.25;margin:0 0 1rem}h3{font-size:1.05rem;margin:0 0 .5rem}p{max-width:72ch;margin:.65rem 0}section{padding:2.5rem 0;border-bottom:1px solid var(--line)}a{color:var(--accent);text-underline-offset:.2em}a:hover{text-decoration-thickness:2px}a:focus-visible,summary:focus-visible,.table-wrap:focus-visible{outline:3px solid var(--focus);outline-offset:4px}::selection{background:var(--accent);color:var(--bg)}nav{display:flex;gap:.6rem 1.2rem;flex-wrap:wrap;margin:1.5rem 0 .5rem}nav a{padding:.35rem 0}nav[aria-label="On this page"]{font-size:.9rem;margin:0}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.9em;overflow-wrap:anywhere}p code,li code,td code{background:var(--surface);padding:.1rem .25rem}pre{padding:1rem;background:var(--surface);border:1px solid var(--line);border-radius:6px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;margin:.6rem 0 1rem}pre code{font-size:.88rem}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.card,.callout{padding:1.2rem;border:1px solid var(--line);border-radius:8px;background:var(--surface)}.callout{background:var(--tint);margin:1rem 0}.card p:last-child{margin-bottom:0}.small,.source{font-size:.88rem;color:var(--muted)}.source{overflow-wrap:anywhere;margin-top:.75rem}.table-wrap{overflow:auto;max-width:100%;margin:.8rem 0;scrollbar-color:var(--line) var(--surface)}table{width:100%;border-collapse:collapse;font-size:.91rem;font-variant-numeric:tabular-nums}caption{text-align:left;font-weight:600;padding:.4rem 0}th,td{padding:.75rem .6rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:var(--surface)}td:first-child,th:first-child{padding-left:.3rem}table.models{min-width:850px}table.routes{min-width:540px}.pipeline{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;list-style:none;padding:1rem 0;margin:1rem 0}.pipeline li{display:flex;align-items:center;gap:.5rem}.pipeline li:not(:last-child)::after{content:'→';color:var(--muted)}.pipeline span{padding:.4rem .65rem;border:1px solid var(--line);border-radius:5px;background:var(--surface)}ol.steps{padding-left:1.5rem}ol.steps>li{padding-left:.25rem;margin:1rem 0}ul{padding-left:1.3rem}li{margin:.4rem 0}footer{color:var(--muted);font-size:.9rem;padding-bottom:3rem}.skip{position:absolute;top:-5rem;left:1rem;background:var(--bg);padding:.5rem}.skip:focus{top:1rem}summary{cursor:pointer;padding:.5rem 0;color:var(--accent)}@media(max-width:640px){header,main,footer{padding-left:1rem;padding-right:1rem}.grid{grid-template-columns:1fr}section{padding:2rem 0}h2{font-size:1.35rem}th,td{padding:.6rem .45rem}.table-wrap{border:1px solid var(--line);padding:.25rem .5rem}header{padding-top:2rem}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+/* Design-system overlay for handler docs: re-point legacy vars to --bp-* tokens and style the new BP components. Loaded after site.css via $css; tokens.css is linked in the template head. */
+:root{--bg:var(--bp-bg);--surface:var(--bp-surface);--ink:var(--bp-text);--muted:var(--bp-muted);--line:var(--bp-hairline);--accent:var(--bp-accent);--tint:var(--bp-bg);--focus:var(--bp-accent);font-family:var(--bp-font-ui)}
+@media(prefers-color-scheme=dark){:root{--bg:var(--bp-bg);--surface:var(--bp-surface);--ink:var(--bp-text);--muted:var(--bp-muted);--line:var(--bp-hairline);--accent:var(--bp-accent);--tint:var(--bp-bg);--focus:var(--bp-accent)}}
+body{max-width:none}
+.bp-wrap{width:100%;max-width:70rem;margin:0 auto;padding-inline:var(--bp-s6)}
+.bp-main{padding-block:var(--bp-s6) var(--bp-s8);max-width:none}
+.bp-main h1{margin:0 0 var(--bp-s3);font-family:var(--bp-font-title);font-size:var(--bp-t-2xl);line-height:1.2;color:var(--bp-text)}
+.bp-main h2{margin:var(--bp-s8) 0 var(--bp-s4);font-family:var(--bp-font-title);font-size:var(--bp-t-xl);line-height:1.25;color:var(--bp-text)}
+.bp-main h3{font-family:var(--bp-font-title);color:var(--bp-text)}
+.bp-sub{margin:0 0 var(--bp-s6);color:var(--bp-muted);max-width:60ch;font-size:var(--bp-t-lg)}
+.bp-header{padding:0;border-bottom:1px solid var(--bp-hairline);background:var(--bp-surface)}
+.bp-header-inner{display:flex;align-items:center;gap:var(--bp-s6);min-height:var(--bp-control-h);padding-block:var(--bp-s3);flex-wrap:wrap}
+.bp-brand{display:inline-flex;align-items:center;gap:var(--bp-s2);color:var(--bp-text);text-decoration:none;font-weight:700;font-family:var(--bp-font-title);font-size:var(--bp-t-xl)}
+.bp-mark{display:grid;place-items:center;width:var(--bp-control-h);height:var(--bp-control-h);border-radius:var(--bp-r-md);background:var(--bp-accent);color:var(--bp-on-accent);font-size:var(--bp-t-sm);font-weight:800}
+.bp-nav{display:flex;gap:var(--bp-s1);margin-right:auto;flex-wrap:wrap}
+.bp-nav a{display:inline-flex;align-items:center;min-height:var(--bp-control-h);padding-inline:var(--bp-s3);border-radius:var(--bp-r-md);color:var(--bp-muted);text-decoration:none;font-weight:600;font-size:var(--bp-t-sm)}
+.bp-nav a:hover{color:var(--bp-text);background:var(--bp-bg)}
+.bp-actions{display:flex;align-items:center;gap:var(--bp-s2);flex-shrink:0}
+.hero{margin-bottom:var(--bp-s8)}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--bp-s3);margin:var(--bp-s4) 0 var(--bp-s8)}
+.tile{padding:var(--bp-s5);border:1px solid var(--bp-hairline);border-radius:var(--bp-r-lg);background:var(--bp-surface)}
+.tile .tile-label{display:block;font-size:var(--bp-t-xs);font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--bp-muted)}
+.tile .tile-value{display:block;margin-top:var(--bp-s1);font-size:var(--bp-t-2xl);font-weight:700;font-variant-numeric:tabular-nums;color:var(--bp-text)}
+.tile .tile-note{display:block;font-size:var(--bp-t-xs);color:var(--bp-muted);margin-top:var(--bp-s1)}
+.pipeline{display:flex;gap:var(--bp-s2);list-style:none;padding:0;margin:0 0 var(--bp-s4)}
+.pipeline li{display:inline-flex;align-items:center;gap:var(--bp-s1);padding:var(--bp-s1) var(--bp-s3);border:1px solid var(--bp-hairline);border-radius:var(--bp-r-pill);background:var(--bp-surface);font-size:var(--bp-t-sm);color:var(--bp-text)}
+.pipeline li span{font-weight:600}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--bp-s2);height:var(--bp-control-h);min-height:var(--bp-control-h);padding:0 var(--bp-s4);border:1px solid var(--bp-control);border-radius:var(--bp-r-md);background:var(--bp-surface);color:var(--bp-text);font-weight:600;font-size:var(--bp-t-sm);text-decoration:none;font-family:inherit}
+.btn:hover{border-color:var(--bp-accent)}
+.btn-primary{background:var(--bp-accent);border-color:var(--bp-accent);color:var(--bp-on-accent)}
+.btn-primary:hover{filter:brightness(0.92)}
+.btn-ghost{background:transparent;border-color:transparent;color:var(--bp-text)}
+.btn-ghost:hover{background:var(--bp-bg);color:var(--bp-accent)}
+.source{border-top:none}
+@media(max-width:760px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.bp-nav{order:3;width:100%;margin-top:var(--bp-s3);justify-content:center;gap:var(--bp-s2)}.bp-header-inner{flex-direction:column;align-items:stretch;gap:var(--bp-s3)}.bp-actions{order:2;width:100%;justify-content:center}}
+@media(prefers-reduced-motion=reduce){.btn{transition:none}}
+</style>
 </head>
 <body>
 <a class="skip" href="#content">Skip to content</a>
