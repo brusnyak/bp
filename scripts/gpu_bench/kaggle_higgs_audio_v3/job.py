@@ -545,7 +545,7 @@ def main():
             return
         run(['uv', 'pip', 'freeze', '--python', TTS_PY], 30)
         run(['uv', 'venv', '--python', '3.12', str(WORK / 'asr')], 120)
-        run(['uv', 'pip', 'install', '--python', ASR_PY, 'faster-whisper==1.2.1'], 600)
+        run(['uv', 'pip', 'install', '--python', ASR_PY, 'faster-whisper'], 600)
         run(['uv', 'pip', 'freeze', '--python', ASR_PY], 30)
         refs = prepare_references()
         try:
