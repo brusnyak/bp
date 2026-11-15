@@ -57,8 +57,8 @@ All model research is consolidated in `documentation/model_landscape_2026-10.md`
 | **Piper** (incumbent live) | `sk_SK-lili` base only | MIT | 0.03–0.05 CPU | ✅ Yes | **Live path fallback — generic quality, working baseline** |
 | Piper + own fine-tune (`me_omni_piper_sk`) | SK | MIT | 0.03–0.05 | ✅ Yes | Trained, WER 0.19 vs 0.54 old |
 | **OmniVoice** | 600+ (zero-shot clone) | Apache-2.0 | 0.40–0.65 T4 | ❌ No (batch/QC) | Batch/QC only, not live |
-| **XTTS v2** (Coqui) | Yes | Non-commercial (CPML) | — | ? | ❌ Failed on Kaggle (Python <3.12, TOS gate) |
-| **X-Voice** (F5 lineage) | Yes (30 langs) | Code MIT, weights CC-BY-NC | — | ? | ❌ Failed on Kaggle (ctranslate2==4.5.0 missing, fastlid SSL) |
+| **XTTS v2** (Coqui) | **No Slovak**; Czech yes, English yes (17 langs) | Non-commercial (CPML) | 0.52-0.63 T4 | ✅ Yes (first chunk 0.45-0.48 s) | **Measured 2026-11-15 (T4, 3 repeats):** EN word error 0%, CS 4-10%, 1.9-2.5 GB GPU. Usable for EN/CS cloning; not for Slovak. Evidence `evidence/2026-11-15/kaggle_xtts_t4_results.json` |
+| **X-Voice** (F5 lineage) | **Yes: sk, cs, en measured** (30 langs) | Code MIT, weights CC-BY-NC | Stage1 0.37-0.47 (16 steps), 0.7-0.89 (32 steps) T4 | ❌ No (whole phrase: 2.2-2.7 s for a 3-5 s sentence at 16 steps) | **Measured 2026-11-15 (T4, 3 repeats):** word error 0-11% EN/SK/CS, < 1.3 GB GPU. Best cross-lingual clone quality of the three, too slow per phrase on a T4 for the 2 s goal; paper reports RTF 0.073 on an RTX 4090. Evidence `evidence/2026-11-15/kaggle_xvoice_t4_results.json` |
 | **Pocket TTS** (Kyutai 100M) | No official SK | MIT | 0.63 T4 | ✅ Yes | No native SK, too slow on T4, cloning needs HF auth |
 | **Higgs Audio v3** (Boson 4B) | Likely (100+ langs) | Non-commercial | — | ? | ❌ Failed on Kaggle (flashinfer compile timeout >5 min) |
 | **Fish Audio S2-Pro** | Unverified (80+ langs) | Non-commercial | — | ? | ❌ Discarded — needs ≥24GB VRAM, T4 has 16GB |
@@ -76,8 +76,8 @@ All kernels pushed to private Kaggle account `yegorby`, Tesla T4 GPU, one poller
 | Kernel | Slug | Model | Status | Result |
 |--------|------|-------|--------|--------|
 | Pocket TTS | `yegorby/bp-kyutai-pocket-tts-t4` | Kyutai Pocket TTS 100M | ✅ complete | RTF 0.63 on T4, EN catalog voice works, no native SK, cloning needs HF auth |
-| X-Voice | `yegorby/bp-x-voice-t4` | X-Voice (F5 lineage, SK+CZ native) | ❌ error | ctranslate2==4.5.0 missing on PyPI, fastlid SSL cert error |
-| XTTS v2 | `yegorby/bp-xtts-voice-clone-t4` | Coqui XTTS v2 | ⏳ queued | COQUI_TOS_AGREED at runtime fixed, waiting |
+| X-Voice | `yegorby/bp-x-voice-t4` | X-Voice (F5 lineage, SK+CZ native) | ✅ complete (v9) | Stage1/Stage2 x 16/32 steps x en/sk/cs, see table above |
+| XTTS v2 | `yegorby/bp-xtts-voice-clone-t4` | Coqui XTTS v2 | ✅ complete (v15) | EN/CS measured, SK unsupported |
 | Higgs Audio v3 | `yegorby/bp-higgs-audio-v3-t4` | Boson Higgs Audio v3 4B | ❌ error | flashinfer CUDA compile timeout >5 min |
 | Fish Audio S2-Pro | — | fishaudio/s2-pro | ❌ discarded | Needs ≥24GB VRAM, T4 has 16GB |
 
