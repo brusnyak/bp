@@ -352,7 +352,8 @@ _ongoing_conversions: Dict[str, asyncio.Lock] = {}
 # Dictionary for per-session locks (prevents race conditions)
 _session_locks: Dict[str, asyncio.Lock] = {}
 
-# ===== Model Pool with Bounds (P0) =============================================
+# ===== Model Pool with Bounds (P0) ======================================
+
 # One instance per (stage, engine, config) per process, shared across sessions.
 # Configurable limits per stage; LRU eviction when limits exceeded.
 MODEL_POOL_CONFIG = {
@@ -1739,6 +1740,56 @@ def _stt_prompt(session_data) -> Optional[str]:
     return (f"{base} {tail}".strip()) or None
 
 
+async def _send_fragment_audio(session_data, audio, sample_rate, utterance, send, crossfade_ms, lead_s=0.0):
+    """Send the body now; retain only an overlap tail for at most 150 ms.
+
+    Each pending tail owns its sender (including Stop/generation checks). A timer
+    releases an isolated tail even if no more text or audio ever arrives.
+    """
+    lock = session_data.setdefault("audio_join_lock", asyncio.Lock())
+    async with lock:
+        timer = session_data.pop("audio_join_timer", None)
+        if timer is not None:
+            timer.cancel()
+        previous = session_data.pop("audio_join_tail", None)
+        now = time.perf_counter()
+        audio = np.asarray(audio)
+        overlap = 0
+        if crossfade_ms > 0:
+            audio = _prosody.fade_fragment(audio, sample_rate)
+        if lead_s > 0:
+            audio = np.concatenate((np.zeros(int(sample_rate * lead_s), dtype=audio.dtype), audio))
+        if previous is not None:
+            tail, rate, key, arrived, sender = previous
+            if (crossfade_ms > 0 and rate == sample_rate and key == utterance
+                    and now - arrived < 0.150 and lead_s < 0.150):
+                overlap = min(len(tail), len(audio), round(sample_rate * crossfade_ms / 1000))
+                audio = _prosody.crossfade_audio(tail, audio, sample_rate, crossfade_ms)
+            else:
+                await sender(_prosody.fade_fragment(tail, rate, fade_in_ms=0, fade_out_ms=len(tail) * 1000 / rate), rate)
+        if crossfade_ms <= 0:
+            await send(audio, sample_rate)
+            return 0.0
+        n = min(len(audio), round(sample_rate * crossfade_ms / 1000))
+        if len(audio) > n:
+            await send(audio[:-n], sample_rate)
+        if n:
+            pending = (audio[-n:].copy(), sample_rate, utterance, now, send)
+            session_data["audio_join_tail"] = pending
+
+            async def release_tail():
+                await asyncio.sleep(0.150)
+                async with lock:
+                    if session_data.get("audio_join_tail") is pending:
+                        session_data.pop("audio_join_tail")
+                        session_data.pop("audio_join_timer", None)
+                        await send(_prosody.fade_fragment(pending[0], sample_rate, fade_in_ms=0,
+                                                         fade_out_ms=crossfade_ms), sample_rate)
+
+            session_data["audio_join_timer"] = asyncio.create_task(release_tail())
+        return overlap / sample_rate
+
+
 async def _send_fragment_lag_trace(websocket, trace):
     """One trace per fragment, at first successful audio send or terminal no-audio result."""
     if trace is None or trace["sent"]:
@@ -2004,14 +2055,31 @@ async def _process_speech_segment_pipeline(
     if tts_lang != target_lang:
         logging.info(f"Backend: Session {client_info}: '{tts_model_choice}' using '{tts_lang}' as a proxy for '{target_lang}'.")
 
+    prosody_on = _prosody.ENABLED and getattr(tts_engine, "SUPPORTS_PROSODY", False)
+    sched = session_data.setdefault("prosody_sched", _prosody.PlayoutScheduler()) if prosody_on else None
+    follower = session_data.setdefault("prosody_rate", _prosody.RateFollower()) if prosody_on else None
+    xfade_ms = float(session_config.get("xfade_ms", os.environ.get("BP_XFADE_MS", "60")))
+    xfade_ms = min(80.0, max(40.0, xfade_ms)) if xfade_ms > 0 else 0.0
+    # Piper chunks are independent phrase syntheses. Native streaming engines must
+    # not lose 60 ms at each internal codec/model chunk boundary.
+    if not isinstance(tts_engine, PiperTTS):
+        xfade_ms = 0.0
+    utterance = (capture_generation, source_onset_time if source_onset_time is not None else segment_start_time,
+                 target_lang, tts_model_choice, speaker_wav_path)
+    previous_piece = session_data.get("tts_previous_piece")
+    continuation = (xfade_ms > 0 and pretranscribed is not None and previous_piece is not None
+                    and previous_piece[0] == utterance and not previous_piece[1].rstrip().endswith((".", "!", "?", ",", ";", ":")))
+    prosody_kwargs = {"length_scale": follower.scale, "pauses": True} if prosody_on else {}
+
+    async def send_audio(samples, rate):
+        audio_buffer = io.BytesIO()
+        sf.write(audio_buffer, samples, rate, format="WAV")
+        await safe_send("tts_audio", audio_buffer.getvalue(), is_bytes=True)
+
     if getattr(tts_engine, "SUPPORTS_STREAMING", False):
         logging.info(f"Backend: Session {client_info}: Starting streaming TTS synthesis with '{tts_model_choice}'...")
         queue = asyncio.Queue()
 
-        prosody_on = _prosody.ENABLED and getattr(tts_engine, "SUPPORTS_PROSODY", False)
-        sched = session_data.setdefault("prosody_sched", _prosody.PlayoutScheduler()) if prosody_on else None
-        follower = session_data.setdefault("prosody_rate", _prosody.RateFollower()) if prosody_on else None
-        prosody_kwargs = {"length_scale": follower.scale, "pauses": True} if prosody_on else {}
         stream_audio_s = 0.0
 
         def run_streaming_tts():
@@ -2041,20 +2109,20 @@ async def _process_speech_segment_pipeline(
 
             chunk_count += 1
             stream_audio_s += len(chunk) / stream_sample_rate
+            lead_s = 0.0
             if prosody_on and chunk_count == 1:
                 # Mirror the speaker's pause before this segment: pad silence so the onset-to-onset spacing is kept.
                 # Reported onsets are None for most segments and span a whole utterance for finals, so they cannot drive the
                 # scheduler (found 2026-11-07: 4 of 22 segments had one). Use when THIS audio started: dispatch time minus its length.
                 chunk_onset = segment_start_time - audio_segment_np.size / AUDIO_SAMPLE_RATE
-                lead_s = sched.lead_silence(chunk_onset, time.perf_counter())
+                lead_s = sched.lead_silence(chunk_onset, time.perf_counter(), continuation=continuation)
                 if lead_s > 0:
-                    chunk = np.concatenate([np.zeros(int(stream_sample_rate * lead_s), dtype=np.asarray(chunk).dtype), np.asarray(chunk)])
                     logging.info(f"Backend: Session {client_info}: prosody lead silence {lead_s:.2f}s")
-            # Convert numpy chunk to WAV bytes
-            audio_buffer = io.BytesIO()
-            sf.write(audio_buffer, chunk, stream_sample_rate, format="WAV")
-            await safe_send("tts_audio", audio_buffer.getvalue(), is_bytes=True)
+            stream_audio_s -= await _send_fragment_audio(
+                session_data, chunk, stream_sample_rate, utterance, send_audio, xfade_ms, lead_s=lead_s)
 
+        if chunk_count:
+            session_data["tts_previous_piece"] = (utterance, transcribed_text)
         if prosody_on and chunk_count:
             sched.committed(stream_audio_s)
             _src_dur = (source_span[1] - source_span[0]) if source_span and len(source_span) == 2 else audio_segment_np.size / AUDIO_SAMPLE_RATE   # incremental fragments carry no audio (1 zero sample): the pace follower used 0 s and never ran (62 of 62 log lines, 2026-11-09)
@@ -2077,11 +2145,8 @@ async def _process_speech_segment_pipeline(
         if torch is not None and isinstance(audio_wav, torch.Tensor):
             audio_wav = audio_wav.cpu().numpy()
         
-        audio_buffer = io.BytesIO()
-        # Use soundfile to write the audio to a WAV buffer
-        await loop.run_in_executor(None, lambda: sf.write(audio_buffer, audio_wav, sample_rate, format="WAV"))
-        # Send the WAV data as bytes over the WebSocket
-        await safe_send("tts_audio", audio_buffer.getvalue(), is_bytes=True)
+        await _send_fragment_audio(session_data, audio_wav, sample_rate, utterance, send_audio, xfade_ms)
+        session_data["tts_previous_piece"] = (utterance, transcribed_text)
     elif not getattr(tts_engine, "SUPPORTS_STREAMING", False):
         # T045: this used to hardcode `!= "xtts"` (the only streaming engine at the time) — now
         # piper/hybrid also stream (audio already sent chunk-by-chunk above, audio_wav staying
@@ -2187,7 +2252,9 @@ class _IncState:
         self.agree = Agreement()
         self.frag = Fragmenter(min_words=int(cfg.get("incr_min_words", os.environ.get("BP_INCR_MIN_WORDS", "4"))),
                                max_words=int(cfg.get("incr_max_words", os.environ.get("BP_INCR_MAX_WORDS", "9"))),
-                               max_wait_s=float(cfg.get("incr_max_wait_s", os.environ.get("BP_INCR_MAX_WAIT_S", "1.6"))))
+                               max_wait_s=float(cfg.get("incr_max_wait_s", os.environ.get("BP_INCR_MAX_WAIT_S", "1.6"))),
+                               language=cfg.get("source_lang", "en"),
+                               phrase_guard=cfg.get("incr_phrase_guard"))
         self.busy = False
         self.closed = False
         self.last_step = 0.0
@@ -2261,7 +2328,7 @@ async def _incremental_step(websocket, session_data, session_config, client_info
             inc.committed += len(committed)
             inc.context += " " + " ".join(w[0] for w in committed)
             frames.trim(min(n, int(committed[-1][2] / frame_s) + 1))   # audio before the last agreed word is done
-        text = inc.frag.pop(time.perf_counter())
+        text = inc.frag.pop(time.perf_counter(), next_word=inc.agree.prev[0][0] if inc.agree.prev else None)
         if text:
             await _emit_fragment(websocket, session_config, client_info, session_data, text, inc.frag.span, inc.source_onset_time, inc.frag.hold_s)
     except Exception as e:
@@ -2484,6 +2551,11 @@ async def handle_audio_stream(websocket: WebSocket, token: Optional[str] = None)
                             if data.get("strategy") in STRATEGIES:
                                 session_config["strategy"] = data["strategy"]
                                 _apply_strategy(session_config)
+                            if isinstance(data.get("incr_phrase_guard"), bool):
+                                session_config["incr_phrase_guard"] = data["incr_phrase_guard"]
+                            if (isinstance(data.get("xfade_ms"), (int, float))
+                                    and (data["xfade_ms"] == 0 or 40 <= data["xfade_ms"] <= 80)):
+                                session_config["xfade_ms"] = data["xfade_ms"]
                             if "room_id" in data:   # room mode: this session is the speaker of that room (listeners join /ws/listen)
                                 _rid_new = str(data["room_id"])[:64] or None
                                 _r_new = _room.get_room(_rid_new, create=False) if _rid_new else None

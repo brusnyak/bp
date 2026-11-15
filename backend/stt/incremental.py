@@ -5,10 +5,17 @@ audio start with the same words. Committed words are grouped into short fragment
 that can be translated and voiced while the speaker is still talking. A fragment is flushed when it
 ends a clause, reaches max_words, or has waited max_wait_s. Nothing here touches audio or models.
 """
+import os
 import re
 
 SENTENCE_END = (".", "!", "?", ";", ":")
 CLAUSE_END = SENTENCE_END + (",",)
+FUNCTION_WORDS = {
+    "en": set("a an the to of in on at for from with by and or but if that as".split()),
+    "de": set("der die das den dem des ein eine einen einem einer zu von in an auf mit für und oder aber dass weil".split()),
+    "cs": set("v ve na do z ze k ke s se pro od u o a i ale nebo že aby".split()),
+    "sk": set("v vo na do z zo k ku s so pre od u o a i ale alebo že aby".split()),
+}
 
 
 def _norm(word: str) -> str:
@@ -39,8 +46,11 @@ def stream_end(frame_times, last_push_t):
 
 
 class Fragmenter:
-    def __init__(self, min_words=4, max_words=9, max_wait_s=1.6):
+    def __init__(self, min_words=4, max_words=9, max_wait_s=1.6, language="en", phrase_guard=None):
         self.min_words, self.max_words, self.max_wait_s = min_words, max_words, max_wait_s
+        self.phrase_guard = os.environ.get("BP_INCR_PHRASE_GUARD", "1") != "0" if phrase_guard is None else phrase_guard
+        self.function_words = FUNCTION_WORDS.get(language, set())
+        self._words, self._arrivals = [], []
         self.pending, self.since = [], None
         self.t0 = self.t1 = None      # stream-clock span of the pending words
         self.span = None              # span of the last popped fragment
@@ -50,25 +60,39 @@ class Fragmenter:
         for w in words:
             if w[0].strip():
                 self.pending.append(w[0].strip())
+                self._words.append(w)
+                self._arrivals.append(now)
                 self.t0 = w[1] if self.t0 is None else min(self.t0, w[1])
                 self.t1 = w[2] if self.t1 is None else max(self.t1, w[2])
         if self.pending and self.since is None:
             self.since = now
 
-    def pop(self, now, final=False):
+    def pop(self, now, final=False, next_word=None):
         n = len(self.pending)
         if not n:
             return None
-        last = self.pending[-1]
-        ready = (final
-                 or (n >= 2 and last.endswith(SENTENCE_END))
-                 or (n >= self.min_words and last.endswith(CLAUSE_END))
-                 or n >= self.max_words
-                 or (n >= 2 and self.since is not None and now - self.since >= self.max_wait_s))
-        if not ready:
-            return None
-        text = " ".join(self.pending)
+        expired = self.since is not None and now - self.since >= self.max_wait_s
+        cut = n
+        if not final and not expired:
+            # Prefer the first complete clause, preserving the remainder and its clocks.
+            boundaries = [i + 1 for i, w in enumerate(self.pending)
+                          if (i + 1 >= 2 and w.endswith(SENTENCE_END))
+                          or (i + 1 >= self.min_words and w.endswith(CLAUSE_END))]
+            if self.phrase_guard and boundaries:
+                cut = boundaries[0]
+            elif not (boundaries and boundaries[-1] == n) and n < self.max_words:
+                return None
+            if self.phrase_guard and not self.pending[cut - 1].endswith(CLAUSE_END):
+                following = self.pending[cut] if cut < n else (next_word or "")
+                if (_norm(self.pending[cut - 1]) in self.function_words
+                        or _norm(following) in self.function_words):
+                    return None
+        text = " ".join(self.pending[:cut])
         self.hold_s = (now - self.since) if self.since is not None else 0.0
-        self.span = (self.t0, self.t1)
-        self.pending, self.since, self.t0, self.t1 = [], None, None, None
+        emitted = self._words[:cut]
+        self.span = (min(w[1] for w in emitted), max(w[2] for w in emitted))
+        del self.pending[:cut], self._words[:cut], self._arrivals[:cut]
+        self.since = self._arrivals[0] if self._arrivals else None
+        self.t0 = min((w[1] for w in self._words), default=None)
+        self.t1 = max((w[2] for w in self._words), default=None)
         return text
