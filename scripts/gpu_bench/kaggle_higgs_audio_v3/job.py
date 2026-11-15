@@ -152,7 +152,17 @@ def t4_gate(label):
 
 ASR_CODE = r'''
 import json, sys, time, traceback
+import numpy as np, soundfile as sf
 from faster_whisper import WhisperModel
+
+def load16k(path):
+    # decode with soundfile, not PyAV: PyAV/faster-whisper kwarg clash failed twice on 2026-11-15
+    x, sr = sf.read(path, dtype='float32', always_2d=True)
+    x = x.mean(axis=1)
+    if sr != 16000:
+        n = int(round(len(x) * 16000 / sr))
+        x = np.interp(np.linspace(0, len(x) - 1, n), np.arange(len(x)), x).astype('float32')
+    return x
 jobs = json.loads(sys.argv[1])
 t = time.perf_counter()
 # CPU int8 avoids CUDA-12 ASR libraries colliding with the CUDA-13 TTS stack.
@@ -163,7 +173,7 @@ results = {}
 for job in jobs:
     try:
         t = time.perf_counter()
-        segments, info = model.transcribe(job['path'], language=job['lang'], beam_size=5)
+        segments, info = model.transcribe(load16k(job['path']), language=job['lang'], beam_size=5)
         text = ' '.join(s.text.strip() for s in segments)
         results[job['path']] = {'text': text, 'wall_s': time.perf_counter() - t,
                                 'language': info.language}
@@ -545,7 +555,7 @@ def main():
             return
         run(['uv', 'pip', 'freeze', '--python', TTS_PY], 30)
         run(['uv', 'venv', '--python', '3.12', str(WORK / 'asr')], 120)
-        run(['uv', 'pip', 'install', '--python', ASR_PY, 'faster-whisper'], 600)
+        run(['uv', 'pip', 'install', '--python', ASR_PY, 'faster-whisper', 'soundfile', 'numpy'], 600)
         run(['uv', 'pip', 'freeze', '--python', ASR_PY], 30)
         refs = prepare_references()
         try:
