@@ -288,6 +288,9 @@ def _apply_strategy(session_config: Dict[str, Any]) -> None:
         for k in ("incr_min_words", "incr_max_words", "incr_max_wait_s"):
             session_config.pop(k, None)
         session_config.update(preset)
+        _w = os.environ.get("BP_INCR_MAX_WAIT_S")   # test override: the preset otherwise always wins over the env
+        if _w and "incr_max_wait_s" in preset:
+            session_config["incr_max_wait_s"] = float(_w)
 
 # Pre-VAD Silence Detection Configuration
 # Threshold calibrated based on user testing:
