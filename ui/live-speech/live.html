@@ -366,9 +366,10 @@
             <span class="metric-value" id="totalLatency">0.0s</span>
           </div>
         </div>
-        <!-- Timeline Chart Canvas -->
+        <p id="lagTraceSummary" role="status" aria-live="polite"></p>
+        <!-- Per-fragment server-send lag -->
         <div class="timeline-chart-container">
-          <canvas id="latencyTimelineChart"></canvas>
+          <canvas id="latencyTimelineChart" role="img" aria-label="Per-fragment lag in milliseconds. Stacked hold, STT, MT, TTS-first and unattributed time; 2000 millisecond goal."></canvas>
         </div>
       </div>
 
