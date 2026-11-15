@@ -1,0 +1,1280 @@
+{
+ "_profiles": {
+  "laptop_cpu": "Windows/Linux laptop, 4-8 CPU cores, 8-16 GB RAM, no usable GPU (measured proxies: colima VM 4 vCPU 7 GB; Win11 CPU-only, no numbers).",
+  "apple_silicon": "Apple M1 or newer, 8+ CPU cores, 16 GB unified memory shared with the desktop, MLX/MPS GPU (measured: M1 Pro 16 GB).",
+  "gpu_8gb": "NVIDIA laptop/desktop GPU with 8 GB VRAM, 4-8 CPU cores, 16 GB RAM, CUDA 12 (no measurement on this tier).",
+  "gpu_16gb": "NVIDIA GPU with 15-16 GB VRAM, 4+ CPU cores, 16-32 GB RAM; Tesla T4 (Turing, 15360 MiB, no bf16) is the measured reference.",
+  "gpu_24gb_plus": "NVIDIA Ampere or newer with 24 GB+ VRAM (RTX 3090/4090, A10, L4 24 GB, A100), 8+ cores, 32 GB+ RAM, bf16 available (no measurement on this tier).",
+  "server_cpu": "Always-on x86/ARM server, 8-16 vCPU, 16-32 GB RAM, no GPU (no measurement; proxy: Kaggle notebook host CPU)."
+ },
+ "piper-en_US-lessac-medium": {
+  "measured": [],
+  "when": "English CPU voice for live use on any laptop or server; no GPU needed.",
+  "avoid_when": "Needs a cloned or personal voice, or any non-English output.",
+  "profiles": {
+   "laptop_cpu": "recommended",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "recommended"
+  },
+  "profile_basis": "spec-only"
+ },
+ "piper-sk_SK-lili-medium": {
+  "measured": [
+   {
+    "device": "cpu",
+    "hardware": "Kaggle T4 notebook host CPU (Piper runs on CPU)",
+    "metric": "latency_s",
+    "value": 0.15,
+    "note": "median wall per 3-6 word SK/CS piece, n=32 (lili SK + jirka CS)",
+    "source": "documentation/evidence/2026-11-10/tts_probe_v2_omnivoice_piper.json (arms.piper.summary.wall_median_s)"
+   },
+   {
+    "device": "cpu",
+    "hardware": "Kaggle T4 notebook host CPU",
+    "metric": "rtf",
+    "value": 0.07,
+    "note": "sustained_ratio wall/audio, SK+CS pieces",
+    "source": "documentation/evidence/2026-11-10/tts_probe_v2_omnivoice_piper.json (arms.piper.summary.sustained_ratio)"
+   },
+   {
+    "device": "cpu",
+    "hardware": "Kaggle T4 notebook host CPU",
+    "metric": "latency_s",
+    "value": 0.475,
+    "note": "voice stage for a ~10 s EN->SK chain utterance",
+    "source": "documentation/evidence/2026-11-07/e2e_chain.json (chain.en->sk.tts_s)"
+   }
+  ],
+  "when": "Slovak CPU voice for live EN->SK output on any machine; generic voice.",
+  "avoid_when": "Needs a voice that sounds like a specific person.",
+  "profiles": {
+   "laptop_cpu": "recommended",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "recommended"
+  },
+  "profile_basis": "measured"
+ },
+ "faster-whisper-base": {
+  "measured": [
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 8.6,
+    "note": "FLEURS en, 60 clips, faster-whisper",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (stt_t4.whisper-base|en.WER)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 18.1,
+    "note": "FLEURS de, 60 clips, faster-whisper",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (stt_t4.whisper-base|de.WER)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 67.3,
+    "note": "FLEURS cs, 60 clips, faster-whisper",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (stt_t4.whisper-base|cs.WER)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 64.6,
+    "note": "FLEURS sk, 60 clips, faster-whisper",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (stt_t4.whisper-base|sk.WER)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "rtf",
+    "value": 0.018,
+    "note": "en FLEURS, mean RTF",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (stt_t4.whisper-base|en.RTF)"
+   },
+   {
+    "device": "cpu",
+    "hardware": "arm64 CPU int8 (maintainer Mac)",
+    "metric": "wer_pct",
+    "value": 66.0,
+    "note": "Slovak own reading me_sk_trhove, whole clip, beam 5 (RTF 0.06)",
+    "source": "bench/results/2026-11-02_whisper-base_whole.json (me_sk_trhove WER 0.660)"
+   }
+  ],
+  "when": "English-only transcription on a weak CPU where speed beats accuracy.",
+  "avoid_when": "Any language except English: 38-67% word error on Czech, Slovak and Polish.",
+  "profiles": {
+   "laptop_cpu": "ok",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "ok"
+  },
+  "profile_basis": "measured"
+ },
+ "faster-whisper-small": {
+  "measured": [
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 6.1,
+    "note": "FLEURS en, 60 clips, faster-whisper",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (stt_t4.whisper-small|en.WER)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 10.9,
+    "note": "FLEURS de, 60 clips, faster-whisper",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (stt_t4.whisper-small|de.WER)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 37.8,
+    "note": "FLEURS cs, 60 clips, faster-whisper",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (stt_t4.whisper-small|cs.WER)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 37.8,
+    "note": "FLEURS sk, 60 clips, faster-whisper",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (stt_t4.whisper-small|sk.WER)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "rtf",
+    "value": 0.024,
+    "note": "en FLEURS, mean RTF",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (stt_t4.whisper-small|en.RTF)"
+   }
+  ],
+  "when": "CPU-only install (the cpu preset): German about 11% word error, int8; fine for English and German.",
+  "avoid_when": "Czech or Slovak speech (37.8% word error on T4).",
+  "profiles": {
+   "laptop_cpu": "recommended",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "recommended"
+  },
+  "profile_basis": "measured"
+ },
+ "kinit/whisper-large-v3-turbo-sk": {
+  "measured": [
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 6.5,
+    "note": "FLEURS sk, 60 clips",
+    "source": "documentation/evidence/2026-11-07/sk_compare.json (cells.kinit/whisper-large-v3-turbo-sk|fleurs-sk.WER)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 19.8,
+    "note": "maintainer non-native Slovak reading, one 134 s file",
+    "source": "documentation/evidence/2026-11-07/sk_compare.json (cells.kinit/whisper-large-v3-turbo-sk|owner-sk.WER)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "rtf",
+    "value": 0.039,
+    "note": "FLEURS sk",
+    "source": "documentation/evidence/2026-11-07/sk_compare.json (cells...|fleurs-sk.RTF)"
+   },
+   {
+    "device": "cpu",
+    "hardware": "Mac M1 Pro CPU (CT2)",
+    "metric": "latency_s",
+    "value": 3.88,
+    "note": "SK->EN live route median lag, generic Slovak speech (range 3.88-5.59 s)",
+    "source": "documentation/PLAN_2026-11-10.md (Work done after approval, Generic Piper Slovak test)"
+   }
+  ],
+  "when": "Slovak (and Czech) speech input on an NVIDIA GPU: 6.5% on FLEURS vs 10.7% plain turbo.",
+  "avoid_when": "Live use on a Mac or CPU if under 2 s lag is needed: 3.9-5.6 s measured on M1 Pro.",
+  "profiles": {
+   "laptop_cpu": "untested",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "recommended",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "ok"
+  },
+  "profile_basis": "measured"
+ },
+ "parakeet-tdt-0.6b-v3": {
+  "measured": [
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 5.1,
+    "note": "FLEURS en, 60 clips (ran on CPU provider in this run)",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (stt_t4.parakeet-tdt-v3|en.WER)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 6.3,
+    "note": "FLEURS de, 60 clips (ran on CPU provider in this run)",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (stt_t4.parakeet-tdt-v3|de.WER)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 9.9,
+    "note": "FLEURS sk, 60 clips (ran on CPU provider in this run)",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (stt_t4.parakeet-tdt-v3|sk.WER)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 14.0,
+    "note": "FLEURS cs, 60 clips (ran on CPU provider in this run)",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (stt_t4.parakeet-tdt-v3|cs.WER)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "latency_s",
+    "value": 0.112,
+    "note": "per en clip on CUDA provider (RTF 0.012)",
+    "source": "documentation/evidence/2026-11-07/e2e_chain.json (parakeet.en.s_per_clip)"
+   },
+   {
+    "device": "cpu",
+    "hardware": "Mac M1 Pro CPU",
+    "metric": "wer_pct",
+    "value": 4.8,
+    "note": "FLEURS en, 20 clips, RTF 0.085",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (mac_m1_pro engine=parakeet-cpu set=fleurs-en)"
+   },
+   {
+    "device": "cpu",
+    "hardware": "Mac M1 Pro CPU",
+    "metric": "wer_pct",
+    "value": 80.7,
+    "note": "maintainer SK reading: language auto-detect picked the wrong language",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (mac_m1_pro parakeet-cpu owner-sk-script WER 0.807)"
+   }
+  ],
+  "when": "Fast (3x turbo per clip on GPU) EN/DE/FR recogniser, and a fast CPU-capable option on a Mac.",
+  "avoid_when": "Slovak from non-native speakers (80.7%); Slovak streaming (14-47% in strategy matrix).",
+  "profiles": {
+   "laptop_cpu": "ok",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "recommended",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "ok"
+  },
+  "profile_basis": "measured"
+ },
+ "Helsinki-NLP--opus-mt-en-sk": {
+  "measured": [
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "latency_s",
+    "value": 0.029,
+    "note": "sk from_en s/sentence (= 1/34.9 sent/s), chrF 55.6, 200 opus-100 sentences",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (mt_t4.opus-mt|sk|from_en.sent_per_s)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "latency_s",
+    "value": 0.257,
+    "note": "MT stage in a ~10 s en->sk chain",
+    "source": "documentation/evidence/2026-11-07/e2e_chain.json (chain.en->sk.mt_s)"
+   }
+  ],
+  "when": "Default EN->SK translation on any machine; beat NLLB in every cell measured and is 2-4x faster.",
+  "avoid_when": "",
+  "profiles": {
+   "laptop_cpu": "recommended",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "recommended",
+   "server_cpu": "recommended"
+  },
+  "profile_basis": "measured"
+ },
+ "Helsinki-NLP--opus-mt-en-cs": {
+  "measured": [
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "latency_s",
+    "value": 0.027,
+    "note": "cs from_en s/sentence (= 1/37.0 sent/s), chrF 51.2, 200 opus-100 sentences",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (mt_t4.opus-mt|cs|from_en.sent_per_s)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "latency_s",
+    "value": 0.284,
+    "note": "MT stage in a ~10 s en->cs chain",
+    "source": "documentation/evidence/2026-11-07/e2e_chain.json (chain.en->cs.mt_s)"
+   }
+  ],
+  "when": "Default EN->CS translation on any machine.",
+  "avoid_when": "",
+  "profiles": {
+   "laptop_cpu": "recommended",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "recommended",
+   "server_cpu": "recommended"
+  },
+  "profile_basis": "measured"
+ },
+ "piper-xtts-v2": {
+  "measured": [
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "first_audio_s",
+    "value": 0.458,
+    "note": "EN short, streaming, median of 3",
+    "source": "documentation/evidence/2026-11-15/kaggle_xtts_t4_results.json (tts.en.cases.short_streaming.median.first_audio_latency_s)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "rtf",
+    "value": 0.629,
+    "note": "EN long, streaming, median of 3",
+    "source": "documentation/evidence/2026-11-15/kaggle_xtts_t4_results.json (tts.en.cases.long_streaming.median.rtf)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "rtf",
+    "value": 0.525,
+    "note": "EN short, streaming, median of 3",
+    "source": "documentation/evidence/2026-11-15/kaggle_xtts_t4_results.json (tts.en.cases.short_streaming.median.rtf)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "vram_gb",
+    "value": 2.39,
+    "note": "peak GPU, EN long streaming (2449 MB)",
+    "source": "documentation/evidence/2026-11-15/kaggle_xtts_t4_results.json (tts.en.cases.long_streaming.median.peak_gpu_mb)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 4.0,
+    "note": "CS long streaming round-trip ASR, median",
+    "source": "documentation/evidence/2026-11-15/kaggle_xtts_t4_results.json (tts.cs.cases.long_streaming.median.wer)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 0.0,
+    "note": "EN round-trip ASR, all cases",
+    "source": "documentation/evidence/2026-11-15/kaggle_xtts_t4_results.json (tts.en.cases.*.median.wer)"
+   }
+  ],
+  "when": "Voice cloning for English or Czech on a 4+ GB GPU, with 0.45 s first audio when streamed.",
+  "avoid_when": "Slovak (unsupported per receipt) or any commercial product (CPML non-commercial).",
+  "profiles": {
+   "laptop_cpu": "too-heavy",
+   "apple_silicon": "untested",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "recommended",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "too-heavy"
+  },
+  "profile_basis": "measured"
+ },
+ "x-voice-multilingual": {
+  "measured": [
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "first_audio_s",
+    "value": 2.511,
+    "note": "SK short, stage 1, NFE16 (whole phrase, not streamed)",
+    "source": "documentation/evidence/2026-11-15/kaggle_xvoice_t4_results.json (tts.xvoice_stage1_nfe16_sk_short.first_audio_latency_s)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "rtf",
+    "value": 0.416,
+    "note": "SK short stage 1 NFE16 (range 0.369-0.474 over en/sk/cs, stage 1)",
+    "source": "documentation/evidence/2026-11-15/kaggle_xvoice_t4_results.json (tts.xvoice_stage1_nfe16_sk_short.rtf)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "rtf",
+    "value": 0.866,
+    "note": "EN long stage 1 NFE32",
+    "source": "documentation/evidence/2026-11-15/kaggle_xvoice_t4_results.json (tts.xvoice_stage1_nfe32_en_long.rtf)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "vram_gb",
+    "value": 0.93,
+    "note": "peak GPU, stage 1 long (950 MB /1024)",
+    "source": "documentation/evidence/2026-11-15/kaggle_xvoice_t4_results.json (tts.xvoice_stage1_nfe32_sk_long.peak_gpu_mb)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 4.0,
+    "note": "SK long stage 1 NFE16 round-trip ASR",
+    "source": "documentation/evidence/2026-11-15/kaggle_xvoice_t4_results.json (tts.xvoice_stage1_nfe16_sk_long.wer)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 20.0,
+    "note": "CS short stage 2 NFE16 round-trip ASR (worst cell; other cells 0-10%)",
+    "source": "documentation/evidence/2026-11-15/kaggle_xvoice_t4_results.json (tts.xvoice_stage2_nfe16_cs_short.wer)"
+   }
+  ],
+  "when": "Cloned Slovak/Czech speech on a small (1.3 GB) GPU model; batch or quality use, not live on a T4.",
+  "avoid_when": "Real-time use on a T4 or Mac (T4 RTF 0.37-0.47 at 16 steps, 0.8-0.9 at 32; landscape review: Mac MPS RTF 2.9-4.2); product use (weights CC-BY-NC).",
+  "profiles": {
+   "laptop_cpu": "untested",
+   "apple_silicon": "too-heavy",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "recommended",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "untested"
+  },
+  "profile_basis": "measured"
+ },
+ "higgs-audio-v3-4b": {
+  "measured": [
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 100.0,
+    "note": "EN/SK/CS all cases, fp16: unintelligible audio",
+    "source": "documentation/evidence/2026-11-15/kaggle_higgs_t4_fp16_results.json (tts.en.cases.short.median.wer = 1.0; sk, cs same)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "rtf",
+    "value": 1.261,
+    "note": "EN short fp16 median, not real time",
+    "source": "documentation/evidence/2026-11-15/kaggle_higgs_t4_fp16_results.json (tts.en.cases.short.median.rtf)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "vram_gb",
+    "value": 13.66,
+    "note": "peak GPU EN short (13985 MB /1024); 13.86 GB at long",
+    "source": "documentation/evidence/2026-11-15/kaggle_higgs_t4_fp16_results.json (tts.en.cases.short.median.peak_gpu_mb)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "first_audio_s",
+    "value": 5.333,
+    "note": "EN short fp16 median",
+    "source": "documentation/evidence/2026-11-15/kaggle_higgs_t4_fp16_results.json (tts.en.cases.short.median.first_audio_latency_s)"
+   }
+  ],
+  "when": "Only a datacenter-class GPU (24 GB, Ampere+ with bf16) - never run there.",
+  "avoid_when": "Any T4/16 GB card: audio is unintelligible (WER 100%, fp16) and RTF 1.2-1.4; bf16 server exits on T4 (attempt1 receipt).",
+  "profiles": {
+   "laptop_cpu": "too-heavy",
+   "apple_silicon": "too-heavy",
+   "gpu_8gb": "too-heavy",
+   "gpu_16gb": "too-heavy",
+   "gpu_24gb_plus": "untested",
+   "server_cpu": "too-heavy"
+  },
+  "profile_basis": "measured"
+ },
+ "kokoro-82m": {
+  "measured": [],
+  "when": "English-only small TTS if GPU or CPU time is available; Apache-2.0.",
+  "avoid_when": "Slovak or Czech output (EN only).",
+  "profiles": {
+   "laptop_cpu": "untested",
+   "apple_silicon": "untested",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "untested"
+  },
+  "profile_basis": "spec-only"
+ },
+ "nemotron-3.5-asr-0.6b": {
+  "measured": [
+   {
+    "device": "mps",
+    "hardware": "Mac M1 Pro 16 GB (MLX)",
+    "metric": "latency_s",
+    "value": 0.621,
+    "note": "EN->SK route median lag, adaptive pace, generated English, agree_short",
+    "source": "documentation/evidence/2026-11-09/route_check_nemotron_en_sk_follow.json (rates.adaptive.lag_median_s)"
+   },
+   {
+    "device": "mps",
+    "hardware": "Mac M1 Pro 16 GB (MLX)",
+    "metric": "latency_s",
+    "value": 1.098,
+    "note": "EN->SK route median lag, REAL speech, 1x",
+    "source": "documentation/evidence/2026-11-10/route_nemotron_en_sk_real_speech_mac.json (rates.1.0.lag_median_s)"
+   },
+   {
+    "device": "mps",
+    "hardware": "Mac M1 Pro 16 GB (MLX)",
+    "metric": "latency_s",
+    "value": 0.548,
+    "note": "EN->DE route median lag, adaptive pace, generated English",
+    "source": "documentation/evidence/2026-11-09/route_check_nemotron_en_de_follow.json (rates.adaptive.lag_median_s)"
+   },
+   {
+    "device": "mps",
+    "hardware": "Mac M1 Pro 16 GB (MLX)",
+    "metric": "latency_s",
+    "value": 1.065,
+    "note": "EN->CS route median lag, adaptive, min07",
+    "source": "documentation/evidence/2026-11-09/route_check_nemotron_en_cs_min07.json (rates.adaptive.lag_median_s)"
+   },
+   {
+    "device": "mps",
+    "hardware": "Mac M1 Pro 16 GB (MLX)",
+    "metric": "latency_s",
+    "value": 0.792,
+    "note": "EN->SK median lag, 2026-11-15 sweep D_wait05 (step 0.35 s, max wait 0.5 s)",
+    "source": "documentation/evidence/2026-11-15/D_wait05.json (rates.1.0.lag_median_s)"
+   },
+   {
+    "device": "mps",
+    "hardware": "Mac M1 Pro 16 GB (MLX)",
+    "metric": "wer_pct",
+    "value": 5.2,
+    "note": "EN source recognition error, generated English",
+    "source": "documentation/evidence/2026-11-15/D_wait05.score.txt (check 4)"
+   },
+   {
+    "device": "mps",
+    "hardware": "Mac M1 Pro 16 GB (MLX)",
+    "metric": "wer_pct",
+    "value": 41.0,
+    "note": "Slovak source (declared in preset header, receipt not located)",
+    "source": "presets/mac-nemotron.env (line 6)"
+   }
+  ],
+  "when": "Low-lag English/German/Czech streaming recognition on Apple Silicon (MLX).",
+  "avoid_when": "Slovak input (41% word error per preset; Whisper+kinit used instead) and non-Apple machines (MLX only).",
+  "profiles": {
+   "laptop_cpu": "too-heavy",
+   "apple_silicon": "recommended",
+   "gpu_8gb": "too-heavy",
+   "gpu_16gb": "too-heavy",
+   "gpu_24gb_plus": "too-heavy",
+   "server_cpu": "too-heavy"
+  },
+  "profile_basis": "measured"
+ },
+ "piper-voice-clone-en": {
+  "measured": [],
+  "when": "Local-only English voice fine-tune on CPU.",
+  "avoid_when": "Distribution (personal voice, not shippable).",
+  "profiles": {
+   "laptop_cpu": "recommended",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "recommended"
+  },
+  "profile_basis": "spec-only"
+ },
+ "faster-whisper-tiny": {
+  "measured": [],
+  "when": "Lowest-RAM fallback recogniser; no receipt.",
+  "avoid_when": "Anything but a last-resort English demo.",
+  "profiles": {
+   "laptop_cpu": "ok",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "ok"
+  },
+  "profile_basis": "spec-only"
+ },
+ "faster-whisper-large-v3-turbo": {
+  "measured": [
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 4.5,
+    "note": "FLEURS en, 60 clips, faster-whisper",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (stt_t4.whisper-large-v3-turbo|en.WER)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 4.8,
+    "note": "FLEURS de, 60 clips, faster-whisper",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (stt_t4.whisper-large-v3-turbo|de.WER)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 11.6,
+    "note": "FLEURS cs, 60 clips, faster-whisper",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (stt_t4.whisper-large-v3-turbo|cs.WER)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 10.7,
+    "note": "FLEURS sk, 60 clips, faster-whisper",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (stt_t4.whisper-large-v3-turbo|sk.WER)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "rtf",
+    "value": 0.043,
+    "note": "en FLEURS, mean RTF",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (stt_t4.whisper-large-v3-turbo|en.RTF)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "latency_s",
+    "value": 0.411,
+    "note": "per 10 s-class FLEURS en clip",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (stt_t4.whisper-large-v3-turbo|en.per_clip_s)"
+   },
+   {
+    "device": "mps",
+    "hardware": "Mac M1 Pro 16 GB (MLX build, not faster-whisper)",
+    "metric": "wer_pct",
+    "value": 4.4,
+    "note": "FLEURS de, 20 clips",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (mac_m1_pro engine=mlx-turbo set=fleurs-de WER)"
+   },
+   {
+    "device": "mps",
+    "hardware": "Mac M1 Pro 16 GB (MLX build)",
+    "metric": "latency_s",
+    "value": 0.72,
+    "note": "median per call, 2.0 s window (fixed 30 s pad cost)",
+    "source": "documentation/BENCHMARKS.md (Key findings 1 table, MLX turbo 2.0 s)"
+   }
+  ],
+  "when": "Best general accuracy in 15 languages on an NVIDIA GPU (T4: 0.4-0.5 s per 10 s clip) or a fast CPU; Apple Silicon uses its MLX build.",
+  "avoid_when": "Slovak (use the kinit fine-tune) and live Mac use with very short chunks: fixed ~0.72 s per call.",
+  "profiles": {
+   "laptop_cpu": "untested",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "recommended",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "ok"
+  },
+  "profile_basis": "measured"
+ },
+ "voxtral-mini-4b-realtime": {
+  "measured": [
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "vram_gb",
+    "value": 8.25,
+    "note": "fp16 via Transformers (receipt vram_gb)",
+    "source": "documentation/evidence/2026-11-09/voxtral_t4.json (vram_gb)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "rtf",
+    "value": 1.005,
+    "note": "offline decode en_paced; no headroom, lag drifts",
+    "source": "documentation/evidence/2026-11-09/voxtral_t4.json (cells.en_paced.offline.rtf)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "latency_s",
+    "value": 0.06,
+    "note": "stream lag median en_paced (excludes ~0.5 s model delay); unstable between runs",
+    "source": "documentation/evidence/2026-11-09/voxtral_t4.json (cells.en_paced.streaming.lag_median_s)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "latency_s",
+    "value": 3.15,
+    "note": "EN->DE real route median lag, agree_short",
+    "source": "documentation/evidence/2026-11-09/voxtral_route_t4.json (runs.en-de|voxtral-agree_short.lag_median_s)"
+   },
+   {
+    "device": "mps",
+    "hardware": "Mac M1 Pro 16 GB (4-bit MLX)",
+    "metric": "latency_s",
+    "value": 11.429,
+    "note": "EN->DE real route median lag; grew 16 s over 60 s - does not hold",
+    "source": "documentation/evidence/2026-11-09/voxtral_route_mac.json (rates.1.0.lag_median_s)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 1.0,
+    "note": "EN paced streaming",
+    "source": "documentation/evidence/2026-11-09/voxtral_t4.json (cells.en_paced.streaming.wer)"
+   }
+  ],
+  "when": "English/German streaming recognition on an NVIDIA GPU with more headroom than a T4 (untested); low WER (1-4%).",
+  "avoid_when": "T4 or 8 GB GPU with the Transformers loop (RTF 1.0, 8.25 GB), and a 16 GB Mac (lag 11.4 s); no Slovak.",
+  "profiles": {
+   "laptop_cpu": "untested",
+   "apple_silicon": "too-heavy",
+   "gpu_8gb": "too-heavy",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "untested",
+   "server_cpu": "untested"
+  },
+  "profile_basis": "measured"
+ },
+ "canary-ast-1b": {
+  "measured": [
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 36.4,
+    "note": "SK ASR, one 7 s clip, cold start, canary-1b-v2 checkpoint, reference unreviewed",
+    "source": "documentation/evidence/kaggle-canary-2026-11-03.json (rows[0].wer)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "vram_gb",
+    "value": 1.828,
+    "note": "peak allocated (PyTorch allocator only)",
+    "source": "documentation/evidence/kaggle-canary-2026-11-03.json (peak_allocated_gib)"
+   }
+  ],
+  "when": "Experimental direct SK->EN speech translation on a GPU; smoke only.",
+  "avoid_when": "Anything user-facing: one short clip, route not verified.",
+  "profiles": {
+   "laptop_cpu": "too-heavy",
+   "apple_silicon": "too-heavy",
+   "gpu_8gb": "untested",
+   "gpu_16gb": "untested",
+   "gpu_24gb_plus": "untested",
+   "server_cpu": "too-heavy"
+  },
+  "profile_basis": "measured"
+ },
+ "Helsinki-NLP--opus-mt-sk-en": {
+  "measured": [
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "latency_s",
+    "value": 0.03,
+    "note": "sk to_en s/sentence (= 1/33.8 sent/s), chrF 62.1, 200 opus-100 sentences",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (mt_t4.opus-mt|sk|to_en.sent_per_s)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "latency_s",
+    "value": 0.24,
+    "note": "MT stage in a ~10 s sk->en chain",
+    "source": "documentation/evidence/2026-11-07/e2e_chain.json (chain.sk->en.mt_s)"
+   }
+  ],
+  "when": "Default SK->EN translation on any machine.",
+  "avoid_when": "",
+  "profiles": {
+   "laptop_cpu": "recommended",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "recommended",
+   "server_cpu": "recommended"
+  },
+  "profile_basis": "measured"
+ },
+ "Helsinki-NLP--opus-mt-en-de": {
+  "measured": [
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "latency_s",
+    "value": 0.047,
+    "note": "de from_en s/sentence (= 1/21.4 sent/s), chrF 52.9, 200 opus-100 sentences",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (mt_t4.opus-mt|de|from_en.sent_per_s)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "latency_s",
+    "value": 0.298,
+    "note": "MT stage in a ~10 s en->de chain",
+    "source": "documentation/evidence/2026-11-07/e2e_chain.json (chain.en->de.mt_s)"
+   }
+  ],
+  "when": "Default EN->DE translation on any machine.",
+  "avoid_when": "",
+  "profiles": {
+   "laptop_cpu": "recommended",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "recommended",
+   "server_cpu": "recommended"
+  },
+  "profile_basis": "measured"
+ },
+ "nllb-200-distilled-600m": {
+  "measured": [
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "latency_s",
+    "value": 0.06,
+    "note": "sk to_en s/sentence (= 1/16.7 sent/s), chrF 59.0, 200 opus-100 sentences",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (mt_t4.nllb-600m|sk|to_en.sent_per_s)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "latency_s",
+    "value": 0.072,
+    "note": "sk from_en s/sentence (= 1/13.9 sent/s), chrF 51.5, 200 opus-100 sentences",
+    "source": "documentation/evidence/2026-11-07/lang_matrix.json (mt_t4.nllb-600m|sk|from_en.sent_per_s)"
+   }
+  ],
+  "when": "Languages Opus-MT lacks (e.g. EN->PL) when a non-commercial licence is acceptable.",
+  "avoid_when": "Any pair Opus-MT covers (lower chrF, 2-4x slower) or a shipped product (CC-BY-NC).",
+  "profiles": {
+   "laptop_cpu": "ok",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "ok"
+  },
+  "profile_basis": "measured"
+ },
+ "madlad400-3b-mt": {
+  "measured": [],
+  "when": "Nothing measured; a GPU-only multilingual MT candidate.",
+  "avoid_when": "Any live use until a receipt exists.",
+  "profiles": {
+   "laptop_cpu": "too-heavy",
+   "apple_silicon": "too-heavy",
+   "gpu_8gb": "untested",
+   "gpu_16gb": "untested",
+   "gpu_24gb_plus": "untested",
+   "server_cpu": "too-heavy"
+  },
+  "profile_basis": "untested"
+ },
+ "voxtral-vllm": {
+  "measured": [
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "latency_s",
+    "value": 0.08,
+    "note": "stream lag median en_paced, vLLM eager, max_model_len 3584",
+    "source": "documentation/evidence/2026-11-09/voxtral_vllm_t4.json (cells.eager|en_paced.paced.lag_median_s)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "latency_s",
+    "value": 0.12,
+    "note": "stream lag p90 en_paced",
+    "source": "documentation/evidence/2026-11-09/voxtral_vllm_t4.json (cells.eager|en_paced.paced.lag_p90_s)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 1.04,
+    "note": "EN paced",
+    "source": "documentation/evidence/2026-11-09/voxtral_vllm_t4.json (cells.eager|en_paced.wer)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "wer_pct",
+    "value": 2.13,
+    "note": "DE paced",
+    "source": "documentation/evidence/2026-11-09/voxtral_vllm_t4.json (cells.eager|de_paced.wer)"
+   }
+  ],
+  "when": "Low-lag (0.08 s) EN/DE streaming recognition on a 16 GB NVIDIA GPU with vLLM.",
+  "avoid_when": "8 GB GPUs, CPU or Mac; default max-model-len 16384 fails on a T4; CUDA-graph mode did not start; no Slovak.",
+  "profiles": {
+   "laptop_cpu": "too-heavy",
+   "apple_silicon": "too-heavy",
+   "gpu_8gb": "too-heavy",
+   "gpu_16gb": "recommended",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "too-heavy"
+  },
+  "profile_basis": "measured"
+ },
+ "piper-generic-de-thorsten-medium": {
+  "measured": [
+   {
+    "device": "cpu",
+    "hardware": "Kaggle T4 notebook host CPU",
+    "metric": "latency_s",
+    "value": 0.522,
+    "note": "voice stage in ~10 s EN->DE chain",
+    "source": "documentation/evidence/2026-11-07/e2e_chain.json (chain.en->de.tts_s)"
+   }
+  ],
+  "when": "German CPU voice; default for the DE pair.",
+  "avoid_when": "",
+  "profiles": {
+   "laptop_cpu": "recommended",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "recommended"
+  },
+  "profile_basis": "measured"
+ },
+ "piper-generic-fr-siwis-medium": {
+  "measured": [
+   {
+    "device": "cpu",
+    "hardware": "Kaggle T4 notebook host CPU",
+    "metric": "latency_s",
+    "value": 0.522,
+    "note": "voice stage in ~10 s EN->FR chain",
+    "source": "documentation/evidence/2026-11-07/e2e_chain.json (chain.en->fr.tts_s)"
+   }
+  ],
+  "when": "French CPU voice.",
+  "avoid_when": "",
+  "profiles": {
+   "laptop_cpu": "recommended",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "recommended"
+  },
+  "profile_basis": "measured"
+ },
+ "piper-generic-en-american-medium": {
+  "measured": [
+   {
+    "device": "unknown",
+    "hardware": "hardware not stated in receipt",
+    "metric": "rtf",
+    "value": 0.03,
+    "note": "SIBLING voice en_US-john-medium, mean RTF",
+    "source": "documentation/evidence/2026-11-04/en-voice-candidates.json (en_US-john-medium.rtf_mean)"
+   }
+  ],
+  "when": "Plain English CPU voice (sibling en_US-john-medium: RTF 0.03, WER 4.4%).",
+  "avoid_when": "",
+  "profiles": {
+   "laptop_cpu": "recommended",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "recommended"
+  },
+  "profile_basis": "measured"
+ },
+ "piper-generic-sk-omni": {
+  "measured": [],
+  "when": "Slovak hybrid voice, local-only.",
+  "avoid_when": "",
+  "profiles": {
+   "laptop_cpu": "recommended",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "recommended"
+  },
+  "profile_basis": "spec-only"
+ },
+ "chatterbox-multilingual": {
+  "measured": [],
+  "when": "Candidate EN voice cloning on a 4-8 GB GPU; unmeasured.",
+  "avoid_when": "Slovak or Czech output (model card: no SK/CZ).",
+  "profiles": {
+   "laptop_cpu": "too-heavy",
+   "apple_silicon": "too-heavy",
+   "gpu_8gb": "untested",
+   "gpu_16gb": "untested",
+   "gpu_24gb_plus": "untested",
+   "server_cpu": "too-heavy"
+  },
+  "profile_basis": "untested"
+ },
+ "qwen3-tts-0.6b": {
+  "measured": [],
+  "when": "Candidate EN/ZH cloning with 97 ms first packet (vendor claim); unmeasured.",
+  "avoid_when": "Slovak output (none).",
+  "profiles": {
+   "laptop_cpu": "too-heavy",
+   "apple_silicon": "too-heavy",
+   "gpu_8gb": "untested",
+   "gpu_16gb": "untested",
+   "gpu_24gb_plus": "untested",
+   "server_cpu": "too-heavy"
+  },
+  "profile_basis": "untested"
+ },
+ "webrtcvad": {
+  "measured": [],
+  "when": "Default live voice gate on every machine; 1 MB.",
+  "avoid_when": "",
+  "profiles": {
+   "laptop_cpu": "recommended",
+   "apple_silicon": "recommended",
+   "gpu_8gb": "recommended",
+   "gpu_16gb": "recommended",
+   "gpu_24gb_plus": "recommended",
+   "server_cpu": "recommended"
+  },
+  "profile_basis": "spec-only"
+ },
+ "silero-vad": {
+  "measured": [],
+  "when": "Alternative VAD used through the streaming STT path.",
+  "avoid_when": "",
+  "profiles": {
+   "laptop_cpu": "ok",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "ok"
+  },
+  "profile_basis": "spec-only"
+ },
+ "piper-sk_SK-personal-male-medium": {
+  "measured": [],
+  "when": "Maintainer Slovak fine-tuned voice, local only; default in the en-sk pack.",
+  "avoid_when": "Distribution (personal voice).",
+  "profiles": {
+   "laptop_cpu": "recommended",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "recommended"
+  },
+  "profile_basis": "spec-only"
+ },
+ "piper-voice-clone-sk": {
+  "measured": [],
+  "when": "Slovak personal fine-tune v2, local only.",
+  "avoid_when": "Distribution.",
+  "profiles": {
+   "laptop_cpu": "recommended",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "recommended"
+  },
+  "profile_basis": "spec-only"
+ },
+ "piper-voice-clone-en-v2": {
+  "measured": [],
+  "when": "English personal fine-tune v2, local only.",
+  "avoid_when": "Distribution.",
+  "profiles": {
+   "laptop_cpu": "recommended",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "recommended"
+  },
+  "profile_basis": "spec-only"
+ },
+ "omnivoice-clone": {
+  "measured": [
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "latency_s",
+    "value": 0.658,
+    "note": "median wall per 3-6 word SK/CS piece, 12 steps",
+    "source": "documentation/evidence/2026-11-10/tts_probe_v2_omnivoice_piper.json (arms.omni_step12.summary.wall_median_s)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "rtf",
+    "value": 0.302,
+    "note": "sustained_ratio, 12 steps, SK/CS pieces",
+    "source": "documentation/evidence/2026-11-10/tts_probe_v2_omnivoice_piper.json (arms.omni_step12.summary.sustained_ratio)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "rtf",
+    "value": 0.416,
+    "note": "sustained_ratio, 16 steps",
+    "source": "documentation/evidence/2026-11-10/tts_probe_v2_omnivoice_piper.json (arms.omni_step16.summary.sustained_ratio)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "vram_gb",
+    "value": 5.9,
+    "note": "peak for WHOLE cascade (whisper+MT+OmniVoice), 5.7-5.9 GB; not OmniVoice alone",
+    "source": "documentation/load_tests_2026-10.md (section 5, VRAM)"
+   },
+   {
+    "device": "cuda-t4",
+    "hardware": "Tesla T4 (Kaggle)",
+    "metric": "first_audio_s",
+    "value": 0.52,
+    "note": "TTS-only first chunk at 12 steps (0.52-0.55 s; 0.75 s at 16)",
+    "source": "documentation/load_tests_2026-10.md (section 5, Engine smoke)"
+   }
+  ],
+  "when": "Batch/QC voice cloning (EN/SK/CS) on a 8+ GB NVIDIA GPU; 12 steps keeps SK acceptable.",
+  "avoid_when": "Live streaming on a T4 (0.66 s per piece, 4 streams max) or a Mac (RTF ~1 on MPS); not a live path per PLAN_2026-11-10.",
+  "profiles": {
+   "laptop_cpu": "too-heavy",
+   "apple_silicon": "too-heavy",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "recommended",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "too-heavy"
+  },
+  "profile_basis": "measured"
+ },
+ "hybrid-tts": {
+  "measured": [],
+  "when": "Mixed EN/CS engine that inherits component licences; unmeasured standalone.",
+  "avoid_when": "Commercial use (XTTS component non-commercial).",
+  "profiles": {
+   "laptop_cpu": "ok",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "ok"
+  },
+  "profile_basis": "spec-only"
+ },
+ "qwen3-omni-unified": {
+  "measured": [],
+  "when": "Planned adapter; nothing runs.",
+  "avoid_when": "Everything: not built.",
+  "profiles": {
+   "laptop_cpu": "too-heavy",
+   "apple_silicon": "too-heavy",
+   "gpu_8gb": "too-heavy",
+   "gpu_16gb": "too-heavy",
+   "gpu_24gb_plus": "too-heavy",
+   "server_cpu": "too-heavy"
+  },
+  "profile_basis": "untested"
+ },
+ "seamless-m4t-v2-unified": {
+  "measured": [],
+  "when": "End-to-end S2S quality reference; not the live path.",
+  "avoid_when": "Live use; non-commercial licence; voice generic.",
+  "profiles": {
+   "laptop_cpu": "too-heavy",
+   "apple_silicon": "too-heavy",
+   "gpu_8gb": "too-heavy",
+   "gpu_16gb": "untested",
+   "gpu_24gb_plus": "untested",
+   "server_cpu": "too-heavy"
+  },
+  "profile_basis": "spec-only"
+ },
+ "rvc-mlx-voice-conversion": {
+  "measured": [],
+  "when": "Voice-conversion layer on a Mac (MLX); nothing measured.",
+  "avoid_when": "",
+  "profiles": {
+   "laptop_cpu": "ok",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "ok"
+  },
+  "profile_basis": "spec-only"
+ },
+ "rvc-onnx-voice-conversion": {
+  "measured": [],
+  "when": "Cross-platform voice-conversion layer on CPU or CUDA; nothing measured.",
+  "avoid_when": "",
+  "profiles": {
+   "laptop_cpu": "ok",
+   "apple_silicon": "ok",
+   "gpu_8gb": "ok",
+   "gpu_16gb": "ok",
+   "gpu_24gb_plus": "ok",
+   "server_cpu": "ok"
+  },
+  "profile_basis": "spec-only"
+ }
+}

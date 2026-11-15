@@ -1,0 +1,314 @@
+{
+  "models": [
+    {
+      "id": "piper-en_US-lessac-medium", "stage": "tts", "name": "Piper English (Lessac)", "engine": "piper",
+      "languages": ["en"], "pair": null, "size_mb": 60, "devices": ["cpu"], "min_ram_gb": 1, "min_vram_gb": null,
+      "streaming": true, "clone": false, "installed": true, "fit": "good", "recommended": true,
+      "why": "CPU baseline English voice, ~0.04 RTF.",
+      "licence": { "label": "GPL-3.0-or-later (runtime); voice CC0", "url": "https://huggingface.co/rhasspy/piper-voices" },
+      "source": { "kind": "piper", "repo": "rhasspy/piper-voices", "files": {} },
+      "notes": "Installed."
+    },
+    {
+      "id": "piper-sk_SK-lili-medium", "stage": "tts", "name": "Piper Slovak (Lili)", "engine": "piper",
+      "languages": ["sk"], "pair": null, "size_mb": 60, "devices": ["cpu"], "min_ram_gb": 1, "min_vram_gb": null,
+      "streaming": true, "clone": false, "installed": false, "fit": "good", "recommended": true,
+      "why": "CPU baseline Slovak voice.",
+      "licence": { "label": "GPL-3.0-or-later (runtime); voice CC0", "url": "https://huggingface.co/rhasspy/piper-voices" },
+      "source": { "kind": "piper", "repo": "rhasspy/piper-voices", "files": {} },
+      "notes": ""
+    },
+    {
+      "id": "faster-whisper-base", "stage": "stt", "name": "Whisper base", "engine": "faster_whisper",
+      "languages": ["en","sk","cs","de","es","fr","zh","hi","pl","ja","uk","ru"], "pair": null,
+      "size_mb": 140, "devices": ["cpu","cuda"], "min_ram_gb": 2, "min_vram_gb": null,
+      "streaming": false, "clone": false, "installed": true, "fit": "good", "recommended": true,
+      "why": "General STT, 99 languages, CPU/CUDA via CTranslate2.",
+      "licence": { "label": "MIT", "url": "https://huggingface.co/Systran/faster-whisper-base" },
+      "source": { "kind": "hf", "repo": "Systran/faster-whisper-base", "files": {} },
+      "notes": ""
+    },
+    {
+      "id": "faster-whisper-small", "stage": "stt", "name": "Whisper small", "engine": "faster_whisper",
+      "languages": ["en","sk","cs","de","es","fr"], "pair": null,
+      "size_mb": 240, "devices": ["cpu","cuda"], "min_ram_gb": 2, "min_vram_gb": null,
+      "streaming": false, "clone": false, "installed": false, "fit": "good", "recommended": false,
+      "why": "Smaller/faster Whisper, slightly higher WER.",
+      "licence": { "label": "MIT", "url": "https://huggingface.co/Systran/faster-whisper-small" },
+      "source": { "kind": "hf", "repo": "Systran/faster-whisper-small", "files": {} },
+      "notes": ""
+    },
+    {
+      "id": "kinit/whisper-large-v3-turbo-sk", "stage": "stt", "name": "Whisper large-v3-turbo Slovak", "engine": "faster_whisper",
+      "languages": ["sk","cs"], "pair": null,
+      "size_mb": 800, "devices": ["cpu","cuda"], "min_ram_gb": 4, "min_vram_gb": null,
+      "streaming": false, "clone": false, "installed": false, "fit": "ok", "recommended": true,
+      "why": "SK fine-tune: ~6-13% WER on FLEURS-sk.",
+      "licence": { "label": "MIT", "url": "https://huggingface.co/kinit/whisper-large-v3-turbo-sk" },
+      "source": { "kind": "hf", "repo": "kinit/whisper-large-v3-turbo-sk", "files": {} },
+      "notes": "Manual install (BP_SK_STT_MODEL)."
+    },
+    {
+      "id": "parakeet-tdt-0.6b-v3", "stage": "stt", "name": "Parakeet TDT 0.6B v3", "engine": "parakeet",
+      "languages": ["en","sk","cs","de","es","fr"], "pair": null,
+      "size_mb": 1200, "devices": ["cuda","cpu","mps"], "min_ram_gb": 4, "min_vram_gb": 1.2,
+      "streaming": true, "clone": false, "installed": false, "fit": "ok", "recommended": false,
+      "why": "GPU streaming STT, 25 European languages incl. SK/CZ.",
+      "licence": { "label": "CC-BY-4.0", "url": "https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3" },
+      "source": { "kind": "hf", "repo": "nvidia/parakeet-tdt-0.6b-v3", "files": {} },
+      "notes": "Needs torch + nemo/transformers."
+    },
+    {
+      "id": "Helsinki-NLP--opus-mt-en-sk", "stage": "mt", "name": "Opus-MT EN->SK", "engine": "opus-mt",
+      "languages": ["en","sk"], "pair": "en-sk",
+      "size_mb": 300, "devices": ["cpu","cuda"], "min_ram_gb": 1, "min_vram_gb": null,
+      "streaming": false, "clone": false, "installed": false, "fit": "good", "recommended": true,
+      "why": "Default MT for the en-sk reference pair, CC-BY-4.0.",
+      "licence": { "label": "CC-BY-4.0 (verify per pair)", "url": "https://huggingface.co/Helsinki-NLP/opus-mt-en-sk" },
+      "source": { "kind": "hf", "repo": "Helsinki-NLP/opus-mt-en-sk", "files": {} },
+      "notes": "Converted to CT2 at install."
+    },
+    {
+      "id": "Helsinki-NLP--opus-mt-sk-en", "stage": "mt", "name": "Opus-MT SK->EN", "engine": "opus-mt",
+      "languages": ["sk","en"], "pair": "sk-en",
+      "size_mb": 300, "devices": ["cpu","cuda"], "min_ram_gb": 1, "min_vram_gb": null,
+      "streaming": false, "clone": false, "installed": false, "fit": "good", "recommended": true,
+      "why": "Reverse direction of the reference pair.",
+      "licence": { "label": "CC-BY-4.0 (verify per pair)", "url": "https://huggingface.co/Helsinki-NLP/opus-mt-sk-en" },
+      "source": { "kind": "hf", "repo": "Helsinki-NLP/opus-mt-sk-en", "files": {} },
+      "notes": ""
+    },
+    {
+      "id": "Helsinki-NLP--opus-mt-en-de", "stage": "mt", "name": "Opus-MT EN->DE", "engine": "opus-mt",
+      "languages": ["en","de"], "pair": "en-de",
+      "size_mb": 300, "devices": ["cpu","cuda"], "min_ram_gb": 1, "min_vram_gb": null,
+      "streaming": false, "clone": false, "installed": true, "fit": "good", "recommended": true,
+      "why": "EN->DE direction, already converted.",
+      "licence": { "label": "CC-BY-4.0 (verify per pair)", "url": "https://huggingface.co/Helsinki-NLP/opus-mt-en-de" },
+      "source": { "kind": "hf", "repo": "Helsinki-NLP/opus-mt-en-de", "files": {} },
+      "notes": "Installed."
+    },
+    {
+      "id": "nllb-200-distilled-600m", "stage": "mt", "name": "NLLB-200 distilled 600M", "engine": "nllb",
+      "languages": ["en","sk","cs","de","es","fr","zh","hi","pl","ja","uk","ru"], "pair": null,
+      "size_mb": 1000, "devices": ["cpu","cuda"], "min_ram_gb": 4, "min_vram_gb": null,
+      "streaming": false, "clone": false, "installed": false, "fit": "ok", "recommended": false,
+      "why": "200 languages; CC-BY-NC-4.0 non-commercial.",
+      "licence": { "label": "CC-BY-NC-4.0 (non-commercial)", "url": "https://huggingface.co/facebook/nllb-200-distilled-600M" },
+      "source": { "kind": "hf", "repo": "facebook/nllb-200-distilled-600M", "files": {} },
+      "notes": "Not shippable."
+    },
+    {
+      "id": "madlad400-3b-mt", "stage": "mt", "name": "MADLAD 400 3B", "engine": "nllb",
+      "languages": ["en","sk","cs","de","es","fr","zh","hi","pl","ja","ru"], "pair": null,
+      "size_mb": 3000, "devices": ["cuda"], "min_ram_gb": 8, "min_vram_gb": 8,
+      "streaming": false, "clone": false, "installed": false, "fit": "too-heavy", "recommended": false,
+      "why": "Multilingual MT 3B, needs GPU.",
+      "licence": { "label": "verify per model card", "url": "https://huggingface.co/google/madlad400-3b-mt" },
+      "source": { "kind": "hf", "repo": "google/madlad400-3b-mt", "files": {} },
+      "notes": "Declared-only."
+    },
+    {
+      "id": "piper-xtts-v2", "stage": "tts", "name": "Coqui XTTS v2", "engine": "xtts",
+      "languages": ["en","cs"], "pair": null,
+      "size_mb": 2048, "devices": ["cuda","mps"], "min_ram_gb": 4, "min_vram_gb": 2,
+      "streaming": true, "clone": true, "installed": false, "fit": "ok", "recommended": false,
+      "why": "Voice cloning EN/CS, T4 first audio 0.45 s.",
+      "licence": { "label": "Coqui Public Model License (non-commercial)", "url": "https://huggingface.co/coqui/XTTS-v2" },
+      "source": { "kind": "hf", "repo": "coqui/XTTS-v2", "files": {} },
+      "notes": "Non-commercial; user installs."
+    },
+    {
+      "id": "x-voice-multilingual", "stage": "tts", "name": "X-Voice", "engine": "omnivoice",
+      "languages": ["en","sk","cs","de","es","fr","zh","hi","pl","ja"], "pair": null,
+      "size_mb": 1300, "devices": ["cuda","mps","cpu"], "min_ram_gb": 4, "min_vram_gb": 1.3,
+      "streaming": true, "clone": true, "installed": false, "fit": "ok", "recommended": false,
+      "why": "30 langs incl SK/CS, whole phrase 2.2-2.7 s at 16 steps on T4.",
+      "licence": { "label": "confirm model-card licence before shipping", "url": "https://huggingface.co/fishaudio/x-voice" },
+      "source": { "kind": "hf", "repo": "fishaudio/x-voice", "files": {} },
+      "notes": "Needs GPU for real use."
+    },
+    {
+      "id": "higgs-audio-v3-4b", "stage": "tts", "name": "Higgs Audio v3 4B", "engine": "hybrid",
+      "languages": ["en"], "pair": null,
+      "size_mb": 24000, "devices": ["cuda"], "min_ram_gb": 24, "min_vram_gb": 24,
+      "streaming": true, "clone": false, "installed": false, "fit": "too-heavy", "recommended": false,
+      "why": "Needs Ampere+ 24 GB; unintelligible on T4 (WER 100%).",
+      "licence": { "label": "commercial-ok", "url": "https://huggingface.co/higgs-audio/higgs-audio-v3-4b" },
+      "source": { "kind": "hf", "repo": "higgs-audio/higgs-audio-v3-4b", "files": {} },
+      "notes": "Declared-only."
+    },
+    {
+      "id": "kokoro-82m", "stage": "tts", "name": "Kokoro 82M", "engine": "kokoro",
+      "languages": ["en"], "pair": null,
+      "size_mb": 1330, "devices": ["cuda","cpu"], "min_ram_gb": 2, "min_vram_gb": 1.33,
+      "streaming": true, "clone": false, "installed": false, "fit": "ok", "recommended": false,
+      "why": "EN-only TTS, Apache-2.0, RTF 0.03 on T4.",
+      "licence": { "label": "Apache-2.0", "url": "https://huggingface.co/hexgrad/Kokoro-82M" },
+      "source": { "kind": "hf", "repo": "hexgrad/Kokoro-82M", "files": {} },
+      "notes": "No Slovak output."
+    },
+    {
+      "id": "nemotron-3.5-asr-0.6b", "stage": "stt", "name": "Nemotron 3.5 ASR 0.6B", "engine": "nemotron",
+      "languages": ["en","de","cs","sk"], "pair": null,
+      "size_mb": 640, "devices": ["cpu"], "min_ram_gb": 2, "min_vram_gb": null,
+      "streaming": true, "clone": false, "installed": false, "fit": "good", "recommended": false,
+      "why": "MLX streaming ASR on Apple Silicon, ~0.64 GB at 8-bit.",
+      "licence": { "label": "NVIDIA Open Model License (weights); mlx-audio MIT", "url": "https://huggingface.co/nvidia/nemotron-nemo-asr" },
+      "source": { "kind": "hf", "repo": "nvidia/nemotron-nemo-asr", "files": {} },
+      "notes": "Untested on route."
+    },
+    {
+      "id": "webrtcvad", "stage": "vad", "name": "WebRTC VAD", "engine": "webrtcvad",
+      "languages": ["en","sk","cs","de","es","fr","zh","hi","pl","ja","uk","ru"], "pair": null,
+      "size_mb": 1, "devices": ["cpu"], "min_ram_gb": 0.1, "min_vram_gb": null,
+      "streaming": true, "clone": false, "installed": true, "fit": "good", "recommended": true,
+      "why": "Default live gate, ~1 MB, BSD-3-Clause.",
+      "licence": { "label": "BSD-3-Clause", "url": "https://github.com/wiseman/py-webrtcvad" },
+      "source": { "kind": "local", "repo": "stdlib", "files": {} },
+      "notes": "Always available."
+    },
+    {
+      "id": "chatterbox-multilingual", "stage": "tts", "name": "Chatterbox Multilingual", "engine": "chatterbox",
+      "languages": ["en","sk","cs","de","es","fr","zh","hi","pl","ja"], "pair": null,
+      "size_mb": 4096, "devices": ["cuda"], "min_ram_gb": 8, "min_vram_gb": 4,
+      "streaming": true, "clone": true, "installed": false, "fit": "ok", "recommended": false,
+      "why": "Zero-shot voice cloning, 5-7 s reference, MIT.",
+      "licence": { "label": "MIT", "url": "https://huggingface.co/resemble-ai/chatterbox" },
+      "source": { "kind": "hf", "repo": "resemble-ai/chatterbox", "files": {} },
+      "notes": "Declared-only."
+    },
+    {
+      "id": "faster-whisper-tiny", "stage": "stt", "name": "Whisper tiny", "engine": "faster_whisper",
+      "languages": ["en","sk","cs","de","es","fr"], "pair": null,
+      "size_mb": 80, "devices": ["cpu","cuda"], "min_ram_gb": 1, "min_vram_gb": null,
+      "streaming": false, "clone": false, "installed": false, "fit": "good", "recommended": false,
+      "why": "Fastest Whisper, lowest RAM, higher WER.",
+      "licence": { "label": "MIT", "url": "https://huggingface.co/Systran/faster-whisper-tiny" },
+      "source": { "kind": "hf", "repo": "Systran/faster-whisper-tiny", "files": {} },
+      "notes": "Good for CPU-only low-latency."
+    },
+    {
+      "id": "faster-whisper-large-v3-turbo", "stage": "stt", "name": "Whisper large-v3-turbo", "engine": "faster_whisper",
+      "languages": ["en","sk","cs","de","es","fr","zh","hi"], "pair": null,
+      "size_mb": 1550, "devices": ["cpu","cuda"], "min_ram_gb": 6, "min_vram_gb": null,
+      "streaming": false, "clone": false, "installed": false, "fit": "ok", "recommended": false,
+      "why": "Largest Whisper, best accuracy, fixed 30 s padding cost per call.",
+      "licence": { "label": "MIT", "url": "https://huggingface.co/Systran/faster-whisper-large-v3-turbo" },
+      "source": { "kind": "hf", "repo": "Systran/faster-whisper-large-v3-turbo", "files": {} },
+      "notes": "Measured fixed cost per call regardless of audio length."
+    },
+    {
+      "id": "voxtral-mini-4b-realtime", "stage": "stt", "name": "Voxtral Mini 4B Realtime", "engine": "voxtral",
+      "languages": ["en","fr","es","it","de","pt","zh","ko","ja","ar","hi","ru"], "pair": null,
+      "size_mb": 2300, "devices": ["cuda","cpu"], "min_ram_gb": 6, "min_vram_gb": 2.3,
+      "streaming": true, "clone": false, "installed": false, "fit": "ok", "recommended": false,
+      "why": "Streaming recogniser ~0.5 s behind speech, 13 languages, no Slovak.",
+      "licence": { "label": "Apache 2.0 (weights); mlx-audio MIT", "url": "https://huggingface.co/mistralai/Voxtral-Mini-4B-Realtime" },
+      "source": { "kind": "hf", "repo": "mistralai/Voxtral-Mini-4B-Realtime", "files": {} },
+      "notes": "Apple GPU via mlx-audio ~2.3 GB 4-bit."
+    },
+    {
+      "id": "canary-ast-1b", "stage": "stt", "name": "NVIDIA Canary-1B AST", "engine": "canary-ast",
+      "languages": ["en","sk","cs","de","es","fr"], "pair": null,
+      "size_mb": 1500, "devices": ["cuda"], "min_ram_gb": 4, "min_vram_gb": 2,
+      "streaming": false, "clone": false, "installed": false, "fit": "ok", "recommended": false,
+      "why": "Direct speech->text translation SK->EN collapses STT+MT.",
+      "licence": { "label": "CC-BY-4.0", "url": "https://huggingface.co/nvidia/parakeet" },
+      "source": { "kind": "hf", "repo": "nvidia/canary-1b", "files": {} },
+      "notes": "Declared-only until WER < 0.2 on SK."
+    },
+    {
+      "id": "Helsinki-NLP--opus-mt-en-cs", "stage": "mt", "name": "Opus-MT EN->CS", "engine": "opus-mt",
+      "languages": ["en","cs"], "pair": "en-cs",
+      "size_mb": 300, "devices": ["cpu","cuda"], "min_ram_gb": 1, "min_vram_gb": null,
+      "streaming": false, "clone": false, "installed": false, "fit": "good", "recommended": true,
+      "why": "EN->CS direction, CC-BY-4.0.",
+      "licence": { "label": "CC-BY-4.0 (verify per pair)", "url": "https://huggingface.co/Helsinki-NLP/opus-mt-en-cs" },
+      "source": { "kind": "hf", "repo": "Helsinki-NLP/opus-mt-en-cs", "files": {} },
+      "notes": ""
+    },
+    {
+      "id": "Helsinki-NLP--opus-mt-cs-en", "stage": "mt", "name": "Opus-MT CS->EN", "engine": "opus-mt",
+      "languages": ["cs","en"], "pair": "cs-en",
+      "size_mb": 300, "devices": ["cpu","cuda"], "min_ram_gb": 1, "min_vram_gb": null,
+      "streaming": false, "clone": false, "installed": false, "fit": "good", "recommended": true,
+      "why": "CS->EN direction, CC-BY-4.0.",
+      "licence": { "label": "CC-BY-4.0 (verify per pair)", "url": "https://huggingface.co/Helsinki-NLP/opus-mt-cs-en" },
+      "source": { "kind": "hf", "repo": "Helsinki-NLP/opus-mt-cs-en", "files": {} },
+      "notes": ""
+    },
+    {
+      "id": "piper-generic-de-thorsten-medium", "stage": "tts", "name": "Piper German (Thorsten)", "engine": "piper_generic_de",
+      "languages": ["de"], "pair": null, "size_mb": 60, "devices": ["cpu"], "min_ram_gb": 1, "min_vram_gb": null,
+      "streaming": true, "clone": false, "installed": true, "fit": "good", "recommended": true,
+      "why": "Generic DE Piper voice, GPL-3.0 runtime.",
+      "licence": { "label": "GPL-3.0-or-later (runtime); voice CC0", "url": "https://huggingface.co/rhasspy/piper-voices" },
+      "source": { "kind": "piper", "repo": "rhasspy/piper-voices", "files": {} },
+      "notes": "Installed."
+    },
+    {
+      "id": "piper-generic-fr-siwis-medium", "stage": "tts", "name": "Piper French (Siwis)", "engine": "piper_generic_fr",
+      "languages": ["fr"], "pair": null, "size_mb": 60, "devices": ["cpu"], "min_ram_gb": 1, "min_vram_gb": null,
+      "streaming": true, "clone": false, "installed": false, "fit": "good", "recommended": true,
+      "why": "Generic FR Piper voice, GPL-3.0 runtime.",
+      "licence": { "label": "GPL-3.0-or-later (runtime); voice CC0", "url": "https://huggingface.co/rhasspy/piper-voices" },
+      "source": { "kind": "piper", "repo": "rhasspy/piper-voices", "files": {} },
+      "notes": ""
+    },
+    {
+      "id": "omnivoice-clone", "stage": "tts", "name": "OmniVoice", "engine": "omnivoice",
+      "languages": ["en","sk","cs","de","es","fr","zh","hi","pl","ja"], "pair": null,
+      "size_mb": 5800, "devices": ["cuda","mps","cpu"], "min_ram_gb": 8, "min_vram_gb": 5.8,
+      "streaming": true, "clone": true, "installed": false, "fit": "ok", "recommended": false,
+      "why": "Cloning, ~5.8 GB VRAM at 12 steps on T4, SUPPORTS_STREAMING=True.",
+      "licence": { "label": "confirm model-card licence before shipping", "url": "https://huggingface.co/fishaudio/x-voice" },
+      "source": { "kind": "hf", "repo": "fishaudio/x-voice", "files": {} },
+      "notes": "Needs GPU for real use."
+    },
+    {
+      "id": "qwen3-tts-0.6b", "stage": "tts", "name": "Qwen3-TTS 0.6B", "engine": "qwen3-tts",
+      "languages": ["en","zh"], "pair": null, "size_mb": 2500, "devices": ["cuda"], "min_ram_gb": 8, "min_vram_gb": 4,
+      "streaming": true, "clone": true, "installed": false, "fit": "ok", "recommended": false,
+      "why": "EN zero-shot cloning, 3 s reference, 97 ms first packet; Apache-2.0.",
+      "licence": { "label": "Apache-2.0", "url": "https://huggingface.co/Qwen/Qwen3-TTS" },
+      "source": { "kind": "hf", "repo": "Qwen/Qwen3-TTS", "files": {} },
+      "notes": "Declared-only; no Slovak output."
+    },
+    {
+      "id": "silero-vad", "stage": "vad", "name": "Silero VAD", "engine": "silero",
+      "languages": ["en","sk","cs","de","es","fr","zh","hi","pl","ja","uk","ru"], "pair": null,
+      "size_mb": 2, "devices": ["cpu"], "min_ram_gb": 1, "min_vram_gb": null,
+      "streaming": true, "clone": false, "installed": false, "fit": "good", "recommended": false,
+      "why": "~2 MB + torch, MIT; used via streaming STT path.",
+      "licence": { "label": "MIT", "url": "https://github.com/snakers4/silero-vad" },
+      "source": { "kind": "local", "repo": "vendor", "files": {} },
+      "notes": "Declared in registry, factory=None."
+    },
+    {
+      "id": "Helsinki-NLP--opus-mt-en-fr", "stage": "mt", "name": "Opus-MT EN->FR", "engine": "opus-mt",
+      "languages": ["en","fr"], "pair": "en-fr",
+      "size_mb": 300, "devices": ["cpu","cuda"], "min_ram_gb": 1, "min_vram_gb": null,
+      "streaming": false, "clone": false, "installed": false, "fit": "good", "recommended": true,
+      "why": "EN->FR direction, CC-BY-4.0.",
+      "licence": { "label": "CC-BY-4.0 (verify per pair)", "url": "https://huggingface.co/Helsinki-NLP/opus-mt-en-fr" },
+      "source": { "kind": "hf", "repo": "Helsinki-NLP/opus-mt-en-fr", "files": {} },
+      "notes": ""
+    }
+  ],
+  "languages": [
+    { "code": "en", "name": "English", "stt": 6, "mt_from": 3, "mt_to": 3, "tts": 4 },
+    { "code": "sk", "name": "Slovak", "stt": 5, "mt_from": 2, "mt_to": 2, "tts": 5 },
+    { "code": "cs", "name": "Czech", "stt": 5, "mt_from": 2, "mt_to": 2, "tts": 2 },
+    { "code": "de", "name": "German", "stt": 5, "mt_from": 2, "mt_to": 2, "tts": 3 },
+    { "code": "es", "name": "Spanish", "stt": 5, "mt_from": 2, "mt_to": 2, "tts": 3 },
+    { "code": "fr", "name": "French", "stt": 5, "mt_from": 2, "mt_to": 2, "tts": 3 },
+    { "code": "zh", "name": "Chinese", "stt": 4, "mt_from": 2, "mt_to": 2, "tts": 2 },
+    { "code": "hi", "name": "Hindi", "stt": 4, "mt_from": 2, "mt_to": 2, "tts": 2 },
+    { "code": "pl", "name": "Polish", "stt": 4, "mt_from": 2, "mt_to": 2, "tts": 2 },
+    { "code": "ja", "name": "Japanese", "stt": 4, "mt_from": 2, "mt_to": 2, "tts": 2 },
+    { "code": "uk", "name": "Ukrainian", "stt": 3, "mt_from": 1, "mt_to": 1, "tts": 1 },
+    { "code": "ru", "name": "Russian", "stt": 3, "mt_from": 1, "mt_to": 1, "tts": 1 }
+  ],
+  "source": { "curated": "2026-11-15", "refreshed": null }
+}

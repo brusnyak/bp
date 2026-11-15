@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+    <title>Models — Live Speech Translation</title>
+    <link rel="manifest" href="/ui/manifest.webmanifest" />
+    <meta name="theme-color" content="#0A1C4F" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/ui/images/icon-192.png" />
+    <link rel="stylesheet" href="/ui/global-styles.css?v=20261115-local" />
+    <link rel="stylesheet" href="/ui/vendor/fonts.css" />
+    <link rel="stylesheet" href="/ui/vendor/material-symbols.css" />
+    <link rel="stylesheet" href="/ui/tokens.css?v=20261115-ds" />
+    <link rel="stylesheet" href="/ui/app.css?v=20261115-ds" />
+    <link rel="stylesheet" href="/ui/models/models.css?v=20261115ds2" />
+    <script>document.documentElement.classList.add('js')</script>
+  </head>
+  <body>
+    <a class="skip" href="#main" data-i18n>Skip to content</a>
+    <header class="bp-header">
+      <div class="bp-wrap bp-header-inner">
+        <a class="bp-brand" href="/" aria-label="Speech Translation, home"><span class="bp-mark" aria-hidden="true">BP</span><span>Speech Translation</span></a>
+        <nav class="bp-nav" aria-label="Pages">
+          <a href="/ui/live-speech/live.html" data-i18n>Live</a>
+          <a href="/ui/models/models.html" aria-current="page" data-i18n>Models</a>
+        </nav>
+        <div class="bp-actions">
+          <button id="theme-toggle" class="icon-btn" type="button" aria-label="Toggle theme"><span class="material-symbols-outlined" aria-hidden="true"></span></button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main" class="bp-wrap bp-main">
+      <h1 data-i18n>Models</h1>
+      <p class="bp-sub" data-i18n>Pick the languages and where BP will run. It builds the best speech recognition, translation and voice chain for that machine. Nothing is bundled; you choose.</p>
+
+      <section class="card controls" aria-label="Languages">
+        <div class="pair-selects">
+          <div class="field"><label for="srcLang" data-i18n>You speak</label><select id="srcLang" aria-label="Source language"></select></div>
+          <button class="icon-swap swap" type="button" title="Swap languages" aria-label="Swap languages"><span class="material-symbols-outlined" aria-hidden="true">swap_horiz</span></button>
+          <div class="field"><label for="tgtLang" data-i18n>You hear</label><select id="tgtLang" aria-label="Target language"></select></div>
+        </div>
+      </section>
+
+      <section class="card where" id="hardware" aria-label="Where it runs">
+        <h2 data-i18n>Where will it run?</h2>
+        <div class="profile-tabs" id="profileTabs" role="group" aria-label="Deployment target"></div>
+        <div class="tiles hw-list" id="hwList"></div>
+        <p class="hint" id="hwVerdict" data-i18n>Detecting hardware…</p>
+      </section>
+
+      <section class="card plan" id="plan" aria-label="Recommended route">
+        <h2 data-i18n>Recommended route</h2>
+        <div class="plan-empty hint" id="planEmpty" hidden data-i18n>Pick two languages to see the route.</div>
+        <div class="plan-full" id="planFull" hidden>
+          <div class="chain" id="chain"></div>
+          <p class="plan-size hint" id="planSize"></p>
+          <p class="plan-note hint" id="planNote"></p>
+          <div class="plan-actions">
+            <button id="planInstall" class="btn btn-primary" disabled data-i18n>Install and use</button>
+            <div class="plan-progress" id="planProgress" hidden>
+              <div class="p-bar"><div class="p-fill" id="pFill"></div></div>
+              <span id="pText" class="p-text">0%</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="landscape" id="landscape" aria-label="All models">
+        <div class="land-head">
+          <h2 data-i18n>All models</h2>
+          <button id="landRefresh" class="btn" data-i18n>Refresh catalog</button>
+        </div>
+        <div class="stage-tabs" role="group" aria-label="Model stage">
+          <button class="tab" data-stage="stt" aria-pressed="true" data-i18n>Speech recognition</button>
+          <button class="tab" data-stage="mt" aria-pressed="false" data-i18n>Translation</button>
+          <button class="tab" data-stage="tts" aria-pressed="false" data-i18n>Voice</button>
+          <button class="tab" data-stage="unified" aria-pressed="false" data-i18n>Speech-to-speech</button>
+          <button class="tab" data-stage="vad" aria-pressed="false" data-i18n>Voice activity</button>
+        </div>
+        <div class="land-filter">
+          <input id="landSearch" class="land-search" placeholder="Search models…" data-i18n-placeholder="Search models…" />
+          <select id="landLang" class="lang-select"><option value="" data-i18n>All languages</option></select>
+        </div>
+        <div class="land-list card" id="landList"></div>
+
+        <details class="drawer">
+          <summary data-i18n>Add a model by Hugging Face id or local path</summary>
+          <form id="addForm" class="drawer-body">
+            <div class="form-grid">
+              <div class="field"><label data-i18n>Stage</label><select id="addStage"><option value="stt">Speech recognition</option><option value="mt">Translation</option><option value="tts">Voice</option></select></div>
+              <div class="field"><label data-i18n>Engine</label><input id="addEngine" placeholder="piper, faster_whisper, opus-mt…" data-i18n-placeholder="piper, faster_whisper, opus-mt…" /></div>
+              <div class="field"><label data-i18n>Languages</label><input id="addLangs" placeholder="en, sk" data-i18n-placeholder="en, sk" /></div>
+              <div class="field"><label data-i18n>HF id or local path</label><input id="addRef" placeholder="Helsinki-NLP/opus-mt-en-sk" data-i18n-placeholder="Helsinki-NLP/opus-mt-en-sk" /></div>
+            </div>
+            <div class="button-row"><button type="button" class="btn" id="addSave" data-i18n>Save</button></div>
+            <p id="addMsg" class="hint"></p>
+          </form>
+        </details>
+      </section>
+    </main>
+
+    <div id="toast" role="alert" aria-live="polite" class="toast hidden"></div>
+
+    <script src="/ui/theme-toggle.js"></script>
+    <script src="/ui/i18n/i18n.js"></script>
+    <script src="/ui/models/models.js?v=20261115ds2"></script>
+  </body>
+</html>

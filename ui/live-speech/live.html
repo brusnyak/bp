@@ -11,8 +11,6 @@
     <link rel="apple-touch-icon" href="/ui/images/icon-192.png" />
     <link rel="stylesheet" href="/ui/global-styles.css" />
     <link rel="stylesheet" href="/ui/site.css?v=20261105" />
-    <link rel="stylesheet" href="/ui/live-speech/live-style.css?v=20261115c" />
-    <script src="/ui/vendor/chart.min.js"></script>
     <script>
       // PWA shell: register the service worker (control-room installable, UI resilient offline).
       // Models/voices/API stay live on the backend — never cached (see ui/sw.js).
@@ -26,255 +24,189 @@
     </script>
       <link rel="stylesheet" href="/ui/vendor/fonts.css" />
     <link rel="stylesheet" href="/ui/vendor/material-symbols.css" />
+    <link rel="stylesheet" href="/ui/tokens.css?v=20261115-ds" />
+    <link rel="stylesheet" href="/ui/app.css?v=20261115-ds" />
+    <link rel="stylesheet" href="/ui/live-speech/live-style.css?v=20261115ds" />
     <link rel="stylesheet" href="/ui/shared/lang-picker.css" />
+    <script src="/ui/vendor/chart.min.js"></script>
 </head>
   <body>
-    <main class="container">
-      <header class="live-header">
-        <h1 data-i18n>Live translation</h1>
-        <button id="theme-toggle" class="icon-btn" type="button" aria-label="Toggle theme"><span class="material-symbols-outlined" aria-hidden="true"></span></button>
-      </header>
-      <section class="main-controls" aria-label="Translation controls">
-        <div class="control-row">
-          <div class="control-group route-direction">
+    <header class="bp-header">
+      <div class="bp-wrap bp-header-inner">
+        <a class="bp-brand" href="/" aria-label="Speech Translation, home"><span class="bp-mark" aria-hidden="true">BP</span><span>Speech Translation</span></a>
+        <nav class="bp-nav" aria-label="Pages">
+          <a href="/ui/live-speech/live.html" aria-current="page" data-i18n>Live</a>
+          <a href="/ui/models/models.html" data-i18n>Models</a>
+        </nav>
+        <div class="bp-actions">
+          <button id="theme-toggle" class="icon-btn" type="button" aria-label="Toggle theme"><span class="material-symbols-outlined" aria-hidden="true"></span></button>
+        </div>
+      </div>
+    </header>
+    <main class="bp-wrap bp-main">
+      <h1 data-i18n>Live translation</h1>
+      <p class="bp-sub" data-i18n>Speak, read the transcript, hear the translation.</p>
+      <section class="card controls" aria-label="Translation controls">
+        <div class="row row-lang">
+          <div class="field">
+            <span class="label" data-i18n>Languages</span>
             <div class="direction-row" role="group" aria-label="Languages">
               <button id="fromBtn" class="lp-trigger lp-stack" type="button"><small data-i18n>You speak</small><span>English</span></button>
               <button id="swapLangBtn" class="icon-swap" type="button" title="Swap languages" aria-label="Swap languages"><span class="material-symbols-outlined" aria-hidden="true">swap_horiz</span></button>
               <button id="toBtn" class="lp-trigger lp-stack" type="button"><small data-i18n>You hear</small><span>Slovak</span></button>
               <span id="directionLabel" class="visually-hidden" aria-live="polite">English → Slovak</span>
             </div>
-<select
-              id="inputLanguageSelect"
-              class="language-select" hidden
-              title="Select Input Language"
-              aria-label="Select input language"
-            >
+            <select id="inputLanguageSelect" class="language-select" hidden title="Select Input Language" aria-label="Select input language">
               <option value="en" selected>English (English)</option>
               <option value="sk">Slovak (Slovenčina)</option>
-            </select><select
-              id="outputLanguageSelect"
-              class="language-select" hidden
-              title="Select Target Language"
-              aria-label="Select target language"
-            >
+            </select><select id="outputLanguageSelect" class="language-select" hidden title="Select Target Language" aria-label="Select target language">
               <option value="sk" selected>Slovak (Slovenčina)</option>
               <option value="en">English (English)</option>
             </select>
           </div>
-          <div class="control-group mic-control">
+          <span class="spacer"></span>
+          <button id="startStopBtn" class="btn btn-primary" type="button">Start</button>
+        </div>
+        <div class="row row-audio">
+          <div class="field">
             <label for="audioInputSelect" data-i18n>Microphone</label>
             <div class="mic-device"><select id="audioInputSelect" class="control-select"><option value="" data-i18n>System default input</option></select>
-            <div
-              class="input-level-bar-segments"
-              id="inputLevelSegments"
-              role="progressbar"
-              aria-valuenow="0"
-              aria-valuemin="0"
-              aria-valuemax="100"
-              aria-label="Microphone input level"
-            >
-              <!-- Segments will be dynamically added/removed by JavaScript -->
-            </div></div>
-            <button id="soundCheckBtn" type="button" class="text-button" aria-describedby="soundCheckStatus" data-i18n>Test microphone</button>
+              <div class="input-level-bar-segments" id="inputLevelSegments" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Microphone input level"></div>
+            </div>
           </div>
-          <div class="control-group" id="audio-output-group">
+          <div class="field" id="audio-output-group">
             <label for="audioOutputSelect" data-i18n>Output</label>
             <select id="audioOutputSelect" class="control-select"><option value="" data-i18n>Speakers / headphones (default)</option></select>
           </div>
-          <button id="startStopBtn" class="btn btn-primary" type="button">Start</button>
+          <button id="soundCheckBtn" type="button" class="btn" aria-describedby="soundCheckStatus" data-i18n>Test microphone</button>
         </div>
-        <p id="soundCheckStatus" class="hint-text" role="status"></p>
-        <p id="feedbackWarning" class="hint-text" role="status" hidden data-i18n>Microphone is open. Use headphones or isolated audio to avoid feedback.</p>
+        <p id="soundCheckStatus" class="hint" role="status"></p>
+        <p id="feedbackWarning" class="hint" role="status" hidden data-i18n>Microphone is open. Use headphones or isolated audio to avoid feedback.</p>
       </section>
       <p id="routeStatus" class="status-line" role="status" aria-live="polite" aria-atomic="true">Connecting…</p>
-      <!-- Main content: Two columns -->
       <div class="content">
-        <!-- Left Column: Transcription -->
         <div class="column transcription-column" aria-live="polite">
           <div class="column-header">
             <h2 data-i18n>Transcription</h2>
-            <span
-              id="inputLanguageBadge"
-              class="language-badge"
-              aria-hidden="true"
-              >EN</span
-            >
-            <label for="inputLanguageSelect" class="visually-hidden"
-              >Input language</label
-            >
-
+            <span id="inputLanguageBadge" class="language-badge" aria-hidden="true">EN</span>
+            <label for="inputLanguageSelect" class="visually-hidden">Input language</label>
           </div>
-          <div
-            class="transcript-box"
-            id="transcriptionOutput"
-            tabindex="0"
-            role="region"
-            aria-label="Transcription output"
-          >
+          <div class="transcript-box" id="transcriptionOutput" tabindex="0" role="region" aria-label="Transcription output">
             <p class="placeholder" data-i18n>Waiting for speech...</p>
           </div>
         </div>
-
-        <!-- Divider -->
-        <div class="divider" aria-hidden="true"></div>
-
-        <!-- Right Column: Translation -->
+        <div class="divider" aria-hidden="true" hidden></div>
         <div class="column translation-column" aria-live="polite">
           <div class="column-header">
-            <h2 data-i18n>Translation</h2><button id="pipBtn" class="icon-btn" type="button" title="Pop out subtitles" aria-label="Pop out subtitles"><span class="material-symbols-outlined" aria-hidden="true">picture_in_picture_alt</span></button>
-            <span
-              id="outputLanguageBadge"
-              class="language-badge"
-              aria-hidden="true"
-              >SK</span
-            >
-            <label for="outputLanguageSelect" class="visually-hidden"
-              >Output language</label
-            >
-
+            <h2 data-i18n>Translation</h2>
+            <span id="outputLanguageBadge" class="language-badge" aria-hidden="true">SK</span>
+            <label for="outputLanguageSelect" class="visually-hidden">Output language</label>
+            <button id="pipBtn" class="icon-btn" type="button" title="Pop out subtitles" aria-label="Pop out subtitles"><span class="material-symbols-outlined" aria-hidden="true">picture_in_picture_alt</span></button>
           </div>
-          <div
-            class="transcript-box"
-            id="translationOutput"
-            tabindex="0"
-            role="region"
-            aria-label="Translation output"
-          >
+          <div class="transcript-box" id="translationOutput" tabindex="0" role="region" aria-label="Translation output">
             <p class="placeholder" data-i18n>Translation will appear here...</p>
           </div>
         </div>
       </div>
 
-
-      <details class="more" id="moreOptions">
-        <summary data-i18n>More</summary>
-        <!-- Interface language — prominent at top -->
-        <section class="more-section" id="more-language">
-          <h2 data-i18n>Interface language</h2>
-          <div class="control-group"><div class="lang-slot"></div></div>
-        </section>
-        <!-- Route & models -->
-        <section class="more-section" id="more-route">
-          <h2 data-i18n>Route &amp; models</h2>
-          <a class="btn btn-secondary" href="/ui/models/models.html?v=20261115b" data-i18n>Models</a>
-          <div class="control-group" id="playback-rate-group">
-            <label for="playbackRateSelect" data-i18n>Translation speed</label>
-            <select id="playbackRateSelect" class="control-select" aria-label="Translation playback speed" aria-describedby="rateHelp">
-              <option value="auto">Auto: speed up only when behind</option>
-              <option value="1">Normal</option>
-              <option value="1.15">Faster (+15%)</option>
-              <option value="1.25">Fastest (+25%)</option>
-            </select>
-            <p id="rateHelp" data-i18n>Auto speeds up only while behind (up to +45%, pitch kept).</p>
-          </div>
-        </section>
-        <!-- Voice & engine -->
-        <section class="more-section" id="more-voice">
-          <h2 data-i18n>Voice &amp; engine</h2>
-          <div class="control-group" id="voice-selection-group">
-            <label for="speakerVoiceSelect" data-i18n>Voice reference</label>
-            <select
-              id="speakerVoiceSelect"
-              class="model-select"
-              title="Select Speaker Voice"
-              aria-label="Select speaker voice for cloning"
-            >
-              <!-- Local references are loaded here -->
-            </select>
-          </div>
-          <div class="control-group route-advanced">
-            <details><summary data-i18n>Advanced voice profile</summary><label for="ttsModelSelect" data-i18n>Speech engine</label>
-            <select id="ttsModelSelect" class="model-select">
-              <option value="piper">Piper (Generic Voice)</option>
-              <option value="piper_sk_personal">My Slovak clone (fast)</option>
-              <option value="piper_personal_v2">My English clone (fast)</option>
-              <option value="omnivoice">OmniVoice clone (GPU, untested live)</option>
-              <option value="xtts">XTTS (Custom Voice, slower)</option>
-            </select><p data-i18n>Personal profiles need installed assets. GPU clones are research candidates; loading does not establish quality.</p>
-            <label for="strategySelect" data-i18n>Speech cutting</label>
-            <select id="strategySelect" class="model-select" title="How your speech is cut into pieces for recognition">
-              <option value="phrase" selected>Phrase: wait for a pause (the demo)</option>
-              <option value="clause">Clause: pause or 4 s cap</option>
-              <option value="agree">Agreement: speak while you talk</option>
-              <option value="agree_short">Agreement, short pieces (fastest start)</option>
-              <option value="chunks">Fixed 2 s windows (old)</option>
-            </select></details>
-          </div>
-          <section class="control-group">
-            <h2 data-i18n>Voice reference</h2>
-            <button id="recordVoiceBtn" class="btn btn-secondary" type="button" data-i18n>Voice reference (record or choose a file)</button>
-            <button id="deleteVoiceReferenceBtn" class="btn btn-secondary" type="button" data-i18n>Delete selected reference</button>
-            <p data-i18n>Up to 5 files. WAV, M4A, MP3 or WebM. Maximum 15 MB and 60 seconds each.</p>
-          </section>
-        </section>
-        <!-- Room & meeting -->
-        <section class="more-section" id="more-room">
-          <h2 data-i18n>Room &amp; meeting</h2>
-          <div class="control-group" id="room-broadcast-group">
-            <label for="roomIdInput" data-i18n>Audience broadcast (room mode)</label>
-            <div class="room-create">
-              <input id="roomIdInput" class="control-select" placeholder="Press Start room" readonly>
-              <button id="startRoomBtn" type="button" class="btn btn-secondary" title="Create a room; listeners join by link">Start room</button>
+      <details class="drawer" id="moreOptions">
+        <summary data-i18n>Settings</summary>
+        <div class="drawer-body card-grid">
+          <section class="card" id="more-route">
+            <h2 data-i18n>Route and speed</h2>
+            <div class="control-group">
+              <a class="btn" href="/ui/models/models.html" data-i18n>Choose models</a>
+              <div class="control-group" id="playback-rate-group">
+                <label class="label" for="playbackRateSelect" data-i18n>Translation speed</label>
+                <select id="playbackRateSelect" class="control-select" aria-label="Translation playback speed" aria-describedby="rateHelp">
+                  <option value="auto">Auto: speed up only when behind</option>
+                  <option value="1">Normal</option>
+                  <option value="1.15">Faster (+15%)</option>
+                  <option value="1.25">Fastest (+25%)</option>
+                </select>
+                <p id="rateHelp" class="hint" data-i18n>Auto speeds up only while behind (up to +45%, pitch kept).</p>
+              </div>
             </div>
-            <a id="roomPreviewLink" hidden data-i18n>Open audience link</a>
-            <button id="copyRoomLinkBtn" type="button" class="btn btn-secondary" data-i18n>Copy audience link</button>
-            <div id="roomStatusInfo" class="hint-text" style="display:none;margin-top:4px;">
-              <span id="roomListenerCount">0 listeners connected</span>
-            </div>
-          </div>
-          <section class="control-group">
-            <h2 data-i18n>Sending the translation into a meeting?</h2>
-            <p class="hint-text" id="virtualMicHint">Choose a virtual cable as the output, then select it as the microphone in your meeting app.</p>
-            <p class="hint-text" data-i18n>Use BlackHole on macOS or VB-Cable on Windows. The page cannot tell whether the meeting is listening to the cable.</p>
           </section>
-        </section>
-      </details>
-      <details class="diagnostics" id="diagnostics">
-        <summary data-i18n>Diagnostics: latency and activity log</summary>
-      <!-- Latency Metrics -->
-      <div class="latency-metrics" role="status" aria-live="polite">
-        <h3 data-i18n>Latency Breakdown</h3>
-        <div class="metric-group">
-          <div class="metric">
-            <span class="metric-label">STT:</span>
-            <span class="metric-value" id="sttLatency">0.0s</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">MT:</span>
-            <span class="metric-value" id="mtLatency">0.0s</span>
-          </div>
-          <div class="metric">
-            <span class="metric-label">TTS:</span>
-            <span class="metric-value" id="ttsLatency">0.0s</span>
-          </div>
-          <div class="metric total-e2e">
-            <span class="metric-label">Total Latency:</span>
-            <span class="metric-value" id="totalLatency">0.0s</span>
-          </div>
+          <section class="card" id="more-voice">
+            <h2 data-i18n>Voice</h2>
+            <div class="control-group" id="voice-selection-group">
+              <label class="label" for="speakerVoiceSelect" data-i18n>Voice reference</label>
+              <select id="speakerVoiceSelect" class="model-select" title="Select Speaker Voice" aria-label="Select speaker voice for cloning"></select>
+              <div class="button-row">
+                <button id="recordVoiceBtn" class="btn" type="button" data-i18n>Record or choose a file</button>
+                <button id="deleteVoiceReferenceBtn" class="btn" type="button" data-i18n>Delete selected</button>
+              </div>
+              <p class="hint" data-i18n>Up to 5 files. WAV, M4A, MP3 or WebM. Maximum 15 MB and 60 seconds each.</p>
+            </div>
+            <details class="control-group"><summary data-i18n>Advanced voice profile</summary>
+              <label class="label" for="ttsModelSelect" data-i18n>Speech engine</label>
+              <select id="ttsModelSelect" class="model-select">
+                <option value="piper">Piper (Generic Voice)</option>
+                <option value="piper_sk_personal">My Slovak clone (fast)</option>
+                <option value="piper_personal_v2">My English clone (fast)</option>
+                <option value="omnivoice">OmniVoice clone (GPU, untested live)</option>
+                <option value="xtts">XTTS (Custom Voice, slower)</option>
+              </select>
+              <p class="hint" data-i18n>Personal profiles need installed assets. GPU clones are research candidates; loading does not establish quality.</p>
+              <label class="label" for="strategySelect" data-i18n>Speech cutting</label>
+              <select id="strategySelect" class="model-select" title="How your speech is cut into pieces for recognition">
+                <option value="phrase" selected>Phrase: wait for a pause (the demo)</option>
+                <option value="clause">Clause: pause or 4 s cap</option>
+                <option value="agree">Agreement: speak while you talk</option>
+                <option value="agree_short">Agreement, short pieces (fastest start)</option>
+                <option value="chunks">Fixed 2 s windows (old)</option>
+              </select>
+            </details>
+          </section>
+          <section class="card wide" id="more-room">
+            <h2 data-i18n>Room and meeting</h2>
+            <div class="card-grid">
+              <div class="control-group" id="room-broadcast-group">
+                <label class="label" for="roomIdInput" data-i18n>Audience broadcast (room mode)</label>
+                <div class="room-create">
+                  <input id="roomIdInput" class="control-select" placeholder="Press Start room" readonly>
+                  <button id="startRoomBtn" type="button" class="btn" title="Create a room; listeners join by link">Start room</button>
+                </div>
+                <a id="roomPreviewLink" hidden data-i18n>Open audience link</a>
+                <button id="copyRoomLinkBtn" type="button" class="btn" data-i18n>Copy audience link</button>
+                <div id="roomStatusInfo" class="hint" hidden><span id="roomListenerCount">0 listeners connected</span></div>
+              </div>
+              <div class="control-group">
+                <span class="label" data-i18n>Sending the translation into a meeting?</span>
+                <p class="hint" id="virtualMicHint">Choose a virtual cable as the output, then select it as the microphone in your meeting app.</p>
+                <p class="hint" data-i18n>Use BlackHole on macOS or VB-Cable on Windows. The page cannot tell whether the meeting is listening to the cable.</p>
+              </div>
+            </div>
+          </section>
         </div>
-        <p id="lagTraceSummary" role="status" aria-live="polite"></p>
-        <!-- Per-fragment server-send lag -->
-        <div class="timeline-chart-container">
-          <canvas id="latencyTimelineChart" role="img" aria-label="Per-fragment lag in milliseconds. Stacked hold, STT, MT, TTS-first and unattributed time; 2000 millisecond goal."></canvas>
-        </div>
-      </div>
-
-      <div class="settings-status" role="status" aria-live="polite" aria-atomic="true">
-        <span id="settingsStatusText" class="metric-value"></span>
-      </div>
-      <div
-        class="log-container"
-        role="log"
-        aria-live="polite"
-        aria-atomic="false"
-      >
-        <h3 data-i18n>Activity Log</h3>
-        <div id="activityLog" class="activity-log-box" tabindex="0" aria-label="Application activity log">
-          <!-- Log messages will be appended here -->
-        </div>
-      </div>
       </details>
 
+      <details class="drawer diagnostics" id="diagnostics">
+        <summary data-i18n>Diagnostics</summary>
+        <div class="drawer-body">
+          <div class="tiles" role="status" aria-live="polite">
+            <div class="tile"><span class="tile-label">STT</span><span class="tile-value" id="sttLatency">—</span><span class="tile-note" data-i18n>speech to text, last fragment</span></div>
+            <div class="tile"><span class="tile-label">MT</span><span class="tile-value" id="mtLatency">—</span><span class="tile-note" data-i18n>translation, last fragment</span></div>
+            <div class="tile"><span class="tile-label">TTS</span><span class="tile-value" id="ttsLatency">—</span><span class="tile-note" data-i18n>voice, last fragment</span></div>
+            <div class="tile total"><span class="tile-label" data-i18n>Total</span><span class="tile-value" id="totalLatency">—</span><span class="tile-note" id="settingsStatusText" data-i18n>No fragments yet. Press Start.</span></div>
+          </div>
+          <section class="card">
+            <div class="card-head"><h2 data-i18n>Speech and translation activity</h2>
+              <label class="label" for="lagWindow"><span data-i18n>Zoom</span>
+                <select id="lagWindow"><option value="10">Last 10 s</option><option value="20" selected>Last 20 s</option><option value="60">Last 60 s</option></select></label></div>
+            <p id="lagTraceSummary" class="metric-note" role="status" aria-live="polite"></p>
+            <div class="chart-box"><canvas id="latencyTimelineChart" role="img" aria-label="Timeline of your speech and the translated speech per fragment, start and stop in milliseconds."></canvas></div>
+            <div class="lag-table" role="table" aria-label="Last fragments">
+              <div class="lag-row lag-head" role="row"><span>#</span><span data-i18n>You spoke (ms)</span><span data-i18n>Translation heard (ms)</span><span data-i18n>Lag</span></div>
+              <div id="lagRows" role="rowgroup"></div>
+            </div>
+          </section>
+          <section class="card" role="log" aria-live="polite" aria-atomic="false">
+            <h2 data-i18n>Activity log</h2>
+            <div id="activityLog" class="activity-log-box log-rows" tabindex="0" aria-label="Application activity log"></div>
+          </section>
+        </div>
       </details>
     </main>
     <!-- Floating Configuration Window (Modal) -->
@@ -383,7 +315,7 @@
     <script src="/ui/live-speech/session-playback.js"></script>
     <script src="/ui/shared/caps.js"></script>
     <script src="/ui/shared/lang-picker.js"></script>
-    <script src="/ui/live-speech/live-script.js?v=20261115b"></script>
+    <script src="/ui/live-speech/live-script.js?v=20261115ds4"></script>
     <script src="/ui/live-speech/live-langs.js"></script>
     <script src="/ui/i18n/i18n.js"></script>
   </body>

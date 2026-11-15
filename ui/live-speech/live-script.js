@@ -60,7 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const timestamp = new Date().toLocaleTimeString();
         const logEntry = document.createElement('div');
         logEntry.className = `log-entry log-${type}`; // CSS classes: log-info, log-success, log-warning, log-error
-        logEntry.textContent = `[${timestamp}] ${message}`;
+        for (const [cls, text] of [['t', timestamp], ['lv', type === 'success' ? 'ok' : type], ['m', message]]) {
+            const cell = document.createElement('span'); cell.className = cls; cell.textContent = text; logEntry.appendChild(cell);
+        }
         activityLog.appendChild(logEntry);
         activityLog.scrollTop = activityLog.scrollHeight; // Auto-scroll to bottom
     }
@@ -207,6 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Apply sqrt to approximate perceptual loudness, then EMA smoothing
         const scaled = Math.sqrt(Math.min(1, Math.max(0, level)));
         emaLevel = emaLevel * (1 - EMA_ALPHA) + scaled * EMA_ALPHA;
+        if (window.lagTimeline && isStreaming) window.lagTimeline.micLevel(emaLevel);
 
         const normalizedLevel = Math.min(1, Math.max(0, emaLevel));
         inputLevelSegments.setAttribute('aria-valuenow', String(Math.round(normalizedLevel * 100)));
@@ -250,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const audio = new Audio(url);
         audio.addEventListener('ended', () => { if (isStreaming) setRouteStatus('Listening'); });
         return audio;
-    }, onEvent: e => { if (isStreaming && e.event === 'tts_play_start') setRouteStatus('Speaking');  try { if (websocket && websocket.readyState === 1) websocket.send(JSON.stringify({ type: 'client_event', t_ms: Math.round(performance.timeOrigin + performance.now()), ...e })); } catch (_) {} }, onError: error => {
+    }, onEvent: e => { if (window.lagTimeline) window.lagTimeline.playbackEvent(e); if (isStreaming && e.event === 'tts_play_start') setRouteStatus('Speaking');  try { if (websocket && websocket.readyState === 1) websocket.send(JSON.stringify({ type: 'client_event', t_ms: Math.round(performance.timeOrigin + performance.now()), ...e })); } catch (_) {} }, onError: error => {
         stopRealtimeAudioStreaming();
 
         updateStartAvailability();
@@ -431,15 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (totalLatencyEl) totalLatencyEl.textContent = (message.metrics.total_latency || 0).toFixed(2) + 's';
 
                     // Update activity log
-                    const activityLog = document.getElementById('activityLog');
-                    if (activityLog) {
-                        const timestamp = new Date().toLocaleTimeString();
-                        const logEntry = document.createElement('div');
-                        logEntry.className = 'log-entry';
-                        logEntry.textContent = `[${timestamp}] Processed speech - STT: ${(message.metrics.stt_time || 0).toFixed(2)}s, MT: ${(message.metrics.mt_time || 0).toFixed(2)}s, TTS: ${(message.metrics.tts_time || 0).toFixed(2)}s`;
-                        activityLog.appendChild(logEntry);
-                        activityLog.scrollTop = activityLog.scrollHeight; // Auto-scroll to bottom
-                    }
+                    logActivity(`Processed speech: STT ${(message.metrics.stt_time || 0).toFixed(2)}s, MT ${(message.metrics.mt_time || 0).toFixed(2)}s, TTS ${(message.metrics.tts_time || 0).toFixed(2)}s`, 'info');
 
                     // Update settings status
                     const settingsStatusText = document.getElementById('settingsStatusText');
@@ -447,7 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         settingsStatusText.textContent = `Last processed: ${new Date().toLocaleTimeString()} | Total: ${(message.metrics.total_latency || 0).toFixed(2)}s`;
                     }
 
-                } else if (message.type === 'lag_trace') {
+                } else if (message.type === 'lag_trace' || message.type === 'lag_trace_end') {
                     window.updateLatencyChart(message);
                 } else if (message.type === 'status' || message.type === 'notification') {
                     showNotification(message.message, message.type === 'notification' ? message.type : 'info');
@@ -601,6 +596,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (typeof window.updateLatencyChart === 'function') {
                 sessionStartTime = performance.now() / 1000;
             }
+            if (typeof window.resetLatencyChart === 'function') window.resetLatencyChart();
 
             // Send "start" command to backend to begin transcription
             if (websocket && websocket.readyState === WebSocket.OPEN) {
@@ -676,11 +672,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateMainMicLevel(0); // Reset mic level display
         updateStartAvailability();
 
-        // Reset chart if it exists
-        if (typeof window.resetLatencyChart === 'function') {
-            window.resetLatencyChart();
-        }
-
+        // Keep the chart after Stop so the last session can be read; it resets on the next Start.
         // Only report "stopped" when we were actually streaming — not on page load or idle teardowns.
         if (wasStreaming) {
             showNotification('Real-time streaming stopped.', 'info');
@@ -1472,153 +1464,115 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Server-send lag only. Browser output and physical-device queues are unmeasured.
+    // Activity timeline: two lanes, both observed in the browser (works with every speech-cutting strategy).
+    //   You speak   = microphone level above an adaptive threshold (noise floor and recent peak), gaps under 700 ms merged
+    //   Translation = translated audio playing (tts_play_start .. tts_ended), gaps under 150 ms merged
+    // Times are ms since Start. Lag = start of the translation minus end of the speech it answers.
     function initializeLatencyChart() {
         const canvas = document.getElementById('latencyTimelineChart');
-        if (!canvas) return;
+        if (!canvas || typeof Chart === 'undefined') return;
         const readout = document.getElementById('lagTraceSummary');
-        const limit = 30;
-        const traces = [];
-        let fragmentNumber = 0;
-        const parts = ['hold_ms', 'stt_ms', 'mt_ms', 'tts_first_ms'];
-        const labels = ['Hold', 'STT', 'MT', 'TTS-first', 'Queue / other (unattributed)'];
-        const tokenNames = ['--primary-color', '--log-success-color', '--secondary-color', '--deep-berry', '--border-color'];
-        const finite = value => typeof value === 'number' && Number.isFinite(value);
-        const fmt = value => finite(value) ? `${Math.round(value)} ms` : 'unmeasured';
-        const percentile = (sorted, p) => {
-            const index = (sorted.length - 1) * p;
-            const lo = Math.floor(index), hi = Math.ceil(index);
-            return sorted[lo] + (sorted[hi] - sorted[lo]) * (index - lo);
+        const table = document.getElementById('lagRows');
+        const winSel = document.getElementById('lagWindow');
+        const input = [], output = [];
+        let t0 = performance.now(), dirty = true, floor = 0.02, peak = 0.1, belowSince = null;
+        const now = () => performance.now() - t0;
+        const finite = v => typeof v === 'number' && Number.isFinite(v);
+        const ms = v => finite(v) ? Math.round(v).toLocaleString('en-US') : '—';
+        const MIC_GAP = 700, OUT_GAP = 150, HANG = 300;
+        const openIv = (list, gap) => {
+            const t = now(), last = list[list.length - 1];
+            if (last && last.e === null) return;
+            if (last && t - last.e <= gap) { last.e = null; dirty = true; return; }
+            list.push({s: t, e: null}); dirty = true;
         };
-        const overlay = {
-            id: 'fragmentLagLabels',
-            afterDatasetsDraw(chart) {
-                const {ctx, chartArea, scales: {x, y}} = chart;
-                ctx.save();
-                ctx.fillStyle = chart.options.color;
-                ctx.strokeStyle = chart.options.color;
-                ctx.setLineDash([5, 4]);
-                ctx.beginPath();
-                ctx.moveTo(chartArea.left, y.getPixelForValue(2000));
-                ctx.lineTo(chartArea.right, y.getPixelForValue(2000));
-                ctx.stroke();
-                ctx.setLineDash([]);
-                ctx.textAlign = 'right';
-                ctx.fillText('Goal 2000 ms', chartArea.right, y.getPixelForValue(2000) - 5);
-                ctx.textAlign = 'center';
-                traces.forEach((trace, i) => {
-                    const total = trace.total_ms;
-                    ctx.save();
-                    // Vertical labels remain separate even with 30 fragments on a phone.
-                    ctx.translate(x.getPixelForValue(i), Math.max(chartArea.top + 4,
-                        y.getPixelForValue(finite(total) && total >= 0 ? total : 0) - 5));
-                    ctx.rotate(-Math.PI / 2);
-                    ctx.textAlign = 'left';
-                    ctx.fillText(finite(total) ? `${Math.round(total)} ms` : 'n/a', 0, 0);
-                    ctx.restore();
-                });
-                ctx.restore();
+        const closeIv = (list, at) => { const last = list[list.length - 1]; if (last && last.e === null) { last.e = at === undefined ? now() : at; dirty = true; } };
+        window.lagTimeline = {
+            micLevel(level) {
+                const speaking = input.length && input[input.length - 1].e === null;
+                if (!speaking) floor += (level - floor) * 0.02;
+                peak = Math.max(level, peak * 0.998);
+                const on = Math.max(0.03, floor * 2.5, peak * 0.25), off = on * 0.6;
+                if (level >= on) { belowSince = null; openIv(input, MIC_GAP); }
+                else if (speaking && level < off) {
+                    if (belowSince === null) belowSince = now();
+                    else if (now() - belowSince > HANG) { closeIv(input, belowSince); belowSince = null; }
+                }
+            },
+            playbackEvent(e) {
+                if (e.event === 'tts_play_start') openIv(output, OUT_GAP);
+                else if (e.event === 'tts_ended') closeIv(output);
             }
         };
-        latencyChart = new Chart(canvas.getContext('2d'), {
+        const css = n => getComputedStyle(canvas).getPropertyValue(n).trim();
+        const chart = new Chart(canvas.getContext('2d'), {
             type: 'bar',
-            data: {labels: [], datasets: labels.map(label => ({label, data: [], stack: 'lag', borderWidth: 1}))},
-            plugins: [overlay],
+            data: {labels: ['You speak', 'Translation'], datasets: []},
             options: {
-                responsive: true, maintainAspectRatio: false, animation: false,
-                layout: {padding: {top: 55}},
+                indexAxis: 'y', responsive: true, maintainAspectRatio: false, animation: false,
                 scales: {
-                    x: {stacked: true, title: {display: true, text: 'Fragment (last 30)'}},
-                    y: {stacked: true, beginAtZero: true, suggestedMax: 2500,
-                        title: {display: true, text: 'Speech end → first server audio send (ms)'}}
+                    x: {type: 'linear', min: 0, max: 20000, ticks: {callback: v => (v / 1000).toFixed(v % 1000 ? 1 : 0) + ' s'}},
+                    y: {stacked: true, grid: {display: false}}
                 },
                 plugins: {
-                    legend: {position: 'bottom', labels: {boxWidth: 10}},
-                    tooltip: {
-                        callbacks: {
-                            title: items => traces[items[0].dataIndex].text,
-                            label: item => `${item.dataset.label}: ${fmt(item.raw)}`,
-                            afterBody: items => {
-                                const trace = traces[items[0].dataIndex];
-                                return [
-                                    ...parts.map((key, i) => `${labels[i]} measured: ${fmt(trace[key])}`),
-                                    `Total: ${fmt(trace.total_ms)}`,
-                                    trace.overlap ? 'Parts overlap/exceed total; total shown as unattributed.' : 'Other includes unmeasured work; browser playback is excluded.'
-                                ];
-                            }
-                        }
-                    }
+                    legend: {display: false},
+                    tooltip: {callbacks: {
+                        title: items => items[0].label,
+                        label: item => { const [s, e] = item.raw; return `${ms(s)} → ${ms(e)} ms  (${ms(e - s)} ms long)`; }
+                    }}
                 }
             }
         });
-        function applyTheme() {
-            const style = getComputedStyle(canvas);
-            const ink = style.getPropertyValue('--text-color').trim() || style.color;
-            const border = style.getPropertyValue('--border-color').trim();
-            latencyChart.options.color = ink;
-            latencyChart.options.plugins.legend.labels.color = ink;
-            for (const axis of Object.values(latencyChart.options.scales)) {
-                axis.ticks.color = ink;
-                axis.title.color = ink;
-                axis.grid.color = border;
-            }
-            latencyChart.data.datasets.forEach((dataset, i) => {
-                dataset.backgroundColor = style.getPropertyValue(tokenNames[i]).trim() || ink;
-                dataset.borderColor = ink;
+        latencyChart = {update: () => { dirty = true; }};
+        function pairs() {
+            const rows = []; let k = 0;
+            input.forEach((i, n) => {
+                while (k < output.length && output[k].s < i.s) k++;
+                const next = input[n + 1];
+                const o = output[k] && (!next || output[k].s < next.s) ? output[k++] : null;
+                rows.push({n: n + 1, i, o});
             });
-            latencyChart.update('none');
+            return rows;
         }
-        function summarize() {
-            const valid = traces.filter(t => finite(t.total_ms) && t.total_ms >= 0);
-            if (!valid.length) {
-                readout.textContent = 'Waiting for measured fragment lag. Window: last 30 fragments. Browser playback excluded.';
-                return;
-            }
-            const sorted = valid.map(t => t.total_ms).sort((a, b) => a - b);
-            const timed = valid.filter(t => finite(t.speech_end));
-            let drift = null;
-            if (timed.length > 1) {
-                const meanX = timed.reduce((sum, t) => sum + t.speech_end, 0) / timed.length;
-                const meanY = timed.reduce((sum, t) => sum + t.total_ms, 0) / timed.length;
-                const variance = timed.reduce((sum, t) => sum + (t.speech_end - meanX) ** 2, 0);
-                if (variance > 0) drift = timed.reduce((sum, t) => sum +
-                    (t.speech_end - meanX) * (t.total_ms - meanY), 0) / variance * 60000;
-            }
-            readout.textContent = `Last ${traces.length}/30 fragments · ${valid.length} measured · Median ${fmt(percentile(sorted, .5))} · p90 ${fmt(percentile(sorted, .9))} · Drift ${finite(drift) ? `${Math.round(drift)} ms/min of speech` : 'unmeasured'} · Server send; browser playback excluded.`;
-        }
-        window.updateLatencyChart = function (trace) {
-            // Legacy five-timestamp calls cannot supply fragment lag; never invent it.
-            if (!trace || trace.type !== 'lag_trace') return;
-            const measured = parts.map(key => finite(trace[key]) && trace[key] >= 0 ? trace[key] : null);
-            const known = measured.reduce((sum, value) => sum + (value ?? 0), 0);
-            const validTotal = finite(trace.total_ms) && trace.total_ms >= 0;
-            const overlap = validTotal && known > trace.total_ms;
-            traces.push({...trace, number: ++fragmentNumber, overlap});
-            if (traces.length > limit) traces.shift();
-            latencyChart.data.labels = traces.map(t => `#${t.number}`);
-            latencyChart.data.datasets.forEach((dataset, i) => {
-                dataset.data = traces.map(t => {
-                    if (!finite(t.total_ms) || t.total_ms < 0) return null;
-                    if (i === 4) return t.overlap ? t.total_ms : t.total_ms - parts.reduce((sum, key) =>
-                        sum + (finite(t[key]) && t[key] >= 0 ? t[key] : 0), 0);
-                    return t.overlap ? null : (finite(t[parts[i]]) && t[parts[i]] >= 0 ? t[parts[i]] : null);
+        function render() {
+            if (!dirty && !input.concat(output).some(x => x.e === null)) return;
+            dirty = false;
+            while (input.length > 40) input.shift();
+            while (output.length > 40) output.shift();
+            const win = Number(winSel ? winSel.value : 20) * 1000, t = now();
+            const muted = css('--bp-muted'), line = css('--bp-hairline'), accent = css('--bp-accent');
+            const bars = (list, lane, color) => list.map(x => ({
+                label: lane === 0 ? 'You speak' : 'Translation', backgroundColor: color, borderRadius: 4, barThickness: 22,
+                data: lane === 0 ? [[x.s, x.e === null ? t : x.e], null] : [null, [x.s, x.e === null ? t : x.e]]
+            }));
+            chart.data.datasets = bars(input, 0, muted).concat(bars(output, 1, accent));
+            chart.options.scales.x.min = Math.max(0, t - win); chart.options.scales.x.max = Math.max(win, t);
+            chart.options.scales.x.ticks.color = muted; chart.options.scales.y.ticks.color = muted; chart.options.scales.x.grid.color = line;
+            chart.update('none');
+            const rows = pairs();
+            const lags = rows.filter(r => r.o && r.i.e !== null).map(r => r.o.s - r.i.e).filter(v => v >= 0).sort((a, b) => a - b);
+            if (readout) readout.textContent = lags.length
+                ? `Lag, end of your speech to start of translation: median ${ms(lags[Math.floor((lags.length - 1) / 2)])} ms, p90 ${ms(lags[Math.min(lags.length - 1, Math.ceil((lags.length - 1) * 0.9))])} ms (${lags.length} pairs)`
+                : 'Press Start and speak.';
+            if (table) {
+                table.textContent = '';
+                rows.slice(-6).reverse().forEach(r => {
+                    const row = document.createElement('div'); row.className = 'lag-row';
+                    const cells = ['#' + r.n, ms(r.i.s) + ' → ' + (r.i.e === null ? 'now' : ms(r.i.e)),
+                        r.o ? ms(r.o.s) + ' → ' + (r.o.e === null ? 'now' : ms(r.o.e)) : '—',
+                        r.o && r.i.e !== null ? ms(r.o.s - r.i.e) + ' ms' : '—'];
+                    cells.forEach((text, idx) => { const s = document.createElement('span'); s.textContent = text; if (idx === 3) s.className = 'lag'; row.appendChild(s); });
+                    table.appendChild(row);
                 });
-            });
-            summarize();
-            latencyChart.update('none');
-        };
-        window.resetLatencyChart = function () {
-            traces.length = 0;
-            fragmentNumber = 0;
-            latencyChart.data.labels = [];
-            latencyChart.data.datasets.forEach(dataset => { dataset.data = []; });
-            summarize();
-            latencyChart.update('none');
-        };
-        new MutationObserver(applyTheme).observe(document.documentElement,
-            {attributes: true, attributeFilter: ['data-theme', 'class']});
-        applyTheme();
-        summarize();
+            }
+        }
+        window.updateLatencyChart = function () { /* server lag_trace stays in the logs; this chart shows what the browser observes */ };
+        window.resetLatencyChart = function () { input.length = 0; output.length = 0; belowSince = null; floor = 0.02; peak = 0.1; t0 = performance.now(); dirty = true; render(); };
+        if (winSel) winSel.addEventListener('change', () => { dirty = true; render(); });
+        new MutationObserver(() => { dirty = true; render(); }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme', 'class']});
+        document.addEventListener('toggle', () => { dirty = true; setTimeout(render, 0); }, true);
+        setInterval(() => { const d = document.getElementById('diagnostics'); if (d && d.open && !document.hidden) render(); }, 250);
+        render();
     }
 
     // Initialize the chart

@@ -39,7 +39,7 @@ test_output/
 *.wav
 
 # Models and temporary files
-models/
+/models/
 temp/
 processed/
 .agent/

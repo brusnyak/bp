@@ -5,7 +5,16 @@ Check this file before adding any page or restyling; match it first, distinctive
 choices second. Built from `ui/global-styles.css` (the contract) + the
 `frontend-design` skill (the taste).
 
-## Tokens (from `ui/global-styles.css` — never hardcode hex in page CSS)
+## Enforced system for Live and Models (added 2026-11-15)
+
+Source of truth: `ui/tokens.css` (`--bp-*`: color light and dark, space s1-s8, type t-xs..t-2xl, radius, elevation,
+motion, z-index). Direction "lingonberry-quiet": warm neutrals, lingonberry `#C41E3A` (dark `#FF7A8A`) as the single
+accent for the primary action and key figures. `live-style.css` and `models.css` may use only these tokens; shared CSS
+that still reads legacy names is bridged inside `tokens.css`. Gate: `make check-ui` (`scripts/lint_tokens.py`) fails on a
+literal color, length, duration or z-index in those two files and on any token pair under WCAG AA. Home, docs and
+extra pages keep the older tokens below until they are migrated on purpose.
+
+## Legacy tokens, home and document pages (from `ui/global-styles.css` — never hardcode hex in page CSS)
 
 | Role | Var | Value |
 |---|---|---|

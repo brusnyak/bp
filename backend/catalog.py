@@ -1,7 +1,7 @@
 """Model catalog for the router feature.
 
 Assembles a unified model list from:
-  * curated entries (models/curated.json, tracked) — measured, recommended defaults
+  * curated entries (catalog/curated.json, tracked) — measured, recommended defaults
   * live cache (cache/catalog_live.json, git-ignored) — refreshed from HF/Piper
 
 Computes hardware fit and per-stage/language recommendations. Never hides a model
@@ -20,7 +20,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CURATED_PATH = os.path.join(REPO_ROOT, "models", "curated.json")
+CURATED_PATH = os.path.join(REPO_ROOT, "catalog", "curated.json")
 LIVE_CACHE_PATH = os.path.join(REPO_ROOT, "cache", "catalog_live.json")
 USER_ENTRIES_PATH = os.path.join(REPO_ROOT, "config", "models.user.json")
 
@@ -99,24 +99,25 @@ def _fits(hw: Hardware, m: dict) -> str:
 
 
 def _recommended(models: list[dict]) -> list[dict]:
-    """Best 'good' model per (stage, language|pair), measured numbers first."""
-    best: dict[str, dict] = {}
+    """Best model per (stage, language|pair): fits first, evidence-recommended before untested, measured, then smaller."""
+    best: dict[tuple, dict] = {}
+
+    def score(x: dict) -> tuple:
+        return (
+            x.get("_pref", 1) == 2,          # untested on this target goes last
+            x.get("fit") != "good",          # 'good' before 'ok'
+            x.get("_pref", 1),
+            0 if x.get("measured") else 1,
+            x.get("size_mb") or 0,
+            0 if x.get("recommended") else 1,
+        )
+
     for m in models:
-        if m.get("fit") != "good":
+        if m.get("fit") not in ("good", "ok"):
             continue
-        key = (m.get("stage"), m.get("pair") or m.get("languages", [""])[0] if m.get("languages") else "")
+        key = (m.get("stage"), m.get("pair") or (m.get("languages") or [""])[0])
         cur = best.get(key)
-        if cur is None:
-            best[key] = m
-            continue
-        # Prefer measured, then smaller, then recommended flag.
-        def score(x: dict) -> tuple:
-            return (
-                0 if x.get("measured") else 1,
-                x.get("size_mb") or 0,
-                0 if x.get("recommended") else 1,
-            )
-        if score(m) < score(cur):
+        if cur is None or score(m) < score(cur):
             best[key] = m
     return list(best.values())
 
@@ -140,8 +141,49 @@ def _installed(m: dict) -> bool:
     return False
 
 
+PROFILES = {
+    "laptop_cpu": {"label": "Laptop, CPU only", "cpu_cores": 8, "ram_gb": 16.0, "gpu": None},
+    "apple_silicon": {"label": "Apple Silicon (M-series)", "cpu_cores": 8, "ram_gb": 16.0,
+                      "gpu": {"name": "Apple Silicon MPS", "vram_gb": None, "backend": "mps"}},
+    "gpu_8gb": {"label": "GPU server, 8 GB VRAM", "cpu_cores": 8, "ram_gb": 32.0,
+                "gpu": {"name": "8 GB CUDA GPU", "vram_gb": 8.0, "backend": "cuda"}},
+    "gpu_16gb": {"label": "GPU server, 16 GB VRAM (e.g. T4)", "cpu_cores": 8, "ram_gb": 32.0,
+                 "gpu": {"name": "16 GB CUDA GPU", "vram_gb": 16.0, "backend": "cuda"}},
+    "gpu_24gb_plus": {"label": "GPU server, 24 GB+ VRAM", "cpu_cores": 16, "ram_gb": 64.0,
+                      "gpu": {"name": "24 GB+ CUDA GPU", "vram_gb": 24.0, "backend": "cuda"}},
+    "server_cpu": {"label": "Server, CPU only", "cpu_cores": 32, "ram_gb": 64.0, "gpu": None},
+}
+EVIDENCE_PATH = os.path.join(REPO_ROOT, "catalog", "evidence.json")
+_FIT_FROM_EVIDENCE = {"recommended": "good", "ok": "ok", "too-heavy": "too-heavy"}
+
+
+def hardware_for_profile(key: str, disk_free_gb: float = 0.0) -> Optional[dict]:
+    p = PROFILES.get(key)
+    if not p:
+        return None
+    return {"cpu_cores": p["cpu_cores"], "ram_gb": p["ram_gb"], "gpu": p["gpu"], "disk_free_gb": disk_free_gb}
+
+
+def infer_profile(hardware: dict) -> str:
+    """Nearest deployment profile for the machine we are on, so evidence applies to 'this computer' too."""
+    gpu = hardware.get("gpu") if isinstance(hardware.get("gpu"), dict) else None
+    backend = (gpu or {}).get("backend")
+    if backend == "mps":
+        return "apple_silicon"
+    if backend == "cuda":
+        v = (gpu or {}).get("vram_gb") or 0
+        return "gpu_24gb_plus" if v >= 20 else ("gpu_16gb" if v >= 12 else "gpu_8gb")
+    return "server_cpu" if (hardware.get("cpu_cores") or 0) >= 24 else "laptop_cpu"
+
+
+def load_evidence() -> dict:
+    data = _load_json(EVIDENCE_PATH)
+    return data if isinstance(data, dict) else {}
+
+
 def build_catalog(hardware: dict, stage: Optional[str] = None,
-                  lang: Optional[str] = None, q: Optional[str] = None) -> dict:
+                  lang: Optional[str] = None, q: Optional[str] = None,
+                  profile: Optional[str] = None) -> dict:
     """Assemble the full catalog: curated + live cache + user entries, merged by id."""
     curated = load_curated()
     live = load_live_cache()
@@ -166,11 +208,25 @@ def build_catalog(hardware: dict, stage: Optional[str] = None,
         disk_free_gb=hardware.get("disk_free_gb", 0.0),
     )
 
+    evidence = load_evidence()
     out = []
     for m in models:
         mm = dict(m)
         mm["fit"] = _fits(hw, mm)
+        mm["fit_basis"] = "spec"
         mm["installed"] = _installed(mm)
+        ev = evidence.get(mm.get("id"))
+        if isinstance(ev, dict):
+            mm["when"] = ev.get("when") or ""
+            mm["avoid_when"] = ev.get("avoid_when") or ""
+            mm["measured"] = ev.get("measured") or []
+            status = (ev.get("profiles") or {}).get(profile) if profile else None
+            if status in _FIT_FROM_EVIDENCE and ev.get("profile_basis") in ("measured", "spec-only"):
+                mm["fit"] = _FIT_FROM_EVIDENCE[status]
+                mm["fit_basis"] = ev["profile_basis"]
+            mm["_pref"] = 0 if status == "recommended" else (2 if status == "untested" else 1)
+            if status == "untested":
+                mm["fit_basis"] = "untested"
         out.append(mm)
 
     # Filters
@@ -210,6 +266,8 @@ def build_catalog(hardware: dict, stage: Optional[str] = None,
 
     return {
         "hardware": hardware,
+        "profile": profile,
+        "profiles": [{"key": k, "label": v["label"], "cpu_cores": v["cpu_cores"], "ram_gb": v["ram_gb"], "gpu": v["gpu"]} for k, v in PROFILES.items()],
         "models": out,
         "languages": sorted(langs.values(), key=lambda x: x["code"]),
         "source": {
@@ -219,13 +277,13 @@ def build_catalog(hardware: dict, stage: Optional[str] = None,
     }
 
 
-def plan_route(src: str, tgt: str, hardware: dict) -> dict:
+def plan_route(src: str, tgt: str, hardware: dict, profile: Optional[str] = None) -> dict:
     """Best installed-or-installable chain for a language pair.
 
     Falls back to an English pivot (src->en->tgt) when no direct MT pair exists,
     flagged in the note. missing lists model ids not installed.
     """
-    cat = build_catalog(hardware)
+    cat = build_catalog(hardware, profile=profile)
     models = cat["models"]
 
     def pick(stage: str, langs_filter: list[str]) -> Optional[dict]:

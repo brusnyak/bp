@@ -1,0 +1,16 @@
+{
+  "state": "done",
+  "progress": 1,
+  "current": null,
+  "log_tail": [
+    "download faster-whisper-base -> models/...",
+    "installed faster-whisper-base",
+    "download Helsinki-NLP--opus-mt-en-sk -> models/...",
+    "converting to CT2",
+    "installed Helsinki-NLP--opus-mt-en-sk",
+    "piper-en_US-lessac-medium already installed",
+    "done"
+  ],
+  "error": null,
+  "ids": ["faster-whisper-base", "Helsinki-NLP--opus-mt-en-sk", "piper-en_US-lessac-medium"]
+}
