@@ -11,7 +11,7 @@
     <link rel="apple-touch-icon" href="/ui/images/icon-192.png" />
     <link rel="stylesheet" href="/ui/global-styles.css" />
     <link rel="stylesheet" href="/ui/site.css?v=20261105" />
-    <link rel="stylesheet" href="/ui/live-speech/live-style.css?v=20261115-local" />
+    <link rel="stylesheet" href="/ui/live-speech/live-style.css?v=20261115c" />
     <script src="/ui/vendor/chart.min.js"></script>
     <script>
       // PWA shell: register the service worker (control-room installable, UI resilient offline).
@@ -148,7 +148,15 @@
 
       <details class="more" id="moreOptions">
         <summary data-i18n>More</summary>
-        <div class="more-grid">
+        <!-- Interface language — prominent at top -->
+        <section class="more-section" id="more-language">
+          <h2 data-i18n>Interface language</h2>
+          <div class="control-group"><div class="lang-slot"></div></div>
+        </section>
+        <!-- Route & models -->
+        <section class="more-section" id="more-route">
+          <h2 data-i18n>Route &amp; models</h2>
+          <a class="btn btn-secondary" href="/ui/models/models.html?v=20261115b" data-i18n>Models</a>
           <div class="control-group" id="playback-rate-group">
             <label for="playbackRateSelect" data-i18n>Translation speed</label>
             <select id="playbackRateSelect" class="control-select" aria-label="Translation playback speed" aria-describedby="rateHelp">
@@ -159,7 +167,10 @@
             </select>
             <p id="rateHelp" data-i18n>Auto speeds up only while behind (up to +45%, pitch kept).</p>
           </div>
-
+        </section>
+        <!-- Voice & engine -->
+        <section class="more-section" id="more-voice">
+          <h2 data-i18n>Voice &amp; engine</h2>
           <div class="control-group" id="voice-selection-group">
             <label for="speakerVoiceSelect" data-i18n>Voice reference</label>
             <select
@@ -171,7 +182,6 @@
               <!-- Local references are loaded here -->
             </select>
           </div>
-
           <div class="control-group route-advanced">
             <details><summary data-i18n>Advanced voice profile</summary><label for="ttsModelSelect" data-i18n>Speech engine</label>
             <select id="ttsModelSelect" class="model-select">
@@ -190,14 +200,16 @@
               <option value="chunks">Fixed 2 s windows (old)</option>
             </select></details>
           </div>
-
-
           <section class="control-group">
             <h2 data-i18n>Voice reference</h2>
             <button id="recordVoiceBtn" class="btn btn-secondary" type="button" data-i18n>Voice reference (record or choose a file)</button>
             <button id="deleteVoiceReferenceBtn" class="btn btn-secondary" type="button" data-i18n>Delete selected reference</button>
             <p data-i18n>Up to 5 files. WAV, M4A, MP3 or WebM. Maximum 15 MB and 60 seconds each.</p>
           </section>
+        </section>
+        <!-- Room & meeting -->
+        <section class="more-section" id="more-room">
+          <h2 data-i18n>Room &amp; meeting</h2>
           <div class="control-group" id="room-broadcast-group">
             <label for="roomIdInput" data-i18n>Audience broadcast (room mode)</label>
             <div class="room-create">
@@ -210,14 +222,13 @@
               <span id="roomListenerCount">0 listeners connected</span>
             </div>
           </div>
-
           <section class="control-group">
             <h2 data-i18n>Sending the translation into a meeting?</h2>
             <p class="hint-text" id="virtualMicHint">Choose a virtual cable as the output, then select it as the microphone in your meeting app.</p>
             <p class="hint-text" data-i18n>Use BlackHole on macOS or VB-Cable on Windows. The page cannot tell whether the meeting is listening to the cable.</p>
           </section>
-          <div class="control-group"><h2 data-i18n>Interface language</h2><div class="lang-slot"></div></div>
-        </div>
+        </section>
+      </details>
       <details class="diagnostics" id="diagnostics">
         <summary data-i18n>Diagnostics: latency and activity log</summary>
       <!-- Latency Metrics -->
@@ -372,7 +383,7 @@
     <script src="/ui/live-speech/session-playback.js"></script>
     <script src="/ui/shared/caps.js"></script>
     <script src="/ui/shared/lang-picker.js"></script>
-    <script src="/ui/live-speech/live-script.js?v=20261115-local"></script>
+    <script src="/ui/live-speech/live-script.js?v=20261115b"></script>
     <script src="/ui/live-speech/live-langs.js"></script>
     <script src="/ui/i18n/i18n.js"></script>
   </body>

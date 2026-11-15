@@ -36,8 +36,8 @@ def test_supported_formats_round_trip(test_client, headers, suffix, codec, tmp_p
     name = response.json()["name"]
     assert name.endswith("." + suffix)
     assert test_client.get("/api/voice-reference", headers=headers).json() == [{"name": name}]
-    assert Path(bm.SPEAKER_VOICES_DIR, name).read_bytes() == target.read_bytes()
-    assert bm.authorize_speaker_wav(name) == str(Path(bm.SPEAKER_VOICES_DIR, name))
+    assert Path(bm.VOICES_DIR, name).read_bytes() == target.read_bytes()
+    assert bm.authorize_speaker_wav(name) == str(Path(bm.VOICES_DIR, name))
     other = {"Authorization": "Bearer " + test_client.post("/api/guest").json()["token"]}
     assert test_client.get("/api/voice-reference", headers=other).json() == [{"name": name}]
     assert test_client.delete("/api/voice-reference", headers=other, params={"name": name}).status_code == 200
@@ -52,7 +52,7 @@ def test_reference_selected_by_exact_filename_for_synthesis(test_client, headers
     monkeypatch.setattr(app, "initialize_all_models", initialize)
     response = test_client.post("/initialize", headers=headers, params={"source_lang": "en", "target_lang": "sk", "tts_model_choice": "omnivoice", "speaker_wav_path": name})
     assert response.status_code == 200
-    assert initialize.call_args.kwargs["speaker_wav_path"] == str(Path(bm.SPEAKER_VOICES_DIR, name))
+    assert initialize.call_args.kwargs["speaker_wav_path"] == str(Path(bm.VOICES_DIR, name))
 
 
 def test_five_file_limit_and_no_duplicate_overwrites(test_client, headers):
@@ -67,18 +67,18 @@ def test_five_file_limit_and_no_duplicate_overwrites(test_client, headers):
 @pytest.mark.parametrize("seconds,status", [(60, 200), (60.01, 413), (80, 413)])
 def test_duration_limit(test_client, headers, seconds, status):
     assert upload(test_client, headers, wav(seconds)).status_code == status
-    assert len(list(Path(bm.SPEAKER_VOICES_DIR).iterdir())) == (1 if status == 200 else 0)
+    assert len(list(Path(bm.VOICES_DIR).iterdir())) == (1 if status == 200 else 0)
 
 
 def test_size_limit_does_not_store_partial_upload(test_client, headers):
     assert upload(test_client, headers, b"x" * (15 * 1024 * 1024 + 1)).status_code == 413
-    assert list(Path(bm.SPEAKER_VOICES_DIR).iterdir()) == []
+    assert list(Path(bm.VOICES_DIR).iterdir()) == []
 
 
 @pytest.mark.parametrize("name,data,status", [("bad.exe", wav(), 415), ("bad.ogg", wav(), 415), ("fake.wav", b"not audio", 422), ("empty.wav", b"", 422), ("disguised.mp3", wav(), 422)])
 def test_invalid_file_rejected(test_client, headers, name, data, status):
     assert upload(test_client, headers, data, name).status_code == status
-    assert list(Path(bm.SPEAKER_VOICES_DIR).iterdir()) == []
+    assert list(Path(bm.VOICES_DIR).iterdir()) == []
 
 
 def test_upload_name_is_sanitized(test_client, headers):
@@ -86,7 +86,7 @@ def test_upload_name_is_sanitized(test_client, headers):
     assert response.status_code == 200
     name = response.json()["name"]
     assert name.startswith("voice_") and name.endswith(".wav")
-    assert Path(bm.SPEAKER_VOICES_DIR, name).is_file()
+    assert Path(bm.VOICES_DIR, name).is_file()
 
 
 @pytest.mark.parametrize("name", ["../outside.wav", "..\\outside.wav", "/tmp/outside.wav", "a/../voice.wav", "..", ""])
@@ -99,7 +99,7 @@ def test_selection_and_delete_traversal_rejected(test_client, headers, name):
 
 def test_symlink_reference_cannot_read_or_remove_external_file(test_client, headers, tmp_path):
     outside = tmp_path / "outside.wav"; outside.write_bytes(wav())
-    Path(bm.SPEAKER_VOICES_DIR, "link.wav").symlink_to(outside)
+    Path(bm.VOICES_DIR, "link.wav").symlink_to(outside)
     assert test_client.get("/api/voice-reference", headers=headers).json() == []
     assert test_client.delete("/api/voice-reference", headers=headers, params={"name": "link.wav"}).status_code == 400
     assert outside.exists()

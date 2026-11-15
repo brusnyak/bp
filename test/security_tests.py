@@ -34,7 +34,7 @@ def test_missing_jwt_secret_persists_random_secret(monkeypatch, tmp_path):
 
 
 def test_voice_path_helpers_block_traversal(tmp_path, monkeypatch):
-    monkeypatch.setattr(bm, "SPEAKER_VOICES_DIR", str(tmp_path))
+    monkeypatch.setattr(bm, "VOICES_DIR", str(tmp_path))
     for bad in ("../x.wav", "..\\x.wav", "/etc/passwd", "sub/../../x.wav"):
         with pytest.raises(HTTPException):
             bm._voice_path(bad)
@@ -46,7 +46,7 @@ def test_voice_path_helpers_block_traversal(tmp_path, monkeypatch):
 
 
 def test_speaker_wav_path_limited_to_voices_dir(tmp_path, monkeypatch):
-    monkeypatch.setattr(bm, "SPEAKER_VOICES_DIR", str(tmp_path))
+    monkeypatch.setattr(bm, "VOICES_DIR", str(tmp_path))
     inside = str(tmp_path / "1_a.wav")
     assert bm._safe_speaker_wav(inside) == inside
     assert bm._safe_speaker_wav(None) is None
