@@ -513,29 +513,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }, 1000); // Reset after 1 second
 
-                    if (latencyChart) {
-                        const currentTime = performance.now() / 1000;
-                        const relativeTime = currentTime - sessionStartTime;
-                        
-                        // Calculate timing for chart visualization
-                        const sttDuration = message.metrics.stt_time || 0;
-                        const mtDuration = message.metrics.mt_time || 0;
-                        const ttsDuration = message.metrics.tts_time || 0;
-                        const totalDuration = sttDuration + mtDuration + ttsDuration;
-                        
-                        // Add speech period marker (input active during STT)
-                        const speechStart = relativeTime - totalDuration;
-                        const speechEnd = speechStart + sttDuration;
-                        
-                        // Add translation period marker (translation active during MT + TTS)
-                        const translationStart = speechEnd;
-                        const translationEnd = translationStart + mtDuration + ttsDuration;
-                        
-                        updateLatencyChart(relativeTime, speechStart, speechEnd, translationStart, translationEnd);
-                        console.log(`Frontend: Chart updated - Speech: ${speechStart.toFixed(2)}s-${speechEnd.toFixed(2)}s, Translation: ${translationStart.toFixed(2)}s-${translationEnd.toFixed(2)}s`);
-                    } else {
-                        console.warn('Frontend: Latency chart not initialized when receiving final_metrics.');
-                    }
+                } else if (message.type === 'lag_trace') {
+                    window.updateLatencyChart(message);
                 } else if (message.type === 'status' || message.type === 'notification') {
                     showNotification(message.message, message.type === 'notification' ? message.type : 'info');
                 } else if (message.type === 'mt_conversion_status') {
@@ -1947,131 +1926,153 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Chart.js for Latency Timeline
+    // Server-send lag only. Browser output and physical-device queues are unmeasured.
     function initializeLatencyChart() {
-        const latencyTimelineChartCanvas = document.getElementById('latencyTimelineChart');
-        if (latencyTimelineChartCanvas) {
-            const ctx = latencyTimelineChartCanvas.getContext('2d');
-            latencyChart = new Chart(ctx, { // Assign to the global latencyChart
-                type: 'line',
-                data: {
-                    labels: Array.from({ length: 60 }, (_, i) => `${i}s`), // 0s to 60 seconds
-                    datasets: [
-                        {
-                            label: 'Input',
-                            data: [],
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            fill: true,
-                            stepped: true,
-                        },
-                        {
-                            label: 'Translation Output',
-                            data: [],
-                            borderColor: 'rgba(153, 102, 255, 1)',
-                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                            fill: true,
-                            stepped: true,
-                        }
-                    ]
+        const canvas = document.getElementById('latencyTimelineChart');
+        if (!canvas) return;
+        const readout = document.getElementById('lagTraceSummary');
+        const limit = 30;
+        const traces = [];
+        let fragmentNumber = 0;
+        const parts = ['hold_ms', 'stt_ms', 'mt_ms', 'tts_first_ms'];
+        const labels = ['Hold', 'STT', 'MT', 'TTS-first', 'Queue / other (unattributed)'];
+        const tokenNames = ['--primary-color', '--log-success-color', '--secondary-color', '--deep-berry', '--border-color'];
+        const finite = value => typeof value === 'number' && Number.isFinite(value);
+        const fmt = value => finite(value) ? `${Math.round(value)} ms` : 'unmeasured';
+        const percentile = (sorted, p) => {
+            const index = (sorted.length - 1) * p;
+            const lo = Math.floor(index), hi = Math.ceil(index);
+            return sorted[lo] + (sorted[hi] - sorted[lo]) * (index - lo);
+        };
+        const overlay = {
+            id: 'fragmentLagLabels',
+            afterDatasetsDraw(chart) {
+                const {ctx, chartArea, scales: {x, y}} = chart;
+                ctx.save();
+                ctx.fillStyle = chart.options.color;
+                ctx.strokeStyle = chart.options.color;
+                ctx.setLineDash([5, 4]);
+                ctx.beginPath();
+                ctx.moveTo(chartArea.left, y.getPixelForValue(2000));
+                ctx.lineTo(chartArea.right, y.getPixelForValue(2000));
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.textAlign = 'right';
+                ctx.fillText('Goal 2000 ms', chartArea.right, y.getPixelForValue(2000) - 5);
+                ctx.textAlign = 'center';
+                traces.forEach((trace, i) => {
+                    const total = trace.total_ms;
+                    ctx.save();
+                    // Vertical labels remain separate even with 30 fragments on a phone.
+                    ctx.translate(x.getPixelForValue(i), Math.max(chartArea.top + 4,
+                        y.getPixelForValue(finite(total) && total >= 0 ? total : 0) - 5));
+                    ctx.rotate(-Math.PI / 2);
+                    ctx.textAlign = 'left';
+                    ctx.fillText(finite(total) ? `${Math.round(total)} ms` : 'n/a', 0, 0);
+                    ctx.restore();
+                });
+                ctx.restore();
+            }
+        };
+        latencyChart = new Chart(canvas.getContext('2d'), {
+            type: 'bar',
+            data: {labels: [], datasets: labels.map(label => ({label, data: [], stack: 'lag', borderWidth: 1}))},
+            plugins: [overlay],
+            options: {
+                responsive: true, maintainAspectRatio: false, animation: false,
+                layout: {padding: {top: 55}},
+                scales: {
+                    x: {stacked: true, title: {display: true, text: 'Fragment (last 30)'}},
+                    y: {stacked: true, beginAtZero: true, suggestedMax: 2500,
+                        title: {display: true, text: 'Speech end → first server audio send (ms)'}}
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            type: 'linear', // Change to linear scale
-                            min: 0,
-                            max: 60, // Show 60 seconds of data
-                            title: {
-                                display: true,
-                                text: 'Time (seconds)'
-                            },
-                            ticks: {
-                                stepSize: 10 // Show ticks every 10 seconds
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            max: 2, // 0 for idle, 1 for input, 2 for translation
-                            ticks: {
-                                callback: function (value, index, ticks) {
-                                    if (value === 0) return 'Idle';
-                                    if (value === 1) return 'Input';
-                                    if (value === 2) return 'Translation';
-                                    return '';
-                                }
-                            },
-                            title: {
-                                display: true,
-                                text: 'Activity'
+                plugins: {
+                    legend: {position: 'bottom', labels: {boxWidth: 10}},
+                    tooltip: {
+                        callbacks: {
+                            title: items => traces[items[0].dataIndex].text,
+                            label: item => `${item.dataset.label}: ${fmt(item.raw)}`,
+                            afterBody: items => {
+                                const trace = traces[items[0].dataIndex];
+                                return [
+                                    ...parts.map((key, i) => `${labels[i]} measured: ${fmt(trace[key])}`),
+                                    `Total: ${fmt(trace.total_ms)}`,
+                                    trace.overlap ? 'Parts overlap/exceed total; total shown as unattributed.' : 'Other includes unmeasured work; browser playback is excluded.'
+                                ];
                             }
                         }
-                    },
-                    animation: false // Disable animation for real-time feel
+                    }
                 }
+            }
+        });
+        function applyTheme() {
+            const style = getComputedStyle(canvas);
+            const ink = style.getPropertyValue('--text-color').trim() || style.color;
+            const border = style.getPropertyValue('--border-color').trim();
+            latencyChart.options.color = ink;
+            latencyChart.options.plugins.legend.labels.color = ink;
+            for (const axis of Object.values(latencyChart.options.scales)) {
+                axis.ticks.color = ink;
+                axis.title.color = ink;
+                axis.grid.color = border;
+            }
+            latencyChart.data.datasets.forEach((dataset, i) => {
+                dataset.backgroundColor = style.getPropertyValue(tokenNames[i]).trim() || ink;
+                dataset.borderColor = ink;
             });
-
-            // Function to update chart data with speech/translation timing
-            window.updateLatencyChart = function (currentTime, speechStart, speechEnd, translationStart, translationEnd) {
-                if (!latencyChart) return;
-
-                const inputDataset = latencyChart.data.datasets[0];
-                const translationDataset = latencyChart.data.datasets[1];
-
-                // Add data points for speech period
-                if (speechStart !== undefined && speechEnd !== undefined) {
-                    // Mark speech start
-                    inputDataset.data.push({ x: speechStart, y: 1 });
-                    translationDataset.data.push({ x: speechStart, y: 0 });
-                    
-                    // Mark speech end
-                    inputDataset.data.push({ x: speechEnd, y: 1 });
-                    translationDataset.data.push({ x: speechEnd, y: 0 });
-                    
-                    // Mark translation start
-                    inputDataset.data.push({ x: translationStart, y: 0 });
-                    translationDataset.data.push({ x: translationStart, y: 2 });
-                    
-                    // Mark translation end
-                    inputDataset.data.push({ x: translationEnd, y: 0 });
-                    translationDataset.data.push({ x: translationEnd, y: 2 });
-                    
-                    // Return to idle
-                    inputDataset.data.push({ x: currentTime, y: 0 });
-                    translationDataset.data.push({ x: currentTime, y: 0 });
-                }
-
-                // Keep only the last 60 seconds of data for better visibility
-                const maxTime = 60;
-                const minTime = Math.max(0, currentTime - maxTime);
-                
-                // Filter out old data points
-                inputDataset.data = inputDataset.data.filter(point => point.x >= minTime);
-                translationDataset.data = translationDataset.data.filter(point => point.x >= minTime);
-
-                // Update x-axis to show a rolling 60-second window
-                latencyChart.options.scales.x.min = minTime;
-                latencyChart.options.scales.x.max = Math.max(maxTime, currentTime);
-
-                latencyChart.update();
-            };
-
-            // Function to reset chart data
-            window.resetLatencyChart = function () {
-                if (!latencyChart) return;
-
-                latencyChart.data.labels = [];
-                latencyChart.data.datasets[0].data = [];
-                latencyChart.data.datasets[1].data = [];
-
-                // Reset scales
-                latencyChart.options.scales.x.min = 0;
-                latencyChart.options.scales.x.max = 300;
-
-                latencyChart.update();
-            };
+            latencyChart.update('none');
         }
+        function summarize() {
+            const valid = traces.filter(t => finite(t.total_ms) && t.total_ms >= 0);
+            if (!valid.length) {
+                readout.textContent = 'Waiting for measured fragment lag. Window: last 30 fragments. Browser playback excluded.';
+                return;
+            }
+            const sorted = valid.map(t => t.total_ms).sort((a, b) => a - b);
+            const timed = valid.filter(t => finite(t.speech_end));
+            let drift = null;
+            if (timed.length > 1) {
+                const meanX = timed.reduce((sum, t) => sum + t.speech_end, 0) / timed.length;
+                const meanY = timed.reduce((sum, t) => sum + t.total_ms, 0) / timed.length;
+                const variance = timed.reduce((sum, t) => sum + (t.speech_end - meanX) ** 2, 0);
+                if (variance > 0) drift = timed.reduce((sum, t) => sum +
+                    (t.speech_end - meanX) * (t.total_ms - meanY), 0) / variance * 60000;
+            }
+            readout.textContent = `Last ${traces.length}/30 fragments · ${valid.length} measured · Median ${fmt(percentile(sorted, .5))} · p90 ${fmt(percentile(sorted, .9))} · Drift ${finite(drift) ? `${Math.round(drift)} ms/min of speech` : 'unmeasured'} · Server send; browser playback excluded.`;
+        }
+        window.updateLatencyChart = function (trace) {
+            // Legacy five-timestamp calls cannot supply fragment lag; never invent it.
+            if (!trace || trace.type !== 'lag_trace') return;
+            const measured = parts.map(key => finite(trace[key]) && trace[key] >= 0 ? trace[key] : null);
+            const known = measured.reduce((sum, value) => sum + (value ?? 0), 0);
+            const validTotal = finite(trace.total_ms) && trace.total_ms >= 0;
+            const overlap = validTotal && known > trace.total_ms;
+            traces.push({...trace, number: ++fragmentNumber, overlap});
+            if (traces.length > limit) traces.shift();
+            latencyChart.data.labels = traces.map(t => `#${t.number}`);
+            latencyChart.data.datasets.forEach((dataset, i) => {
+                dataset.data = traces.map(t => {
+                    if (!finite(t.total_ms) || t.total_ms < 0) return null;
+                    if (i === 4) return t.overlap ? t.total_ms : t.total_ms - parts.reduce((sum, key) =>
+                        sum + (finite(t[key]) && t[key] >= 0 ? t[key] : 0), 0);
+                    return t.overlap ? null : (finite(t[parts[i]]) && t[parts[i]] >= 0 ? t[parts[i]] : null);
+                });
+            });
+            summarize();
+            latencyChart.update('none');
+        };
+        window.resetLatencyChart = function () {
+            traces.length = 0;
+            fragmentNumber = 0;
+            latencyChart.data.labels = [];
+            latencyChart.data.datasets.forEach(dataset => { dataset.data = []; });
+            summarize();
+            latencyChart.update('none');
+        };
+        new MutationObserver(applyTheme).observe(document.documentElement,
+            {attributes: true, attributeFilter: ['data-theme', 'class']});
+        applyTheme();
+        summarize();
     }
 
     // Initialize the chart

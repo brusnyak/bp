@@ -1,4 +1,5 @@
 import logging
+from backend.lag_trace import build_lag_trace
 import sys
 import asyncio
 import threading
@@ -1738,13 +1739,33 @@ def _stt_prompt(session_data) -> Optional[str]:
     return (f"{base} {tail}".strip()) or None
 
 
+async def _send_fragment_lag_trace(websocket, trace):
+    """One trace per fragment, at first successful audio send or terminal no-audio result."""
+    if trace is None or trace["sent"]:
+        return
+    trace["sent"] = True
+    payload = build_lag_trace(**trace["values"])
+    try:
+        await websocket.send_text(json.dumps(payload))
+    except Exception as exc:
+        logging.debug("Lag trace send failed: %s", exc)
+    if os.environ.get("BP_LOG_SESSIONS") == "1":
+        try:
+            os.makedirs(os.path.join("processed", "sessions"), exist_ok=True)
+            with open(os.path.join("processed", "sessions", "lag_trace.jsonl"), "a", encoding="utf-8") as log:
+                log.write(json.dumps(payload, ensure_ascii=False) + "\n")
+        except OSError as exc:
+            logging.warning("Lag trace log failed (non-fatal): %s", exc)
+
+
 async def _process_speech_segment_pipeline(
     websocket: WebSocket, audio_segment_np: np.ndarray, segment_start_time: float, is_final: bool = True,
     session_config: Dict[str, Any] = None, # Add session_config parameter
     tts_seq: Optional[int] = None,  # emission order: TTS of segment N may not start before segment N-1 finished
     pretranscribed: Optional[str] = None,  # incremental mode: text already agreed by the streaming transcriber, skip STT
     source_span: Optional[tuple] = None,  # stream-clock (start_s, end_s) of the source words, reported to clients
-    source_onset_time: Optional[float] = None  # server-clock first source sample of this utterance
+    source_onset_time: Optional[float] = None,  # server-clock first source sample of this utterance
+    lag_trace=None
 ):
     """Processes a detected speech segment: STT -> MT -> TTS -> Send audio."""
     if session_config is None:
@@ -1803,6 +1824,9 @@ async def _process_speech_segment_pipeline(
                 await websocket.send_bytes(payload)
                 if first_audio_sent_time is None:
                     first_audio_sent_time = time.perf_counter()
+                    if lag_trace is not None:
+                        lag_trace["values"]["playback_at"] = first_audio_sent_time
+                        await _send_fragment_lag_trace(websocket, lag_trace)
                 _log_session_event(client_info, {"type": message_type, "dir": "out",
                     "bytes": len(payload) if hasattr(payload, "__len__") else -1})
             else:
@@ -1915,6 +1939,8 @@ async def _process_speech_segment_pipeline(
             logging.info(f"Backend: Session {client_info}: Source and target languages are the same ({source_lang}). Skipping machine translation.")
         logging.info(f"Backend: Session {client_info}: MT completed for {source_lang}-{target_lang}. Translated: {_log_text(translated_text)}. Time: {mt_total_time:.2f}s")
 
+        if lag_trace is not None and source_lang != target_lang:
+            lag_trace["values"]["mt_s"] = mt_total_time
         if not translated_text:
             logging.warning(f"Backend: Session {client_info}: MT produced no translated text for {_log_text(transcribed_text)} (Final: {is_final}). Skipping TTS.")
             await safe_send("translation_result", {"type": "translation_result", "translated": "", "is_final": is_final, "metrics": {"mt_time": mt_total_time}})
@@ -1959,6 +1985,8 @@ async def _process_speech_segment_pipeline(
     # --- TTS ---
     websocket.timestamps["tts_start"].append(time.perf_counter())
     tts_start_time = time.perf_counter()
+    if lag_trace is not None:
+        lag_trace["values"]["tts_started_at"] = tts_start_time
 
     audio_wav = None
     sample_rate = None
@@ -2090,7 +2118,7 @@ async def _process_speech_segment_pipeline(
 # does not preempt that specific blocking call — asyncio defers the CancelledError until that
 # call returns, then stops before the next stage/send. Worst-case barge-in lag is bounded by
 # whichever single stage is in flight, not the whole pipeline. Real numbers in the doc above.
-async def _run_pipeline_task(websocket, audio_segment_np, segment_start_time, is_final, session_config, client_info, pretranscribed=None, source_span=None, source_onset_time=None):
+async def _run_pipeline_task(websocket, audio_segment_np, segment_start_time, is_final, session_config, client_info, pretranscribed=None, source_span=None, source_onset_time=None, lag_trace=None):
     # T044: every real (SILENCE_TIMEOUT-triggered) segment resets the captioner's buffer, so its
     # partials don't bleed across utterance boundaries. All call sites now funnel through here,
     # so one reset call covers every trigger point instead of duplicating it at each of them.
@@ -2111,7 +2139,7 @@ async def _run_pipeline_task(websocket, audio_segment_np, segment_start_time, is
     try:
         if session_data.get("capture_generation", 0) != generation:
             return
-        await _process_speech_segment_pipeline(websocket, audio_segment_np, segment_start_time, is_final=is_final, session_config=session_config, tts_seq=seq, pretranscribed=pretranscribed, source_span=source_span, source_onset_time=source_onset_time)
+        await _process_speech_segment_pipeline(websocket, audio_segment_np, segment_start_time, is_final=is_final, session_config=session_config, tts_seq=seq, pretranscribed=pretranscribed, source_span=source_span, source_onset_time=source_onset_time, lag_trace=lag_trace)
     except asyncio.CancelledError:
         logging.info(f"Backend: Session {client_info}: Pipeline task cancelled (superseded by new speech).")
     except Exception as e:
@@ -2119,6 +2147,9 @@ async def _run_pipeline_task(websocket, audio_segment_np, segment_start_time, is
     finally:
         tasks.discard(task)
         session_data.setdefault("tts_events", {}).setdefault(seq, asyncio.Event()).set()
+        if (session_data.get("capture_active", True)
+                and session_data.get("capture_generation", 0) == generation):
+            await _send_fragment_lag_trace(websocket, lag_trace)
 
 # T044: fire-and-forget per audio chunk. Bounded to one in-flight feed() at a time via
 # captioner_lock — a chunk is dropped, never queued, if the previous call hasn't returned yet, so
@@ -2169,9 +2200,13 @@ class _IncState:
 async def _emit_fragment(websocket, session_config, client_info, session_data, text, span, source_onset_time=None, hold_s=None):
     """Translate + voice one agreed fragment; ordered with all other segments by _run_pipeline_task."""
     logging.info(f"INCR emit: hold={hold_s if hold_s is None else round(hold_s, 2)}s words={len(text.split())} span={span} text='{text[:60]}'")   # the fragment policy's share of the lag, greppable
+    emitted_at = time.perf_counter()
+    trace = {"sent": False, "values": {
+        "source_span": span, "stream_origin": session_data.get("source_clock_origin"),
+        "emitted_at": emitted_at, "hold_s": hold_s, "text": text}}
     task = asyncio.create_task(_run_pipeline_task(
         websocket, np.zeros(1, dtype=np.float32), time.perf_counter(), True, session_config, client_info,
-        pretranscribed=text, source_span=span, source_onset_time=source_onset_time))
+        pretranscribed=text, source_span=span, source_onset_time=source_onset_time, lag_trace=trace))
     session_data["active_pipeline_task"] = task
 
 
@@ -2591,6 +2626,7 @@ async def handle_audio_stream(websocket: WebSocket, token: Optional[str] = None)
                     # Browser capture/network delay is outside this server-side metric.
                     if source_clock_origin is None:
                         source_clock_origin = time.perf_counter() - len(audio_np) / AUDIO_SAMPLE_RATE
+                        session_data["source_clock_origin"] = source_clock_origin
                     received_samples += len(audio_np)
                     pre_vad_threshold_met = _queue_pre_vad_audio(
                         audio_np, audio_queue, pre_vad_buffer, pre_vad_threshold_met)
