@@ -15,23 +15,14 @@ import backend.main as bm
 from backend.registry import target_tts_engine
 
 
-class FakeDB:
-    def __enter__(self): return self
-    def __exit__(self, *args): pass
-    def query(self, *args): return self
-    def filter(self, *args): return self
-    def first(self): return SimpleNamespace(id=7, email="test@example.invalid")
-    def close(self): pass
-
-
 @pytest.fixture
 def client(monkeypatch):
-    monkeypatch.setattr(server, "_default_SessionLocal", FakeDB)
-    monkeypatch.setattr(bm, "SessionLocal", FakeDB)
     import backend.utils.auth as auth
     def decode(token):
-        if token != "valid": raise ValueError("expired")
-        return "test@example.invalid"
+        if token != "valid":
+            from fastapi import HTTPException
+            raise HTTPException(401, "expired")
+        return "1" * 32
     monkeypatch.setattr(auth, "decode_access_token", decode)
     return TestClient(server.create_app())
 
@@ -76,10 +67,9 @@ def test_http_initialize_requires_auth_before_model_loading(client, monkeypatch)
 
 
 def test_research_library_qc_and_unowned_media_are_not_public(client, monkeypatch):
-    monkeypatch.setattr(bm, "_read_speaker_voices_metadata", lambda: [{"filename": "private.wav", "user_id": 8}])
     monkeypatch.setenv("BP_LAB", "1")  # even with the Lab enabled, research media stays private
     for path in ("/ui/voice-lab/library.json", "/voice_qc/private.wav", "/processed/omnivoice/private.wav",
-                 "/speaker_voices/private.wav", "/speaker_voices/private.wav?token=valid"):
+                 "/speaker_voices/private.wav"):
         assert client.get(path).status_code == 403
     # The Lab itself is development only: hidden unless BP_LAB=1.
     assert client.get("/ui/voice-lab/lab.html").status_code == 200
@@ -87,17 +77,15 @@ def test_research_library_qc_and_unowned_media_are_not_public(client, monkeypatc
     assert client.get("/ui/voice-lab/lab.html").status_code == 404
 
 
-def test_speaker_media_requires_explicit_public_receipt_or_owner(client, monkeypatch):
+def test_speaker_media_requires_session_and_existing_local_reference(client, monkeypatch):
     from starlette.responses import Response
     async def audio(*args): return Response(b"fake-audio", media_type="audio/wav")
     monkeypatch.setattr(server._AudioOnlyStatic, "get_response", audio)
-    entries = [{"filename": "owned.wav", "user_id": 7}, {"filename": "old.wav", "user_id": None},
-               {"filename": "demo.wav", "public_demo": True}]
-    monkeypatch.setattr(bm, "_read_speaker_voices_metadata", lambda: entries)
-    assert client.get("/speaker_voices/owned.wav").status_code == 403
-    assert client.get("/speaker_voices/owned.wav?token=valid").status_code == 200
-    assert client.get("/speaker_voices/old.wav").status_code == 403
-    assert client.get("/speaker_voices/demo.wav").status_code == 200
+    Path(bm.SPEAKER_VOICES_DIR, "local.wav").write_bytes(b"reference")
+    assert client.get("/speaker_voices/local.wav").status_code == 403
+    assert client.get("/speaker_voices/local.wav?token=expired").status_code == 403
+    assert client.get("/speaker_voices/local.wav?token=valid").status_code == 200
+    assert client.get("/speaker_voices/missing.wav?token=valid").status_code == 404
 
 
 def test_mps_is_never_selected_for_ctranslate2(monkeypatch):
@@ -149,7 +137,6 @@ def test_full_route_record_binds_reviews_fingerprint_and_output(tmp_path, monkey
 def test_stop_cancels_capture_and_discards_later_bytes(monkeypatch):
     import backend.utils.auth as auth
     monkeypatch.setattr(auth, "decode_access_token", lambda token: "test@example.invalid")
-    monkeypatch.setattr(bm, "SessionLocal", FakeDB)
     class Socket:
         scope = {"client": ("test-stop", 1)}
         sent = []
@@ -190,13 +177,13 @@ def test_sdk_pools_beam_and_target_voice_separately(monkeypatch):
     asyncio.run(check())
 
 
-def test_client_voice_reference_rejects_other_users(monkeypatch, tmp_path):
+def test_client_voice_reference_requires_existing_local_file(monkeypatch, tmp_path):
     from fastapi import HTTPException
     monkeypatch.setattr(bm, "SPEAKER_VOICES_DIR", str(tmp_path))
-    monkeypatch.setattr(bm, "_read_speaker_voices_metadata", lambda: [{"filename": "mine.wav", "user_id": 7}])
-    assert bm.authorize_speaker_wav(str(tmp_path / "mine.wav"), 7)
-    with pytest.raises(HTTPException): bm.authorize_speaker_wav(str(tmp_path / "mine.wav"), 8)
-    with pytest.raises(HTTPException): bm.authorize_speaker_wav(str(tmp_path / "unknown.wav"), 7)
+    (tmp_path / "mine.wav").write_bytes(b"local-reference")
+    assert bm.authorize_speaker_wav("mine.wav") == str(tmp_path / "mine.wav")
+    with pytest.raises(HTTPException): bm.authorize_speaker_wav(str(tmp_path / "unknown.wav"))
+    with pytest.raises(HTTPException): bm.authorize_speaker_wav("../mine.wav")
 
 
 def test_runtime_missing_stt_requests_local_cache_only(monkeypatch):

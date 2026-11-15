@@ -96,8 +96,6 @@ document.addEventListener('DOMContentLoaded', () => {
     micActive = true;
     try {
       micStatus.textContent = t('Starting session…');
-      const cfg = await (await fetch('/api/auth/config')).json();
-      if (!cfg.guest_enabled) { micStatus.textContent = t('Guest sessions not enabled on this server.'); micActive = false; return; }
       const r = await fetch('/api/guest', { method: 'POST' });
       if (!r.ok) { micStatus.textContent = t('Could not start a guest session.'); micActive = false; return; }
       const d = await r.json();

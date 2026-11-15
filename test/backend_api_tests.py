@@ -11,64 +11,14 @@ import io
 # For testing, we'll use a TestClient
 from fastapi.testclient import TestClient
 from app import create_app
-from backend.main import SPEAKER_VOICES_DIR, SPEAKER_VOICES_METADATA_FILE, AUDIO_SAMPLE_RATE, initialize_all_models, _read_speaker_voices_metadata, _write_speaker_voices_metadata, get_current_user
-from backend.utils.db_manager import User
-from fastapi import Depends
-
-# Create a TestClient for the FastAPI application
+from backend.main import get_current_session
+from backend.utils.auth import GuestSession
 app = create_app()
 client = TestClient(app)
 
-# --- Fixtures for Test Setup and Teardown ---
 @pytest.fixture(scope="module", autouse=True)
-def setup_test_environment():
-    # Ensure speaker_voices directory exists for tests
-    os.makedirs(SPEAKER_VOICES_DIR, exist_ok=True)
-    # Snapshot the real registry + directory contents BEFORE the test writes its empty
-    # registry. The old teardown wrote [] and unlinked every *.wav in place, which on a
-    # machine with real recordings destroyed the user's speaker metadata for good
-    # (nothing in git to restore it from on Windows; on macOS only the committed copy
-    # saves you). Restore-instead-of-destroy, 2026-09-28.
-    meta_backup = None
-    if os.path.exists(SPEAKER_VOICES_METADATA_FILE):
-        with open(SPEAKER_VOICES_METADATA_FILE, encoding="utf-8") as f:
-            meta_backup = f.read()
-    files_before = set(os.listdir(SPEAKER_VOICES_DIR))
-    # Clear metadata file before tests
-    _write_speaker_voices_metadata([]) # Initialize as an empty list
-    yield
-    # Clean up after tests: restore the registry, remove only files the test created
-    if meta_backup is not None:
-        with open(SPEAKER_VOICES_METADATA_FILE, "w", encoding="utf-8") as f:
-            f.write(meta_backup)
-    elif os.path.exists(SPEAKER_VOICES_METADATA_FILE):
-        os.remove(SPEAKER_VOICES_METADATA_FILE)
-    for f in os.listdir(SPEAKER_VOICES_DIR):
-        if f not in files_before and (f.endswith(".wav") or f.startswith("temp_upload_")):
-            os.remove(os.path.join(SPEAKER_VOICES_DIR, f))
-
-# --- Mocking external dependencies ---
-# SANDBOX-NOTE (2026-09-28): the old mock_models fixture patched backend.main.F5_TTS,
-# an engine that no longer exists, and the translate_phrase tests below targeted a
-# /api/translate_phrase route that no longer exists either (404 for all six tests).
-# This file now smoke-tests the routes that DO exist. The deleted machinery is
-# documented here so a future F5/translate_phrase revival knows what was here.
-# (No autouse mocks: the live-simulation tests below intentionally use real models.)
-
-@pytest.fixture(scope="module")
-def mock_user():
-    """Provides a mock User object for authentication."""
-    class MockUser:
-        def __init__(self, id: int, username: str, email: str):
-            self.id = id
-            self.username = username
-            self.email = email
-    return MockUser(id=1, username="testuser", email="testuser@example.com")
-
-@pytest.fixture(scope="module", autouse=True)
-def override_get_current_user_dependency(mock_user):
-    """Overrides the get_current_user dependency for tests."""
-    app.dependency_overrides[get_current_user] = lambda: mock_user
+def override_session_dependency():
+    app.dependency_overrides[get_current_session] = lambda: GuestSession("0" * 32)
     yield
     app.dependency_overrides.clear()
 
@@ -109,7 +59,7 @@ async def test_initialize_full_pipeline_live():
     assert response.status_code == 200
     assert response.json()["status"] == "success"
     from backend.main import active_sessions
-    session = active_sessions.get("http_init_user_1")
+    session = active_sessions.get("http_init_session_00000000000000000000000000000000")
     assert session is not None
     assert session["stt_model"] is not None
     assert session["tts_engine"] is not None

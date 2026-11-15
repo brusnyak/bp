@@ -93,8 +93,7 @@ bp corpus                        # normalize/dedupe/transcribe voice clips
 | `BP_REGISTRATION_OPEN` | unset | Allow user registration (`=1` to enable) |
 | `BP_DEMO_USER` | unset | Create test@example.com / password user |
 | `BP_HOST` | `localhost` | Bind address (use `0.0.0.0` for LAN demo) |
-| `GOOGLE_CLIENT_ID` | unset | Enable Google OAuth button |
-| `JWT_SECRET` | required | HS256 secret for auth tokens |
+| `JWT_SECRET` | generated locally if unset | HS256 secret for anonymous two-hour session tokens |
 
 ---
 

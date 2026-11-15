@@ -11,22 +11,10 @@ import soundfile as sf
 import time
 import os
 from typing import Dict, Any, Optional, Tuple, List, Callable
-from fastapi import FastAPI, Depends, Request, WebSocket, WebSocketDisconnect, APIRouter, UploadFile, File, Form, HTTPException # Import Depends, Request
-from pydantic import BaseModel, Field # Import Field
-from argon2 import PasswordHasher
-from argon2.exceptions import VerifyMismatchError
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, OAuth2PasswordRequestForm # Import security components
+from fastapi import FastAPI, Depends, Request, WebSocket, WebSocketDisconnect, APIRouter, UploadFile, File, HTTPException # Import Depends, Request
+from pydantic import BaseModel # Import Field
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials # Import security components
 import uuid
-
-# Rate limiter import is optional: rate limiting only enabled via BP_ENABLE_RATE_LIMIT=1.
-try:
-    from slowapi import Limiter
-    from slowapi.util import get_remote_address
-    _SLOWAPI_AVAILABLE = True
-except ImportError:
-    Limiter = None
-    get_remote_address = None
-    _SLOWAPI_AVAILABLE = False
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', stream=sys.stdout)
@@ -43,9 +31,6 @@ if os.environ.get("BP_LOG_FILE", "1") != "0":
     except OSError:
         pass  # read-only checkout: console logging only
 
-# Initialize the database for the main application
-from backend.utils.db_manager import SQLALCHEMY_DATABASE_URL, get_db_session_and_engine, init_db, User # Import init_db and User
-from backend.utils.auth import get_password_hash, verify_password # Import auth functions
 from backend.tts.piper_tts import PiperTTS
 try:
     from backend.tts.coqui_tts import CoquiTTS
@@ -61,72 +46,18 @@ try:
 except ImportError:
     NLLBMT = None
 
-# Get engine and SessionLocal
-engine, SessionLocal = get_db_session_and_engine(SQLALCHEMY_DATABASE_URL)
-# init_db(engine) # Initialize database tables - Removed to prevent premature table creation outside of app lifespan or test setup
-
-# Pydantic Models for Request Bodies
-class RenameVoiceRequest(BaseModel):
-    old_name: str
-    new_name: str
-
-class TranslatePhraseRequest(BaseModel):
-    phrase: str
-    target_lang: str
-
-class DeleteVoiceRequest(BaseModel):
-    filename: str
-
-# New Pydantic Models for User Authentication
-class UserCreate(BaseModel):
-    username: str = Field(..., min_length=1, max_length=64)
-    email: str = Field(..., max_length=254, pattern=r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
-    password: str = Field(..., min_length=8, max_length=256)
-
-class UserLogin(BaseModel):
-    email: str
-    password: str
-
-class GoogleAuthRequest(BaseModel):
-    id_token: str
-
-from sqlalchemy.orm import Session
-from backend.utils.db_manager import get_db # Import get_db
-
-# Dependency to get the database session
-def get_db_dependency():
-    yield from get_db(SessionLocal)
-
 # Security dependency for user authentication
 security = HTTPBearer()
 
-# Rate limiter (P1) -- protect auth & upload endpoints
-# ONLY enable if explicitly requested via BP_ENABLE_RATE_LIMIT=1
-from backend.utils.auth import rate_limit_enabled
-if rate_limit_enabled() and Limiter is not None:
-    limiter = Limiter(key_func=get_remote_address)
-else:
-    limiter = None
-
-# Helper to conditionally apply rate limiting
-def rate_limit(limit: str):
-    """Conditionally apply rate limiting based on whether limiter is enabled."""
-    if limiter is None:
-        def noop_decorator(func):
-            return func
-        return noop_decorator
-    return limiter.limit(limit)
+from backend.utils.auth import rate_limit
 
 # Engine registry (T010) -- selection + licence gate + instantiation
 from backend.registry import instantiate, select, license_ok, engines as reg_engines, target_tts_engine
 
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db_dependency)):
-    from backend.utils.auth import decode_access_token
-    email = decode_access_token(credentials.credentials)
-    user = db.query(User).filter(User.email == email).first()
-    if user is None:
-        raise HTTPException(status_code=401, detail="User not found")
-    return user
+from backend.utils.auth import GuestSession, session_from_token
+
+async def get_current_session(credentials: HTTPAuthorizationCredentials = Depends(security)) -> GuestSession:
+    return session_from_token(credentials.credentials)
 
 # Removed explicit FFmpeg environment variable settings as soundfile is now used for audio I/O
 # and torchaudio is no longer a core dependency for the pipeline.
@@ -134,7 +65,6 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
 # os.environ["TORCH_USE_EXTERNAL_FFMPEG"] = "1"
 # logging.info("Backend: TORCH_USE_LIBAV set to 0. TORCH_USE_EXTERNAL_FFMPEG set to 1.")
 
-from fastapi.responses import FileResponse
 from starlette.responses import JSONResponse
 try:
     import torch  # optional: only for Tensor->numpy conversion of TTS output
@@ -143,7 +73,6 @@ except ImportError:
 import webrtcvad # Re-enabled
 from collections import deque
 import websockets.exceptions # Explicitly import websockets.exceptions
-import ffmpeg # Import ffmpeg for audio conversion
 from starlette.websockets import WebSocketState # Import WebSocketState
 
 from backend.stt.faster_whisper_stt import FasterWhisperSTT
@@ -179,7 +108,6 @@ def _effective_stt_engine(config: Dict[str, Any]) -> str:
     return engine
 DEFAULT_TTS_MODEL = "piper"
 AUDIO_SAMPLE_RATE = 16000 # Standard sample rate for VAD and STT (Reverted to 16000 Hz for VAD/STT compatibility)
-MAX_VOICE_UPLOAD_BYTES = 50 * 1024 * 1024 # /voices/upload had no size cap - unbounded file.read() into memory
 
 # Machine-aware device selection so the pipeline runs anywhere
 # (Mac M1 Pro MPS, NVIDIA CUDA, CPU-only Windows, Kaggle T4).
@@ -302,12 +230,11 @@ PRE_VAD_BUFFER_DURATION = 0.5 # seconds, how much audio to buffer before checkin
 
 # Speaker Voices Directory and Metadata
 SPEAKER_VOICES_DIR = "speaker_voices"
-SPEAKER_VOICES_METADATA_FILE = os.path.join(SPEAKER_VOICES_DIR, "speaker_voices.json")
 os.makedirs(SPEAKER_VOICES_DIR, exist_ok=True)
 
 
 def _safe_voice_name(name: str) -> str:
-    """Same character policy as /voices/upload; rejects names that are empty or only dots."""
+    """Local filename policy; rejects names that are empty or only dots."""
     cleaned = "".join(c for c in name if c.isalnum() or c in (" ", ".", "_")).strip()
     if not cleaned or not cleaned.strip("."):
         raise HTTPException(status_code=400, detail="Invalid voice name.")
@@ -316,7 +243,7 @@ def _safe_voice_name(name: str) -> str:
 
 def _voice_path(filename: str) -> str:
     """Resolve `filename` inside SPEAKER_VOICES_DIR or raise 400 (blocks ../, backslash traversal and absolute paths)."""
-    if "\\" in filename:  # not a separator on POSIX, but never produced by _safe_voice_name and is one on Windows
+    if not filename or filename in (".", "..") or "/" in filename or "\\" in filename:  # not a separator on POSIX, but never produced by _safe_voice_name and is one on Windows
         raise HTTPException(status_code=400, detail="Invalid voice path.")
     base = os.path.realpath(SPEAKER_VOICES_DIR)
     path = os.path.realpath(os.path.join(base, filename))
@@ -529,45 +456,22 @@ def get_session_lock(client_info: str) -> asyncio.Lock:
         _session_locks[client_info] = asyncio.Lock()
     return _session_locks[client_info]
 
-# --- Helper Functions for Speaker Metadata ---
-def authorize_speaker_wav(path: Optional[str], user_id: int) -> Optional[str]:
-    """Client-selected voice references require ownership, not just a safe directory."""
+def authorize_speaker_wav(path: Optional[str]) -> Optional[str]:
+    """Only existing local reference files may be selected, by filename or legacy path."""
     if not path:
         return None
-    safe = _safe_speaker_wav(path)
-    if not safe:
+    if os.path.dirname(path):
+        safe = _safe_speaker_wav(path)
+        if not safe:
+            raise HTTPException(status_code=403, detail="Voice reference is not available")
+        name = os.path.basename(safe)
+    else:
+        name = path
+    resolved = _voice_path(name)
+    if name not in _reference_names():
         raise HTTPException(status_code=403, detail="Voice reference is not available")
-    name = os.path.basename(safe)
-    entry = next((v for v in _read_speaker_voices_metadata()
-                  if (v.get("filename") or os.path.basename(v.get("path", ""))) == name), None)
-    if not entry or not (entry.get("public_demo") is True or entry.get("user_id") == user_id):
-        raise HTTPException(status_code=403, detail="Voice reference is not owned by this user")
-    return safe
+    return resolved
 
-
-def _read_speaker_voices_metadata() -> list[Dict[str, Any]]:
-    """Reads the speaker voices metadata from the JSON file."""
-    logging.debug(f"Backend: Checking for metadata file at: {SPEAKER_VOICES_METADATA_FILE}")
-    if not os.path.exists(SPEAKER_VOICES_METADATA_FILE):
-        logging.warning(f"Backend: Metadata file not found at: {SPEAKER_VOICES_METADATA_FILE}")
-        return []
-    try:
-        with open(SPEAKER_VOICES_METADATA_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except json.JSONDecodeError as e:
-        logging.error(f"Backend: Error decoding speaker voices metadata file: {e}")
-        return []
-    except Exception as e:
-        logging.error(f"Backend: Error reading speaker voices metadata file: {e}")
-        return []
-
-def _write_speaker_voices_metadata(metadata: list[Dict[str, Any]]):
-    """Writes the speaker voices metadata to the JSON file."""
-    try:
-        with open(SPEAKER_VOICES_METADATA_FILE, "w", encoding="utf-8") as f:
-            json.dump(metadata, f, indent=2)
-    except Exception as e:
-        logging.error(f"Backend: Error writing speaker voices metadata file: {e}")
 
 def get_mt_model_name(source_lang: str, target_lang: str) -> str:
     """Constructs the MT model name based on source and target languages."""
@@ -929,493 +833,114 @@ async def route_inventory():
     return {"routes": routes}
 
 
-# --- Voice Management Endpoints ---
-@router.post("/register", summary="Register a new user")
-@rate_limit("5/minute")
-async def register_user(request: Request, user: UserCreate, db: Session = Depends(get_db_dependency)):
-    if user.email.strip().lower().endswith("@guest.local"):
-        raise HTTPException(status_code=400, detail="That email address is reserved.")
-    db_user_email = db.query(User).filter(User.email == user.email).first()
-    if db_user_email:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    db_user_username = db.query(User).filter(User.username == user.username).first()
-    if db_user_username:
-        raise HTTPException(status_code=400, detail="Username already taken")
-    
-    hashed_password = get_password_hash(user.password)
-    db_user = User(username=user.username, email=user.email, hashed_password=hashed_password)
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return {"message": "User registered successfully"}
-
-@router.post("/token", summary="Login and get an access token")
-@rate_limit("10/minute")
-async def login_for_access_token(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db_dependency)):
-    user = db.query(User).filter(User.email == form_data.username).first() # username field is used for email
-    if not user or not verify_password(form_data.password, user.hashed_password):
-        raise HTTPException(status_code=401, detail="Incorrect email or password")
-
-    from backend.utils.auth import create_access_token
-    return {"access_token": create_access_token(user.email), "token_type": "bearer"}
-
-@router.post("/login", summary="Login endpoint for frontend")
-@rate_limit("10/minute")
-async def login(request: Request, user_login: UserLogin, db: Session = Depends(get_db_dependency)):
-    """
-    Login endpoint that matches the frontend's expected format.
-    Accepts JSON with email and password, returns token and user info.
-    """
-    user = db.query(User).filter(User.email == user_login.email).first()
-    if not user or not verify_password(user_login.password, user.hashed_password):
-        raise HTTPException(status_code=401, detail="Incorrect email or password")
-
-    from backend.utils.auth import create_access_token
-    return {
-        "message": "Login successful",
-        "token": create_access_token(user.email),
-        "username": user.username,
-        "email": user.email
-    }
-
-@router.get("/auth/config", summary="Public auth config (Google client id or null)")
-async def auth_config():
-    """Lets the frontend decide whether to render the real Google button.
-    Inert when GOOGLE_CLIENT_ID is unset — password login keeps working."""
-    return {"google_client_id": os.environ.get("GOOGLE_CLIENT_ID"), "guest_enabled": guest_enabled(),
-            "default_strategy": default_strategy()}
-
-
 def default_strategy() -> str:
-    """Speech cutting the live page preselects. Set per machine class by presets/*.env (BP_DEFAULT_STRATEGY); 'phrase' (the 2025-12 demo) when unset."""
-    v = os.environ.get("BP_DEFAULT_STRATEGY", "phrase")
-    return v if v in STRATEGIES else "phrase"
+    """Default cutting strategy supplied by the hardware preset."""
+    value = os.environ.get("BP_DEFAULT_STRATEGY", "phrase")
+    return value if value in STRATEGIES else "phrase"
 
 
-GUEST_EMAIL = "guest@guest.local"
-
-
-def guest_enabled() -> bool:
-    """Guest sessions let anyone try the translator without an account. On by default; BP_GUEST=0 turns them off.
-    Abuse limits: 20 guest tokens/minute per client, 2-hour tokens, at most BP_GUEST_MAX_SESSIONS live sockets."""
-    flag = (os.environ.get("BP_GUEST") or "").strip().lower()
-    return flag not in ("0", "false", "no")
+@router.get("/session/config")
+async def session_config():
+    return {"default_strategy": default_strategy()}
 
 
 def _log_text(text) -> str:
-    """Spoken words are personal data: server logs carry lengths, not content, unless BP_LOG_SESSIONS=1."""
-    if os.environ.get("BP_LOG_SESSIONS") == "1":
-        return repr(text)
-    return f"<{len(text or '')} chars>"
+    """Log lengths unless optional session logging is enabled."""
+    return repr(text) if os.environ.get("BP_LOG_SESSIONS") == "1" else f"<{len(text or '')} chars>"
 
 
-def _deny_guest(user: "User") -> None:
-    """Guests may translate but never touch stored voices (recordings belong to real accounts)."""
-    if user.email == GUEST_EMAIL:
-        raise HTTPException(status_code=403, detail="Guest sessions cannot manage voices. Create an account to prepare a personal voice.")
-
-
-@router.post("/guest", summary="Start a guest demo session (no account)")
+@router.post("/guest", summary="Start a short-lived anonymous local session")
 @rate_limit("20/minute")
-async def guest_session(request: Request, db: Session = Depends(get_db_dependency)):
-    if not guest_enabled():
-        raise HTTPException(status_code=403, detail="Guest sessions are disabled on this server.")
-    user = db.query(User).filter(User.email == GUEST_EMAIL).first()
-    if user is None:
-        # Empty password hash: password login can never match (see verify_password), so this row is token-only.
-        user = User(username="guest", email=GUEST_EMAIL, hashed_password="")
-        db.add(user)
-        db.commit()
-        db.refresh(user)
+async def guest_session(request: Request):
     from backend.utils.auth import create_access_token
-    return {"message": "Guest session", "token": create_access_token(user.email, hours=2), "username": "Guest", "email": user.email, "guest": True}
+    guest_id = uuid.uuid4().hex
+    return {"token": create_access_token(guest_id), "guest_id": guest_id}
 
-@router.post("/auth/google", summary="Login with a Google ID token")
+
+REFERENCE_EXTENSIONS = {".wav", ".m4a", ".mp3", ".webm"}
+MAX_VOICE_UPLOAD_BYTES = 15 * 1024 * 1024
+MAX_REFERENCE_SECONDS = 60
+_reference_lock = threading.Lock()
+
+
+def _reference_names():
+    from pathlib import Path
+    return sorted(p.name for p in Path(SPEAKER_VOICES_DIR).iterdir()
+                  if p.suffix.lower() in REFERENCE_EXTENSIONS and p.is_file() and not p.is_symlink())
+
+
+def _validate_reference(contents: bytes, suffix: str):
+    """Decode bounded audio, rejecting disguised files and audio longer than 60 seconds."""
+    import subprocess
+    import tempfile
+    import math
+    # ffmpeg decodes at most 61 seconds to bounded mono PCM; duration headers alone
+    # can lie (and WebM recordings often omit them). No URLs or playlists accepted.
+    formats = {".wav": "wav", ".m4a": "mov", ".mp3": "mp3", ".webm": "matroska"}
+    with tempfile.TemporaryDirectory() as directory:
+        source = os.path.join(directory, "input" + suffix)
+        with open(source, "wb") as out:
+            out.write(contents)
+        try:
+            result = subprocess.run([
+                "ffmpeg", "-v", "error", "-nostdin", "-protocol_whitelist", "file,pipe",
+                "-f", formats[suffix], "-i", source, "-map", "0:a:0", "-t", "61",
+                "-ar", "16000", "-ac", "1", "-f", "s16le", "pipe:1",
+            ], capture_output=True, timeout=15)
+        except (OSError, subprocess.TimeoutExpired):
+            raise HTTPException(status_code=422, detail="Audio decoder unavailable or timed out")
+    duration = len(result.stdout) / 32000
+    if result.returncode or not math.isfinite(duration) or duration <= 0:
+        raise HTTPException(status_code=422, detail="Invalid audio file")
+    if duration > MAX_REFERENCE_SECONDS:
+        raise HTTPException(status_code=413, detail="Voice reference exceeds 60 seconds")
+
+
+@router.post("/voice-reference", summary="Save a local voice reference", response_model=Dict[str, str])
 @rate_limit("10/minute")
-async def login_with_google(request: Request, body: GoogleAuthRequest, db: Session = Depends(get_db_dependency)):
-    """Verifies a Google Identity Services ID token, links/creates the user by
-    Google `sub`, and returns the same mock-token shape as /login so the
-    frontend storage flow is unchanged."""
-    client_id = os.environ.get("GOOGLE_CLIENT_ID")
-    if not client_id:
-        raise HTTPException(status_code=501, detail="Google login not configured. Set GOOGLE_CLIENT_ID (see documentation/supabase_auth_db_guide.md).")
+async def upload_voice_reference(request: Request, file: UploadFile = File(...),
+                                 session: GuestSession = Depends(get_current_session)):
+    from pathlib import Path
+    original = (file.filename or "").replace("\\", "/").rsplit("/", 1)[-1]
+    suffix = Path(original).suffix.lower()
+    if suffix not in REFERENCE_EXTENSIONS:
+        raise HTTPException(status_code=415, detail="Use WAV, M4A, MP3 or WebM")
+    stem = _safe_voice_name(Path(original).stem)[:100]
+    chunks, size = [], 0
     try:
-        from google.oauth2 import id_token as google_id_token
-        from google.auth.transport import requests as google_requests
-        claims = google_id_token.verify_oauth2_token(body.id_token, google_requests.Request(), client_id)
-    except ImportError:
-        raise HTTPException(status_code=501, detail="google-auth package not installed. Run: pip install -r requirements.txt")
-    except Exception:
-        raise HTTPException(status_code=401, detail="Invalid Google ID token")
-    sub = claims.get("sub")
-    email = claims.get("email")
-    if not sub or not email:
-        raise HTTPException(status_code=401, detail="Google token missing sub/email")
-    # Linking by email below would let an unverified address take over an existing account.
-    if claims.get("email_verified") is not True:
-        raise HTTPException(status_code=401, detail="Google email is not verified")
-    user = db.query(User).filter(User.google_sub == sub).first()
-    if user is None:
-        user = db.query(User).filter(User.email == email).first()
-        if user is None:
-            base = email.split("@")[0] or "user"
-            username = base
-            n = 1
-            while db.query(User).filter(User.username == username).first():
-                n += 1
-                username = f"{base}{n}"
-            user = User(username=username, email=email, hashed_password="", google_sub=sub)
-            db.add(user)
-            db.commit()
-            db.refresh(user)
-        elif user.hashed_password and not user.google_sub:
-            # A password account created with an unverified address must not be taken over (or kept alive) by linking.
-            raise HTTPException(status_code=409, detail="An account with this email already uses a password. Sign in with email and password.")
-        else:
-            user.google_sub = sub
-            db.commit()
-    from backend.utils.auth import create_access_token
-    return {
-        "message": "Login successful",
-        "token": create_access_token(user.email),
-        "username": user.username,
-        "email": user.email
-    }
-
-@router.post("/voices/upload", summary="Upload a new speaker voice", response_model=Dict[str, str])
-@rate_limit("10/minute")
-async def upload_voice(
-    request: Request,
-    file: UploadFile = File(...),
-    voice_name: str = Form(...),
-    speaker_lang: str = Form(...), # Add speaker_lang parameter
-    current_user: User = Depends(get_current_user) # Authenticated user
-):
-    """
-    Uploads a new speaker voice file and saves its metadata.
-    """
-    _deny_guest(current_user)
-    if not voice_name:
-        raise HTTPException(status_code=400, detail="Voice name cannot be empty.")
-
-    # Sanitize voice_name to create a valid filename
-    sanitized_voice_name = "".join(c for c in voice_name if c.isalnum() or c in (' ', '.', '_')).rstrip()
-    if not sanitized_voice_name:
-        raise HTTPException(status_code=400, detail="Sanitized voice name is empty. Please use a valid name.")
-
-    # Ensure the voice name is unique for the current user
-    metadata = _read_speaker_voices_metadata()
-    user_voices = [v for v in metadata if v.get("user_id") == current_user.id]
-    if any(v.get("name") == sanitized_voice_name for v in user_voices):
-        raise HTTPException(status_code=409, detail=f"Voice with name '{sanitized_voice_name}' already exists for this user.")
-
-    # Save the uploaded file
-    file_extension = os.path.splitext(file.filename)[1]
-    if not file_extension:
-        file_extension = ".wav" # Default to .wav if no extension
-    
-    # Construct a unique filename using user_id and sanitized voice name
-    filename = f"{current_user.id}_{sanitized_voice_name}{file_extension}"
-    file_path = os.path.join(SPEAKER_VOICES_DIR, filename)
-
-    try:
-        chunks, total = [], 0
-        while True:
-            chunk = await file.read(1024 * 1024)
-            if not chunk:
-                break
-            total += len(chunk)
-            if total > MAX_VOICE_UPLOAD_BYTES:   # stop reading at the cap instead of buffering the whole body
-                raise HTTPException(status_code=413, detail=f"Voice upload too large (limit {MAX_VOICE_UPLOAD_BYTES / 1_000_000:.0f} MB).")
+        while chunk := await file.read(1024 * 1024):
+            size += len(chunk)
+            if size > MAX_VOICE_UPLOAD_BYTES:
+                raise HTTPException(status_code=413, detail="Voice reference exceeds 15 MB")
             chunks.append(chunk)
-        contents = b"".join(chunks)
-
-        # Use a BytesIO object for the input to ffmpeg
-        input_audio_buffer = io.BytesIO(contents)
-        output_audio_buffer = io.BytesIO()
-
-        try:
-            # Use ffmpeg to convert the input audio (which might be webm) to WAV format
-            # and ensure it's 16kHz mono.
-            # Use ffmpeg to convert the input audio (which might be webm) to WAV format
-            # and ensure it's 16kHz mono.
-            # Construct the ffmpeg command directly
-            command = [
-                "ffmpeg",
-                "-i", "pipe:0", # Input from stdin
-                "-f", "wav", # Output format WAV
-                "-acodec", "pcm_s16le", # PCM 16-bit little-endian
-                "-ar", str(AUDIO_SAMPLE_RATE), # Sample rate
-                "-ac", "1", # Mono audio
-                "-t", "120", # cap decoded length (seconds)
-                "pipe:1" # Output to stdout
-            ]
-
-            # If the input is webm, specify the input format and codec
-            if 'webm' in (file.content_type or ""):
-                command.insert(1, "webm")
-                command.insert(1, "-f")
-                command.insert(3, "opus")
-                command.insert(3, "-acodec")
-
-            process = await asyncio.create_subprocess_exec(
-                *command,
-                stdin=asyncio.subprocess.PIPE,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
-            )
-            try:
-                stdout, stderr = await asyncio.wait_for(process.communicate(input=input_audio_buffer.getvalue()), timeout=60)
-            except asyncio.TimeoutError:
-                process.kill()
-                raise RuntimeError("FFmpeg conversion timed out")
-
-            if process.returncode != 0:
-                error_message = f"FFmpeg conversion failed. STDOUT: {stdout.decode().strip()}, STDERR: {stderr.decode().strip()}" # type: ignore
-                logging.error(f"Backend: {error_message}") # type: ignore
-                raise RuntimeError(error_message) # type: ignore
-            
-            output_audio_buffer.write(stdout)
-            output_audio_buffer.seek(0) # Rewind buffer for reading
-
-            # Now load the converted WAV audio using soundfile
-            audio_np, sr = load_audio(output_audio_buffer)
-            
-            if sr != AUDIO_SAMPLE_RATE:
-                logging.warning(f"Backend: Audio after FFmpeg conversion is not {AUDIO_SAMPLE_RATE}Hz. Resampling with soundfile.") # type: ignore
-                # load_audio already handles resampling if needed, but this log indicates a potential issue with ffmpeg command if it doesn't output 16kHz
-            
-            save_audio(file_path, audio_np, AUDIO_SAMPLE_RATE)
-            logging.info(f"Backend: Uploaded voice '{voice_name}' saved to {file_path}") # type: ignore
-
-        except Exception as e:
-            logging.error(f"Backend: Error during FFmpeg conversion or audio processing for voice '{voice_name}': {e}") # type: ignore
-            raise HTTPException(status_code=500, detail="Failed to process the uploaded audio. Use a clear WAV, MP3, M4A or WebM recording.") # type: ignore
-
-        # Update metadata
-        new_voice_entry = {
-            "id": str(len(metadata) + 1), # Simple ID generation
-            "user_id": current_user.id,
-            "name": sanitized_voice_name,
-            "filename": filename,
-            "path": file_path,
-            "language": speaker_lang, # Store the speaker language
-            "upload_time": time.time()
-        }
-        metadata.append(new_voice_entry)
-        _write_speaker_voices_metadata(metadata)
-
-        return {"status": "success", "message": f"Voice '{sanitized_voice_name}' uploaded successfully."}
-    except HTTPException:
-        # Don't let a deliberately-raised HTTPException (e.g. the 413 size-limit check above)
-        # get swallowed and rewritten to a generic 500 by the except-Exception clause below.
-        raise
-    except Exception as e:
-        logging.error(f"Backend: Error uploading voice '{voice_name}': {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to upload voice: {e}")
-
-class ProcessSessionRequest(BaseModel):
-    session: str
-    speaker_lang: str
-    items: List[Dict[str, str]]  # [{idx: "01", text: "..."}] in recording order
+    finally:
+        await file.close()
+    contents = b"".join(chunks)
+    await asyncio.to_thread(_validate_reference, contents, suffix)
+    with _reference_lock:
+        if len(_reference_names()) >= 5:
+            raise HTTPException(status_code=409, detail="At most 5 voice references; delete one first")
+        name = f"{stem}_{uuid.uuid4().hex[:12]}{suffix}"
+        path = _voice_path(name)
+        with open(path, "xb") as out:
+            out.write(contents)
+    return {"name": name}
 
 
-@router.post("/voices/process", summary="Segment an enrollment session into a training corpus")
-async def process_session(
-    body: ProcessSessionRequest,
-    current_user: User = Depends(get_current_user),
-):
-    """Collects one enrollment session's clips, resamples to 22050 Hz mono,
-    writes processed/enroll/<user>/<session>/ + speaker_voices.json, and
-    reports READY FOR TRAINING APPROVAL. Nothing trains by itself (approved-first)."""
-    import librosa
-
-    metadata = _read_speaker_voices_metadata()
-    session = "".join(c for c in body.session if c.isalnum() or c in ("-", "_")) or "take1"
-    found, total_s = [], 0.0
-    for it in body.items:
-        idx = str(it.get("idx", "")).zfill(2)
-        name = f"{session}_{idx}"
-        entry = next((v for v in metadata
-                      if v.get("user_id") == current_user.id and v.get("name") == name), None)
-        if entry is None:
-            raise HTTPException(status_code=404, detail=f"Clip not found: {name}")
-        found.append((entry, it.get("text", "")))
-    out_dir = os.path.join("processed", "enroll", str(current_user.id), session)
-    os.makedirs(out_dir, exist_ok=True)
-    entries = []
-    for entry, text in found:
-        wav, _ = librosa.load(entry["path"], sr=22050, mono=True)
-        total_s += len(wav) / 22050
-        base = os.path.basename(entry["path"])
-        root, _ = os.path.splitext(base)
-        out_wav = os.path.join(out_dir, root + "_22k.wav")
-        sf.write(out_wav, wav, 22050)
-        entries.append({"id": entry["name"], "language": body.speaker_lang,
-                        "name": entry["name"], "path": os.path.basename(out_wav),
-                        "transcript_source": "in-browser enrollment",
-                        "transcribed_text": text})
-    with open(os.path.join(out_dir, "speaker_voices.json"), "w") as f:
-        json.dump(entries, f, indent=2, ensure_ascii=False)
-    return {"status": "ready_for_approval", "clips": len(entries),
-            "seconds": round(total_s, 1), "corpus_dir": out_dir}
+@router.get("/voice-reference", summary="List local voice references")
+async def list_voice_references(session: GuestSession = Depends(get_current_session)):
+    return [{"name": name} for name in _reference_names()]
 
 
-@router.put("/voices/rename", summary="Rename an existing speaker voice", response_model=Dict[str, str])
-async def rename_voice(
-    request: RenameVoiceRequest,
-    current_user: User = Depends(get_current_user)
-):
-    """
-    Renames an existing speaker voice file and updates its metadata.
-    """
-    _deny_guest(current_user)
-    metadata = _read_speaker_voices_metadata()
-    
-    # 1. Find all voices with the requested name
-    matching_voices = [v for v in metadata if v.get("name") == request.old_name]
-    
-    if not matching_voices:
-        raise HTTPException(status_code=404, detail=f"Voice '{request.old_name}' not found.")
+@router.delete("/voice-reference", summary="Delete a local voice reference")
+async def delete_voice_reference(name: str, session: GuestSession = Depends(get_current_session)):
+    path = _voice_path(name)
+    with _reference_lock:
+        if name not in _reference_names():
+            raise HTTPException(status_code=404, detail="Voice reference not found")
+        os.remove(path)
+    return {"name": name}
 
-    # 2. Check if the user owns any of these voices
-    user_voice = next((v for v in matching_voices if v.get("user_id") == current_user.id), None)
-
-    if user_voice:
-        # User owns the voice, proceed with rename
-        # new_name becomes part of a file path: apply the same policy as /voices/upload (no separators, no ..).
-        new_name = _safe_voice_name(request.new_name)
-        if any(v.get("user_id") == current_user.id and v.get("name") == new_name for v in metadata):
-            raise HTTPException(status_code=409, detail=f"Voice with name '{new_name}' already exists for this user.")
-
-        old_filename = user_voice["filename"]
-        file_extension = os.path.splitext(old_filename)[1]
-        new_filename = f"{current_user.id}_{new_name}{file_extension}"
-
-        old_file_path = _voice_path(old_filename)
-        new_file_path = _voice_path(new_filename)
-
-        try:
-            os.rename(old_file_path, new_file_path)
-            user_voice["name"] = new_name
-            user_voice["filename"] = new_filename
-            user_voice["path"] = new_file_path
-            _write_speaker_voices_metadata(metadata)
-            logging.info(f"Backend: Renamed voice from '{request.old_name}' to '{request.new_name}' for user {current_user.id}")
-            return {"status": "success", "message": f"Voice '{request.old_name}' renamed to '{request.new_name}' successfully."}
-        except FileNotFoundError:
-            logging.error(f"Backend: File not found for voice '{request.old_name}' at {old_file_path}")
-            raise HTTPException(status_code=404, detail=f"Voice file '{request.old_name}' not found.")
-        except Exception as e:
-            logging.error(f"Backend: Error renaming voice '{request.old_name}': {e}")
-            raise HTTPException(status_code=500, detail=f"Failed to rename voice: {e}")
-    else:
-        # Voice exists but belongs to someone else (e.g., system default)
-        raise HTTPException(status_code=403, detail="Sorry, but you don't have permission to edit this file, deal with it")
-
-@router.delete("/voices/delete", summary="Delete a speaker voice", response_model=Dict[str, str])
-async def delete_voice(
-    request: DeleteVoiceRequest,
-    current_user: User = Depends(get_current_user)
-):
-    """
-    Deletes a speaker voice file and removes its metadata.
-    """
-    _deny_guest(current_user)
-    metadata = _read_speaker_voices_metadata()
-    updated_metadata = []
-    voice_deleted = False
-    for voice in metadata:
-        if voice.get("user_id") == current_user.id and voice.get("filename") == request.filename:
-            file_path = _voice_path(request.filename)
-            try:
-                os.remove(file_path)
-                logging.info(f"Backend: Deleted voice file {file_path}")
-                voice_deleted = True
-            except FileNotFoundError:
-                logging.warning(f"Backend: File not found for deletion: {file_path}. Removing metadata anyway.")
-                voice_deleted = True # Consider it deleted if file is already gone
-            except Exception as e:
-                logging.error(f"Backend: Error deleting voice file {file_path}: {e}")
-                raise HTTPException(status_code=500, detail=f"Failed to delete voice file: {e}")
-        else:
-            updated_metadata.append(voice)
-    
-    if not voice_deleted:
-        raise HTTPException(status_code=404, detail=f"Voice file '{request.filename}' not found for this user.")
-    
-    _write_speaker_voices_metadata(updated_metadata)
-    return {"status": "success", "message": f"Voice '{request.filename}' deleted successfully."}
-
-@router.get("/voices", summary="Get all speaker voices for the current user", response_model=List[Dict[str, Any]])
-async def get_voices(
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(HTTPBearer(auto_error=False)),
-    db: Session = Depends(get_db_dependency)
-):
-    """
-    Retrieves a list of speaker voices.
-    - If authenticated: returns default voices (user_id=null) + user's own voices
-    - If not authenticated: returns only default voices (user_id=null)
-    """
-    metadata = _read_speaker_voices_metadata()
-    
-    # Try to get current user if credentials provided
-    current_user = None
-    if credentials:
-        try:
-            from backend.utils.auth import decode_access_token
-            email = decode_access_token(credentials.credentials)
-            current_user = db.query(User).filter(User.email == email).first()
-        except Exception as e:
-            logging.warning(f"Backend: Failed to authenticate user for voices endpoint: {e}")
-    
-    # Return voices based on authentication status
-    if current_user:
-        # Authenticated: return default voices + user's voices
-        user_voices = [
-            {"id": v.get("id", str(uuid.uuid4())), "name": v["name"], "filename": v.get("filename") or os.path.basename(v.get("path", "")) or "unknown_filename.wav", "path": v.get("path", "unknown_path"), "language": v.get("language", "unknown"), "upload_time": v.get("upload_time", 0)}
-            for v in metadata if v.get("public_demo") is True or v.get("user_id") == current_user.id
-        ]
-        logging.info(f"Backend: Retrieved {len(user_voices)} voices for authenticated user {current_user.id}")
-    else:
-        # Unauthenticated: return only default voices
-        user_voices = [
-            {"id": v.get("id", str(uuid.uuid4())), "name": v["name"], "filename": v.get("filename") or os.path.basename(v.get("path", "")) or "unknown_filename.wav", "path": v.get("path", "unknown_path"), "language": v.get("language", "unknown"), "upload_time": v.get("upload_time", 0)}
-            for v in metadata if v.get("public_demo") is True
-        ]
-        logging.info(f"Backend: Retrieved {len(user_voices)} default voices for unauthenticated user")
-    
-    return user_voices
-
-@router.get("/voices/file", summary="Download a speaker voice file (preview/listen)")
-async def get_voice_file(
-    filename: str,
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(HTTPBearer(auto_error=False)),
-    db: Session = Depends(get_db_dependency)
-):
-    """Serve one voice file for in-browser preview. Same visibility as GET /voices
-    (default voices + the caller's own); path traversal blocked by _voice_path."""
-    metadata = _read_speaker_voices_metadata()
-    current_user = None
-    if credentials:
-        try:
-            from backend.utils.auth import decode_access_token
-            email = decode_access_token(credentials.credentials)
-            current_user = db.query(User).filter(User.email == email).first()
-        except Exception:
-            current_user = None
-    entry = next((v for v in metadata if v.get("filename") == filename), None)
-    if entry is None:
-        raise HTTPException(status_code=404, detail="Voice not found.")
-    if entry.get("public_demo") is not True and (current_user is None or entry.get("user_id") != current_user.id):
-        raise HTTPException(status_code=403, detail="Not your voice.")
-    path = _voice_path(filename)
-    if not os.path.isfile(path):
-        raise HTTPException(status_code=404, detail="Voice file missing.")
-    ext = os.path.splitext(filename)[1].lower()
-    media = {"wav": "audio/wav", "mp3": "audio/mpeg", "m4a": "audio/mp4",
-             "ogg": "audio/ogg", "flac": "audio/flac"}.get(ext.lstrip("."), "audio/wav")
-    return FileResponse(path, media_type=media, filename=filename)
 
 EAR_GRADES_PATH = os.path.join("processed", "ear_grades.json")
 
@@ -1441,18 +966,17 @@ def _write_ear_grades(store: Dict[str, Any]) -> None:
 
 
 @router.get("/ratings", summary="Read ear-grade store (Voice Lab sync)")
-async def get_ratings(current_user: User = Depends(get_current_user)):
+async def get_ratings(session: GuestSession = Depends(get_current_session)):
     """Return processed/ear_grades.json so the Lab can merge server-side
-    verdicts over browser localStorage. Authenticated like /voices/upload."""
+    verdicts over browser localStorage. Protected by an anonymous session token."""
     return _read_ear_grades()
 
 
 @router.post("/ratings", summary="Save one ear-grade verdict (Voice Lab sync)")
-async def post_rating(body: RatingIn, current_user: User = Depends(get_current_user)):
+async def post_rating(body: RatingIn, session: GuestSession = Depends(get_current_session)):
     """Merge one Lab verdict into processed/ear_grades.json. The item must
     already exist in the store (run scripts/grade_library.py first); the note
     is capped, defect values are validated. Returns the stored ear slot."""
-    _deny_guest(current_user)
     store = _read_ear_grades()
     grades = store.get("grades", [])
     entry = next((g for g in grades if g.get("name") == body.name), None)
@@ -1481,7 +1005,7 @@ async def post_rating(body: RatingIn, current_user: User = Depends(get_current_u
     if slot["updated"] >= old_updated:
         entry["ear"] = slot
         _write_ear_grades(store)
-        logging.info(f"Backend: rating saved for '{body.name}' by user {current_user.id}")
+        logging.info(f"Backend: rating saved for '{body.name}' by session {session.id}")
     return {"name": body.name, "ear": entry["ear"]}
 
 @router.get("/voice-lab/status", summary="Voice-lab system status (no auth, local eval page)")
@@ -1588,15 +1112,8 @@ async def metrics(credentials: HTTPAuthorizationCredentials = Depends(security))
     """Detailed metrics endpoint — requires auth.
     Returns model pool stats, per-session details, capacity."""
     from backend.utils.auth import decode_access_token
-    from backend.utils.db_manager import get_db
-    from sqlalchemy.orm import Session
-    
-    email = decode_access_token(credentials.credentials)
-    db = next(get_db(SessionLocal))
-    user = db.query(User).filter(User.email == email).first()
-    if not user:
-        raise HTTPException(status_code=401, detail="User not found")
-    
+    decode_access_token(credentials.credentials)
+
     pool_stats = get_model_pool_stats()
     
     # Per-session detail
@@ -2391,26 +1908,17 @@ async def handle_audio_stream(websocket: WebSocket, token: Optional[str] = None)
         return
     try:
         from backend.utils.auth import decode_access_token
-        email = decode_access_token(token)
+        guest_id = decode_access_token(token)
     except Exception:
         await websocket.close(code=4003, reason="Invalid or expired token")
         return
-    db = SessionLocal()
-    try:
-        user = db.query(User).filter(User.email == email).first()
-    finally:
-        db.close()
-    if user is None:
-        await websocket.close(code=4003, reason="User not found")
-        return
-
     # Use websocket.scope["client"] to get client host and port.
     # NOTE: app.py's websocket_endpoint (app.py:331) initializes the session under the
     # plain "host:port" key and all active_sessions lookups use client_info as that key,
-    # so client_info MUST stay "host:port" (email is only for display/logging).
+    # so client_info MUST stay "host:port".
     client_host, client_port = websocket.scope["client"]
     client_info = f"{client_host}:{client_port}"
-    logging.info(f"Client connected from {client_info} (user={email})")
+    logging.info(f"Client connected from {client_info} (guest={guest_id})")
     
     # Initialize timestamps attribute for this WebSocket connection
     websocket.timestamps = {
@@ -2547,7 +2055,7 @@ async def handle_audio_stream(websocket: WebSocket, token: Optional[str] = None)
                             new_source_lang = data.get("source_lang", session_config["source_lang"])
                             new_target_lang = data.get("target_lang", session_config["target_lang"])
                             new_tts_model_choice = data.get("tts_model_choice", session_config["tts_model_choice"])
-                            new_speaker_wav_path = authorize_speaker_wav(data.get("speaker_wav_path", session_config["speaker_wav_path"]), user.id)
+                            new_speaker_wav_path = authorize_speaker_wav(data.get("speaker_wav_path", session_config["speaker_wav_path"]))
                             new_speaker_text = data.get("speaker_text", session_config["speaker_text"])
                             new_speaker_lang = data.get("speaker_lang", session_config["speaker_lang"])
                             new_vad_enabled = data.get("vad_enabled", session_config["vad_enabled"]) # Get new VAD enabled state
@@ -2562,9 +2070,10 @@ async def handle_audio_stream(websocket: WebSocket, token: Optional[str] = None)
                             if "room_id" in data:   # room mode: this session is the speaker of that room (listeners join /ws/listen)
                                 _rid_new = str(data["room_id"])[:64] or None
                                 _r_new = _room.get_room(_rid_new, create=False) if _rid_new else None
-                                if _rid_new and (_r_new is None or (_r_new.owner is not None and _r_new.owner != user.id)):
-                                    logging.warning(f"Backend: Session {client_info}: room '{_rid_new}' does not exist or belongs to another user; speaker not attached.")
-                                    _rid_new = None
+                                if _rid_new and (_r_new is None or (_r_new.owner is not None and _r_new.owner != guest_id)):
+                                    logging.warning(f"Backend: Session {client_info}: room '{_rid_new}' does not exist or belongs to another session; speaker not attached.")
+                                    await websocket.send_text(json.dumps({"type": "error", "message": "Room is unavailable to this session"}))
+                                    continue
                                 if _r_new is not None and _rid_new:
                                     _r_new.src_lang = new_source_lang   # listeners joining later are checked against this language
                                 session_config["room_id"] = _rid_new

@@ -30,8 +30,8 @@ filled in; the procedure in §2 was superseded mid-run by the `lite` one-command
 ```bash
 sudo apt-get install -y python3.12-venv ffmpeg libsndfile1 espeak-ng build-essential python3-dev
 git clone -b <integration-tip> <repo-url> && cd bp
-python3 scripts/setup.py --dev          # venv + deps + .env + certs + voices + whisper + MT/STT conversion
-# .env is never in git -- add GOOGLE_CLIENT_ID locally (demo_preflight requires it)
+python3 scripts/setup.py --dev          # venv + deps + local signing secret + certs + voices + whisper + MT/STT conversion
+# A private .jwt_secret is generated on first run unless JWT_SECRET is supplied.
 # local-only voice assets (not in git since lite): sk_SK-personal-male-medium.onnx + .onnx.json,
 # speaker_voices/ — copy them onto a demo machine by hand (setup falls back to generic voices without them)
 ```

@@ -92,14 +92,8 @@ def main():
         step(f"Engine packages for profile '{a.profile}': {' '.join(extra_pip)}")
         pip_install(PY, *extra_pip)
 
-    step(".env (JWT secret)")
-    env_file = ROOT / ".env"
-    if not env_file.exists():
-        env_file.write_text(f"JWT_SECRET={secrets.token_urlsafe(48)}\n", encoding="utf-8")
-        print("created .env with a random JWT_SECRET")
-    elif "JWT_SECRET" not in env_file.read_text(encoding="utf-8"):
-        with env_file.open("a", encoding="utf-8") as f:
-            f.write(f"\nJWT_SECRET={secrets.token_urlsafe(48)}\n")
+    step("Local session signing secret")
+    run([PY, "-c", "from dotenv import load_dotenv; load_dotenv(); from backend.utils.auth import _jwt_secret; _jwt_secret()"])
 
     step("Self-signed localhost certificate (certs/)")
     if not (ROOT / "certs" / "cert.pem").exists():

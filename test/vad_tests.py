@@ -16,33 +16,14 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../backend')))
 
 from backend.main import (
-    handle_audio_stream, initialize_all_models, User,
+    handle_audio_stream, initialize_all_models,
     AUDIO_SAMPLE_RATE, VAD_FRAME_DURATION, SILENCE_TIMEOUT, STREAMING_CHUNK_LENGTH,
 )
 from backend.utils.audio_utils import resample_audio # Import resample_audio
-from backend.utils.auth import create_access_token, get_password_hash # JWT for WS auth
-
-TEST_EMAIL = "vad-test@bp.local"
-TEST_PASSWORD = "vad-test-pw"
-
-@pytest.fixture(autouse=True)
-def isolated_vad_auth(monkeypatch):
-    """Authenticate the stream without writing a test identity to the test speaker's database."""
-    import backend.main as bm
-    from backend.utils.db_manager import Base, get_db_session_and_engine
-    engine, sessions = get_db_session_and_engine("sqlite:///:memory:")
-    Base.metadata.create_all(bind=engine)
-    with sessions() as db:
-        db.add(User(username="vad-test", email=TEST_EMAIL,
-                    hashed_password=get_password_hash(TEST_PASSWORD)))
-        db.commit()
-    monkeypatch.setattr(bm, "SessionLocal", sessions)
-    yield
-    engine.dispose()
-
+from backend.utils.auth import create_access_token # JWT for WS auth
 
 def _auth_token():
-    return create_access_token(TEST_EMAIL)
+    return create_access_token("1" * 32)
 
 
 # Mock WebSocket for testing

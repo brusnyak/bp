@@ -164,7 +164,7 @@ def cmd_grades(args):
         import urllib.request
         token = args.token or os.environ.get("BP_TOKEN")
         if not token:
-            sys.exit("need --token or BP_TOKEN (login token from /ui/auth/auth.html)")
+            sys.exit("need --token or BP_TOKEN (anonymous token from POST /api/guest)")
         base = args.server.rstrip("/")
         req = urllib.request.Request(
             base + "/api/ratings", headers={"Authorization": "Bearer " + token})
@@ -548,7 +548,7 @@ def main():
                    help="import Lab browser ratings JSON into processed/ear_grades.json")
     p.add_argument("--pull", action="store_true",
                    help="pull ear verdicts from a running backend (/api/ratings) into processed/ear_grades.json")
-    p.add_argument("--token", default=None, help="login token for --pull (or BP_TOKEN env)")
+    p.add_argument("--token", default=None, help="anonymous session token for --pull (or BP_TOKEN env)")
     p.add_argument("--server", default="http://localhost:8000",
                    help="backend base URL for --pull")
 

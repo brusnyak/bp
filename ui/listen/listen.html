@@ -258,8 +258,6 @@
     });
 
     async function token() {
-      let t = localStorage.getItem('userToken');
-      if (t) return t;
       const r = await fetch('/api/guest', { method: 'POST' });
       const d = await r.json();
       return d.token || d.access_token;

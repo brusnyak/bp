@@ -59,8 +59,11 @@ The current API is experimental. The following wire format follows `app.py` and 
 
 | Step | Contract |
 |---|---|
-| Inspect | `GET /api/routes` for declared routes and installed assets; `GET /api/capabilities` for available engines; `GET /health` for health |
-| Authenticate | `POST /api/guest` when enabled, or JSON credentials to `POST /api/login`; response includes `token` |
+| Inspect | `GET /api/routes` for declared routes and installed assets; `GET /api/capabilities` for available engines; `GET /api/health` for health |
+| Start a session | `POST /api/guest` is always enabled; returns `{token, guest_id}` with a distinct random ID and a two-hour signed token |
+| Save a reference | `POST /api/voice-reference`, multipart `file`, Bearer token; WAV/M4A/MP3/WebM, max 15 MB and 60 s, at most five local files; returns `{name}` |
+| List references | `GET /api/voice-reference`, Bearer token; returns `[{name}]` for this machine |
+| Delete a reference | `DELETE /api/voice-reference?name=FILENAME`, Bearer token; returns `{name}` |
 | Connect | `ws://HOST:8000/ws?token=TOKEN`, or `wss://` under HTTPS. Authenticate before model loading |
 | Configure | Send JSON `{"type":"config_update","source_lang":"en","target_lang":"sk","tts_model_choice":"piper"}`; wait for `models_loading_status` and inspect route readiness |
 | Start | Send `{"type":"start"}`, then binary **16 kHz mono float32 PCM** frames. Do not send a compressed MediaRecorder container or int16 samples |
@@ -68,6 +71,8 @@ The current API is experimental. The following wire format follows `app.py` and 
 | Stop | Send `{"type":"stop"}` and clear the client's playback queue. Late work must not be played |
 | Create a room | Authenticated `POST /api/room` returns `room_id`, `listen_path` and `listen_url`. Bearer token required |
 | Listen | `/ws/listen?room=ID&lang=sk&token=TOKEN`; receives `room_caption` JSON and binary WAV. JSON `{"type":"set_lang","lang":"de"}` changes listener language |
+
+Select a reference by passing its returned `name` as `speaker_wav_path` during configuration. References are local files shared across anonymous sessions; nothing is tied to an identity database.
 
 Keep tokens out of logs and shared URLs. Preinstall assets before capture; a socket connection does not prepare the route. A successful request or loaded model does not establish language quality.
 
@@ -84,7 +89,7 @@ Complete this table with the AV/IT team before choosing the final route.
 | Which source/target languages and voices are installed and tested? | To fill in |
 | How many listeners and distinct output languages must run at once? | To fill in |
 | Can devices reach the host? Wi-Fi isolation, firewall, port, HTTPS and certificate trust? | To fill in |
-| Who administers the host, accounts, model updates and recovery? | To fill in |
+| Who administers the host, local recordings, model updates and recovery? | To fill in |
 | What consent, privacy, recording and transcript-retention rules apply? | To fill in |
 | Who checks model/voice licences and permission to use any cloned voice? | To fill in |
 | What is the fallback if translation or the network fails? | To fill in |

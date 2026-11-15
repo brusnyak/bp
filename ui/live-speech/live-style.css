@@ -66,7 +66,7 @@ summary { padding: 1rem 0; font-weight: 600; }
 .log-error, .error-text { color: var(--danger-color); }
 .log-success { color: var(--log-success-color); }
 .settings-status { font-size: .8rem; margin-top: .5rem; }
-/* Reference enrollment keeps its existing recording/upload lifecycle. */
+/* Reference recording keeps its existing recording/upload lifecycle. */
 .modal { display: none; position: fixed; inset: 0; z-index: 100; padding: 1rem; background: var(--background-color-start); overflow: auto; }
 .modal.open { display: flex; align-items: center; justify-content: center; }
 .modal-content { position: relative; width: min(100%, 760px); max-height: calc(100dvh - 2rem); overflow: auto; background: var(--surface-color); padding: 1.5rem; border: 1px solid var(--border-color); border-radius: .75rem; box-shadow: 0 5px 15px var(--shadow-color); }

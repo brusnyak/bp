@@ -11,7 +11,7 @@
     <link rel="apple-touch-icon" href="/ui/images/icon-192.png" />
     <link rel="stylesheet" href="/ui/global-styles.css" />
     <link rel="stylesheet" href="/ui/site.css?v=20261105" />
-    <link rel="stylesheet" href="/ui/live-speech/live-style.css?v=20261115" />
+    <link rel="stylesheet" href="/ui/live-speech/live-style.css?v=20261115-local" />
     <script src="/ui/vendor/chart.min.js"></script>
     <script>
       // PWA shell: register the service worker (control-room installable, UI resilient offline).
@@ -160,15 +160,15 @@
             <p id="rateHelp" data-i18n>Auto speeds up only while behind (up to +45%, pitch kept).</p>
           </div>
 
-          <div class="control-group hidden" id="voice-selection-group">
-            <label for="speakerVoiceSelect" data-i18n>Speaker voice</label>
+          <div class="control-group" id="voice-selection-group">
+            <label for="speakerVoiceSelect" data-i18n>Voice reference</label>
             <select
               id="speakerVoiceSelect"
               class="model-select"
               title="Select Speaker Voice"
               aria-label="Select speaker voice for cloning"
             >
-              <!-- Speaker voices will be dynamically loaded here -->
+              <!-- Local references are loaded here -->
             </select>
           </div>
 
@@ -194,7 +194,9 @@
 
           <section class="control-group">
             <h2 data-i18n>Voice reference</h2>
-            <button id="recordVoiceBtn" class="btn btn-secondary" type="button" data-i18n>Record or choose a file</button>
+            <button id="recordVoiceBtn" class="btn btn-secondary" type="button" data-i18n>Voice reference (record or choose a file)</button>
+            <button id="deleteVoiceReferenceBtn" class="btn btn-secondary" type="button" data-i18n>Delete selected reference</button>
+            <p data-i18n>Up to 5 files. WAV, M4A, MP3 or WebM. Maximum 15 MB and 60 seconds each.</p>
           </section>
           <div class="control-group" id="room-broadcast-group">
             <label for="roomIdInput" data-i18n>Audience broadcast (room mode)</label>
@@ -298,7 +300,7 @@
               </select>
             </div>
             <div class="modal-section">
-              <p data-i18n>Please read the following passage clearly (same script we train voices on):</p>
+              <p data-i18n>Read a short passage clearly (up to 60 seconds):</p>
               <p>
                 <button class="btn-small passage-tab" data-lang="en">English</button>
                 <button class="btn-small passage-tab" data-lang="sk">Slovenčina</button>
@@ -326,7 +328,7 @@
             </div>
             <div class="modal-section">
               <label for="speakerVoiceUploadModal" data-i18n>Upload Existing Voice (Optional):</label>
-              <input type="file" id="speakerVoiceUploadModal" accept="audio/wav" title="Upload a WAV file for voice cloning" aria-label="Upload speaker voice WAV file" class="hidden-file-input">
+              <input type="file" id="speakerVoiceUploadModal" accept=".wav,.m4a,.mp3,.webm" title="WAV, M4A, MP3 or WebM; 15 MB and 60 seconds maximum" aria-label="Choose voice reference file" class="hidden-file-input">
               <span id="currentSpeakerVoiceModal" class="info-text">No voice selected</span>
             </div>
           </div>
@@ -370,7 +372,7 @@
     <script src="/ui/live-speech/session-playback.js"></script>
     <script src="/ui/shared/caps.js"></script>
     <script src="/ui/shared/lang-picker.js"></script>
-    <script src="/ui/live-speech/live-script.js?v=20261115"></script>
+    <script src="/ui/live-speech/live-script.js?v=20261115-local"></script>
     <script src="/ui/live-speech/live-langs.js"></script>
     <script src="/ui/i18n/i18n.js"></script>
   </body>

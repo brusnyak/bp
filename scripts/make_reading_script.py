@@ -64,7 +64,7 @@ def main():
     lines += [
         "",
         "Recording spec: 2–3 min per language, quiet room, steady pace, short pauses.",
-        "Stage files in the Voice Lab upload box first, listen, then register.",
+        "Stage files in the Voice Lab upload box first, listen, then save a local reference.",
     ]
     with open(OUT, "w") as f:
         f.write("\n".join(lines) + "\n")

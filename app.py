@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from backend.cuda_libs import preload_pip_cuda_libs
 preload_pip_cuda_libs()  # pip-installed CUDA libraries on Linux (no-op elsewhere); must run before any engine import
 
-load_dotenv()  # local .env (GOOGLE_CLIENT_ID etc.) — untracked, never committed
+load_dotenv()  # optional local configuration — untracked, never committed
 
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Request
 from fastapi.responses import HTMLResponse, JSONResponse, Response
@@ -14,15 +14,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from urllib.parse import urlsplit
 import posixpath
 
-# Rate limiter import is optional: rate limiting only enabled via BP_ENABLE_RATE_LIMIT=1.
-try:
-    from slowapi import Limiter, _rate_limit_exceeded_handler
-    from slowapi.util import get_remote_address
-    from slowapi.errors import RateLimitExceeded
-    _SLOWAPI_AVAILABLE = True
-except ImportError:
-    Limiter = _rate_limit_exceeded_handler = get_remote_address = RateLimitExceeded = None
-    _SLOWAPI_AVAILABLE = False
 import asyncio
 import json
 import os
@@ -47,9 +38,7 @@ sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "backen
 import logging # Import logging
 from backend.main import initialize_all_models, handle_audio_stream, get_initialized_models, AUDIO_SAMPLE_RATE, router as backend_router
 import backend.main as backend_main # Import backend.main as an alias
-from backend.main import User, get_password_hash # Import User and get_password_hash for default user creation
-from sqlalchemy.orm import Session # Import Session
-from backend.utils.db_manager import get_db_session_and_engine, SQLALCHEMY_DATABASE_URL, get_db, init_db # Import init_db
+from backend.utils.auth import GuestSession, session_from_token
 from fastapi import UploadFile, File, Depends, Query # Import Depends, Query
 from backend.hardware_scan import autoconfigure, get_config, AutoConfig # type: ignore
 from backend.session_manager import ( # type: ignore
@@ -60,7 +49,7 @@ from backend.streaming.pipeline import ContinuousStreamingPipeline # type: ignor
 import backend.session_manager as _session_manager
 
 class _AudioOnlyStatic(StaticFiles):
-    """Serve voice clips but never speaker_voices.json (it lists every user's uploads and file paths)."""
+    """Serve voice clips but never speaker_voices.json (it lists private local filenames)."""
 
     async def get_response(self, path, scope):
         if not path.lower().endswith((".wav", ".m4a", ".mp3", ".webm", ".ogg")):
@@ -68,40 +57,13 @@ class _AudioOnlyStatic(StaticFiles):
         return await super().get_response(path, scope)
 
 
-# Define module-level engine and SessionLocal for non-test runs
-_default_engine, _default_SessionLocal = get_db_session_and_engine(SQLALCHEMY_DATABASE_URL)
-
-# Function to create a default user if no users exist, now accepts SessionLocal
-async def create_default_user_if_empty(db_session_local):
-    # A well-known account (test@example.com / password) is a backdoor on any reachable server,
-    # so it exists only when explicitly requested for local development / tests.
-    if os.environ.get("BP_DEMO_USER") != "1":
-        return
-    with db_session_local() as db:
-        if db.query(User).count() == 0:
-            default_email = "test@example.com"
-            hashed_password = get_password_hash("password")
-            db.add(User(username="testuser", email=default_email, hashed_password=hashed_password))
-            db.commit()
-            print(f"APP: BP_DEMO_USER=1 -> demo user '{default_email}' created (development only).")
-
 from contextlib import asynccontextmanager
 
 @asynccontextmanager
-async def lifespan(app: FastAPI, db_session_local_override=None):
-    """
-    Handles startup and shutdown events for the FastAPI application.
-    Uses db_session_local_override if provided, otherwise uses the default.
-    """
-    startup_time = time.time()
-    print(f"APP: Application startup initiated at {time.strftime('%H:%M:%S', time.localtime(startup_time))}")
-    
-    current_db_session_local = db_session_local_override if db_session_local_override else _default_SessionLocal
-    current_engine = current_db_session_local.kw["bind"] # Get engine from sessionmaker
-    
-    init_db(current_engine) # Initialize database tables using the correct engine
-    await create_default_user_if_empty(current_db_session_local)
-    
+async def lifespan(app: FastAPI):
+    """Start periodic cleanup and drain sessions on shutdown."""
+    from backend.utils.auth import _jwt_secret
+    _jwt_secret()  # persist a random signing secret before serving requests
     # Periodic model pool cleanup task (P0)
     cleanup_task = None
     
@@ -151,33 +113,9 @@ async def lifespan(app: FastAPI, db_session_local_override=None):
         
         print(f"APP: Application shutdown completed at {time.strftime('%H:%M:%S', time.localtime(time.time()))}")
 
-def create_app(db_session_local_override=None) -> FastAPI:
-    import os
-    print(f"DEBUG create_app: BP_ENABLE_RATE_LIMIT = {repr(os.environ.get('BP_ENABLE_RATE_LIMIT'))}")
-    _app = FastAPI(lifespan=lambda app: lifespan(app, db_session_local_override))
+def create_app() -> FastAPI:
+    _app = FastAPI(lifespan=lifespan)
     _app.include_router(backend_router, prefix="/api")
-
-    # Rate limiting (P1) -- protect auth & upload endpoints
-    # ONLY enable if explicitly requested via BP_ENABLE_RATE_LIMIT=1
-    from backend.utils.auth import rate_limit_enabled
-    if rate_limit_enabled() and _SLOWAPI_AVAILABLE:
-        limiter = Limiter(key_func=get_remote_address)
-        _app.state.limiter = limiter
-        _app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-        print("DEBUG: Rate limiter ENABLED")
-    else:
-        print("DEBUG: Rate limiter DISABLED (loopback default; BP_ENABLE_RATE_LIMIT=1 or a non-loopback BP_HOST enables it)")
-
-    # Dependency to get the database session for the app
-    def get_db_dependency_for_app():
-        db = db_session_local_override() if db_session_local_override else _default_SessionLocal()
-        try:
-            yield db
-        finally:
-            db.close()
-
-    # Override the get_db_dependency in backend.main with the app's specific one
-    _app.dependency_overrides[backend_main.get_db_dependency] = get_db_dependency_for_app
 
     class ConnectionManager:
         def __init__(self):
@@ -210,16 +148,12 @@ def create_app(db_session_local_override=None) -> FastAPI:
 
     manager = ConnectionManager()
 
-    def authenticated_user(token):
+    def authenticated_session(token):
         if not token:
             return None
         try:
-            from backend.utils.auth import decode_access_token
-            email = decode_access_token(token)
-            factory = db_session_local_override or _default_SessionLocal
-            with factory() as db:
-                return db.query(User).filter(User.email == email).first()
-        except Exception:
+            return session_from_token(token)
+        except HTTPException:
             return None
 
     @_app.middleware("http")
@@ -246,15 +180,14 @@ def create_app(db_session_local_override=None) -> FastAPI:
             filename = path.removeprefix("/speaker_voices/")
             if not filename.lower().endswith((".wav", ".m4a", ".mp3", ".webm", ".ogg")):
                 return JSONResponse(status_code=404, content={"detail": "Not found"})
-            entry = next((v for v in backend_main._read_speaker_voices_metadata()
-                          if v.get("filename") == filename), None)
             auth = request.headers.get("authorization", "")
             token = auth[7:] if auth.lower().startswith("bearer ") else request.query_params.get("token")
-            user = authenticated_user(token)
-            public = bool(entry and entry.get("public_demo") is True)
-            owned = bool(entry and user and entry.get("user_id") == user.id)
-            if not (public or owned):
+            if authenticated_session(token) is None:
                 return JSONResponse(status_code=403, content={"detail": "Private voice media."})
+            try:
+                backend_main.authorize_speaker_wav(filename)
+            except HTTPException:
+                return JSONResponse(status_code=404, content={"detail": "Not found"})
         response = await call_next(request)
         if path.startswith("/speaker_voices/"):
             response.headers["Cache-Control"] = "private, no-store"
@@ -266,13 +199,13 @@ def create_app(db_session_local_override=None) -> FastAPI:
     os.makedirs("processed/voice_qc", exist_ok=True)
     _app.mount("/ui", StaticFiles(directory="ui"), name="ui")
     _app.mount("/ui/images", StaticFiles(directory="ui/images"), name="images") # Explicitly mount images
-    _app.mount("/speaker_voices", _AudioOnlyStatic(directory="speaker_voices"), name="speaker_voices")
+    _app.mount("/speaker_voices", _AudioOnlyStatic(directory=backend_main.SPEAKER_VOICES_DIR), name="speaker_voices")
     # Voice-lab eval page (ui/voice-lab/): serves QC candidate audio + manifests.
     # Read-only static mount, same pattern as /speaker_voices above.
     _app.mount("/voice_qc", StaticFiles(directory="processed/voice_qc"), name="voice_qc")
     # The Lab's library.json points at ../../processed/<dir>/*.wav. Mount only the audio
     # dirs it references, audio extensions only: processed/ also holds session logs and
-    # per-user enrollment recordings that must not be served.
+    # private recordings that must not be served.
     for _d in ("conversation", "demo_audio", "meeting", "new_models", "gpu_bench", "omni_hq_en",
                "omni_hq_sk", "omnivoice", "stt_input_test"):
         if os.path.isdir(f"processed/{_d}"):
@@ -299,15 +232,15 @@ def create_app(db_session_local_override=None) -> FastAPI:
         speaker_wav_path: Optional[str] = None,
         speaker_text: Optional[str] = None,
         speaker_lang: Optional[str] = None,
-        current_user: User = Depends(backend_main.get_current_user),
+        current_session: GuestSession = Depends(backend_main.get_current_session),
     ):
         init_start_time = time.time()
         print(f"APP: Received initialization request at {time.strftime('%H:%M:%S', time.localtime(init_start_time))}: source_lang={source_lang}, target_lang={target_lang}, tts_model_choice={tts_model_choice}, stt_model_size={stt_model_size}, vad_enabled_param={vad_enabled_param}, speaker_wav_path={speaker_wav_path}, speaker_text={speaker_text}, speaker_lang={speaker_lang}")
         
-        speaker_wav_path = backend_main.authorize_speaker_wav(speaker_wav_path, current_user.id)
+        speaker_wav_path = backend_main.authorize_speaker_wav(speaker_wav_path)
 
-        # HTTP preparation is scoped to the authenticated user.
-        dummy_client_info = f"http_init_user_{current_user.id}"
+        # HTTP preparation is scoped to the anonymous session.
+        dummy_client_info = f"http_init_session_{current_session.id}"
         
         # This will trigger the model loading in the background
         result = await initialize_all_models(
@@ -325,7 +258,7 @@ def create_app(db_session_local_override=None) -> FastAPI:
         init_models_end_time = time.time()
         print(f"APP: initialize_all_models completed at {time.strftime('%H:%M:%S', time.localtime(init_models_end_time))}. Duration: {init_models_end_time - init_start_time:.2f}s")
 
-        # HTTP initialization belongs to this authenticated user, never broadcast it.
+        # HTTP initialization belongs to this anonymous session, never broadcast it.
         stored = backend_main.active_sessions.get(dummy_client_info, {})
         result["fully_loaded"] = all(stored.get(k) is not None for k in
                                     ("stt_model", "tts_engine", "vad_instance"))
@@ -364,24 +297,24 @@ def create_app(db_session_local_override=None) -> FastAPI:
 
     # ----------------------------------------------------------------------- room mode
     @_app.post("/api/room", summary="Create a room (speaker side); listeners join /ws/listen?room=ID&lang=xx")
-    async def room_create(request: Request, current_user: User = Depends(backend_main.get_current_user)):
+    async def room_create(request: Request, current_session: GuestSession = Depends(backend_main.get_current_session)):
         from backend.room import get_room, new_room_id, listen_url, lan_address
-        rid = new_room_id(); get_room(rid).owner = current_user.id   # only this user's speaker session may publish into it
+        rid = new_room_id(); get_room(rid).owner = current_session.id   # only this session’s speaker session may publish into it
         host = os.environ.get("BP_HOST", "127.0.0.1")
         return {"room_id": rid, "listen_path": f"/ui/listen/listen.html?room={rid}",
                 "listen_url": listen_url(str(request.base_url), rid, lan_address()),
                 "lan_ready": host not in ("127.0.0.1", "localhost", "::1")}   # False: the server only answers on this computer, phones cannot join (start with BP_HOST=0.0.0.0)
 
     @_app.get("/api/room/{room_id}/qr", summary="QR code (SVG) of the listener link, speaker side")
-    async def room_qr(room_id: str, request: Request, current_user: User = Depends(backend_main.get_current_user)):
+    async def room_qr(room_id: str, request: Request, current_session: GuestSession = Depends(backend_main.get_current_session)):
         from backend.room import get_room, listen_url, lan_address, qr_svg
         room = get_room(room_id, create=False)
-        if room is None or (room.owner is not None and room.owner != current_user.id):
+        if room is None or (room.owner is not None and room.owner != current_session.id):
             raise HTTPException(status_code=404, detail="no such room")
         return Response(qr_svg(listen_url(str(request.base_url), room_id, lan_address())), media_type="image/svg+xml")
 
     @_app.get("/api/room/{room_id}", summary="Room status: listeners per language")
-    async def room_status(room_id: str, current_user: User = Depends(backend_main.get_current_user)):
+    async def room_status(room_id: str, current_session: GuestSession = Depends(backend_main.get_current_session)):
         from backend.room import get_room
         room = get_room(room_id, create=False)
         if room is None:
@@ -395,7 +328,7 @@ def create_app(db_session_local_override=None) -> FastAPI:
     async def listen_websocket(websocket: WebSocket):
         """Room listener: ?room=ID&lang=de&token=TOKEN. Receives JSON {type: room_caption, lang, seq, source, translated} and binary WAV chunks.
         Client may send {"type": "set_lang", "lang": "fr"}."""
-        user = authenticated_user(websocket.query_params.get("token"))
+        user = authenticated_session(websocket.query_params.get("token"))
         await websocket.accept()
         if user is None:
             await websocket.close(code=4003, reason="Authentication required"); return
@@ -439,7 +372,7 @@ def create_app(db_session_local_override=None) -> FastAPI:
     # ------------------------------------------------------- meeting room mgmt
     @_app.post("/api/meeting/create", summary="Create a meeting room")
     async def meeting_create(room_id: Optional[str] = Query(None),
-                             current_user: User = Depends(backend_main.get_current_user)):
+                             current_session: GuestSession = Depends(backend_main.get_current_session)):
         rid = room_id or f"room-{uuid.uuid4().hex[:8]}"
         room = await get_or_create_room(rid)
         return {"room_id": rid, "max_speakers": room.config.max_concurrent_sessions,
@@ -454,7 +387,7 @@ def create_app(db_session_local_override=None) -> FastAPI:
 
     @_app.delete("/api/meeting/{room_id}", summary="Close a meeting room")
     async def meeting_close(room_id: str,
-                            current_user: User = Depends(backend_main.get_current_user)):
+                            current_session: GuestSession = Depends(backend_main.get_current_session)):
         await remove_room(room_id)
         return {"status": "closed", "room_id": room_id}
 
@@ -479,7 +412,7 @@ def create_app(db_session_local_override=None) -> FastAPI:
           {"type":"error","message":"..."}
         """
         token = websocket.query_params.get("token")
-        user = authenticated_user(token)
+        user = authenticated_session(token)
         if user is None:
             await websocket.accept()
             await websocket.close(code=4003, reason="Authentication required")
@@ -506,7 +439,7 @@ def create_app(db_session_local_override=None) -> FastAPI:
 
                 if mtype == "join":
                     role = data.get("role")
-                    name = data.get("name", user.email)
+                    name = data.get("name", "Speaker")
                     if role == "speaker":
                         source_lang = data.get("source_lang", "en")
                         voice = data.get("voice")
@@ -600,21 +533,19 @@ def create_app(db_session_local_override=None) -> FastAPI:
                 await websocket.close(code=4003, reason="Untrusted origin")
                 return
         token = websocket.query_params.get("token")
-        user = authenticated_user(token)
+        user = authenticated_session(token)
         if user is None:
             # Accept only to convey an actionable auth close code; no session/models exist.
             await websocket.accept()
             await websocket.close(code=4003, reason="Authentication required")
             return
         client_info = f"{websocket.client.host}:{websocket.client.port}"
-        is_guest = user.email == backend_main.GUEST_EMAIL
-        if is_guest and len(guest_sockets) >= int(os.environ.get("BP_GUEST_MAX_SESSIONS", "4")):
+        if len(guest_sockets) >= int(os.environ.get("BP_GUEST_MAX_SESSIONS", "4")):
             await websocket.accept()
-            await websocket.close(code=4009, reason="The demo is busy. Try again in a minute, or sign in.")
+            await websocket.close(code=4009, reason="The local service is busy. Try again in a minute.")
             return
         await manager.connect(websocket)
-        if is_guest:
-            guest_sockets.add(websocket)
+        guest_sockets.add(websocket)
         try:
             await websocket.send_json({"type": "models_loading_status", "fully_loaded": False,
                 "route_status": {"pair": "en-sk", "status": "experimental",
@@ -644,11 +575,11 @@ if __name__ == "__main__":
     os.makedirs("backend/tts/piper_models", exist_ok=True)
     os.makedirs("speaker_voices", exist_ok=True)
     os.makedirs("processed/voice_qc", exist_ok=True)
-    # Loopback by default: the API has open registration and an unauthenticated /ws.
+    # Loopback by default; exposing the host grants network clients local-tool access.
     # For a conference/LAN demo opt in explicitly: BP_HOST=0.0.0.0
-    host = os.environ.get("BP_HOST", "localhost")  # Google OAuth needs localhost:8000, not 127.0.0.1
+    host = os.environ.get("BP_HOST", "localhost")
     if host not in ("127.0.0.1", "localhost", "::1"):
-        print(f"APP: WARNING - listening on {host}; anyone on the network can register and use /ws.")
+        print(f"APP: WARNING - listening on {host}; anyone on the network can request a session and use this tool, including local voice references.")
     # Plain HTTP on localhost is a browser "secure context": the microphone works and there is no
     # certificate warning. HTTPS (self-signed certs/, needed for LAN/phone access) is opt-in: BP_HTTPS=1.
     use_tls = os.environ.get("BP_HTTPS") == "1" and os.environ.get("BP_NO_SSL") != "1"

@@ -167,32 +167,35 @@ tts = instantiate("tts", "piper_sk_personal")
 
 ## REST API (FastAPI)
 
-Base URL: `https://localhost:8000` (self-signed cert in `certs/`)
+Base URL: `http://localhost:8000`; HTTPS is opt-in with `BP_HTTPS=1` and local certificates.
 
-### Public Endpoints
-
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/health` | Health check — per-stage readiness, active sessions, pool stats. No auth. |
-| GET | `/api/capabilities` | Engine availability, hardware backends, Piper models, QC scores. No auth. |
-| GET | `/auth/config` | Google OAuth client ID (or null). No auth. |
-| POST | `/register` | User registration (email, username, password). Rate limited. |
-| POST | `/token` | Password login → JWT. Rate limited. |
-| POST | `/login` | JSON login → JWT + user info. Rate limited. |
-| POST | `/auth/google` | Google ID token → JWT. Rate limited. |
-
-### Authenticated Endpoints (Bearer JWT)
+### Public endpoints
 
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | `/initialize` | Authenticated user-scoped model preparation; Authorization Bearer required. Does not initialize a separate WS session. |
-| POST | `/voices/upload` | Upload speaker voice (webm/wav/mp3) → converted to 16kHz WAV. |
-| POST | `/voices/process` | Segment enrollment session into training corpus (approval-gated). |
-| GET | `/voices/list` | List user's uploaded voices. |
-| GET | `/voices/file/{filename}` | Download voice file (auth-aware). |
-| GET | `/api/ratings` | Export ear-grading data (for Voice Lab). |
-| GET | `/metrics` | Detailed metrics — pool stats, per-session detail, capacity. |
-| WS | `/ws` | **WebSocket** — real-time audio streaming (see below). |
+| GET | `/api/health` | Per-stage readiness and active sessions. |
+| GET | `/api/capabilities` | Engine availability and hardware backends. |
+| GET | `/api/session/config` | Default speech-cutting strategy. |
+| POST | `/api/guest` | Always enabled. Returns `{token, guest_id}`; distinct random ID, two-hour signed token. Rate limited. |
+
+### Endpoints requiring the anonymous Bearer token
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/initialize` | Session-scoped model preparation; does not initialize a separate WS session. |
+| POST | `/api/voice-reference` | Multipart `file`; WAV/M4A/MP3/WebM, max 15 MB and 60 seconds, at most five files; returns `{name}`. |
+| GET | `/api/voice-reference` | Local references as `[{name}]`, shared across sessions on this machine. |
+| DELETE | `/api/voice-reference?name=FILENAME` | Delete one reference, returns `{name}`. |
+| POST | `/api/room` | Speaker creates a room owned by its guest ID. |
+| GET | `/api/ratings` | Ear-grading data for Voice Lab. |
+| GET | `/api/metrics` | Pool stats, session details and capacity. |
+| WS | `/ws` | Real-time audio streaming. |
+| WS | `/ws/meeting` | Meeting audio stream. |
+| WS | `/ws/listen?room=ID&lang=de&token=TOKEN` | Listener joins with its own anonymous token. |
+
+Pass the returned reference `name` as `speaker_wav_path`; synthesis resolves it
+inside `speaker_voices/`. The first run creates a private, git-ignored `.jwt_secret`
+unless `JWT_SECRET` is supplied by environment. No identity store is required.
 
 ---
 

@@ -61,7 +61,7 @@ class Room:
         self.channels: Dict[str, _Channel] = {}
         self.created = time.time()
         self.published = 0
-        self.owner: Optional[int] = None        # user id of the speaker who created the room (None: unowned, tests)
+        self.owner: Optional[str] = None        # guest id of the speaker who created the room (None: unowned, tests)
         self.src_lang: Optional[str] = None     # language the speaker's session recognises, set at the first publish
 
     # -- membership ---------------------------------------------------------------------------------------------------
