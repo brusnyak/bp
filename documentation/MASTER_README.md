@@ -133,12 +133,12 @@ Runs the same E2E test across multiple TTS engines and compares against baseline
 | 1 | Wait for XTTS v13 Kaggle result; read `xtts_report.json` | Kaggle `yegorby/bp-xtts-voice-clone-t4` | RTF, first-audio latency per language | Kaggle slot free |
 | 2 | Fix X-Voice (ctranslate2 + fastlid SSL) and re-push | Kaggle `yegorby/bp-x-voice-t4` | Successful SK synth with RTF | Kaggle slot free |
 | 3 | Fix Higgs Audio v3 (flashinfer compile timeout) and re-push | Kaggle `yegorby/bp-higgs-audio-v3-t4` | Server ready + TTS per language | Kaggle slot free |
-| 4 | Run E2E streaming tests locally with Piper baseline | Mac, `scripts/live/e2e_streaming_test.py` | per-segment lag under 2 s goal | Server running, load < 6 |
+| 4 | Run E2E streaming tests locally with Piper baseline | Mac, `scripts/live/e2e_streaming_test.py` | per-segment lag under 2 s goal | Server running, load < 10 |
 | 5 | Run E2E compare across all TTS engines | Mac + Kaggle results | comparison table vs baselines | All kernels complete |
 | 6 | Pick voice route: Piper fallback vs. cloned voice | Owner decision | documented in this file | Ear check / Kaggle data |
 | 7 | Commit working tree (31 commits ahead, uncommitted) | `git commit` + `git push` | tree clean, pushed to origin | Owner yes |
 | 8 | Room mode real-model test | Kaggle `bp-room-test-t4` | speaker lag ≤ 2× baseline | After voice route decided |
-| 9 | Real-speech E2E test (non-generated audio) | Mac, `paced_replay.py` | lag ≤ 2 s median | Owner go, load < 6 |
+| 9 | Real-speech E2E test (non-generated audio) | Mac, `paced_replay.py` | lag ≤ 2 s median | Owner go, load < 10 |
 
 ---
 

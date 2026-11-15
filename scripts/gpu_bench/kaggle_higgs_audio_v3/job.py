@@ -1,317 +1,574 @@
 #!/usr/bin/env python3
-"""Kaggle T4 kernel: Higgs Audio v3 TTS via SGLang-Omni (proper standalone env).
+"""Standalone Higgs TTS 3 research/non-commercial benchmark; never imports BP.
 
-Tests bosonai/higgs-audio-v3-tts-4b on Kaggle Tesla T4 GPU:
-- Installs uv + Python 3.12 venv (SGLang-Omni requires Python 3.11-3.12,
-  Kaggle default is 3.13.16, no conda available)
-- Installs SGLang-Omni from pip
-- Serves the model via sgl-omni serve
-- Tests zero-shot TTS and voice cloning (EN/SK/CS) via /v1/audio/speech API
-- Measures RTF, first-audio latency
+Sources inspected 2026-11-15 (installed 0.2.0 source/help is also recorded):
+https://huggingface.co/bosonai/higgs-tts-3-4b/blob/main/README.md
+https://github.com/sgl-project/sglang-omni/blob/main/docs/cookbook/higgs_tts.md
+https://github.com/sgl-project/sglang-omni/blob/main/sglang_omni/models/higgs_tts/config.py
+https://github.com/sgl-project/sglang-omni/blob/main/sglang_omni/models/higgs_tts/engine_builder.py
+https://github.com/sgl-project/sglang-omni/blob/main/sglang_omni/models/higgs_tts/stages.py
+https://github.com/sgl-project/sglang-omni/blob/main/sglang_omni/cli/serve.py
+https://github.com/sgl-project/sglang-omni/blob/main/sglang_omni/serve/protocol.py
+https://github.com/sgl-project/sglang-omni/blob/main/sglang_omni/serve/openai_api.py
+https://github.com/sgl-project/sglang/blob/main/python/sglang/srt/arg_groups/choices.py
+https://github.com/SYSTRAN/faster-whisper/blob/master/README.md
 
-CRITICAL: SGLang-Omni requires CUDA 13. Kaggle T4 has CUDA 13.0.88 available.
-Higgs Audio v3 is a 4B model (~10GB VRAM in bf16) — fits in T4's 16GB VRAM.
-
-License: Boson Higgs TTS 3 Research and Non-Commercial License (non-commercial).
-
-Run: kaggle kernels push -p scripts/gpu_bench/kaggle_higgs_audio_v3 --accelerator NvidiaTeslaT4 -t 1800
-Outputs: /kaggle/working/higgs_audio_{en,sk,cs}.wav + higgs_audio_v3_report.json
+T4/dtype/streaming are experiments, not compatibility claims. No project env.
 """
-import json, os, shutil, subprocess, sys, time, traceback, signal
+import atexit
+import base64
+import io
+import json
+import os
+import shutil
+import signal
+import statistics
+import subprocess
+import sys
+import threading
+import time
+import traceback
+import unicodedata
+import urllib.request
+import wave
 from pathlib import Path
 
-OUT = Path("/kaggle/working")
-REPORT = OUT / "higgs_audio_v3_report.json"
+OUT = Path('/kaggle/working')
+REPORT = OUT / 'results.json'
 T0 = time.time()
-R = {"schema": 1, "status": "running", "steps": [], "errors": [], "tts": {}, "infrastructure": {}}
+R = {'schema': 2, 'status': 'running', 'steps': [], 'errors': [], 'tts': {}, 'infrastructure': {}}
 SERVER_PROC = None
 
 
 def save():
-    R["elapsed_s"] = round(time.time() - T0, 1)
-    tmp = REPORT.with_suffix(".tmp")
+    R['elapsed_s'] = round(time.time() - T0, 1)
+    tmp = REPORT.with_suffix('.tmp')
     tmp.write_text(json.dumps(R, indent=1, ensure_ascii=False))
     tmp.replace(REPORT)
 
 
 def step(name, **kw):
-    R["steps"].append({"t": round(time.time() - T0, 1), "step": name, **kw})
-    print(f"[{time.time() - T0:7.1f}s] {name} {kw}", flush=True)
+    R['steps'].append({'t': round(time.time() - T0, 1), 'step': name, **kw})
+    print(f'[{time.time() - T0:7.1f}s] {name} {kw}', flush=True)
     save()
 
 
-def sh(cmd, timeout=900):
-    p = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout)
-    return p.returncode, (p.stdout + p.stderr)[-4000:]
-
-
-def cleanup():
-    global SERVER_PROC
-    if SERVER_PROC:
-        try:
-            SERVER_PROC.terminate()
-            SERVER_PROC.wait(timeout=10)
-        except Exception:
-            try:
-                SERVER_PROC.kill()
-            except Exception:
-                pass
-
-
-import atexit
-atexit.register(cleanup)
-
-# ---------------------------------------------------------------------------
-# 0. Environment + GPU check
-# ---------------------------------------------------------------------------
-step("env", python=sys.version, cwd=os.getcwd())
-rc, out = sh("nvidia-smi --query-gpu=name,driver_version,memory.total --format=csv,noheader", 60)
-step("gpu", output=out.strip())
-
-rc, out = sh("python3 -c 'import torch; print(torch.__version__); print(torch.cuda.is_available()); print(torch.version.cuda)'", 30)
-R["infrastructure"]["torch"] = out.strip() if rc == 0 else "not_installed"
-save()
-
-# ---------------------------------------------------------------------------
-# 1. Check CUDA version — SGLang-Omni requires CUDA 13
-# ---------------------------------------------------------------------------
-step("cuda_check")
-rc, out = sh("nvcc --version 2>/dev/null | tail -3 || echo 'nvcc not found'", 30)
-step("nvcc", output=out.strip()[-500:])
-
-# ---------------------------------------------------------------------------
-# 2. Install uv and Python 3.12 (SGLang-Omni requirement)
-# ---------------------------------------------------------------------------
-step("install_uv")
-rc, out = sh("pip install uv", 120)
-step("uv_install", rc=rc, output=out[-200:] if rc != 0 else "ok")
-
-step("uv_python_312")
-rc, out = sh("uv python install 3.12", 300)
-step("uv_python_install", rc=rc, output=out[-500:] if rc != 0 else "ok")
-
-if rc != 0:
-    step("uv_python_failed", error=out[-500:])
-    R["status"] = "failed"; save(); sys.exit(1)
-
-# Create venv with Python 3.12 (no conda on Kaggle; uv venv without --pip, use uv pip install --python)
-VENV_DIR = "/tmp/tts312-venv"
-step("create_venv")
-rc, out = sh(f"uv venv --python 3.12 {VENV_DIR}", 120)
-step("venv_create", rc=rc, output=out[-300:] if rc != 0 else "ok")
-
-if rc != 0:
-    step("venv_failed", error=out[-500:])
-    R["status"] = "failed"; save(); sys.exit(1)
-
-VENV_PYTHON = f"{VENV_DIR}/bin/python"
-
-# Verify Python version
-rc, out = sh(f"{VENV_PYTHON} --version", 30)
-step("venv_python_version", output=out.strip() if rc == 0 else "failed")
-
-# ---------------------------------------------------------------------------
-# 3. Install SGLang-Omni in the venv (use uv pip install --python, no `source activate`)
-# ---------------------------------------------------------------------------
-step("install_sglang_omni")
-UV_PIP_INSTALL = f"uv pip install --python {VENV_PYTHON}"
-rc, out = sh(f"{UV_PIP_INSTALL} --upgrade pip uv", 120)
-step("pip_upgrade", rc=rc, output=out[-200:] if rc != 0 else "ok")
-
-# SGLang-Omni needs CUDA 13 (available on Kaggle T4: v13.0.88)
-rc, out = sh(f"{UV_PIP_INSTALL} --pre sglang", 900)
-step("sglang_pip", rc=rc, output=out[-800:] if rc != 0 else "ok")
-
-if rc == 0:
-    rc, out = sh(f"{UV_PIP_INSTALL} sglang-omni", 900)
-    step("sglang_omni_pip", rc=rc, output=out[-800:] if rc != 0 else "ok")
-
-if rc != 0:
-    # Fallback: install from source
-    step("install_from_source")
-    rc, out = sh(f"git clone --depth 1 https://github.com/sgl-project/sglang-omni.git /tmp/sglang-omni", 300)
-    step("git_clone", rc=rc, output=out[-300:] if rc != 0 else "ok")
-    if rc == 0:
-        rc, out = sh(f"{UV_PIP_INSTALL} -e /tmp/sglang-omni", 900)
-        step("sglang_omni_source", rc=rc, output=out[-800:] if rc != 0 else "ok")
-
-# Install huggingface_hub (for hf-cli) and descript-audio-codec
-rc, out = sh(f"{UV_PIP_INSTALL} huggingface_hub descript-audiotools==0.7.2 descript-audio-codec==1.0.0", 300)
-step("dac_deps", rc=rc, output=out[-300:] if rc != 0 else "ok")
-save()
-
-# ---------------------------------------------------------------------------
-# 4. Find staged BP repo for voice reference files
-# ---------------------------------------------------------------------------
-step("repo_lookup")
-src = next((p for p in Path("/kaggle/input").rglob("app.py")
-            if (p.parent / "benchmark-provenance.json").is_file()), None)
-repo = src.parent if src else None
-step("repo", path=str(repo) if repo else "none")
-
-candidates_by_lang = {
-    "en": ["speaker_voices/me_en_rainbow.m4a", "processed/testaudio/en_paced.wav"],
-    "sk": ["speaker_voices/me_sk_trhove.m4a", "processed/testaudio/sk_paced.wav"],
-    "cs": ["speaker_voices/me_cs_staromestske.m4a", "processed/testaudio/cs_paced.wav"],
+MODEL = 'bosonai/higgs-tts-3-4b'
+BASE = 'http://127.0.0.1:8000'
+WORK = Path('/tmp/higgs-tts3-eval')
+TTS_PY = str(WORK / 'tts/bin/python')
+ASR_PY = str(WORK / 'asr/bin/python')
+TEXTS = {
+    'en': {
+        'short': 'Hello, this is a test of real-time speech translation.',
+        'long': 'During our international meeting today, the interpreter will translate every spoken sentence clearly, preserve the original meaning, and help all participants understand each other better.',
+    },
+    'sk': {
+        'short': 'Dobrý deň, toto je test prekladov reči v reálnom čase.',
+        'long': 'Počas medzinárodného stretnutia bude tlmočník jasne prekladať každú vyslovenú vetu, zachová pôvodný význam a pomôže všetkým účastníkom lepšie porozumieť ostatným aj pri zložitých odborných témach.',
+    },
+    'cs': {
+        'short': 'Dobrý den, toto je test překladu řeči v reálném čase.',
+        'long': 'Během mezinárodního setkání bude tlumočník jasně překládat každou vyslovenou větu, zachová původní význam a pomůže všem účastníkům lépe porozumět ostatním i při složitých odborných tématech.',
+    },
 }
+# Clean Python subprocesses cannot inherit the project import path/venv.
+ENV = os.environ.copy()
+for key in ('PYTHONPATH', 'PYTHONHOME', 'VIRTUAL_ENV'):
+    ENV.pop(key, None)
+ENV.update(HF_HOME=str(WORK / 'hf'), UV_CACHE_DIR=str(WORK / 'uv-cache'),
+           PYTHONNOUSERSITE='1', CUDA_VISIBLE_DEVICES='0')
+ENV['PATH'] = os.pathsep.join(p for p in ENV.get('PATH', '').split(os.pathsep)
+                              if not any(x in p for x in ('.venv', '/venv/', '/envs/')))
 
-def find_file(paths):
-    for p in paths:
-        cand = Path(".") / p
-        if cand.is_file():
-            return str(cand)
-        if repo:
-            cand2 = repo / p
-            if cand2.is_file():
-                return str(cand2)
+
+def error(stage, exc, lang=None):
+    item = {'stage': stage, 'lang': lang, 'error': f'{type(exc).__name__}: {exc}'}
+    R['errors'].append(item)
+    step('error', **item)
+    return item
+
+
+def run(argv, timeout=120, env=None):
+    p = subprocess.run(argv, cwd=WORK, env=env or ENV, capture_output=True,
+                       text=True, timeout=timeout)
+    step('command', argv=argv, rc=p.returncode, output=(p.stdout + p.stderr)[-6000:])
+    if p.returncode:
+        raise RuntimeError(f'{argv[0]} exited {p.returncode}: {(p.stdout + p.stderr)[-3000:]}')
+    return p.stdout
+
+
+def stop_server():
+    global SERVER_PROC
+    if SERVER_PROC is not None:
+        # Kill the session, including stage subprocesses, even if the CLI exited.
+        try:
+            os.killpg(SERVER_PROC.pid, signal.SIGTERM)
+            SERVER_PROC.wait(timeout=10)
+        except (ProcessLookupError, subprocess.TimeoutExpired):
+            pass
+        try:
+            os.killpg(SERVER_PROC.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        SERVER_PROC = None
+
+
+atexit.register(stop_server)
+
+GATE = r'''
+import json, subprocess, torch, traceback
+r = {'torch': torch.__version__, 'cuda': torch.version.cuda,
+     'arch_list': torch.cuda.get_arch_list(), 'cuda_available': torch.cuda.is_available()}
+r['sm_75_in_arch_list'] = 'sm_75' in r['arch_list']
+r['nvidia_smi'] = subprocess.check_output(['nvidia-smi'], text=True)
+r['fp16_matmul_ok'] = False
+try:
+    r['device'] = torch.cuda.get_device_name(0)
+    r['capability'] = list(torch.cuda.get_device_capability(0))
+    a = torch.ones((32, 32), device='cuda', dtype=torch.float16)
+    b = a @ a
+    torch.cuda.synchronize()
+    r['fp16_matmul_value'] = b[0, 0].item()
+    r['fp16_matmul_ok'] = bool(torch.isfinite(b).all().item() and b[0, 0].item() == 32)
+except Exception:
+    r['matmul_error'] = traceback.format_exc()
+r['supported'] = r['sm_75_in_arch_list'] and r['fp16_matmul_ok']
+print('GATE_JSON=' + json.dumps(r))
+'''
+
+
+def t4_gate(label):
+    try:
+        output = run([TTS_PY, '-I', '-c', GATE], timeout=120)
+        facts = json.loads(next(line[10:] for line in output.splitlines() if line.startswith('GATE_JSON=')))
+    except Exception as exc:
+        facts = {'supported': False, 'error': str(exc)}
+        error(label, exc)
+    R['infrastructure'][label] = facts
+    save()
+    return facts['supported']
+
+
+ASR_CODE = r'''
+import json, sys, time, traceback
+from faster_whisper import WhisperModel
+jobs = json.loads(sys.argv[1])
+t = time.perf_counter()
+# CPU int8 avoids CUDA-12 ASR libraries colliding with the CUDA-13 TTS stack.
+model = WhisperModel('large-v3-turbo', device='cpu', compute_type='int8',
+                     download_root=sys.argv[2])
+load_s = time.perf_counter() - t
+results = {}
+for job in jobs:
+    try:
+        t = time.perf_counter()
+        segments, info = model.transcribe(job['path'], language=job['lang'], beam_size=5)
+        text = ' '.join(s.text.strip() for s in segments)
+        results[job['path']] = {'text': text, 'wall_s': time.perf_counter() - t,
+                                'language': info.language}
+    except Exception:
+        results[job['path']] = {'error': traceback.format_exc()}
+print('ASR_JSON=' + json.dumps({'model_load_s': load_s, 'device': 'cpu',
+      'compute_type': 'int8', 'model': 'large-v3-turbo', 'results': results}))
+'''
+
+
+def transcribe(jobs):
+    output = run([ASR_PY, '-I', '-c', ASR_CODE, json.dumps(jobs), str(WORK / 'asr-models')], timeout=1200)
+    return json.loads(next(s[9:] for s in output.splitlines() if s.startswith('ASR_JSON=')))
+
+
+def prepare_references():
+    roots = [Path('/kaggle/input'), Path.cwd()]
+    # Dataset packaging differs; find real files by exact documented suffix.
+    refs = {}
+    for lang in TEXTS:
+        try:
+            candidates = []
+            for root in roots:
+                candidates += sorted(root.glob(f'**/speaker_voices/me_{lang}*.m4a'))
+                candidates += sorted(root.glob(f'**/processed/testaudio/{lang}*_paced.wav'))
+            if not candidates:
+                raise FileNotFoundError(f'No real {lang} reference under {roots}')
+            dest = WORK / f'ref_{lang}.wav'
+            run(['ffmpeg', '-nostdin', '-y', '-v', 'error', '-i', str(candidates[0]),
+                 '-t', '10', '-ac', '1', '-ar', '24000', '-c:a', 'pcm_s16le', str(dest)], 60)
+            with wave.open(str(dest)) as f:
+                duration = f.getnframes() / f.getframerate()
+                if f.getnchannels() != 1 or abs(duration - 10) > 0.01:
+                    raise ValueError(f'Reference must contain 10 seconds of real mono speech: {duration}')
+            refs[lang] = {'path': str(dest), 'source': str(candidates[0]), 'audio_s': duration}
+        except Exception as exc:
+            error('reference', exc, lang)
+            R['tts'][lang]['status'] = 'reference_failed'
+    if not refs:
+        raise RuntimeError('No valid reference voices; refusing synthetic fallback')
+    decoded = transcribe([{'path': ref['path'], 'lang': lang} for lang, ref in refs.items()])
+    R['reference_asr'] = decoded
+    for lang, ref in list(refs.items()):
+        try:
+            row = decoded['results'][ref['path']]
+            if 'error' in row or not row.get('text', '').strip():
+                raise ValueError(f'Reference transcription failed: {row}')
+            ref['text'] = row['text']
+            R['tts'][lang]['reference'] = ref
+        except Exception as exc:
+            error('reference_asr', exc, lang)
+            R['tts'][lang]['status'] = 'reference_failed'
+            del refs[lang]
+    if not refs:
+        raise RuntimeError('No transcribed reference voices')
+    save()
+    return refs
+
+
+def tail(path):
+    return '\n'.join(path.read_text(errors='replace').splitlines()[-60:])
+
+
+def serve():
+    global SERVER_PROC
+    cli = str(WORK / 'tts/bin/sgl-omni')
+    run([cli, 'serve', '--help'], 90)
+    # Preserve the actual installed source evidence; no assumption that main == 0.2.0.
+    source = run([TTS_PY, '-I', '-c', '''
+import importlib.util, pathlib
+root = pathlib.Path(importlib.util.find_spec('sglang_omni').origin).parent
+for rel in ['models/higgs_tts/config.py', 'models/higgs_tts/engine_builder.py',
+            'models/higgs_tts/stages.py', 'serve/protocol.py', 'cli/serve.py']:
+    print('SOURCE', rel)
+    for line in (root / rel).read_text().splitlines():
+        if any(s in line for s in ('dtype', 'attention_backend', 'process=', 'stream_format', 'parse_extra_args')):
+            print(line)
+'''], 90)
+    R['infrastructure']['installed_source_excerpt'] = source
+    R['infrastructure']['jit_strategy'] = {
+        'attempt': 'tts_engine.engine.attention_backend=triton; disable_cuda_graph=true',
+        'limit': 'Avoids FlashInfer attention selection; imports or other kernels may still JIT. No global no-JIT guarantee.',
+        'reference_encoding': 'CPU float32; preserve cookbook default separate processes',
+    }
+    attempts = R['serve_attempts'] = []
+    overall_deadline = time.monotonic() + 720
+    for dtype in ('bfloat16', 'float16'):
+        log = OUT / f'serve_{dtype}.log'
+        cmd = [cli, 'serve', '--model-path', MODEL, '--port', '8000',
+               '--allowed-local-media-path', str(WORK),
+               '--audio_encoder.factory.device', 'cpu',
+               '--audio_encoder.factory.dtype', 'float32',
+               '--tts_engine.engine.dtype', dtype,
+               '--vocoder.factory.dtype', dtype,
+               '--tts_engine.engine.attention_backend', 'triton',
+               '--tts_engine.engine.disable_cuda_graph', 'true']
+        attempt = {'dtype': dtype, 'argv': cmd, 'log': str(log)}
+        attempts.append(attempt)
+        try:
+            started = time.perf_counter()
+            with log.open('w') as output:
+                SERVER_PROC = subprocess.Popen(cmd, cwd=WORK, env=ENV, stdout=output,
+                                               stderr=subprocess.STDOUT, start_new_session=True)
+            # Reserve six minutes for fp16 if bf16 stalls; total health budget <=12m.
+            deadline = min(overall_deadline, time.monotonic() + (350 if dtype == 'bfloat16' else 720))
+            step('serve_attempt', **attempt)
+            while time.monotonic() < deadline:
+                if SERVER_PROC.poll() is not None:
+                    raise RuntimeError(f'Server exited {SERVER_PROC.returncode}')
+                try:
+                    with urllib.request.urlopen(BASE + '/health', timeout=2) as resp:
+                        health = json.load(resp)
+                    if health.get('status') == 'healthy':
+                        attempt.update(status='healthy', model_load_s=time.perf_counter() - started,
+                                       model_load_definition='CLI launch to healthy; includes download, initialization and server warmup',
+                                       health=health)
+                        step('server_ready', dtype=dtype, model_load_s=attempt['model_load_s'])
+                        return attempt['model_load_s']
+                except Exception as exc:
+                    attempt['last_health_error'] = str(exc)
+                time.sleep(min(2, max(0, deadline - time.monotonic())))
+            raise TimeoutError('Server did not become healthy within attempt budget')
+        except Exception as exc:
+            attempt.update(status='failed', error=str(exc))
+            stop_server()
+            attempt['last_60_log_lines'] = tail(log) if log.exists() else ''
+            error('serve_' + dtype, exc)
+    R['last_60_log_lines'] = attempts[-1].get('last_60_log_lines', '')
     return None
 
-voice_files = {}
-for lang, paths in candidates_by_lang.items():
-    ref = find_file(paths)
-    if ref:
-        wav_path = OUT / f"ref_{lang}.wav"
-        rc, out = sh(f'ffmpeg -y -v error -i {ref} -t 10 -ac 1 -ar 24000 {wav_path}', 60)
-        if rc == 0:
-            voice_files[lang] = str(wav_path)
-            step("ref", lang=lang, wav=str(wav_path))
-        else:
-            step("ref_fail", lang=lang, error=out[-200:])
+
+def gpu_sample():
+    output = subprocess.check_output(['nvidia-smi', '--id=0', '--query-gpu=memory.used',
+                                      '--format=csv,noheader,nounits'], text=True, timeout=5)
+    return float(output.strip())
+
+
+def wav_parts(raw):
+    with wave.open(io.BytesIO(raw)) as f:
+        params = (f.getnchannels(), f.getsampwidth(), f.getframerate())
+        return params, f.readframes(f.getnframes())
+
+
+def synthesize(text, ref, mode, output):
+    payload = {'input': text, 'references': [{'audio_path': ref['path'], 'text': ref['text']}],
+               'temperature': 0.8, 'top_k': 50, 'max_new_tokens': 1024}
+    if mode == 'pcm':
+        payload.update(stream=True, response_format='pcm')
+    elif mode == 'card_sse':
+        payload.update(stream=True)  # Exact model-card request; inspect actual content type.
+    elif mode == 'explicit_sse':
+        payload.update(stream=True, stream_format='sse', response_format='wav')
     else:
-        step("ref_missing", lang=lang)
+        payload.update(stream=False, response_format='wav')
+    samples, monitor_errors = [], []
+    done = threading.Event()
 
-if not voice_files:
-    step("warning", msg="no reference voice files found — synthesizing fallback audio")
-    import wave, struct, math
-    for lang in ("en", "sk", "cs"):
-        wav_path = OUT / f"ref_{lang}.wav"
-        sr = 24000
-        duration = 5.0
-        freq = 440 if lang == "en" else (520 if lang == "sk" else 600)
-        frames = []
-        for i in range(int(sr * duration)):
-            t = i / sr
-            sample = int(16000 * math.sin(2 * math.pi * freq * t) * (0.5 + 0.5 * math.sin(2 * math.pi * 0.5 * t)))
-            frames.append(struct.pack('<h', sample))
-        with wave.open(str(wav_path), 'wb') as wf:
-            wf.setnchannels(1)
-            wf.setsampwidth(2)
-            wf.setframerate(sr)
-            wf.writeframes(b''.join(frames))
-        voice_files[lang] = str(wav_path)
-        step("ref_synth", lang=lang, wav=str(wav_path))
+    def monitor():
+        while not done.is_set():
+            try:
+                samples.append(gpu_sample())
+            except Exception as exc:
+                monitor_errors.append(str(exc))
+                return
+            done.wait(0.2)
 
-# ---------------------------------------------------------------------------
-# 5. Serve Higgs Audio v3 via SGLang-Omni (direct venv binary, no `source`)
-# ---------------------------------------------------------------------------
-step("serve_higgs")
-MODEL_PATH = "bosonai/higgs-audio-v3-tts-4b"
-PORT = 8000
-VENV_HF = f"{VENV_DIR}/bin/hf"
-VENV_SGL = f"{VENV_DIR}/bin/sgl-omni"
-
-# Download model first (use `hf` not deprecated `huggingface-cli`)
-rc, out = sh(f"{VENV_HF} download {MODEL_PATH} --local-dir /tmp/higgs-audio-v3-tts-4b", 600)
-step("hf_download", rc=rc, output=out[-500:] if rc != 0 else "ok")
-
-if rc == 0:
-    # Start server in background
-    server_cmd = (
-        f"{VENV_SGL} serve "
-        f"--model-path /tmp/higgs-audio-v3-tts-4b "
-        f"--host 0.0.0.0 --port {PORT} "
-        f"--allowed-local-media-path /tmp "
-    )
-    SERVER_PROC = subprocess.Popen(server_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-    step("server_started", pid=SERVER_PROC.pid)
-
-    # Wait for server to be ready
-    import urllib.request, urllib.error
-    server_ready = False
-    for i in range(60):
-        time.sleep(5)
-        try:
-            req = urllib.request.Request(f"http://localhost:{PORT}/v1/models")
-            with urllib.request.urlopen(req, timeout=5) as resp:
-                if resp.status == 200:
-                    server_ready = True
-                    break
-        except Exception:
-            pass
-        step("waiting_server", attempt=i + 1)
-
-    if server_ready:
-        step("server_ready")
-    else:
-        # Read server output for error
-        try:
-            server_out = SERVER_PROC.stdout.read() if SERVER_PROC.stdout else ""
-        except Exception:
-            server_out = ""
-        step("server_not_ready", output=server_out[-1000:])
-        R["errors"].append("SGLang-Omni server did not become ready — likely CUDA 13 requirement unmet on Kaggle T4")
-        R["status"] = "failed"; save(); sys.exit(1)
-else:
-    step("hf_download_failed", error=out[-500:])
-    R["status"] = "failed"; save(); sys.exit(1)
-
-# ---------------------------------------------------------------------------
-# 6. Test TTS per language via API
-# ---------------------------------------------------------------------------
-import requests
-
-for lang in ("en", "sk", "cs"):
-    step("tts", lang=lang)
+    samples.append(gpu_sample())
+    thread = threading.Thread(target=monitor, daemon=True)
+    thread.start()
+    first = None
+    chunks = []
+    params = (1, 2, 24000)
+    t = time.perf_counter()
     try:
-        ref_wav = voice_files.get(lang, voice_files.get("en"))
-        payload = {
-            "model": MODEL_PATH,
-            "voice": "default",
-            "input": {
-                "en": "Hello, this is a test of real-time speech translation.",
-                "sk": "Dobrý deň, toto je test prekladov reči v reálnom čase.",
-                "cs": "Dobrý den, toto je test překladu řeči v reálném čase.",
-            }[lang],
-        }
-        if ref_wav:
-            payload["voice"] = ref_wav  # voice cloning via reference path
+        request = urllib.request.Request(BASE + '/v1/audio/speech', data=json.dumps(payload).encode(),
+                                         headers={'Content-Type': 'application/json'})
+        with urllib.request.urlopen(request, timeout=180) as resp:
+            content_type = resp.headers.get('Content-Type', '').lower()
+            if 'text/event-stream' in content_type:
+                observed = 'sse_wav'
+                terminal = False
+                for line in resp:
+                    if not line.startswith(b'data:'):
+                        continue
+                    data = line[5:].strip()
+                    if data == b'[DONE]':
+                        terminal = True
+                        break
+                    event = json.loads(data)
+                    if event.get('error'):
+                        raise RuntimeError(str(event['error']))
+                    audio = event.get('audio') or {}
+                    if audio.get('data'):
+                        new_params, frames = wav_parts(base64.b64decode(audio['data'], validate=True))
+                        if chunks and new_params != params:
+                            raise ValueError('SSE chunk WAV formats differ')
+                        params = new_params
+                        if frames:
+                            if first is None:
+                                first = time.perf_counter() - t
+                            chunks.append(frames)
+                    if event.get('finish_reason') == 'stop':
+                        terminal = True
+                        break
+                if not terminal:
+                    raise ValueError('SSE ended without stop/DONE')
+            elif 'audio/pcm' in content_type or 'audio/l16' in content_type:
+                observed = 'pcm'
+                params = (int(resp.headers.get('x-channels', 1)), 2,
+                          int(resp.headers.get('x-sample-rate', 24000)))
+                while True:
+                    chunk = resp.read1(65536)
+                    if not chunk:
+                        break
+                    if first is None:
+                        first = time.perf_counter() - t
+                    chunks.append(chunk)
+            elif 'wav' in content_type or 'octet-stream' in content_type:
+                observed = 'non-streaming'
+                params, frames = wav_parts(resp.read())
+                chunks = [frames]
+                first = time.perf_counter() - t
+            else:
+                raise ValueError(f'Unexpected response {content_type}: {resp.read(500)!r}')
+        wall = time.perf_counter() - t
+        frames = b''.join(chunks)
+        if not frames or first is None or len(frames) % (params[0] * params[1]):
+            raise ValueError('Empty or misaligned audio')
+        with wave.open(str(output), 'wb') as f:
+            f.setnchannels(params[0]); f.setsampwidth(params[1]); f.setframerate(params[2])
+            f.writeframes(frames)
+        duration = len(frames) / (params[0] * params[1] * params[2])
+        return {'first_audio_latency_s': first, 'wall_s': wall, 'audio_s': duration,
+                'rtf': wall / duration, 'streaming': observed,
+                'requested_protocol': mode, 'content_type': content_type,
+                'output_wav': str(output)}
+    finally:
+        done.set()
+        thread.join(timeout=6)
+        # Mutable result metadata is collected by caller even on an exception.
+        R['last_gpu_sample'] = {'peak_gpu_mb': max(samples) if samples else None,
+                                'gpu_memory_method': 'nvidia-smi GPU0 total used MiB, sampled every 0.2s; includes server resident memory',
+                                'samples': len(samples), 'errors': monitor_errors}
 
-        t0 = time.perf_counter()
-        resp = requests.post(
-            f"http://localhost:{PORT}/v1/audio/speech",
-            json=payload,
-            timeout=300,
-        )
-        first_audio_s = time.perf_counter() - t0
 
-        if resp.status_code == 200:
-            out_path = OUT / f"higgs_audio_{lang}.wav"
-            out_path.write_bytes(resp.content)
-            import soundfile as sf
-            info = sf.info(str(out_path))
-            audio_s = info.frames / info.samplerate
-            wall_s = time.perf_counter() - t0
-            rtf = wall_s / audio_s if audio_s > 0 else None
-            R["tts"][lang] = {
-                "status_code": resp.status_code,
-                "first_audio_s": round(first_audio_s, 3),
-                "wall_s": round(wall_s, 3),
-                "audio_s": round(audio_s, 2),
-                "rtf": round(rtf, 3) if rtf else None,
-                "output_wav": str(out_path),
-                "voice_clone": bool(ref_wav),
-            }
-            step("tts_done", lang=lang, rtf=round(rtf, 3) if rtf else None, first_audio=round(first_audio_s, 3))
-        else:
-            step("tts_http_error", lang=lang, status=resp.status_code, output=resp.text[-500:])
-            R["errors"].append(f"{lang}: HTTP {resp.status_code}: {resp.text[-300:]}")
-            R["tts"][lang] = {"error": f"HTTP {resp.status_code}"}
-    except Exception as e:
-        step("tts_fail", lang=lang, err=f"{type(e).__name__}: {str(e)[:300]}")
-        R["errors"].append(f"{lang}: {type(e).__name__}: {str(e)[:500]}")
-        R["tts"][lang] = {"error": str(e)[:500]}
+def normalise(text):
+    return ''.join(c for c in unicodedata.normalize('NFC', text.lower())
+                   if not unicodedata.category(c).startswith('P')).split()
+
+
+def wer(reference, hypothesis):
+    a, b = normalise(reference), normalise(hypothesis)
+    row = list(range(len(b) + 1))
+    for i, word in enumerate(a, 1):
+        nxt = [i]
+        for j, other in enumerate(b, 1):
+            nxt.append(min(nxt[-1] + 1, row[j] + 1, row[j - 1] + (word != other)))
+        row = nxt
+    return {'wer': row[-1] / len(a), 'word_errors': row[-1], 'reference_words': len(a),
+            'normalised_reference': ' '.join(a), 'normalised_hypothesis': ' '.join(b)}
+
+
+def benchmark(refs, model_load):
+    for lang, ref in refs.items():
+        row = R['tts'][lang]
+        row.update(status='running', model_load_s=model_load, cases={})
+        try:
+            probes = row['protocol_probes'] = []
+            selected = None
+            for mode in ('pcm', 'card_sse', 'explicit_sse'):
+                try:
+                    measurement = synthesize(TEXTS[lang]['short'], ref, mode,
+                                             OUT / f'higgs_{lang}_probe_{mode}.wav')
+                    measurement.update(R['last_gpu_sample'])
+                    probes.append({'status': 'ok', **measurement})
+                    if selected is None:
+                        selected = mode
+                except Exception as exc:
+                    probes.append({'mode': mode, 'status': 'failed', **error('protocol_' + mode, exc, lang)})
+                save()
+            if selected is None:
+                selected = 'non-streaming'  # Explicitly measured and labelled, never called TTFC.
+            for case, text in TEXTS[lang].items():
+                case_row = row['cases'][case] = {'text': text, 'word_count': len(text.split()), 'runs': []}
+                try:
+                    case_row['warmup'] = synthesize(text, ref, selected, OUT / f'higgs_{lang}_{case}_warmup.wav')
+                    for repeat in range(3):
+                        try:
+                            path = OUT / f'higgs_{lang}_{case}_r{repeat + 1}.wav'
+                            measurement = synthesize(text, ref, selected, path)
+                            measurement.update(R['last_gpu_sample'], repeat=repeat + 1, model_load_s=model_load)
+                            case_row['runs'].append(measurement)
+                        except Exception as exc:
+                            case_row['runs'].append({'repeat': repeat + 1, **error(case, exc, lang)})
+                        save()
+                    good = [r for r in case_row['runs'] if 'error' not in r]
+                    if len(good) != 3:
+                        raise RuntimeError(f'{case}: only {len(good)}/3 repeats succeeded; no valid median')
+                    keys = ('model_load_s', 'first_audio_latency_s', 'wall_s', 'audio_s', 'rtf', 'peak_gpu_mb')
+                    case_row['median'] = {k: statistics.median(r[k] for r in good) for k in keys}
+                    case_row.update(status='ok', streaming=good[0]['streaming'])
+                    # Canonical WAV is an actual run nearest median wall time, not synthetic audio.
+                    representative = min(good, key=lambda r: abs(r['wall_s'] - case_row['median']['wall_s']))
+                    dest = OUT / (f'higgs_{lang}.wav' if case == 'short' else f'higgs_{lang}_long.wav')
+                    shutil.copyfile(representative['output_wav'], dest)
+                    case_row.update(output_wav=str(dest), representative_source=representative['output_wav'])
+                except Exception as exc:
+                    case_row.update(status='failed', error=str(exc))
+                    error('case_' + case, exc, lang)
+                save()
+            row['status'] = 'ok' if all(c['status'] == 'ok' for c in row['cases'].values()) else 'failed'
+        except Exception as exc:
+            row.update(status='failed', error=str(exc))
+            error('language', exc, lang)
+        save()
+
+
+def round_trip():
+    jobs, targets = [], {}
+    for lang, row in R['tts'].items():
+        for case in row.get('cases', {}).values():
+            for measurement in case['runs']:
+                if 'output_wav' in measurement:
+                    path = measurement['output_wav']
+                    jobs.append({'path': path, 'lang': lang})
+                    targets[path] = (lang, case['text'], measurement)
+    if not jobs:
+        return
+    try:
+        decoded = transcribe(jobs)
+        R['round_trip_asr'] = {k: v for k, v in decoded.items() if k != 'results'}
+        for path, (lang, text, measurement) in targets.items():
+            try:
+                result = decoded['results'][path]
+                if 'error' in result:
+                    raise RuntimeError(result['error'])
+                measurement['asr'] = {**result, **wer(text, result['text'])}
+            except Exception as exc:
+                measurement['asr'] = error('round_trip', exc, lang)
+                R['tts'][lang]['status'] = 'asr_failed'
+        for row in R['tts'].values():
+            for case in row.get('cases', {}).values():
+                values = [r['asr']['wer'] for r in case['runs'] if 'wer' in r.get('asr', {})]
+                if len(values) == 3 and 'median' in case:
+                    case['median']['wer'] = statistics.median(values)
+                    representative = next(r for r in case['runs'] if r.get('output_wav') == case['representative_source'])
+                    case['asr'] = representative['asr']
+    except Exception as exc:
+        error('round_trip_asr', exc)
+        for row in R['tts'].values():
+            if row['status'] == 'ok':
+                row['status'] = 'asr_failed'
     save()
 
-R["status"] = "complete"
-save()
-print("Higgs Audio v3 kernel complete.", flush=True)
+
+def main():
+    OUT.mkdir(parents=True, exist_ok=True)
+    WORK.mkdir(parents=True, exist_ok=True)
+    R.update(model=MODEL, license='Research and non-commercial; not a production adoption test',
+             texts=TEXTS, supported_languages=['en', 'sk', 'cs'],
+             support_source='Model card production-quality tier; language quality is unmeasured here',
+             tts={lang: {'status': 'not_run'} for lang in TEXTS})
+    step('env', python=sys.version, executable=sys.executable, cwd=os.getcwd())
+    try:
+        # STEP 0 FIRST: no model downloads, ASR setup or serving before this gate.
+        run(['nvidia-smi'], 30)
+        run([sys.executable, '-m', 'pip', 'install', 'uv'], 120)
+        run(['uv', 'python', 'install', '3.12'], 300)
+        run(['uv', 'venv', '--python', '3.12', str(WORK / 'tts')], 120)
+        run(['uv', 'pip', 'install', '--python', TTS_PY, 'torch==2.14.1'], 900)
+        if not t4_gate('initial_t4_gate'):
+            R['status'] = 'unsupported_on_T4'
+            save()
+            return
+        run(['uv', 'pip', 'install', '--python', TTS_PY, '--prerelease=allow', 'sglang-omni==0.2.0'], 1200)
+        if not t4_gate('installed_stack_t4_gate'):
+            R['status'] = 'unsupported_on_T4'
+            save()
+            return
+        run(['uv', 'pip', 'freeze', '--python', TTS_PY], 30)
+        run(['uv', 'venv', '--python', '3.12', str(WORK / 'asr')], 120)
+        run(['uv', 'pip', 'install', '--python', ASR_PY, 'faster-whisper==1.2.1'], 600)
+        run(['uv', 'pip', 'freeze', '--python', ASR_PY], 30)
+        refs = prepare_references()
+        try:
+            model_load = serve()
+        except Exception as exc:
+            error('serve_setup', exc)
+            model_load = None
+        if model_load is None:
+            R['status'] = 'failed_to_serve'
+            save()
+            return
+        benchmark(refs, model_load)
+        stop_server()
+        round_trip()
+        R['status'] = 'complete' if all(r['status'] == 'ok' for r in R['tts'].values()) else 'partial_failure'
+    except Exception as exc:
+        error('fatal', exc)
+        R['status'] = 'failed'
+        R['traceback'] = traceback.format_exc()
+    finally:
+        stop_server()
+        save()
+
+
+if __name__ == '__main__':
+    main()
