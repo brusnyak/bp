@@ -653,5 +653,15 @@
  "{n} routes with speech [many]": "{n} Routen mit Sprache",
  "{n} routes with speech": "{n} Routen mit Sprache",
  "Improve this translation": "Diese Übersetzung verbessern",
- "Translation correction": "Übersetzungskorrektur"
+ "Translation correction": "Übersetzungskorrektur",
+ "More": "Mehr",
+ "Test microphone": "Mikrofon testen",
+ "Voice reference": "Stimmreferenz",
+ "Record or choose a file": "Aufnehmen oder Datei auswählen",
+ "Ready": "Bereit",
+ "Preparing…": "Wird vorbereitet…",
+ "Connecting…": "Verbindung wird hergestellt…",
+ "Open audience link": "Zuhörerlink öffnen",
+ "Copy audience link": "Zuhörerlink kopieren",
+ "Microphone is open. Use headphones or isolated audio to avoid feedback.": "Das Mikrofon ist aktiv. Verwenden Sie Kopfhörer oder getrennte Audiokanäle, um Rückkopplungen zu vermeiden."
 }

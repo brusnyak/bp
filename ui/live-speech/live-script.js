@@ -1,12 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const burgerMenuBtn = document.getElementById('burgerMenuBtn');
-    const sidebar = document.getElementById('sidebar');
-    const closeSidebarBtn = document.getElementById('closeSidebarBtn');
     const ttsModelSelect = document.getElementById('ttsModelSelect');
     const inputLanguageSelect = document.getElementById('inputLanguageSelect');
     const voiceSelectionGroup = document.getElementById('voice-selection-group');
     const speakerVoiceSelect = document.getElementById('speakerVoiceSelect');
-    const mainControlsTopRow = document.querySelector('.main-controls .top-row');
     const recordVoiceBtn = document.getElementById('recordVoiceBtn');
     const voiceConfigModal = document.getElementById('voiceConfigModal');
     const closeModalBtn = document.getElementById('closeModalBtn');
@@ -17,26 +13,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const speakerVoiceUploadModal = document.getElementById('speakerVoiceUploadModal');
     const currentSpeakerVoiceModal = document.getElementById('currentSpeakerVoiceModal');
     const modalInputLanguageSelect = document.getElementById('modalInputLanguageSelect');
-    const readingText = document.getElementById('readingText');
     const voiceNamingModal = document.getElementById('voiceNamingModal');
     const closeNamingModalBtn = document.getElementById('closeNamingModalBtn');
     const saveVoiceNameBtn = document.getElementById('saveVoiceNameBtn');
     const cancelVoiceNameBtn = document.getElementById('cancelVoiceNameBtn');
-    const deleteConfirmationModal = document.getElementById('deleteConfirmationModal');
-    const closeDeleteModalBtn = document.getElementById('closeDeleteModalBtn');
-    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-    const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
     const inputLevelSegments = document.getElementById('inputLevelSegments');
     const modalInputLevelSegments = document.getElementById('modalInputLevelSegments');
     const voiceNameInput = document.getElementById('voiceNameInput'); // Added for voice naming modal
 
-    const SPEAKER_VOICES_DIR = "speaker_voices"; // Define SPEAKER_VOICES_DIR for frontend use
 
     let mediaRecorder;
     let audioChunks = [];
     let audioStream; // To store the microphone stream
     let currentRecordedBlob = null; // To store the recorded audio blob temporarily
-    let voiceToEdit = null; // To store the voice data when editing
     let notificationTimeout; // For custom notifications
     let websocket; // Declare websocket globally
     let latencyChart = null; // Declare latencyChart globally within the DOMContentLoaded scope
@@ -127,10 +116,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 virtualMicHint.style.color = 'var(--log-success-color)';
                 // Availability is not a successful routing check.
             } else if (audioOutputs.length && audioOutputs.every(d => !d.label)) {
-                virtualMicHint.textContent = 'Device names are hidden until the browser has microphone permission. Run the sound check above to detect a virtual cable.';
+                virtualMicHint.textContent = 'Device names are hidden until the browser has microphone permission. Run the microphone test to detect a virtual cable.';
                 virtualMicHint.style.color = 'var(--secondary-color)';
             } else {
-                virtualMicHint.textContent = 'Playback stays on speakers/headphones. A virtual cable (BlackHole, VB-Cable) is needed only to send audio into a meeting; see the steps below.';
+                virtualMicHint.textContent = 'Playback stays on speakers/headphones. A virtual cable (BlackHole, VB-Cable) is needed only to send audio into a meeting; select the cable as your meeting microphone.';
                 virtualMicHint.style.color = 'var(--secondary-color)'; // informational, not a warning (orange failed contrast)
                 console.warn('Frontend: No virtual audio device detected. Translation will play through default output.');
             }
@@ -219,6 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
         emaLevel = emaLevel * (1 - EMA_ALPHA) + scaled * EMA_ALPHA;
 
         const normalizedLevel = Math.min(1, Math.max(0, emaLevel));
+        inputLevelSegments.setAttribute('aria-valuenow', String(Math.round(normalizedLevel * 100)));
         const activeSegments = Math.ceil(normalizedLevel * NUM_LEVEL_SEGMENTS);
 
         // Debug logging - remove after testing
@@ -252,12 +242,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let captureGeneration = 0;
     let soundCheckStream = null;
     let soundCheckRecorder = null;
-    let checkedDevices = null;
+
     let starting = false;
     // Playback timing goes to the server session log (BP_LOG_SESSIONS=1) so lag can be split into chunking, recognition and playback queueing.
-    const playback = new SessionPlayback({ adaptive: true, onEvent: e => { try { if (websocket && websocket.readyState === 1) websocket.send(JSON.stringify({ type: 'client_event', t_ms: Math.round(performance.timeOrigin + performance.now()), ...e })); } catch (_) {} }, onError: error => {
+    const playback = new SessionPlayback({ adaptive: true, makeAudio: url => {
+        const audio = new Audio(url);
+        audio.addEventListener('ended', () => { if (isStreaming) setRouteStatus('Listening'); });
+        return audio;
+    }, onEvent: e => { if (isStreaming && e.event === 'tts_play_start') setRouteStatus('Speaking');  try { if (websocket && websocket.readyState === 1) websocket.send(JSON.stringify({ type: 'client_event', t_ms: Math.round(performance.timeOrigin + performance.now()), ...e })); } catch (_) {} }, onError: error => {
         stopRealtimeAudioStreaming();
-        checkedDevices = null;
+
         updateStartAvailability();
         showNotification(error.message, 'error');
     }});
@@ -274,31 +268,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const setRouteStatus = text => { if (routeStatus) routeStatus.textContent = text; };
     const deviceFingerprint = () => `${document.getElementById('audioInputSelect').value}|${selectedAudioOutputDeviceId || ''}`;
-    // Read by live-flow.js (the guided button). Called wherever streaming or preparation state changes.
+    let pendingPreparation = null;
+    const finishPreparation = ready => {
+        if (!pendingPreparation) return;
+        clearTimeout(pendingPreparation.timer);
+        pendingPreparation.resolve(ready);
+        pendingPreparation = null;
+    };
     const publishLive = () => {
-        window.__live = { isStreaming, starting, modelsReady, soundChecked: checkedDevices === deviceFingerprint(), isolated: document.getElementById('isolationConfirmed').checked };
+        window.__live = { isStreaming, starting, modelsReady };
         document.dispatchEvent(new Event('livestate'));
     };
     const updateStartAvailability = () => {
-        const soundChecked = checkedDevices === deviceFingerprint();
-        const isolated = document.getElementById('isolationConfirmed').checked;
-        startStopBtn.disabled = !(isStreaming || starting || (modelsReady && soundChecked && isolated));
+        startStopBtn.disabled = !isStreaming && !starting && (!websocket || websocket.readyState !== WebSocket.OPEN);
+        startStopBtn.textContent = isStreaming || starting ? 'Stop' : 'Start';
+        const label = audioOutputSelect.selectedOptions[0]?.textContent || '';
+        document.getElementById('feedbackWarning').hidden = !(isStreaming && !/headphone|headset|blackhole|vb[- ]?(cable|audio)/i.test(label));
         publishLive();
-        const reason = document.getElementById('startReason');
-        if (reason) {
-            reason.textContent = isStreaming ? 'Running. Stop ends capture and discards queued audio.'
-                : starting ? 'Starting...'
-                : !modelsReady ? 'Next: prepare the route.'
-                : !soundChecked ? 'Next: run the microphone and playback check.'
-                : !isolated ? 'Next: confirm headphones or isolated meeting audio.'
-                : 'Ready. Press Start.';
-        }
     };
-    document.getElementById('isolationConfirmed').addEventListener('change', updateStartAvailability);
     for (const id of ['audioInputSelect', 'audioOutputSelect']) document.getElementById(id).addEventListener('change', () => {
-        stopRealtimeAudioStreaming(); checkedDevices = null;
-        document.getElementById('isolationConfirmed').checked = false;
-        document.getElementById('soundCheckStatus').textContent = 'Devices changed. Run the sound check again.';
+        stopRealtimeAudioStreaming();
+        document.getElementById('soundCheckStatus').textContent = '';
     });
     document.getElementById('soundCheckBtn').addEventListener('click', async () => {
         stopRealtimeAudioStreaming();
@@ -306,8 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const button = document.getElementById('soundCheckBtn');
         const status = document.getElementById('soundCheckStatus');
         const fingerprint = deviceFingerprint();
-        checkedDevices = null;
-        document.getElementById('isolationConfirmed').checked = false;
+
         button.disabled = true;
         let checkedStream = null;
         let recorder = null;
@@ -332,12 +321,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (generation !== captureGeneration || fingerprint !== deviceFingerprint()) return;
             await enumerateAudioOutputDevices();
             if (generation !== captureGeneration || fingerprint !== deviceFingerprint()) return;
-            checkedDevices = deviceFingerprint();
+
             updateStartAvailability();
             playback.start();
             playback.enqueue(new Blob(chunks, { type: recorder.mimeType }), selectedAudioOutputDeviceId || '');
-            status.textContent = 'Check that you hear your phrase on the intended output, then confirm isolation below. This checks devices, not translation quality.';
-        } catch (error) { status.textContent = `Sound check failed: ${error.message}`; checkedDevices = null; }
+            status.textContent = 'Check that you hear your phrase on the intended output, use headphones if needed. This checks devices, not translation quality.';
+        } catch (error) { status.textContent = `Sound check failed: ${error.message}`; }
         finally {
             if (recorder && recorder.state !== 'inactive') recorder.stop();
             if (checkedStream) checkedStream.getTracks().forEach(track => track.stop());
@@ -347,12 +336,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     navigator.mediaDevices?.addEventListener('devicechange', () => {
-        stopRealtimeAudioStreaming(); checkedDevices = null;
-        document.getElementById('isolationConfirmed').checked = false;
+        stopRealtimeAudioStreaming();
         enumerateAudioOutputDevices();
         setRouteStatus('Audio devices changed. Check input/output and run the sound check again.');
     });
-    // Guest demo session: no account, no voice management. Server decides (GET /api/auth/config guest_enabled).
+    // Local session token; Server decides (GET /api/auth/config guest_enabled).
     let guestRetried = false;
     async function startGuestSession() {
         try {
@@ -373,10 +361,10 @@ document.addEventListener('DOMContentLoaded', () => {
         clearTimeout(reconnectTimer);
         const token = localStorage.getItem('userToken');
         if (!token) {
-            setRouteStatus('Starting a guest session...');
+            setRouteStatus('Connecting…');
             startGuestSession().then(ok => {
                 if (ok) setupWebSocket();
-                else setRouteStatus('Sign in to prepare a session. No microphone capture is active.');
+                else setRouteStatus('Local session unavailable. Check the translation service configuration and reload.');
             });
             return;
         }
@@ -386,7 +374,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         websocket.onopen = (event) => {
             modelsReady = false;
-            initBtn.disabled = false;
+            updateStartAvailability();
+            setRouteStatus('Ready');
+            renderVoices();
             showNotification('Connected to translation service.', 'success');
         };
 
@@ -399,67 +389,35 @@ document.addEventListener('DOMContentLoaded', () => {
                     const rms = message.level || 0;
                     updateMainMicLevel(rms);
                 } else if (message.type === 'models_loading_status') {
-                    if (message.route_status) setRouteStatus(`${message.route_status.pair || 'Route'}: ${message.route_status.status}. ${message.route_status.reason || ''}`);
+                    if (!pendingPreparation) return;
+                    if (message.route_status) logActivity(JSON.stringify(message.route_status), 'info');
                     modelsReady = Boolean(message.fully_loaded);
-                    if (message.fully_loaded) {
-                        initBtn.disabled = true; // Disable initialize button
-                        initBtn.classList.remove('btn-active'); // Dim initialize button
-                        updateStartAvailability(); // Models alone do not complete preparation
-                        startStopBtn.classList.add('btn-active'); // Light up start button
-                        statusLabel.textContent = 'Initialized — sound check before Start';
-                        statusIndicator.classList.remove('off');
-                        statusIndicator.classList.add('on');
-                        showNotification('Models loaded. Route quality and cloned speech still need qualification.', 'info');
-                        logActivity('All models initialized successfully', 'success');
-                    } else {
-                        initBtn.disabled = false; // Enable initialize button
-                        initBtn.classList.add('btn-active'); // Light up initialize button (if it was dimmed)
-                        startStopBtn.disabled = true; // Disable start button
-                        startStopBtn.classList.remove('btn-active'); // Dim start button
-                        statusLabel.textContent = 'Select a direction, then Initialize';
-                        statusIndicator.classList.remove('on');
-                        statusIndicator.classList.add('off');
-                        // A fresh connection is intentionally not initialized.
-                        logActivity('Model initialization failed', 'error');
+                    if (modelsReady) {
+                        finishPreparation(true);
+                        if (!starting) setRouteStatus('Ready');
+                        updateStartAvailability();
+                        logActivity('Route prepared', 'success');
+                    } else if (starting) {
+                        setRouteStatus('Preparing…');
                     }
                 } else if (message.type === 'error') {
                     modelsReady = false;
                     stopRealtimeAudioStreaming();
-                    initBtn.disabled = false;
-                    startStopBtn.disabled = true;
+                    updateStartAvailability();
                     showNotification(message.message || 'Route preparation failed. Check installed assets and prepare again.', 'error');
                 } else if (message.type === 'caption_partial') {
-                    // T044 backend now has a face: streaming LocalAgreement caption,
-                    // shown ~2s ahead of the final transcript on the subtitle strip.
-                    const captionLive = document.getElementById('captionLive');
-                    if (captionLive) captionLive.textContent = message.text;
-                    const subtitleStrip = document.getElementById('subtitleStrip');
-                    if (subtitleStrip) subtitleStrip.classList.add('live');
+                    document.getElementById('transcriptionOutput').textContent = message.text;
                     updatePip(message.text, undefined);
                 } else if (message.type === 'transcription_result') {
                     document.getElementById('transcriptionOutput').textContent = message.transcribed;
-                    const captionLive = document.getElementById('captionLive');
-                    if (captionLive) captionLive.textContent = message.transcribed;
                     updatePip(message.transcribed, undefined);
                     
-                    // Update state indicator: Translating
-                    const stateTranslating = document.getElementById('stateTranslating');
-                    if (stateTranslating) {
-                        stateTranslating.classList.remove('idle');
-                        stateTranslating.classList.add('active');
-                    }
-                    
+                    if (isStreaming) setRouteStatus('Translating');
+
                     if (latencyChart) latencyChart.update();
                 } else if (message.type === 'translation_result') {
                     document.getElementById('translationOutput').textContent = message.translated;
                     updatePip(undefined, message.translated);
-                    
-                    // Update state indicator: Speaking
-                    const stateSpeaking = document.getElementById('stateSpeaking');
-                    if (stateSpeaking) {
-                        stateSpeaking.classList.remove('idle');
-                        stateSpeaking.classList.add('active');
-                    }
                     
                     if (latencyChart) latencyChart.update();
                 } else if (message.type === 'final_metrics') {
@@ -493,26 +451,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         settingsStatusText.textContent = `Last processed: ${new Date().toLocaleTimeString()} | Total: ${(message.metrics.total_latency || 0).toFixed(2)}s`;
                     }
 
-                    // Reset state indicators after processing complete
-                    setTimeout(() => {
-                        const stateListening = document.getElementById('stateListening');
-                        const stateTranslating = document.getElementById('stateTranslating');
-                        const stateSpeaking = document.getElementById('stateSpeaking');
-                        
-                        if (stateListening) {
-                            stateListening.classList.remove('active');
-                            stateListening.classList.add('idle');
-                        }
-                        if (stateTranslating) {
-                            stateTranslating.classList.remove('active');
-                            stateTranslating.classList.add('idle');
-                        }
-                        if (stateSpeaking) {
-                            stateSpeaking.classList.remove('active');
-                            stateSpeaking.classList.add('idle');
-                        }
-                    }, 1000); // Reset after 1 second
-
                 } else if (message.type === 'lag_trace') {
                     window.updateLatencyChart(message);
                 } else if (message.type === 'status' || message.type === 'notification') {
@@ -539,18 +477,17 @@ document.addEventListener('DOMContentLoaded', () => {
         websocket.onclose = (event) => {
             modelsReady = false;
             stopRealtimeAudioStreaming();
-            startStopBtn.disabled = true;
-            initBtn.disabled = true;
+            updateStartAvailability();
             if ([1008, 4003, 4401, 4403].includes(event.code)) {
                 const wasGuest = localStorage.getItem('userGuest') === '1';
                 localStorage.removeItem('userToken');
                 if (wasGuest && !guestRetried) { guestRetried = true; setupWebSocket(); return; }
-                setRouteStatus('Sign-in expired or rejected. Sign in again to prepare a session.');
+                setRouteStatus('Local session expired or rejected. Reload to reconnect.');
                 return;
             }
             showNotification('Disconnected from translation service.', 'warning');
             // Attempt to reconnect after a delay
-            setRouteStatus('Connection lost. Capture stopped. Reconnecting; prepare again before Start.');
+            setRouteStatus('Connection lost. Capture stopped. Reconnecting…');
             reconnectTimer = setTimeout(setupWebSocket, 5000);
         };
     }
@@ -563,9 +500,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const startStopBtn = document.getElementById('startStopBtn');
-    const statusLabel = document.getElementById('statusLabel');
-    const statusIndicator = document.getElementById('statusIndicator');
-    const initBtn = document.getElementById('initBtn'); // Get the initialize button
 
     let isStreaming = false; // Track if real-time streaming is active
     let modalAudioContext = null; // For modal mic level visualization
@@ -574,9 +508,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let animationFrameId = null; // To cancel animation frame for modal mic level
 
     // Set initial button states
-    initBtn.disabled = false;
+    updateStartAvailability();
     startStopBtn.disabled = true;
-    initBtn.classList.add('btn-active'); // Initialize button is active by default
     startStopBtn.classList.remove('btn-active');
 
     // Function to start real-time audio streaming
@@ -587,11 +520,9 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Frontend: Calling navigator.mediaDevices.getUserMedia...'); // Added log before getUserMedia
 
 
-            if (!modelsReady || !websocket || websocket.readyState !== WebSocket.OPEN) throw new Error('Initialize the selected route before Start.');
-            if (checkedDevices !== deviceFingerprint()) throw new Error('Run the sound check for these devices before Start.');
-            if (!document.getElementById('isolationConfirmed').checked) throw new Error('Confirm headphones or isolated input/output before Start.');
+            if (!modelsReady || !websocket || websocket.readyState !== WebSocket.OPEN) throw new Error('Route unavailable. Press Start to prepare it again.');
             const deviceId = document.getElementById('audioInputSelect').value;
-            // Echo cancellation, noise suppression and automatic gain are OFF by default (the page already requires headphones or isolated audio);
+            // Echo cancellation, noise suppression and automatic gain are OFF by default (the page warns about feedback with speakers);
             // ?mic=processed switches them back on. The choice is written to the session log as a client event.
             const rawMic = new URLSearchParams(location.search).get('mic') !== 'processed';   // raw is the default since the 2026-11-08 A/B (English, same engine: 2.7% error raw against 6.7% processed)
             const audioConstraints = { audio: {
@@ -609,6 +540,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Mic permission unlocks real device labels/ids: re-enumerate outputs so the
             // playback dropdown carries usable deviceIds (pre-permission they are empty).
             try { await enumerateAudioOutputDevices(); } catch (e) { console.warn('Frontend: output re-enumeration failed:', e); }
+            if (generation !== captureGeneration) return;
             mainAudioStream.getAudioTracks().forEach((track, index) => {
                 console.log(`Frontend: Audio Track ${index}: id=${track.id}, label=${track.label}, readyState=${track.readyState}, enabled=${track.enabled}`);
             });
@@ -683,9 +615,8 @@ document.addEventListener('DOMContentLoaded', () => {
             isStreaming = true; publishLive();
             playback.start();
             startStopBtn.textContent = 'Stop';
-            statusLabel.textContent = 'Listening...';
-            statusIndicator.classList.remove('off');
-            statusIndicator.classList.add('on');
+            setRouteStatus('Listening');
+            updateStartAvailability();
             showNotification('Real-time streaming started.', 'success');
             logActivity('Session started - real-time streaming active', 'success');
         } catch (err) {
@@ -699,6 +630,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to stop real-time audio streaming
     function stopRealtimeAudioStreaming() {
         captureGeneration++;
+        finishPreparation(false);
         starting = false;
         isStreaming = false; publishLive();
         playback.stop();
@@ -743,9 +675,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         isStreaming = false; publishLive();
         startStopBtn.textContent = 'Start';
-        statusLabel.textContent = modelsReady ? 'Stopped — ready to start' : 'Not initialized';
-        statusIndicator.classList.remove('on');
-        statusIndicator.classList.add('off');
+        setRouteStatus('Ready');
         showNotification('Real-time streaming stopped.', 'info');
         logActivity('Session ended - streaming stopped', 'info');
         updateMainMicLevel(0); // Reset mic level display
@@ -759,21 +689,37 @@ document.addEventListener('DOMContentLoaded', () => {
         showNotification('Real-time streaming stopped.', 'info');
     }
 
-    // Event listener for the main Start/Stop button
-    if (startStopBtn) {
-        startStopBtn.addEventListener('click', () => {
-            console.log('Frontend: Start/Stop button clicked. isStreaming:', isStreaming); // Added log
-            if (isStreaming || starting) {
-                stopRealtimeAudioStreaming();
-            } else {
-                starting = true; publishLive();
-                startRealtimeAudioStreaming().finally(() => { starting = false; publishLive(); });
+    // Start prepares the selected route, then opens capture. Stop is terminal at every await.
+    startStopBtn.addEventListener('click', async () => {
+        if (isStreaming || starting) { stopRealtimeAudioStreaming(); return; }
+        stopRealtimeAudioStreaming();
+        const generation = captureGeneration;
+        starting = true;
+        updateStartAvailability();
+        try {
+            if (!modelsReady) {
+                setRouteStatus('Preparing…');
+                const prepared = new Promise(resolve => {
+                    pendingPreparation = { resolve, timer: setTimeout(() => {
+                        finishPreparation(false);
+                        if (generation === captureGeneration) setRouteStatus('Preparation timed out. Press Start to retry.');
+                    }, 120000) };
+                });
+                const sent = await sendConfigUpdate();
+                if (generation !== captureGeneration) return;
+                if (!sent) finishPreparation(false);
+                if (!await prepared || generation !== captureGeneration) return;
             }
-        });
-    }
+            if (generation === captureGeneration) await startRealtimeAudioStreaming();
+        } catch (error) {
+            if (generation === captureGeneration) { stopRealtimeAudioStreaming(); showNotification(error.message, 'error'); }
+        } finally {
+            if (generation === captureGeneration) { starting = false; updateStartAvailability(); }
+        }
+    });
 
     // PiP floating subtitles (spec 002 US1): hidden canvas-fed video popped out via
-    // requestPictureInPicture. Mirrors the subtitle strip (transcript + translation) so
+    // requestPictureInPicture. Mirrors the subtitle panels (transcript + translation) so
     // captions follow across tabs/windows/apps with zero installs. Needs a user gesture;
     // unsupported browsers get a notice instead of silence.
     let pipVideo = null, pipCanvas = null, pipCtx = null;
@@ -892,7 +838,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
                 if (!('pictureInPictureEnabled' in document) || !document.pictureInPictureEnabled) {
-                    showNotification('Picture-in-Picture is not supported in this browser. The in-page subtitle strip still works.', 'error');
+                    showNotification('Picture-in-Picture is not supported in this browser. The in-page subtitle panels still work.', 'error');
                     return;
                 }
                 if (!pipCanvas) {
@@ -934,17 +880,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!websocket || websocket.readyState !== WebSocket.OPEN) {
             console.warn('Frontend: WebSocket not ready. Cannot send config update.');
             showNotification('WebSocket not connected. Cannot update configuration.', 'error');
-            initBtn.disabled = false;
             return false;
         }
 
         const sourceLang = inputLanguageSelect.value;
         const targetLang = document.getElementById('outputLanguageSelect').value;
-        stopRealtimeAudioStreaming();
         const generation = captureGeneration;
         modelsReady = false;
-        startStopBtn.disabled = true;
-        initBtn.disabled = true;
+        updateStartAvailability();
         try {
             const response = await fetch('/api/routes', { cache: 'no-store' });
             if (!response.ok) throw new Error('Cannot check installed route assets. Retry preparation.');
@@ -954,9 +897,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!route) throw new Error('Choose an explicitly declared input and target language pair. Automatic or undeclared routes need evaluation first.');
             if (!route.assets.resolved) throw new Error('Setup required before this route can run: ' + route.assets.errors.join('; '));
         } catch (error) {
-            if (generation === captureGeneration) {
-                showNotification(error.message, 'error'); initBtn.disabled = false;
-            }
+            if (generation === captureGeneration) showNotification(error.message, 'error');
             return false;
         }
         const ttsModelChoice = ttsModelSelect.value;
@@ -996,22 +937,20 @@ document.addEventListener('DOMContentLoaded', () => {
             })())
         };
 
-        if (generation !== captureGeneration || websocket.readyState !== WebSocket.OPEN) { initBtn.disabled = false; return false; }
+        if (generation !== captureGeneration || websocket.readyState !== WebSocket.OPEN) return false;
         websocket.send(JSON.stringify(configMessage));
         
         // Update UI to loading state
-        startStopBtn.disabled = true;
+        updateStartAvailability();
         startStopBtn.classList.remove('btn-active');
-        statusLabel.textContent = 'Loading...';
-        statusIndicator.classList.remove('on');
-        statusIndicator.classList.add('off');
+        setRouteStatus('Preparing…');
         return true;
     }
 
     const invalidatePreparation = () => {
         stopRealtimeAudioStreaming(); modelsReady = false;
-        startStopBtn.disabled = true; initBtn.disabled = false;
-        setRouteStatus('Direction or voice changed. Initialize the selected route before Start.');
+        updateStartAvailability();
+        setRouteStatus('Ready');
     };
     // Selection never silently starts model loading.
     const strategySelectEl = document.getElementById('strategySelect');
@@ -1068,83 +1007,17 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('languagechange', syncDirection);
     syncDirection();
 
-    // Event listener for the Initialize Pipeline button
-    if (initBtn) {
-        initBtn.addEventListener('click', async () => {
-            showNotification('Initializing models...', 'info');
-            
-            const userToken = localStorage.getItem('userToken');
-            if (!userToken) {
-                showNotification('You must be logged in to initialize models.', 'error');
-                return;
-            }
-
-            // Send config update to trigger initialization via WebSocket
-            const sent = await sendConfigUpdate();
-
-            initBtn.disabled = Boolean(sent);
-            initBtn.classList.remove('btn-active');
-        });
-    }
-
-    // Toggle visibility of speaker voice selection based on TTS model and re-initialize
-    if (ttsModelSelect && mainControlsTopRow) {
-        const updateVoiceSelectionVisibilityAndReinitialize = () => {
-            const currentTtsModelChoice = ttsModelSelect.value;
-            if (currentTtsModelChoice === 'xtts') { // Show for XTTS
-                voiceSelectionGroup.classList.remove('hidden');
-                mainControlsTopRow.classList.add('expanded');
-            } else {
-                voiceSelectionGroup.classList.add('hidden');
-                mainControlsTopRow.classList.remove('expanded');
-            }
-
-            // Trigger re-initialization when TTS model changes
-            const ttsModelName = ttsModelSelect.options[ttsModelSelect.selectedIndex].text;
-            showNotification('Voice profile changed. Initialize the selected route.', 'info');
-            logActivity(`TTS model changed to: ${ttsModelName}`, 'info');
-            invalidatePreparation();
-        };
-
-        ttsModelSelect.addEventListener('change', updateVoiceSelectionVisibilityAndReinitialize);
-        
-        // Also trigger update when voice changes
-        if (speakerVoiceSelect) {
-            speakerVoiceSelect.addEventListener('change', () => {
-                const voiceName = speakerVoiceSelect.options[speakerVoiceSelect.selectedIndex].text;
-                showNotification('Voice changed. Initialize the selected route.', 'info');
-                logActivity(`Voice changed to: ${voiceName}`, 'info');
-                invalidatePreparation();
-            });
-        }
-
-        // Set initial state (but don't trigger update on load to avoid double init)
-        const currentTtsModelChoice = ttsModelSelect.value;
-        if (currentTtsModelChoice === 'xtts') {
-            voiceSelectionGroup.classList.remove('hidden');
-            mainControlsTopRow.classList.add('expanded');
-        } else {
-            voiceSelectionGroup.classList.add('hidden');
-            mainControlsTopRow.classList.remove('expanded');
-        }
-    }
-
-    const voiceLanguageSections = document.getElementById('voiceLanguageSections');
-    const accountButton = document.getElementById('accountButton');
-    const accountFloatingContainer = document.getElementById('accountFloatingContainer');
-    const logoutButton = document.querySelector('.logout-button');
-    const accountUserIcon = document.getElementById('accountUserIcon');
-    const accountDisplayUsername = document.getElementById('accountDisplayUsername');
-    const accountDisplayEmail = document.getElementById('accountDisplayEmail');
-    const accountUsernameSpan = document.getElementById('accountUsername'); // Span inside the account button
+    ttsModelSelect.addEventListener('change', () => {
+        voiceSelectionGroup.classList.toggle('hidden', ttsModelSelect.value !== 'xtts');
+        invalidatePreparation();
+    });
+    speakerVoiceSelect.addEventListener('change', invalidatePreparation);
 
     // Function to load voices from backend API
     async function loadVoices() {
         const userToken = localStorage.getItem('userToken');
         if (!userToken) {
-            console.warn('No user token found. Loading only default voices.');
-            // Optionally, redirect to login or show a message
-            // For now, we'll proceed without user-specific voices
+            return [];
         }
 
         try {
@@ -1164,263 +1037,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Function to render voices in the sidebar and XTTS dropdown
+    // References already available to this session; no library management on this page.
     async function renderVoices() {
         const voices = await loadVoices();
-
-        // Render in sidebar
-        if (voiceLanguageSections) {
-            const voicesByLanguage = voices.reduce((acc, voice) => {
-                // Ensure voice.language is a string, default to 'unknown' if undefined
-                const lang = (voice.language || 'unknown').toLowerCase();
-                if (!acc[lang]) {
-                    acc[lang] = [];
-                }
-                acc[lang].push(voice);
-                return acc;
-            }, {});
-
-            voiceLanguageSections.innerHTML = ''; // Clear existing content
-
-            for (const langCode in voicesByLanguage) {
-                const langSection = document.createElement('div');
-                langSection.classList.add('voice-language-section');
-
-                const langToggle = document.createElement('h4');
-                langToggle.classList.add('language-toggle');
-                langToggle.innerHTML = `-${langCode} <span class="material-symbols-outlined expand-icon">expand_more</span>`;
-                langSection.appendChild(langToggle);
-
-                const ul = document.createElement('ul');
-                ul.classList.add('voice-list', 'hidden'); // Start hidden
-                langSection.appendChild(ul);
-
-                voicesByLanguage[langCode].forEach(voice => {
-                    const li = document.createElement('li');
-                    li.dataset.voicePath = voice.path; // Store voice path
-                    li.dataset.voiceText = voice.transcribed_text; // Store transcribed text
-                    li.dataset.voiceLang = voice.language; // Store voice language
-                    li.dataset.voiceFilename = voice.filename || '';
-                    const noFile = !voice.filename || voice.filename === 'unknown_filename.wav';
-                    li.innerHTML = `
-                        <span>--${voice.name}</span>
-                        <div class="voice-actions">
-                            <button data-id="${voice.id}" class="play-voice-btn" title="Listen to this voice"${noFile ? ' disabled' : ''}>Play</button>
-                            <button data-id="${voice.id}" class="edit-voice-btn">Edit</button>
-                            <button data-id="${voice.id}" class="delete-voice-btn">Delete</button>
-                        </div>
-                    `;
-                    ul.appendChild(li);
-                });
-                voiceLanguageSections.appendChild(langSection);
-            }
-
-            // Add event listeners for language toggles and voice selection
-            voiceLanguageSections.addEventListener('click', (event) => {
-                const toggleElement = event.target.closest('.language-toggle');
-                if (toggleElement) {
-                    const voiceList = toggleElement.nextElementSibling;
-                    const expandIcon = toggleElement.querySelector('.expand-icon');
-
-                    voiceList.classList.toggle('hidden');
-                    if (voiceList.classList.contains('hidden')) {
-                        expandIcon.textContent = 'expand_more';
-                    } else {
-                        expandIcon.textContent = 'expand_less';
-                    }
-                } else if (event.target.classList.contains('play-voice-btn')) {
-                    const voiceId = event.target.dataset.id;
-                    const row = event.target.closest('li');
-                    const filename = row && row.dataset.voiceFilename;
-                    if (!filename) {
-                        showNotification('No audio file stored for this voice.', 'error');
-                    } else {
-                        const btn = event.target;
-                        btn.disabled = true;
-                        btn.textContent = '…';
-                        stopRealtimeAudioStreaming();
-                        const generation = captureGeneration;
-                        const userToken = localStorage.getItem('userToken');
-                        fetch(`/api/voices/file?filename=${encodeURIComponent(filename)}`, {
-                            headers: userToken ? { Authorization: `Bearer ${userToken}` } : {},
-                        }).then((r) => {
-                            if (!r.ok) throw new Error(`HTTP ${r.status}`);
-                            return r.blob();
-                        }).then((blob) => {
-                            if (generation !== captureGeneration) return;
-                            playback.start();
-                            playback.enqueue(blob, selectedAudioOutputDeviceId || '');
-                        }).catch((err) => {
-                            console.error('Frontend: Voice preview failed:', err);
-                            showNotification('Could not play this voice: ' + err.message, 'error');
-                        }).finally(() => {
-                            btn.disabled = false;
-                            btn.textContent = 'Play';
-                        });
-                    }
-                } else if (event.target.classList.contains('edit-voice-btn')) {                    const voiceId = event.target.dataset.id;
-                    voiceToEdit = voices.find(v => v.id === voiceId); // Find the full voice object
-                    if (voiceToEdit) {
-                        voiceNameInput.value = voiceToEdit.name; // Populate input with current name
-                        voiceNamingModal.classList.add('open'); // Open naming modal for editing
-                    }
-                } else if (event.target.classList.contains('delete-voice-btn')) {
-                    const voiceId = event.target.dataset.id;
-                    voiceToEdit = voices.find(v => v.id === voiceId); // Find the full voice object
-                    if (voiceToEdit) {
-                        document.getElementById('deleteConfirmationText').textContent = `Are you sure you want to delete "${voiceToEdit.name}"?`;
-                        deleteConfirmationModal.classList.add('open'); // Open delete confirmation modal
-                    }
-                } else if (event.target.closest('li') && !event.target.classList.contains('edit-voice-btn') && !event.target.classList.contains('delete-voice-btn')) {
-                    const selectedVoiceLi = event.target.closest('li');
-                    const voicePath = selectedVoiceLi.dataset.voicePath;
-                    const voiceText = selectedVoiceLi.dataset.voiceText;
-                    const voiceLang = selectedVoiceLi.dataset.voiceLang;
-                    const voiceName = selectedVoiceLi.querySelector('span').textContent.replace('--', '');
-
-                    // Remove 'selected' class from all other voice list items
-                    document.querySelectorAll('.voice-list li').forEach(item => {
-                        item.classList.remove('selected');
-                    });
-                    // Add 'selected' class to the clicked voice
-                    selectedVoiceLi.classList.add('selected');
-
-                    // Update speaker voice dropdown
-                    const optionExists = Array.from(speakerVoiceSelect.options).some(option => option.value === voicePath);
-                    if (!optionExists) {
-                        const newOption = document.createElement('option');
-                        newOption.value = voice.path;
-                        newOption.textContent = voice.name;
-                        speakerVoiceSelect.appendChild(newOption);
-                    }
-                    speakerVoiceSelect.value = voicePath;
-                    speakerVoiceSelect.dispatchEvent(new Event('change')); // Trigger change event
-
-                    // Update current selected voice in UI
-                    console.log(`Selected voice: ${voiceName} (Path: ${voicePath}, Text: ${voiceText}, Lang: ${voiceLang})`);
-                    // You might want to send this to the backend for configuration
-                }
-            });
-        }
-
-        // Render in speaker voice dropdown
-        if (speakerVoiceSelect) {
-            speakerVoiceSelect.innerHTML = '<option value="">Select a voice</option>'; // Clear existing options
-            voices.forEach(voice => {
-                const option = document.createElement('option');
-                option.value = voice.path;
-                option.textContent = voice.name;
-                option.dataset.voiceLang = voice.language; // Store language for later use
-                speakerVoiceSelect.appendChild(option);
-            });
-
-            // Add event listener for speaker voice dropdown change
-            speakerVoiceSelect.addEventListener('change', (event) => {
-                const selectedPath = event.target.value;
-                document.querySelectorAll('.voice-list li').forEach(item => {
-                    if (item.dataset.voicePath === selectedPath) {
-                        item.classList.add('selected');
-                    } else {
-                        item.classList.remove('selected');
-                    }
-                });
-            });
-        }
-    }
-
-    // Initial render of voices
-    renderVoices().then(() => {
-        // After rendering, if there's a pre-selected voice (e.g., from localStorage or default),
-        // ensure it's highlighted and selected in the dropdown.
-        // For now, we'll just ensure the dropdown change event is triggered if a value is set.
-        if (speakerVoiceSelect.value) {
-            speakerVoiceSelect.dispatchEvent(new Event('change'));
-        }
-    });
-
-    // Initialize user info on page load
-    const storedUsername = localStorage.getItem('userName');
-    const storedEmail = localStorage.getItem('userEmail');
-    if (storedUsername) {
-        accountUsernameSpan.textContent = storedUsername;
-        accountDisplayUsername.textContent = storedUsername;
-    }
-    if (storedEmail) {
-        accountDisplayEmail.textContent = storedEmail;
-    }
-
-    // Function to update user icon based on theme
-    const updateUserIcon = (theme) => {
-        if (accountUserIcon) {
-            // Corrected paths to be relative to the root /ui/images
-            accountUserIcon.src = theme === 'dark' ? '/ui/images/white.png' : '/ui/images/black.png';
-        }
-    };
-
-    // Initial update of user icon
-    updateUserIcon(document.documentElement.getAttribute('data-theme') || 'light');
-
-    // Listen for theme changes to update user icon
-    const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            if (mutation.attributeName === 'data-theme') {
-                updateUserIcon(document.documentElement.getAttribute('data-theme'));
-            }
+        const previous = speakerVoiceSelect.value;
+        speakerVoiceSelect.replaceChildren(new Option('Select a voice reference', ''));
+        voices.forEach(voice => {
+            const option = new Option(voice.name, voice.path);
+            option.dataset.voiceLang = voice.language;
+            speakerVoiceSelect.add(option);
         });
-    });
-    observer.observe(document.documentElement, { attributes: true });
-
-
-    // Account button and floating container interactions
-    if (accountButton) {
-        accountButton.addEventListener('click', (event) => {
-            event.stopPropagation(); // Prevent document click from closing immediately
-            accountFloatingContainer.classList.toggle('hidden');
-            // Update account details from localStorage
-            const storedUsername = localStorage.getItem('userName') || 'Guest';
-            const storedEmail = localStorage.getItem('userEmail') || 'guest@example.com';
-            accountDisplayUsername.textContent = storedUsername;
-            accountDisplayEmail.textContent = storedEmail;
-
-            const selectedVoiceOption = speakerVoiceSelect.options[speakerVoiceSelect.selectedIndex];
-            const selectedVoiceName = selectedVoiceOption && selectedVoiceOption.value !== "" ? selectedVoiceOption.textContent : 'N/A';
-            document.getElementById('accountDisplayVoice').textContent = selectedVoiceName;
-
-            const selectedInputLanguageOption = inputLanguageSelect.options[inputLanguageSelect.selectedIndex];
-            const selectedInputLanguageName = selectedInputLanguageOption ? selectedInputLanguageOption.textContent.split('(')[0].trim() : 'N/A'; // Extract only the language name
-            document.getElementById('accountDisplayLanguage').textContent = selectedInputLanguageName;
-
-            document.getElementById('accountDisplayTheme').textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? 'Dark' : 'Light';
-        });
-    }
-
-    // Close account floating container when clicking outside
-    document.addEventListener('click', (event) => {
-        if (accountFloatingContainer && !accountFloatingContainer.contains(event.target) && !accountButton.contains(event.target) && !accountFloatingContainer.classList.contains('hidden')) {
-            accountFloatingContainer.classList.add('hidden');
-        }
-    });
-
-    if (logoutButton) {
-        logoutButton.addEventListener('click', () => {
-            console.log('Logging out...');
-            localStorage.removeItem('userToken');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('userEmail');
-            window.location.href = '/ui/auth/auth.html'; // Redirect to login page
-        });
+        if ([...speakerVoiceSelect.options].some(option => option.value === previous)) speakerVoiceSelect.value = previous;
     }
 
     if (recordVoiceBtn) {
         recordVoiceBtn.addEventListener('click', () => {
-            // Voices are stored on the server under an account, never in the browser: guests are asked to create one.
-            let guest = true;
-            try { guest = !localStorage.getItem('userToken') || localStorage.getItem('userGuest') === '1'; } catch (e) { /* storage blocked */ }
-            const dlg = document.getElementById('voiceAccountDialog');
-            if (guest && dlg && dlg.showModal) { dlg.showModal(); return; }
             voiceConfigModal.classList.add('open');
         });
-        document.getElementById('vadClose')?.addEventListener('click', () => document.getElementById('voiceAccountDialog').close());
     }
 
     if (closeModalBtn) {
@@ -1678,7 +1311,7 @@ document.addEventListener('DOMContentLoaded', () => {
         uploadSpeakerVoiceModalBtn.addEventListener('click', async () => {
             const userToken = localStorage.getItem('userToken');
             if (!userToken) {
-                alert('You must be logged in to upload a voice.');
+                showNotification('Voice upload unavailable. Reconnect the local session and retry.', 'error');
                 return;
             }
 
@@ -1705,11 +1338,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (response.ok) {
                         console.log('Voice uploaded successfully:', data.voice);
                         voiceConfigModal.classList.remove('open');
-                        renderVoices(); // Re-render sidebar voices
+                        renderVoices(); // Refresh available references
                         alert('Voice uploaded successfully!');
                     } else {
                         console.error('Failed to upload voice:', data.message);
-                        alert(`Failed to upload voice: ${data.message}`);
+                        showNotification(response.status === 403 ? 'Voice upload is unavailable for this local session.' : `Failed to upload voice: ${data.detail || data.message || response.status}`, 'error');
                     }
                 } catch (error) {
                     console.error('Error during voice upload:', error);
@@ -1735,52 +1368,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const userToken = localStorage.getItem('userToken');
             if (!userToken) {
-                showNotification('You must be logged in to save or rename a voice.', 'error');
+                showNotification('Voice upload unavailable. Reconnect the local session and retry.', 'error');
                 return;
             }
 
-            if (voiceToEdit) { // Editing an existing voice
-                try {
-                    const response = await fetch('/api/voices/rename', {
-                        method: 'PUT', // Corrected method to PUT
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${userToken}`
-                        },
-                        body: JSON.stringify({
-                            old_name: voiceToEdit.name, // Backend expects voice name as old_name
-                            new_name: newVoiceName // Backend expects voice name as new_name
-                        })
-                    });
-
-                    const data = await response.json();
-                    if (response.ok) {
-                        console.log('Voice renamed successfully:', data.message);
-                        showNotification('Voice renamed successfully!', 'success'); // Use custom notification
-                        await renderVoices(); // Re-render sidebar voices and wait for it to complete
-                        voiceNamingModal.classList.remove('open');
-
-                        // Automatically select the renamed voice
-                        const renamedVoicePath = voiceToEdit.path.replace(voiceToEdit.path.split('/').pop(), `${newVoiceName}.wav`);
-                        const renamedVoiceLi = document.querySelector(`li[data-voice-path="${renamedVoicePath}"]`);
-                        if (renamedVoiceLi) {
-                            document.querySelectorAll('.voice-list li').forEach(item => item.classList.remove('selected'));
-                            renamedVoiceLi.classList.add('selected');
-                            speakerVoiceSelect.value = renamedVoicePath;
-                            speakerVoiceSelect.dispatchEvent(new Event('change'));
-                        }
-
-                        voiceToEdit = null; // Clear voice being edited
-                    } else {
-                        const errorMessage = data.detail || data.message || 'Unknown error';
-                        console.error('Failed to rename voice:', errorMessage);
-                        showNotification(`Failed to rename voice: ${errorMessage}`, 'error'); // Use custom notification
-                    }
-                } catch (error) {
-                    console.error('Error during voice rename:', error);
-                    showNotification('Network error or server unreachable during voice rename.', 'error'); // Use custom notification
-                }
-            } else if (currentRecordedBlob) { // Saving a new recorded voice
+            if (currentRecordedBlob) { // Saving a new recorded voice
                 const speakerLang = modalInputLanguageSelect.value; // Get selected language for the voice
 
                 const formData = new FormData();
@@ -1802,7 +1394,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (response.ok) {
                         console.log('Voice uploaded successfully:', data.voice);
                         showNotification('Voice uploaded successfully!', 'success'); // Use custom notification
-                        renderVoices(); // Re-render sidebar voices
+                        renderVoices(); // Refresh available references
                         voiceNamingModal.classList.remove('open');
                         currentRecordedBlob = null; // Clear recorded blob
                         // Reset recording UI state
@@ -1813,7 +1405,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         document.getElementById('modalRecordingStatus').textContent = 'Ready to record.';
                         document.getElementById('modalRecordingStatus').style.color = 'var(--text-color)';
                     } else {
-                        const errorMessage = data.detail || data.message || 'Unknown error';
+                        const errorMessage = response.status === 403 ? 'Voice upload is unavailable for this local session.' : data.detail || data.message || 'Unknown error';
                         console.error('Failed to upload voice:', errorMessage);
                         showNotification(`Failed to upload voice: ${errorMessage}`, 'error'); // Use custom notification
                     }
@@ -1834,67 +1426,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (closeNamingModalBtn) {
         closeNamingModalBtn.addEventListener('click', () => {
             voiceNamingModal.classList.remove('open');
-        });
-    }
-
-    // Delete Confirmation Modal interactions
-    if (confirmDeleteBtn) {
-        confirmDeleteBtn.addEventListener('click', async () => {
-            if (!voiceToEdit) {
-                showNotification('No voice selected for deletion.', 'warning');
-                return;
-            }
-
-            const userToken = localStorage.getItem('userToken');
-            if (!userToken) {
-                showNotification('You must be logged in to delete a voice.', 'error');
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/voices/delete', { // Corrected endpoint
-                    method: 'DELETE', // Corrected method to DELETE
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${userToken}`
-                    },
-                    body: JSON.stringify({ filename: voiceToEdit.filename }) // Backend expects filename
-                });
-
-                const data = await response.json();
-                if (response.ok) {
-                    console.log('Voice deleted successfully:', data.message);
-                    showNotification('Voice deleted successfully!', 'success');
-                    await renderVoices(); // Re-render sidebar voices and wait for it to complete
-                    deleteConfirmationModal.classList.remove('open');
-                    voiceToEdit = null; // Clear voice being deleted
-
-                    // After deletion, if the deleted voice was the currently selected one,
-                    // reset the speaker voice selection and account display.
-                    if (speakerVoiceSelect.value === voiceToEdit.path) {
-                        speakerVoiceSelect.value = ""; // Select the "Select a voice" option
-                        speakerVoiceSelect.dispatchEvent(new Event('change'));
-                    }
-                } else {
-                    console.error('Failed to delete voice:', data.message);
-                    showNotification(`Failed to delete voice: ${data.message}`, 'error');
-                }
-            } catch (error) {
-                console.error('Error during voice deletion:', error);
-                showNotification('Network error or server unreachable during voice deletion.', 'error');
-            }
-        });
-    }
-
-    if (cancelDeleteBtn) {
-        cancelDeleteBtn.addEventListener('click', () => {
-            deleteConfirmationModal.classList.remove('open');
-        });
-    }
-
-    if (closeDeleteModalBtn) {
-        closeDeleteModalBtn.addEventListener('click', () => {
-            deleteConfirmationModal.classList.remove('open');
         });
     }
 
@@ -2078,25 +1609,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize the chart
     initializeLatencyChart();
 
-    // Sidebar handlers
-    if (burgerMenuBtn) {
-        burgerMenuBtn.addEventListener('click', () => {
-            if (sidebar) {
-                sidebar.classList.add('open');
-                logActivity('Sidebar opened', 'info');
-            }
-        });
-    }
-
-    if (closeSidebarBtn) {
-        closeSidebarBtn.addEventListener('click', () => {
-            if (sidebar) {
-                sidebar.classList.remove('open');
-                logActivity('Sidebar closed', 'info');
-            }
-        });
-    }
-
     // Room mode broadcast UI wireup
     const roomIdInput = document.getElementById('roomIdInput');
     const copyRoomLinkBtn = document.getElementById('copyRoomLinkBtn');
@@ -2112,9 +1624,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const rid = roomIdInput.value.trim();
             if (rid) {
                 if (roomStatusInfo) roomStatusInfo.style.display = 'block';
-                if (roomPreviewLink) roomPreviewLink.href = `/ui/listen/listen.html?room=${encodeURIComponent(rid)}`;
+                if (roomPreviewLink) { roomPreviewLink.hidden = false; roomPreviewLink.href = `/ui/listen/listen.html?room=${encodeURIComponent(rid)}`; }
             } else {
                 if (roomStatusInfo) roomStatusInfo.style.display = 'none';
+                if (roomPreviewLink) roomPreviewLink.hidden = true;
             }
         };
 
@@ -2124,7 +1637,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         updateRoomUI();
 
-        // Start room: the server creates the room for THIS account (a typed code is refused: listeners cannot create rooms, speakers cannot join others').
+        // Start room: the server creates the room for this session (a typed code is refused: listeners cannot create rooms, speakers cannot join others').
         let roomListenUrl = '';
         const startRoomBtn = document.getElementById('startRoomBtn');
         if (startRoomBtn) {
@@ -2132,7 +1645,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const auth = { Authorization: `Bearer ${localStorage.getItem('userToken') || ''}` };
                 try {
                     const r = await fetch('/api/room', { method: 'POST', headers: auth });
-                    if (!r.ok) throw new Error(r.status === 401 ? 'Sign in (or use guest mode) first.' : `Server said ${r.status}`);
+                    if (!r.ok) throw new Error(r.status === 401 ? 'Local session unavailable. Reload and retry.' : `Server said ${r.status}`);
                     const made = await r.json();
                     roomIdInput.value = made.room_id; roomListenUrl = made.listen_url;
                     updateRoomUI(); invalidatePreparation();
