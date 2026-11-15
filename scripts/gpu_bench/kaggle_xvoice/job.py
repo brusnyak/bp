@@ -366,6 +366,8 @@ def install_dependencies():
          *deps], 1800, env=isolated_env())
     run(["uv", "pip", "install", "--python", TTS_PY, "--no-deps", str(SOURCE)],
         300, env=isolated_env())
+    # 2026-11-15 run: newest pyarrow demanded NumPy>=2 while X-Voice's pins left 1.26.4; keep a pyarrow that works with numpy 1.x
+    run(["uv", "pip", "install", "--python", TTS_PY, "pyarrow<20", "six"], 300, env=isolated_env())
     R["infrastructure"]["dependency_strategy"] = "upstream deps with unpinned CT2; repo --no-deps"
     run(["uv", "pip", "freeze", "--python", TTS_PY], env=isolated_env())
 
@@ -429,7 +431,12 @@ def main():
         R["infrastructure"]["dependency_strategy"] = "unpinned CT2, constrained torch, repo --no-deps"
         env = isolated_env()
         env["PATH"] = f"/tmp/xvoice-venv/bin:{env['PATH']}"
-        run(["bash", "src/x_voice/prepare_ipa.sh"], 1200, cwd=str(SOURCE), env=env)
+        try:
+            run(["bash", "src/x_voice/prepare_ipa.sh"], 1200, cwd=str(SOURCE), env=env)
+        except RuntimeError as exc:
+            # the script's final self-test imports x_voice; espeak-ng itself may be installed fine (it was on 2026-11-15)
+            R["infrastructure"]["prepare_ipa_error"] = str(exc)[:300]
+            run(["espeak-ng", "--version"], 30, env=env)
         # ASR installs are completely separate from the X-Voice resolver.
         run(["uv", "pip", "install", "--python", ASR_PY, "faster-whisper"], 600, env=isolated_env())
         run(["uv", "pip", "freeze", "--python", ASR_PY], env=isolated_env())

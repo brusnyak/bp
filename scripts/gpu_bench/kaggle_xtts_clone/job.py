@@ -334,7 +334,7 @@ def main():
              'torch==2.8.0', 'torchaudio==2.8.0', '--index-url',
              'https://download.pytorch.org/whl/cu128'], 900))
         step('coqui_install', output=run([uv, 'pip', 'install', '--python', tts_python,
-             'coqui-tts==0.28.0', 'huggingface-hub', 'soundfile'], 900))
+             'coqui-tts==0.28.0', 'huggingface-hub', 'soundfile', 'six', 'setuptools'], 900))
         script = Path(__file__).resolve()
         attempts = []
         for attempt in (1, 2):
