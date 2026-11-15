@@ -19,7 +19,7 @@ make run PRESET=mac
 
 Use `mac` for Apple Silicon, `nvidia` for NVIDIA CUDA, or `cpu` for other machines; match the setup profile and `PRESET`. Add `--dev` for test dependencies. On Windows use a Python 3.11 executable for setup, then `.venv\Scripts\python.exe app.py`; the Makefile's preset loader requires a POSIX shell.
 
-Open **http://localhost:8000** in Chrome or Edge. Choose **Try it as a guest** or sign in, select the languages, prepare the route, then choose **Microphone** and **Output**. Use **Test microphone**, wear headphones and press **Start**. Use **Stop** to end capture and queued playback.
+Open **http://localhost:8000** in Chrome or Edge. Select the languages, choose **Microphone** and **Output**, use **Test microphone**, wear headphones and press **Start** (it prepares the route and begins capture). Use **Stop** to end capture and queued playback.
 
 The standard Mac setup prepares Whisper. The faster Nemotron streaming result on the product site uses separately provisioned assets; cloning the repository does not install that configuration automatically. Generic voices are included by setup; personal models and recordings are not shipped.
 
