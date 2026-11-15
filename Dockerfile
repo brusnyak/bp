@@ -1,6 +1,6 @@
-# BP — Docker image for server deployment
+# BP — Docker image for local single-user use
 # Build:  docker build -t bp:latest .
-# Run:    docker run -p 8000:8000 -e BP_HOST=0.0.0.0 bp:latest
+# Run:    docker run -p 127.0.0.1:8000:8000 -e BP_HOST=0.0.0.0 bp:latest
 #         (add -e BP_HTTPS=1 for TLS with certs mounted)
 
 FROM python:3.11-slim
@@ -40,6 +40,7 @@ RUN useradd -m -u 1000 bpuser && chown -R bpuser:bpuser /app
 USER bpuser
 
 # Environment defaults (overridable at runtime)
+# Bind inside the container; publish to host loopback as shown above.
 ENV BP_HOST=0.0.0.0
 ENV BP_PORT=8000
 ENV BP_DEVICE=auto

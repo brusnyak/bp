@@ -40,12 +40,21 @@
     pushRating(name, all[name], statusEl);
   }
 
+  async function localToken() {
+    const saved = sessionStorage.getItem('bp.labToken');
+    if (saved) return saved;
+    const response = await fetch('/api/guest', { method: 'POST' });
+    if (!response.ok) throw new Error('Local session unavailable');
+    const data = await response.json();
+    sessionStorage.setItem('bp.labToken', data.token);
+    return data.token;
+  }
   let pushTimers = {};
-  function pushRating(name, rating, statusEl) {
-    const token = localStorage.getItem("userToken");
+  async function pushRating(name, rating, statusEl) {
+    const token = backendUp ? await localToken().catch(() => null) : null;
     if (!backendUp || !token) {
       if (statusEl) {
-        statusEl.textContent = backendUp ? "local only (login to sync)" : "local only";
+        statusEl.textContent = backendUp ? "local only (session unavailable)" : "local only";
         statusEl.className = "lab-save idle";
       }
       return;
@@ -72,7 +81,7 @@
   }
 
   async function pullRatings() {
-    const token = localStorage.getItem("userToken");
+    const token = backendUp ? await localToken().catch(() => null) : null;
     if (!backendUp || !token) return;
     try {
       const r = await fetch("/api/ratings", {
@@ -734,15 +743,15 @@
   }
 
   // Backend-aware upload: if the FastAPI backend answers, staged files can be
-  // REALLY uploaded (POST /api/voices/upload) instead of just previewed.
-  // Needs a login token (localStorage.userToken from /ui/auth/auth.html);
+  // REALLY uploaded (POST /api/voice-reference) instead of just previewed.
+  // Uses an anonymous local session token;
   // without one the server 401s and we say so plainly.
   let backendUp = false;
   async function probeBackend() {
     try {
       const ctl = new AbortController();
       const t = setTimeout(() => ctl.abort(), 3000);
-      const r = await fetch("/api/auth/config", { signal: ctl.signal });
+      const r = await fetch("/api/session/config", { signal: ctl.signal });
       clearTimeout(t);
       backendUp = r.ok;
     } catch (e) {
@@ -751,19 +760,19 @@
     const hint = document.getElementById("backendHint");
     if (hint) {
       hint.textContent = backendUp
-        ? "Backend reachable: staged files can be uploaded for real (needs login)."
+        ? "Backend reachable: staged files can be uploaded for real (local session ready)."
         : "Backend not reachable: staging only (make run to enable real upload).";
     }
   }
 
   async function uploadStaged(file, lang, msgEl) {
-    const token = localStorage.getItem("userToken");
+    const token = backendUp ? await localToken().catch(() => null) : null;
     const form = new FormData();
     form.append("file", file, file.name);
     form.append("voice_name", file.name.replace(/\.[^.]+$/, ""));
     form.append("speaker_lang", lang);
     try {
-      const r = await fetch("/api/voices/upload", {
+      const r = await fetch("/api/voice-reference", {
         method: "POST",
         headers: token ? { Authorization: "Bearer " + token } : {},
         body: form,
@@ -773,7 +782,7 @@
         msgEl.textContent = "Uploaded ✓ — refresh the manifest: python3 scripts/update_voice_lab_library.py";
         msgEl.className = "lab-meta pass";
       } else if (r.status === 401 || r.status === 403) {
-        msgEl.textContent = "Login required: sign in at /ui/auth/auth.html first, then upload again.";
+        msgEl.textContent = "Local session expired. Reload and retry.";
         msgEl.className = "lab-meta fail";
       } else {
         msgEl.textContent = "Upload failed: " + (data.detail || ("HTTP " + r.status));

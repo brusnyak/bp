@@ -26,4 +26,4 @@ the recording teaches YOUR voice, the text must be worth saying.
 | 18 | Thank you for listening, and I look forward to your questions. | Ďakujem vám za vypočutie a teším sa na vaše otázky. |
 
 Recording spec: 2–3 min per language, quiet room, steady pace, short pauses.
-Stage files in the Voice Lab upload box first, listen, then register.
+Stage files in the Voice Lab upload box first, listen, then save a local reference.

@@ -20,7 +20,7 @@ Known limits to say out loud in a presentation: the default route waits for 2 s 
 
 1. Start the server as above. Open the live page with a room code of your choice: `http://localhost:8000/ui/live-speech/live.html?room=demo1`. (Room mode is built and unit-tested; a real-model test is still pending, see `STATUS.md`.)
 2. Each listener opens `http://<your-ip>:8000/ui/listen/listen.html?room=demo1` (other devices need `BP_HTTPS=1 BP_HOST=0.0.0.0`), picks a language and presses **Start listening**. Earpieces only: the speaker's microphone must not hear the translated audio.
-3. Check who is connected: `GET /api/room/demo1` (needs a login token). Test without people: `python scripts/live/paced_replay.py <audio> --src en --tgt de --room demo1` plus `python scripts/live/room_listeners.py --room demo1 --langs de,sk,fr`.
+3. Check who is connected: `GET /api/room/demo1` (needs an anonymous session token). Test without people: `python scripts/live/paced_replay.py <audio> --src en --tgt de --room demo1` plus `python scripts/live/room_listeners.py --room demo1 --langs de,sk,fr`.
 
 ## Reading script for your own recordings
 

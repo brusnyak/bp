@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const voiceNameInput = document.getElementById('voiceNameInput'); // Added for voice naming modal
 
 
+    let referenceRecordTimer;
     let mediaRecorder;
     let audioChunks = [];
     let audioStream; // To store the microphone stream
@@ -340,19 +341,14 @@ document.addEventListener('DOMContentLoaded', () => {
         enumerateAudioOutputDevices();
         setRouteStatus('Audio devices changed. Check input/output and run the sound check again.');
     });
-    // Local session token; Server decides (GET /api/auth/config guest_enabled).
+    // Each browser session gets a distinct, short-lived anonymous token.
     let guestRetried = false;
     async function startGuestSession() {
         try {
-            const cfg = await (await fetch('/api/auth/config')).json();
-            if (!cfg.guest_enabled) return false;
             const r = await fetch('/api/guest', { method: 'POST' });
             if (!r.ok) return false;
             const d = await r.json();
             localStorage.setItem('userToken', d.token);
-            localStorage.setItem('userName', d.username || 'Guest');
-            localStorage.setItem('userEmail', d.email || '');
-            localStorage.setItem('userGuest', '1');
             return true;
         } catch (e) { return false; }
     }
@@ -911,11 +907,11 @@ document.addEventListener('DOMContentLoaded', () => {
         let speakerText = null;
         let speakerLang = null;
 
-        if (ttsModelChoice === 'xtts') {
+        if (['xtts', 'omnivoice'].includes(ttsModelChoice)) {
             const selectedVoiceOption = speakerVoiceSelect.options[speakerVoiceSelect.selectedIndex];
             if (selectedVoiceOption && selectedVoiceOption.value) {
                 speakerWavPath = selectedVoiceOption.value;
-                speakerLang = selectedVoiceOption.dataset.voiceLang || 'en';
+                speakerLang = modalInputLanguageSelect.value || sourceLang;
             }
         }
 
@@ -957,7 +953,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (strategySelectEl) {
         strategySelectEl.addEventListener('change', invalidatePreparation);
         // Server decides the default per machine class (BP_DEFAULT_STRATEGY in presets/*.env).
-        fetch('/api/auth/config').then((r) => r.json()).then((c) => {
+        fetch('/api/session/config').then((r) => r.json()).then((c) => {
             if (c.default_strategy && [...strategySelectEl.options].some((o) => o.value === c.default_strategy)) strategySelectEl.value = c.default_strategy;
         }).catch(() => {});
     }
@@ -1008,10 +1004,23 @@ document.addEventListener('DOMContentLoaded', () => {
     syncDirection();
 
     ttsModelSelect.addEventListener('change', () => {
-        voiceSelectionGroup.classList.toggle('hidden', ttsModelSelect.value !== 'xtts');
+        voiceSelectionGroup.classList.remove('hidden');
         invalidatePreparation();
     });
     speakerVoiceSelect.addEventListener('change', invalidatePreparation);
+    document.getElementById('deleteVoiceReferenceBtn').addEventListener('click', async () => {
+        const name = speakerVoiceSelect.value;
+        if (!name) return;
+        try {
+            const response = await fetch('/api/voice-reference?name=' + encodeURIComponent(name), {
+                method: 'DELETE', headers: { Authorization: 'Bearer ' + localStorage.getItem('userToken') }
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.detail || 'Could not delete reference');
+            await renderVoices();
+            invalidatePreparation();
+        } catch (error) { showNotification(error.message, 'error'); }
+    });
 
     // Function to load voices from backend API
     async function loadVoices() {
@@ -1021,7 +1030,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch('/api/voices', {
+            const response = await fetch('/api/voice-reference', {
                 headers: {
                     'Authorization': `Bearer ${userToken}`
                 }
@@ -1037,14 +1046,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // References already available to this session; no library management on this page.
-    async function renderVoices() {
+    // Local reference files are shared by this installation.
+    async function renderVoices(selected) {
         const voices = await loadVoices();
-        const previous = speakerVoiceSelect.value;
+        const previous = selected || speakerVoiceSelect.value;
         speakerVoiceSelect.replaceChildren(new Option('Select a voice reference', ''));
         voices.forEach(voice => {
-            const option = new Option(voice.name, voice.path);
-            option.dataset.voiceLang = voice.language;
+            const option = new Option(voice.name, voice.name);
             speakerVoiceSelect.add(option);
         });
         if ([...speakerVoiceSelect.options].some(option => option.value === previous)) speakerVoiceSelect.value = previous;
@@ -1132,9 +1140,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         audioChunks.push(event.data);
                     };
                     mediaRecorder.onstop = () => {
+                        clearTimeout(referenceRecordTimer);
                         console.log('MediaRecorder stopped. Creating audio blob.');
-                        // Explicitly create a WAV blob, mirroring mic_test.html for backend compatibility.
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        // Keep the browser recorder format; changing a MIME label does not convert audio.
+                        const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || audioChunks[0]?.type || 'audio/webm' });
                         currentRecordedBlob = audioBlob; // Store the blob
                         console.log('Recorded audio blob:', currentRecordedBlob);
                         // Trigger voice naming modal
@@ -1158,6 +1167,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         updateModalMicLevel(0); // Reset mic level display
                     };
                     mediaRecorder.start();
+                    referenceRecordTimer = setTimeout(() => { if (mediaRecorder.state === 'recording') mediaRecorder.stop(); }, 60000);
                     console.log('MediaRecorder started. State:', mediaRecorder.state);
                     startRecordingModalBtn.classList.add('hidden');
                     stopRecordingModalBtn.classList.remove('hidden');
@@ -1326,7 +1336,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 formData.append('speaker_lang', speakerLang);
 
                 try {
-                    const response = await fetch('/api/voices/upload', {
+                    const response = await fetch('/api/voice-reference', {
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${userToken}`
@@ -1338,7 +1348,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (response.ok) {
                         console.log('Voice uploaded successfully:', data.voice);
                         voiceConfigModal.classList.remove('open');
-                        renderVoices(); // Refresh available references
+                        await renderVoices(data.name);
+                        invalidatePreparation();
                         alert('Voice uploaded successfully!');
                     } else {
                         console.error('Failed to upload voice:', data.message);
@@ -1376,13 +1387,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const speakerLang = modalInputLanguageSelect.value; // Get selected language for the voice
 
                 const formData = new FormData();
-                // Always send as .wav since we are creating a WAV blob now
-                formData.append('file', currentRecordedBlob, `${newVoiceName}.wav`);
+                const extension = /mp4|m4a/.test(currentRecordedBlob.type) ? 'm4a' : /mpeg/.test(currentRecordedBlob.type) ? 'mp3' : /wav/.test(currentRecordedBlob.type) ? 'wav' : 'webm';
+                formData.append('file', currentRecordedBlob, `${newVoiceName}.${extension}`);
                 formData.append('voice_name', newVoiceName); // Backend expects voice_name as a form field
                 formData.append('speaker_lang', speakerLang);
 
                 try {
-                    const response = await fetch('/api/voices/upload', { // Corrected endpoint
+                    const response = await fetch('/api/voice-reference', { // Corrected endpoint
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${userToken}`
@@ -1394,7 +1405,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (response.ok) {
                         console.log('Voice uploaded successfully:', data.voice);
                         showNotification('Voice uploaded successfully!', 'success'); // Use custom notification
-                        renderVoices(); // Refresh available references
+                        await renderVoices(data.name);
+                        invalidatePreparation();
                         voiceNamingModal.classList.remove('open');
                         currentRecordedBlob = null; // Clear recorded blob
                         // Reset recording UI state

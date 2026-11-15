@@ -2,7 +2,7 @@
 """Demo pre-flight: one command that says whether this machine can run the demo.
 
 Checks the local repo assets a live demo needs (certs, voice models, MT models,
-speaker-voice registry, proof clips, secrets file) and, with --server, the running
+optional voice references and proof clips) and, with --server, the running
 backend itself (HTTPS root + /api/voice-lab/status + engine list).
 
     python3 scripts/demo_preflight.py              # assets only, any python3
@@ -24,7 +24,6 @@ BASE_URL = "http://localhost:8000"
 
 # Required to start the demo at all; missing = exit 1.
 REQUIRED = [
-    (".env", "secrets file: GOOGLE_CLIENT_ID + JWT_SECRET (see documentation/amd_fetch_checklist.md)"),
     ("backend/tts/piper_models/sk_SK-personal-male-medium.onnx",
      "shipped personal SK voice (the demo voice)"),
     ("backend/tts/piper_models/sk_SK-personal-male-medium.onnx.json",
@@ -32,7 +31,6 @@ REQUIRED = [
     ("backend/tts/piper_models/cs_CZ-jirka-medium.onnx", "Piper base for SK text"),
     ("ct2_models/Helsinki-NLP--opus-mt-en-sk/model.bin", "Opus-MT EN->SK"),
     ("ct2_models/Helsinki-NLP--opus-mt-sk-en/model.bin", "Opus-MT SK->EN"),
-    ("speaker_voices/speaker_voices.json", "speaker voice registry"),
 ]
 
 # Nice to have on stage; missing = warning only.
@@ -51,7 +49,6 @@ OPTIONAL = [
 OWNER_LOCAL = {
     "backend/tts/piper_models/sk_SK-personal-male-medium.onnx",
     "backend/tts/piper_models/sk_SK-personal-male-medium.onnx.json",
-    "speaker_voices/speaker_voices.json",
 }
 
 
@@ -68,24 +65,11 @@ def check_paths(entries, repo_root):
     return results
 
 
-def check_env_secrets(repo_root):
-    """Report which of the two demo-critical keys exist -- never their values."""
-    path = os.path.join(repo_root, ".env")
-    try:
-        with open(path, encoding="utf-8") as f:
-            keys = {line.split("=", 1)[0].strip() for line in f
-                    if line.strip() and not line.strip().startswith("#") and "=" in line}
-    except OSError:
-        return []
-    return [(key in keys, f".env:{key}", "needed for Google login / token signing")
-            for key in ("GOOGLE_CLIENT_ID", "JWT_SECRET")]
-
-
 def split_fresh(results):
-    """On a fresh clone move owner-local misses (and GOOGLE_CLIENT_ID, only needed for login) out of the hard-required group."""
+    """On a fresh clone move optional local voice misses out of the required group."""
     hard, soft = [], []
     for ok, name, detail in results:
-        local = name in OWNER_LOCAL or name == ".env:GOOGLE_CLIENT_ID"
+        local = name in OWNER_LOCAL
         (soft if local and not ok else hard).append((ok, name, detail))
     return hard, soft
 
@@ -129,14 +113,14 @@ def main():
     args = ap.parse_args()
 
     print(f"Demo pre-flight -- repo: {REPO_ROOT}")
-    required = check_paths(REQUIRED, REPO_ROOT) + check_env_secrets(REPO_ROOT)
+    required = check_paths(REQUIRED, REPO_ROOT)
     soft = []
     if is_fresh_clone(REPO_ROOT):
         print("Fresh clone detected (no personal SK voice): optional local assets (custom voices) are warnings; the generic Piper voice is used.")
         required, soft = split_fresh(required)
     required_ok = report("REQUIRED (demo cannot start without these)", required)
     if soft:
-        report("OWNER-LOCAL (not in git; generic voice / no Google login without them)", soft, miss="WARN")
+        report("OWNER-LOCAL (not in git; generic voice without custom assets)", soft, miss="WARN")
     optional_ok = report("OPTIONAL (fallbacks / non-default paths)",
                          check_paths(OPTIONAL, REPO_ROOT), miss="WARN")
     server_ok = True

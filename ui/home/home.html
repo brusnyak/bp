@@ -35,8 +35,7 @@
     <div class="bar-actions">
       <span class="lang-slot"></span>
       <button id="theme-toggle" class="icon-btn" type="button" aria-label="Toggle theme"><span class="material-symbols-outlined" aria-hidden="true"></span></button>
-      <a class="btn btn-ghost bar-signin" href="/ui/auth/auth.html">Sign in</a>
-      <a class="btn btn-primary bar-try" href="/ui/live-speech/live.html">Try it now</a>
+      <a class="btn btn-primary bar-try" href="/ui/live-speech/live.html?v=20261115-local">Try it now</a>
       <button id="menu-btn" class="icon-btn menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu"><span class="material-symbols-outlined" aria-hidden="true">menu</span></button>
     </div>
   </div>
@@ -47,9 +46,7 @@
     <a href="#about">About</a>
     <a href="#faq">FAQ</a>
     <hr />
-    <a href="/ui/enroll/enroll.html">Clone your voice</a>
-    <a href="/ui/auth/auth.html">Sign in</a>
-    <a class="btn btn-primary" href="/ui/live-speech/live.html">Try it now</a>
+    <a class="btn btn-primary" href="/ui/live-speech/live.html?v=20261115-local">Try it now</a>
   </nav>
 </header>
 
@@ -69,9 +66,9 @@
   <div class="wrap hero-inner">
     <p class="chip chip-quiet">Local speech translation &middot; Research prototype</p>
     <h1>Speak once.<br />Be heard in another language.</h1>
-    <p class="lede">Live captions and translated speech for meetings and lectures. It runs on your own machine, and you can try it without an account.</p>
+    <p class="lede">Live captions and translated speech for meetings and lectures. It runs on your own machine, with an anonymous local session.</p>
     <div class="hero-cta">
-      <a class="btn btn-primary btn-lg" href="/ui/live-speech/live.html">Try it now</a>
+      <a class="btn btn-primary btn-lg" href="/ui/live-speech/live.html?v=20261115-local">Try it now</a>
       <a class="btn btn-ghost btn-lg" href="#how">See how it works</a>
     </div>
 
@@ -125,7 +122,7 @@
         <a class="demo-fallback" href="https://www.youtube.com/watch?v=_-jwEyGxDYs" target="_blank" rel="noopener noreferrer">Watch on YouTube</a>
       </div>
     </div>
-    <div class="center"><a class="btn btn-primary" href="/ui/live-speech/live.html">Try it with your own voice</a></div>
+    <div class="center"><a class="btn btn-primary" href="/ui/live-speech/live.html?v=20261115-local">Try it with your own voice</a></div>
   </div>
 </section>
 
@@ -179,11 +176,11 @@
 
     <div class="panel" id="s-0" role="tabpanel" aria-labelledby="st-0">
       <ol class="steps">
-        <li><b>Open the live page.</b> A guest session starts by itself. No account.</li>
+        <li><b>Open the live page.</b> A guest session starts by itself. Ready to use.</li>
         <li><b>Pick the languages.</b> The swap button turns the direction around.</li>
         <li><b>Press Start.</b> Allow the microphone, use headphones. Stop ends capture and queued playback.</li>
       </ol>
-      <a class="btn btn-primary" href="/ui/live-speech/live.html">Open the live page</a>
+      <a class="btn btn-primary" href="/ui/live-speech/live.html?v=20261115-local">Open the live page</a>
     </div>
 
     <div class="panel" id="s-1" role="tabpanel" aria-labelledby="st-1" hidden>
@@ -234,7 +231,7 @@ make run</code></pre><button type="button" class="copy" data-copy="code-run"><sp
       <p class="sub">Short answers, with the limits stated.</p>
     </div>
     <div class="faq-list">
-      <details class="faq-item"><summary>Do I need an account?</summary><p>No. Open the live page and a guest session starts by itself. An account is only needed to record your own voice and keep it on the server under your name.</p></details>
+      <details class="faq-item"><summary>How do sessions work?</summary><p>Open the live page and an anonymous session starts automatically. Record or upload a voice reference from More; files stay on this computer until you delete them.</p></details>
       <details class="faq-item"><summary>Which languages work?</summary><p>Those listed on the live page, which reads them from this server. English to Slovak and Czech are the measured ones. Slovak and Czech recognition is the weaker half and is labelled experimental.</p></details>
       <details class="faq-item"><summary>Where does my audio go?</summary><p>To the machine that runs the translator. Run it yourself and nothing leaves your computer. On a shared server your audio goes to that server; it is processed, not stored, and logs hold no spoken text unless the operator turns session logs on.</p></details>
       <details class="faq-item"><summary>How does voice cloning work?</summary><p>You record a short sample and a cloning model synthesizes the translation in that voice. It needs a GPU and is a research feature: clones are not yet graded by listeners, and the default voice is a generic Piper voice.</p></details>
@@ -253,9 +250,9 @@ make run</code></pre><button type="button" class="copy" data-copy="code-run"><sp
     </div>
     <nav class="foot-links" aria-label="Footer">
       <a href="/ui/extra/about.html">About</a>
-      <a href="/ui/extra/privacy.html">Privacy</a>
-      <a href="/ui/extra/terms.html">Terms</a>
-      <a href="/ui/extra/cookies.html">Cookies</a>
+      <a href="/ui/extra/privacy.html?v=20261115-local">Privacy</a>
+      <a href="/ui/extra/terms.html?v=20261115-local">Terms</a>
+      <a href="/ui/extra/cookies.html?v=20261115-local">Cookies</a>
     </nav>
     <div class="foot-contact">
       <a class="foot-cta" href="/ui/extra/feedback.html">Send feedback</a>
@@ -273,10 +270,9 @@ make run</code></pre><button type="button" class="copy" data-copy="code-run"><sp
 </footer>
 
 <script src="/ui/theme-toggle.js"></script>
-<script src="/ui/auth/session-nav.js"></script>
 <script src="/ui/shared/caps.js"></script>
 <script src="/ui/shared/lang-picker.js"></script>
 <script src="/ui/i18n/i18n.js"></script>
-<script src="/ui/home/home.js"></script>
+<script src="/ui/home/home.js?v=20261115-local"></script>
 </body>
 </html>

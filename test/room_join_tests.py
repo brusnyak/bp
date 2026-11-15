@@ -1,13 +1,11 @@
-"""Model-free, through the real app: a speaker account creates a room, a listener with only a guest token (no account) joins it by link, and a made-up room id is refused."""
+"""Model-free, through the real app: a guest speaker creates a room, a listener with only a guest token (anonymous) joins it by link, and a made-up room id is refused."""
 import uuid
 
 API = "/api"
 
 
 def _speaker_token(client):
-    email = f"spk_{uuid.uuid4().hex[:8]}@x.com"
-    client.post(f"{API}/register", json={"username": f"spk_{uuid.uuid4().hex[:8]}", "email": email, "password": "passpass1"})
-    return client.post(f"{API}/login", json={"email": email, "password": "passpass1"}).json()["token"]
+    return client.post(f"{API}/guest").json()["token"]
 
 
 def test_guest_listener_joins_a_room_the_speaker_created(test_client):

@@ -57,7 +57,7 @@ The [integration guide](documentation/INTEGRATION.md) covers BlackHole, VB-Cable
 
 ## Privacy and licences
 
-The default speech pipeline runs on the processing host without cloud ASR, translation or TTS. Installation downloads models. Optional Google sign-in contacts Google. Shared use needs access, consent and retention policies; uploaded recordings stay on the host.
+The default speech pipeline runs on the processing host without cloud ASR, translation or TTS. Installation downloads models. Shared use needs access, consent and retention policies; uploaded recordings stay on the host.
 
 Code: MIT. Models, voices and runtimes retain their own terms. Piper's runtime is GPL-3.0-or-later; each voice needs its own review. XTTS v2 weights use non-commercial CPML and X-Voice weights use CC-BY-NC. Review [NOTICE.md](NOTICE.md) and the [licence inventory](documentation/LICENSE_INVENTORY_2026-11-06.md) before distributing or operating a shared service. An engine being selectable does not grant commercial rights.
 
@@ -78,3 +78,19 @@ Saved measurements from the earlier Whisper configurations. These are different 
 </details>
 
 Created by Yegor Brusnyak, MIT licence
+
+### Local sessions and voice references
+
+The browser automatically requests `POST /api/guest`: a distinct random guest ID
+and a signed token valid for two hours. `JWT_SECRET` may be supplied by environment;
+otherwise the first run generates a private, git-ignored `.jwt_secret` file.
+No identity database is needed. Keep the default loopback binding. Setting
+`BP_HOST=0.0.0.0` explicitly lets network clients use the tool and its reference files;
+rate limits remain enabled on exposed hosts. Use `BP_HTTPS=1` for HTTPS.
+
+In the live page, open More → Voice reference to record, upload, select or delete
+local files. WAV, M4A, MP3 and WebM are accepted, up to 15 MB and 60 seconds each,
+with at most five files in the git-ignored `speaker_voices/` directory. These files
+are shared locally across anonymous sessions, and stay until you delete them.
+Synthesis receives the selected reference filename. Optional `BP_LOG_SESSIONS=1`
+saves session audio and text on the processing machine; leave it off unless needed.

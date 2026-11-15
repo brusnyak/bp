@@ -27,7 +27,7 @@
           <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
             <span class="material-symbols-outlined">dark_mode</span>
           </button>
-          <a href="../live-speech/live.html">Live translation →</a>
+          <a href="../live-speech/live.html?v=20261115-local">Live translation →</a>
         </nav>
       </div>
     </header>
@@ -58,7 +58,7 @@
           <i aria-hidden="true">→</i>
           <div><span class="material-symbols-outlined" aria-hidden="true">record_voice_over</span><strong>Personal TTS</strong><small>audio output</small></div>
         </div>
-        <p class="lab-hint">All pipeline stages run locally. This Lab contains saved evidence; the <a href="../live-speech/live.html">Live translation page</a> is the optional microphone proof.</p>
+        <p class="lab-hint">All pipeline stages run locally. This Lab contains saved evidence; the <a href="../live-speech/live.html?v=20261115-local">Live translation page</a> is the optional microphone proof.</p>
       </section>
 
       <section class="lab-disclosure" aria-labelledby="voicesTitle">
@@ -96,7 +96,7 @@
             <h2>Stage audio for processing</h2>
             <p class="lab-hint">Files stage in the browser for listening.
           <span id="backendHint">Checking backend…</span>
-          To register one manually: save it into
+          To add a local reference manually: save it into
           <code>speaker_voices/</code>, run <code>python3 scripts/prepare_voice_corpus.py --source-dir speaker_voices --write</code>,
           then <code>python3 scripts/update_voice_lab_library.py</code> to refresh this page.</p>
           </div>
@@ -114,6 +114,6 @@
     </main>
 
     <script src="../theme-toggle.js"></script>
-    <script src="lab.js?v=20261002c"></script>
+    <script src="lab.js?v=20261115-local"></script>
   </body>
 </html>

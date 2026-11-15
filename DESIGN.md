@@ -37,9 +37,9 @@ choices second. Built from `ui/global-styles.css` (the contract) + the
 
 ## Page contracts (updated 2026-11-05)
 
-- **Shell** (`ui/site.css`): one top bar (brand, section links, Sign in, theme), one footer, document-page
+- **Shell** (`ui/site.css`): one top bar (brand, section links, theme), one footer, document-page
   layout, buttons (`.cta`), reveal motion (`.rv`, hidden only when `html.js`, off under `prefers-reduced-motion`).
-  Fonts load from Google Fonts (Montserrat, Playfair Display, Material Symbols); no other third-party CSS/JS.
+  Fonts and symbols are self-hosted (Montserrat, Playfair Display, Material Symbols).
 - **Home** (`ui/home/`, rebuilt 2026-11-05): Persuade surface, six anchors: hero with the recorded caption pair (voice line),
   Hear it (three real sentences + video), How it works (tappable stages + one latency bar chart), Get started (browser /
   your machine / meeting tabs, copy buttons, agent prompt), About (works / experimental / not yet) and FAQ (two columns on
@@ -48,7 +48,7 @@ choices second. Built from `ui/global-styles.css` (the contract) + the
 - **Live** (`ui/live-speech/`): Operate surface. Slim header (menu, name, language, theme), a quiet status row, languages as
   You speak / swap / You hear (picker, filled from the server, starting pair from link, last use, then `navigator.languages`),
   one guided button (Prepare route, Check sound, I'm using headphones, Start, Stop) that forwards to the real controls so every
-  safety gate stays, subtitle band above the columns. Engine experiments stay under Advanced.
+  safety gate stays, subtitle band above the columns. Engine experiments stay under Advanced. More provides local voice-reference recording, file upload, selection and deletion. The browser creates an anonymous session automatically.
 - **Document pages** (`ui/extra/`): privacy, terms, cookies (with contents list), about, faq, feedback. Plain
   statements only; claims must match code (cookies page is checked against `localStorage` keys).
 - **Voice Lab** (`ui/voice-lab/`): development only. Served by the app only when `BP_LAB=1`; `make lab` serves it

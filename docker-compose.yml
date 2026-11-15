@@ -1,11 +1,11 @@
 # BP — Docker Compose for server deployment
 #
-# Single-server deployment (one machine, N speakers + M listeners):
+# Local single-user tool. Published port is loopback-only by default.
+# Explicit LAN use: change the published address to 0.0.0.0 and review HTTPS,
+# participant consent and local recording access before sharing the listener link.
+# An empty JWT_SECRET generates /app/.jwt_secret on the first start; it survives
+# container restarts. Supply JWT_SECRET to preserve sessions across recreation.
 #   docker compose up -d
-#
-# Multi-server (load balancer + N BP workers):
-#   Deploy this compose on each worker behind a reverse proxy (nginx/Traefik)
-#   that terminates TLS and forwards WebSocket connections.
 #
 # Environment overrides: copy .env.example to .env and edit, or set
 # variables directly in the environment before `docker compose up`.
@@ -16,7 +16,7 @@ services:
     container_name: bp-server
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     environment:
       - BP_HOST=0.0.0.0
       - BP_PORT=8000
@@ -26,9 +26,7 @@ services:
       - BP_HTTPS=0
       - BP_DISABLE_RATE_LIMIT=0
       - BP_LOG_SESSIONS=0
-      - JWT_SECRET=${JWT_SECRET:-change-me-in-production}
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
-      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
+      - JWT_SECRET=${JWT_SECRET:-}
     volumes:
       # Persist speaker voices and session data across restarts
       - ./speaker_voices:/app/speaker_voices:rw

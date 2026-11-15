@@ -19,7 +19,7 @@
         <div class="wrap">
             <a class="brand" href="/"><span class="brand-mark" aria-hidden="true"><span class="material-symbols-outlined">record_voice_over</span></span>Speech Translation</a>
             <div class="bar-actions">
-                <a class="cta small" href="/ui/live-speech/live.html">Open live translation</a>
+                <a class="cta small" href="/ui/live-speech/live.html?v=20261115-local">Open live translation</a>
                 <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle theme"><span class="material-symbols-outlined"></span></button>
             </div>
         </div>
@@ -33,7 +33,7 @@
             <div class="doc-single">
                 
                 <div class="prose">
-<div class="faq"><details><summary>What does it do?</summary><p>It turns spoken English into Slovak or Czech text and speech during a meeting. Recognition, translation and speech run on the BP server; the browser sends microphone audio and plays the result.</p></details><details><summary>Which languages work?</summary><p>English to Slovak and English to Czech are the demonstrated routes: speed is measured, translation quality is not yet scored. Slovak and Czech to English are experimental. Other language packs are declared in the repository but need installed models and their own testing.</p></details><details><summary>Do I need an account?</summary><p>On a shared server, yes: sign in with email and password, or with Google where the operator has configured it. A server that listens only on localhost also offers a guest session, which cannot record or store voices.</p></details><details><summary>How does voice cloning work?</summary><p>You record a sample and submit it. A cloning model (OmniVoice, needs a GPU) can then speak translations in that voice. This is research: listeners have not graded the result, and the default live voice is a generic Piper voice.</p></details><details><summary>Can it handle a large conference?</summary><p>Not shown yet. One session on one machine has been measured. Capacity for a larger meeting has to be measured on the intended hardware first.</p></details><details><summary>Can I send the translation into a meeting?</summary><p>Yes, through a virtual audio cable (BlackHole on macOS, VB-Cable on Windows) chosen as the playback device and as the microphone in the meeting software. Use headphones while rehearsing. Choosing the output device needs a browser that supports it; Chrome and Edge do.</p></details><details><summary>What happens to my recordings?</summary><p>Voice recordings you submit are stored on the BP server under your account, and retention depends on the deployment. Microphone audio for translation is not stored. The <a href="/ui/extra/privacy.html">privacy policy</a> has the details.</p></details><details><summary>How do I report a problem?</summary><p>Use the <a href="/ui/extra/feedback.html">feedback page</a>.</p></details></div>
+<div class="faq"><details><summary>What does it do?</summary><p>It turns spoken English into Slovak or Czech text and speech during a meeting. Recognition, translation and speech run on the BP server; the browser sends microphone audio and plays the result.</p></details><details><summary>Which languages work?</summary><p>English to Slovak and English to Czech are the demonstrated routes: speed is measured, translation quality is not yet scored. Slovak and Czech to English are experimental. Other language packs are declared in the repository but need installed models and their own testing.</p></details><details><summary>How do I start?</summary><p>Clone the tool, run setup and start it locally. The browser starts a short-lived anonymous session automatically. Record or upload a reference from More on the live page.</p></details><details><summary>How does voice cloning work?</summary><p>You record a sample and submit it. A cloning model (OmniVoice, needs a GPU) can then speak translations in that voice. This is research: listeners have not graded the result, and the default live voice is a generic Piper voice.</p></details><details><summary>Can it handle a large conference?</summary><p>Not shown yet. One session on one machine has been measured. Capacity for a larger meeting has to be measured on the intended hardware first.</p></details><details><summary>Can I send the translation into a meeting?</summary><p>Yes, through a virtual audio cable (BlackHole on macOS, VB-Cable on Windows) chosen as the playback device and as the microphone in the meeting software. Use headphones while rehearsing. Choosing the output device needs a browser that supports it; Chrome and Edge do.</p></details><details><summary>What happens to my recordings?</summary><p>Voice recordings you submit are kept in speaker_voices/ on the machine running BP until you delete them. Translation audio stays on that machine. Optional session logging can save audio, transcripts and translations. The <a href="/ui/extra/privacy.html?v=20261115-local">privacy policy</a> has the details.</p></details><details><summary>How do I report a problem?</summary><p>Use the <a href="/ui/extra/feedback.html">feedback page</a>.</p></details></div>
                 </div>
             </div>
         </div>
@@ -44,11 +44,11 @@
                 <a class="brand" href="/"><span class="brand-mark" aria-hidden="true"><span class="material-symbols-outlined">record_voice_over</span></span>Speech Translation</a>
                 <nav aria-label="Footer">
                     <a href="/ui/extra/about.html">About</a>
-                    <a href="/ui/extra/faq.html">FAQ</a>
+                    <a href="/ui/extra/faq.html?v=20261115-local">FAQ</a>
                     <a href="/ui/extra/feedback.html">Feedback</a>
-                    <a href="/ui/extra/privacy.html">Privacy</a>
-                    <a href="/ui/extra/terms.html">Terms</a>
-                    <a href="/ui/extra/cookies.html">Cookies</a>
+                    <a href="/ui/extra/privacy.html?v=20261115-local">Privacy</a>
+                    <a href="/ui/extra/terms.html?v=20261115-local">Terms</a>
+                    <a href="/ui/extra/cookies.html?v=20261115-local">Cookies</a>
                 </nav>
             </div>
             <small>&copy; 2026 Yegor Brusnyak. Code is MIT-licensed; model and voice licences differ (see NOTICE.md in the repository).</small>

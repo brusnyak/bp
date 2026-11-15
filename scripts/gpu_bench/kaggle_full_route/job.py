@@ -250,8 +250,6 @@ def serve(repo, port):
     """Production app, unchanged authentication/lifespan; separate ephemeral benchmark DB."""
     sys.path.insert(0, str(repo))
     os.chdir(repo)
-    from backend.utils import db_manager
-    db_manager.SQLALCHEMY_DATABASE_URL = os.environ['BP_BENCH_DB_URL']
     import uvicorn
     # Benchmark kernel: ensure ui/ exists so the StaticFiles mount in app.py
     # does not crash when the staged dataset lacks the ui tree.
@@ -273,7 +271,6 @@ def benchmark_profile(args, profile, audio, output):
     env.update(BP_PROFILE=profile, BP_DEVICE=args.device, BP_COMPUTE_TYPE=args.compute_type,
                BP_MT_DEVICE='cpu', BP_SILENCE_RMS='0', BP_HOST='127.0.0.1',
                PYTHON_DOTENV_DISABLED='1', HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1',
-               BP_BENCH_DB_URL='sqlite:///' + str(args.repo.parent / f'{profile}-{secrets.token_hex(6)}.db'))
     env.update(profile_env(profile))
     from importlib.util import spec_from_file_location, module_from_spec
     spec = spec_from_file_location('latency_profiles', args.repo / 'backend/latency_profiles.py')
