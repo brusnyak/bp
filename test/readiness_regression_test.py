@@ -81,7 +81,7 @@ def test_speaker_media_requires_session_and_existing_local_reference(client, mon
     from starlette.responses import Response
     async def audio(*args): return Response(b"fake-audio", media_type="audio/wav")
     monkeypatch.setattr(server._AudioOnlyStatic, "get_response", audio)
-    Path(bm.SPEAKER_VOICES_DIR, "local.wav").write_bytes(b"reference")
+    Path(bm.VOICES_DIR, "local.wav").write_bytes(b"reference")
     assert client.get("/speaker_voices/local.wav").status_code == 403
     assert client.get("/speaker_voices/local.wav?token=expired").status_code == 403
     assert client.get("/speaker_voices/local.wav?token=valid").status_code == 200
@@ -179,7 +179,7 @@ def test_sdk_pools_beam_and_target_voice_separately(monkeypatch):
 
 def test_client_voice_reference_requires_existing_local_file(monkeypatch, tmp_path):
     from fastapi import HTTPException
-    monkeypatch.setattr(bm, "SPEAKER_VOICES_DIR", str(tmp_path))
+    monkeypatch.setattr(bm, "VOICES_DIR", str(tmp_path))
     (tmp_path / "mine.wav").write_bytes(b"local-reference")
     assert bm.authorize_speaker_wav("mine.wav") == str(tmp_path / "mine.wav")
     with pytest.raises(HTTPException): bm.authorize_speaker_wav(str(tmp_path / "unknown.wav"))

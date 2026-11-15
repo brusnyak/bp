@@ -1,9 +1,12 @@
 /* Hlas app shell service worker: cache UI shell, never cache API/WS.
    Backend remains the compute; this only makes the control-room installable
    and resilient to flaky venue networks (models/voices still served live). */
-const SHELL_CACHE = "hlas-shell-v19-local";
+const SHELL_CACHE = "hlas-shell-v20-local";
 const SHELL = [
   "/ui/live-speech/live.html?v=20261115-local",
+  "/ui/models/models.html?v=20261115-local",
+  "/ui/models/models.js?v=20261115-local",
+  "/ui/models/models.css?v=20261115-local",
   "/ui/i18n/i18n.js",
   "/ui/i18n/index.json?v=20261115-local",
   "/ui/shared/caps.js",

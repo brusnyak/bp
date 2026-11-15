@@ -84,6 +84,9 @@ from backend.mt.ctranslate2_mt import CTranslate2MT
 from backend.tts.piper_tts import PiperTTS
 from backend.utils.audio_utils import load_audio, save_audio
 
+# Router feature paths (config/ and cache/ are git-ignored, user-controlled).
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 # Router for FastAPI
 router = APIRouter()
 
@@ -229,8 +232,9 @@ SILENCE_RMS_THRESHOLD = float(os.environ.get("BP_SILENCE_RMS", "0.005"))  # RMS 
 PRE_VAD_BUFFER_DURATION = 0.5 # seconds, how much audio to buffer before checking RMS
 
 # Speaker Voices Directory and Metadata
-SPEAKER_VOICES_DIR = "speaker_voices"
-os.makedirs(SPEAKER_VOICES_DIR, exist_ok=True)
+# Configurable via BP_VOICES_DIR; default is `voices` (renamed from speaker_voices).
+VOICES_DIR = os.environ.get("BP_VOICES_DIR", "voices")
+os.makedirs(VOICES_DIR, exist_ok=True)
 
 
 def _safe_voice_name(name: str) -> str:
@@ -242,10 +246,10 @@ def _safe_voice_name(name: str) -> str:
 
 
 def _voice_path(filename: str) -> str:
-    """Resolve `filename` inside SPEAKER_VOICES_DIR or raise 400 (blocks ../, backslash traversal and absolute paths)."""
+    """Resolve `filename` inside VOICES_DIR or raise 400 (blocks ../, backslash traversal and absolute paths)."""
     if not filename or filename in (".", "..") or "/" in filename or "\\" in filename:  # not a separator on POSIX, but never produced by _safe_voice_name and is one on Windows
         raise HTTPException(status_code=400, detail="Invalid voice path.")
-    base = os.path.realpath(SPEAKER_VOICES_DIR)
+    base = os.path.realpath(VOICES_DIR)
     path = os.path.realpath(os.path.join(base, filename))
     try:
         inside = os.path.commonpath([base, path]) == base
@@ -258,10 +262,10 @@ def _voice_path(filename: str) -> str:
 
 def _safe_speaker_wav(path: Optional[str]) -> Optional[str]:
     """speaker_wav_path comes from the unauthenticated /initialize endpoint and the WebSocket.
-    Only files inside SPEAKER_VOICES_DIR are allowed; anything else is dropped (no cloning, no file read)."""
+    Only files inside VOICES_DIR are allowed; anything else is dropped (no cloning, no file read)."""
     if not path:
         return path
-    base = os.path.realpath(SPEAKER_VOICES_DIR)
+    base = os.path.realpath(VOICES_DIR)
     resolved = os.path.realpath(path)
     try:
         inside = os.path.commonpath([base, resolved]) == base
@@ -865,7 +869,7 @@ _reference_lock = threading.Lock()
 
 def _reference_names():
     from pathlib import Path
-    return sorted(p.name for p in Path(SPEAKER_VOICES_DIR).iterdir()
+    return sorted(p.name for p in Path(VOICES_DIR).iterdir()
                   if p.suffix.lower() in REFERENCE_EXTENSIONS and p.is_file() and not p.is_symlink())
 
 
@@ -1071,6 +1075,403 @@ async def voice_lab_status():
         "qc_scores": (qc_scores or {}).get("results", []),
         "qc_scored": qc_scores is not None,
     }
+
+# ------------------------------------------------------------------ router catalog
+from backend.catalog import build_catalog, load_curated, load_user_entries, plan_route, CURATED_PATH, LIVE_CACHE_PATH, USER_ENTRIES_PATH
+
+# In-memory install jobs (process lifetime). job_id -> {state, progress, current, log_tail, error, ids}
+_install_jobs: dict = {}
+_install_lock = __import__("threading").Lock()
+
+
+def _append_job_log(job_id: str, line: str) -> None:
+    with _install_lock:
+        job = _install_jobs.get(job_id)
+        if job is None:
+            return
+        tail = job["log_tail"]
+        tail.append(line)
+        if len(tail) > 200:
+            del tail[:-200]
+
+
+def _install_worker(job_id: str, ids: list) -> None:
+    """Background download+verify+atomic move. Never runs pip."""
+    import os
+    import shutil
+    import urllib.request
+    import urllib.error
+    import hashlib
+    import json as _json
+
+    def log(line: str) -> None:
+        _append_job_log(job_id, line)
+
+    def set_state(state: str, progress: float | None = None, current: str | None = None, error: str | None = None) -> None:
+        with _install_lock:
+            job = _install_jobs[job_id]
+            job["state"] = state
+            if progress is not None:
+                job["progress"] = progress
+            if current is not None:
+                job["current"] = current
+            if error is not None:
+                job["error"] = error
+
+    set_state("running", 0.0, "starting")
+    curated = load_curated()
+    by_id = {m.get("id"): m for m in curated if m.get("id")}
+
+    total = len(ids)
+    done = 0
+    for i, mid in enumerate(ids):
+        m = by_id.get(mid)
+        if m is None:
+            set_state("error", progress=(done / total) if total else 0, current=mid, error=f"unknown model id {mid}")
+            return
+        source = m.get("source", {}) or {}
+        kind = source.get("kind")
+        files = source.get("files") or {}
+        url = None
+        md5 = None
+        size = None
+        dest_rel = None
+        if kind == "piper":
+            # files: {voice_key: {path, size_bytes, md5_digest}}; pick the .onnx path
+            for _k, finfo in files.items():
+                if isinstance(finfo, dict) and finfo.get("path", "").endswith(".onnx"):
+                    url = f"https://huggingface.co/rhasspy/piper-voices/resolve/main/{finfo['path']}"
+                    md5 = finfo.get("md5_digest")
+                    size = finfo.get("size_bytes")
+                    dest_rel = finfo["path"]
+                    break
+        elif kind == "hf":
+            repo = source.get("repo")
+            # Prefer an explicit single file; otherwise download the model.bin-ish first file.
+            hf_files = files or {}
+            if hf_files:
+                first = next(iter(hf_files.values()))
+                if isinstance(first, dict):
+                    url = f"https://huggingface.co/{repo}/resolve/main/{first.get('path','')}" if first.get('path') else None
+                    md5 = first.get("md5_digest")
+                    size = first.get("size_bytes")
+                    dest_rel = first.get("path")
+            if not url:
+                url = f"https://huggingface.co/{repo}/resolve/main/model.bin"
+                dest_rel = f"{mid.replace('/','--')}/model.bin"
+        else:
+            log(f"skip {mid}: kind '{kind}' not auto-installable")
+            done += 1
+            set_state("running", progress=(done / total) if total else 0, current=mid)
+            continue
+
+        if not url:
+            log(f"skip {mid}: no download url")
+            done += 1
+            set_state("running", progress=(done / total) if total else 0, current=mid)
+            continue
+
+        dest_dir = os.path.join("models", os.path.dirname(dest_rel) or mid)
+        os.makedirs(dest_dir, exist_ok=True)
+        dest_path = os.path.join(dest_dir, os.path.basename(dest_rel))
+        tmp_path = dest_path + ".part"
+
+        try:
+            log(f"download {mid} -> {dest_path}")
+            req = urllib.request.Request(url, headers={"User-Agent": "bp-router/1.0"})
+            with urllib.request.urlopen(req, timeout=30) as resp, open(tmp_path, "wb") as out:
+                shutil.copyfileobj(resp, out, length=1024 * 1024)
+            # verify md5 when provided
+            if md5:
+                h = hashlib.md5()
+                with open(tmp_path, "rb") as f:
+                    for chunk in iter(lambda: f.read(1024 * 1024), b""):
+                        h.update(chunk)
+                if h.hexdigest().lower() != str(md5).lower():
+                    os.remove(tmp_path)
+                    set_state("error", progress=(done / total) if total else 0, current=mid, error=f"md5 mismatch for {mid}")
+                    return
+            os.replace(tmp_path, dest_path)
+            log(f"installed {mid}")
+        except Exception as exc:  # noqa: BLE001
+            log(f"failed {mid}: {type(exc).__name__}: {exc}")
+            set_state("error", progress=(done / total) if total else 0, current=mid, error=str(exc))
+            return
+
+        done += 1
+        set_state("running", progress=(done / total) if total else 0, current=mid)
+
+    set_state("done", progress=1.0, current=None)
+
+
+@router.get("/hardware", summary="Detected hardware for the router catalog")
+async def router_hardware(session=Depends(get_current_session)):
+    from backend.hardware_scan import get_config
+    cfg = get_config()
+    hw = cfg.hardware
+    gpu = {"name": hw.gpu_name, "vram_gb": hw.vram_gb, "backend": hw.gpu} if hw.gpu != "cpu" else None
+    return {
+        "cpu_cores": hw.cpu_cores,
+        "ram_gb": hw.ram_gb,
+        "gpu": gpu,
+        "disk_free_gb": 0.0,
+    }
+
+
+@router.get("/catalog", summary="Unified model catalog: curated + live cache + user entries")
+async def router_catalog(stage: str | None = None, lang: str | None = None, q: str | None = None,
+                         session=Depends(get_current_session)):
+    from backend.hardware_scan import get_config
+    hw = get_config().hardware
+    hardware = {
+        "cpu_cores": hw.cpu_cores,
+        "ram_gb": hw.ram_gb,
+        "gpu": {"name": hw.gpu_name, "vram_gb": hw.vram_gb, "backend": hw.gpu},
+        "disk_free_gb": 0.0,
+    }
+    return build_catalog(hardware, stage=stage, lang=lang, q=q)
+
+
+@router.post("/catalog/refresh", summary="Refresh live catalog from Piper + Hugging Face (offline-capable)")
+async def router_catalog_refresh(session=Depends(get_current_session)):
+    import urllib.request
+    import json as _json
+    import os
+
+    os.makedirs(os.path.dirname(LIVE_CACHE_PATH), exist_ok=True)
+
+    models = []
+    errors = []
+
+    # Piper voices.json
+    try:
+        req = urllib.request.Request("https://huggingface.co/rhasspy/piper-voices/resolve/main/voices.json",
+                                     headers={"User-Agent": "bp-router/1.0"})
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            voices = _json.load(resp)
+        # voices.json is a list of voice entries
+        for v in voices if isinstance(voices, list) else []:
+            key = v.get("key")
+            lang = v.get("language", {}) or {}
+            code = lang.get("code")
+            files = v.get("files", {}) or {}
+            onnx = None
+            for path, finfo in files.items():
+                if path.endswith(".onnx"):
+                    onnx = finfo
+                    break
+            if key and code and onnx:
+                models.append({
+                    "id": f"piper-{key}",
+                    "stage": "tts",
+                    "name": f"Piper {key}",
+                    "engine": "piper",
+                    "languages": [code],
+                    "pair": None,
+                    "size_mb": round((onnx.get("size_bytes") or 0) / 1_000_000, 1),
+                    "devices": ["cpu"],
+                    "min_ram_gb": 1,
+                    "min_vram_gb": None,
+                    "streaming": True,
+                    "clone": False,
+                    "installed": False,
+                    "fit": "good",
+                    "recommended": False,
+                    "why": "Piper voice from live voices.json.",
+                    "licence": {"label": "GPL-3.0-or-later (runtime)", "url": "https://huggingface.co/rhasspy/piper-voices"},
+                    "source": {"kind": "piper", "repo": "rhasspy/piper-voices", "files": {key: {"path": key + ".onnx", "size_bytes": onnx.get("size_bytes"), "md5_digest": onnx.get("md5_digest")}}},
+                    "notes": "Live from voices.json; installed detection at runtime.",
+                })
+    except Exception as exc:  # noqa: BLE001
+        errors.append(f"piper: {type(exc).__name__}: {exc}")
+
+    # Helsinki-NLP opus-mt pairs via HF API cursor pagination
+    try:
+        url = "https://huggingface.co/api/models?author=Helsinki-NLP&search=opus-mt&limit=100&full=false"
+        seen = set()
+        pages = 0
+        while url and pages < 5:
+            req = urllib.request.Request(url, headers={"User-Agent": "bp-router/1.0"})
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                page = _json.load(resp)
+                link = resp.headers.get("Link", "")
+            for item in page:
+                repo_id = item.get("id", "")
+                if "opus-mt" not in repo_id:
+                    continue
+                if repo_id in seen:
+                    continue
+                seen.add(repo_id)
+                parts = repo_id.split("/")[-1]
+                # opus-mt-src-tgt
+                if parts.startswith("opus-mt-"):
+                    rest = parts[len("opus-mt-"):]
+                    if "-" in rest:
+                        src, tgt = rest.split("-", 1)
+                        models.append({
+                            "id": f"Helsinki-NLP--{repo_id.replace('/','--')}",
+                            "stage": "mt",
+                            "name": f"Opus-MT {src}->{tgt}",
+                            "engine": "opus-mt",
+                            "languages": [src, tgt],
+                            "pair": f"{src}-{tgt}",
+                            "size_mb": 300,
+                            "devices": ["cpu", "cuda"],
+                            "min_ram_gb": 1,
+                            "min_vram_gb": None,
+                            "streaming": False,
+                            "clone": False,
+                            "installed": False,
+                            "fit": "ok",
+                            "recommended": False,
+                            "why": f"Live HF entry {repo_id}.",
+                            "licence": {"label": "verify per model card", "url": f"https://huggingface.co/{repo_id}"},
+                            "source": {"kind": "hf", "repo": repo_id, "files": {}},
+                            "notes": "Converted to CT2 at install time.",
+                        })
+            # next page via Link header rel=next
+            next_url = None
+            for part in link.split(","):
+                part = part.strip()
+                if 'rel="next"' in part:
+                    next_url = part[part.find("<") + 1:part.find(">")]
+                    break
+            url = next_url
+            pages += 1
+    except Exception as exc:  # noqa: BLE001
+        errors.append(f"opus-mt: {type(exc).__name__}: {exc}")
+
+    # Systran faster-whisper repos
+    try:
+        req = urllib.request.Request("https://huggingface.co/api/models?author=Systran&search=faster-whisper&limit=50&full=false",
+                                     headers={"User-Agent": "bp-router/1.0"})
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            page = _json.load(resp)
+        for item in page:
+            repo_id = item.get("id", "")
+            size = round((item.get("safetensors", {}).get("total") or 0) / 1_000_000, 1) or 140
+            models.append({
+                "id": f"Systran--{repo_id.replace('/','--')}",
+                "stage": "stt",
+                "name": f"Whisper {repo_id.split('/')[-1]}",
+                "engine": "faster_whisper",
+                "languages": list(item.get("tags", []) or [])[:12] or ["en"],
+                "pair": None,
+                "size_mb": size,
+                "devices": ["cpu", "cuda"],
+                "min_ram_gb": 2,
+                "min_vram_gb": None,
+                "streaming": False,
+                "clone": False,
+                "installed": False,
+                "fit": "ok",
+                "recommended": False,
+                "why": f"Live HF entry {repo_id}.",
+                "licence": {"label": "verify per model card", "url": f"https://huggingface.co/{repo_id}"},
+                "source": {"kind": "hf", "repo": repo_id, "files": {}},
+                "notes": "Downloads on first use via faster-whisper.",
+            })
+    except Exception as exc:  # noqa: BLE001
+        errors.append(f"whisper: {type(exc).__name__}: {exc}")
+
+    payload = {"models": models, "errors": errors, "refreshed": __import__("time").time()}
+    tmp = LIVE_CACHE_PATH + ".tmp"
+    os.makedirs(os.path.dirname(LIVE_CACHE_PATH), exist_ok=True)
+    with open(tmp, "w", encoding="utf-8") as f:
+        _json.dump(payload, f, indent=2)
+    os.replace(tmp, LIVE_CACHE_PATH)
+
+    return {"models": len(models), "errors": errors, "cache": LIVE_CACHE_PATH}
+
+
+@router.get("/route/plan", summary="Best STT/MT/TTS chain for a language pair")
+async def router_route_plan(src: str, tgt: str, session=Depends(get_current_session)):
+    from backend.hardware_scan import get_config
+    hw = get_config().hardware
+    hardware = {
+        "cpu_cores": hw.cpu_cores,
+        "ram_gb": hw.ram_gb,
+        "gpu": {"name": hw.gpu_name, "vram_gb": hw.vram_gb, "backend": hw.gpu},
+        "disk_free_gb": 0.0,
+    }
+    return plan_route(src, tgt, hardware)
+
+
+@router.post("/models/install", summary="Start an install job for model ids")
+async def router_models_install(body: dict, session=Depends(get_current_session)):
+    ids = body.get("ids", []) if isinstance(body, dict) else []
+    if not isinstance(ids, list) or not ids:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=400, detail="ids must be a non-empty list")
+    import uuid as _uuid
+    job_id = _uuid.uuid4().hex
+    with _install_lock:
+        _install_jobs[job_id] = {"state": "queued", "progress": 0.0, "current": None, "log_tail": [], "error": None, "ids": list(ids)}
+    t = __import__("threading").Thread(target=_install_worker, args=(job_id, list(ids)), daemon=True)
+    t.start()
+    return {"job_id": job_id}
+
+
+@router.get("/jobs/{job_id}", summary="Install job status")
+async def router_jobs_status(job_id: str, session=Depends(get_current_session)):
+    with _install_lock:
+        job = _install_jobs.get(job_id)
+    if job is None:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="unknown job")
+    return dict(job)
+
+
+@router.delete("/models/{model_id}", summary="Remove an installed model (models dirs only)")
+async def router_models_delete(model_id: str, session=Depends(get_current_session)):
+    import os
+    import shutil
+    removed = []
+    for root in ("models", "ct2_models", "onnx_models", os.path.join("backend", "tts", "piper_models")):
+        candidates = [model_id, model_id.replace("/", "--"), model_id.replace("/", "-")]
+        for cand in candidates:
+            p = os.path.join(root, cand)
+            if os.path.isdir(p):
+                shutil.rmtree(p)
+                removed.append(p)
+            elif os.path.isfile(p):
+                os.remove(p)
+                removed.append(p)
+    if not removed:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="model not found in models dirs")
+    return {"removed": removed}
+
+
+@router.get("/route", summary="Current route selection from config/route.json")
+async def router_route_get(session=Depends(get_current_session)):
+    import os
+    import json as _json
+    path = os.path.join(REPO_ROOT, "config", "route.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            return _json.load(f)
+    except (OSError, ValueError):
+        return {"src": "en", "tgt": "sk", "stt": None, "mt": None, "tts": None, "voice": None}
+
+
+@router.post("/route", summary="Save route selection to config/route.json")
+async def router_route_post(body: dict, session=Depends(get_current_session)):
+    import os
+    import json as _json
+    from fastapi import HTTPException
+    path = os.path.join(REPO_ROOT, "config", "route.json")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    allowed = {"src", "tgt", "stt", "mt", "tts", "voice"}
+    data = {k: v for k, v in (body or {}).items() if k in allowed}
+    if "src" not in data or "tgt" not in data:
+        raise HTTPException(status_code=400, detail="src and tgt are required")
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        _json.dump(data, f, indent=2)
+    os.replace(tmp, path)
+    return data
+
 
 @router.get("/health", summary="Health check — per-stage readiness, engine in use")
 async def health_check():

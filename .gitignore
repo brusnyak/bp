@@ -67,7 +67,8 @@ onnx_models/
 backend/tts/piper_models/*.onnx
 backend/tts/piper_models/*.onnx.json
 # User voice recordings/uploads are personal (biometric) data; the dir is created at runtime
-speaker_voices/
+# (configurable via BP_VOICES_DIR, default `voices`; was `speaker_voices`).
+voices/
 
 # Voice-clone bootstrap tooling (2026-08-19) - not part of the shipped project
 .voice-clone-tools/
@@ -84,3 +85,7 @@ logs/
 # Anonymous session signing secret (generated on first run)
 .jwt_secret
 backend/tts/piper_models
+
+# Router feature: live catalog cache + user config (never committed)
+cache/
+config/

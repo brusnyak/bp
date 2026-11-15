@@ -199,7 +199,7 @@ def create_app() -> FastAPI:
     os.makedirs("processed/voice_qc", exist_ok=True)
     _app.mount("/ui", StaticFiles(directory="ui"), name="ui")
     _app.mount("/ui/images", StaticFiles(directory="ui/images"), name="images") # Explicitly mount images
-    _app.mount("/speaker_voices", _AudioOnlyStatic(directory=backend_main.SPEAKER_VOICES_DIR), name="speaker_voices")
+    _app.mount("/speaker_voices", _AudioOnlyStatic(directory=backend_main.VOICES_DIR), name="speaker_voices")
     # Voice-lab eval page (ui/voice-lab/): serves QC candidate audio + manifests.
     # Read-only static mount, same pattern as /speaker_voices above.
     _app.mount("/voice_qc", StaticFiles(directory="processed/voice_qc"), name="voice_qc")
@@ -571,9 +571,9 @@ def create_app() -> FastAPI:
 app = create_app()
 
 if __name__ == "__main__":
-    # Ensure piper_models and speaker_voices directories exist
+    # Ensure piper_models and voices directories exist
     os.makedirs("backend/tts/piper_models", exist_ok=True)
-    os.makedirs("speaker_voices", exist_ok=True)
+    os.makedirs(backend_main.VOICES_DIR, exist_ok=True)
     os.makedirs("processed/voice_qc", exist_ok=True)
     # Loopback by default; exposing the host grants network clients local-tool access.
     # For a conference/LAN demo opt in explicitly: BP_HOST=0.0.0.0

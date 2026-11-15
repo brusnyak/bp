@@ -11,7 +11,7 @@ def isolated_references(tmp_path, monkeypatch):
     import backend.main as bm
     directory = tmp_path / "references"
     directory.mkdir()
-    monkeypatch.setattr(bm, "SPEAKER_VOICES_DIR", str(directory))
+    monkeypatch.setattr(bm, "VOICES_DIR", str(directory))
 
 @pytest.fixture
 def test_client():

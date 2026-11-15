@@ -33,7 +33,7 @@ COPY languages/ ./languages/
 COPY ui/ ./ui/
 
 # Directories for runtime assets (gitignored on host, created at runtime)
-RUN mkdir -p ct2_models speaker_voices processed/voice_qc certs
+RUN mkdir -p ct2_models voices processed/voice_qc certs
 
 # Non-root user for security
 RUN useradd -m -u 1000 bpuser && chown -R bpuser:bpuser /app

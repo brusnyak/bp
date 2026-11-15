@@ -625,6 +625,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to stop real-time audio streaming
     function stopRealtimeAudioStreaming() {
+        const wasStreaming = isStreaming || starting;
         captureGeneration++;
         finishPreparation(false);
         starting = false;
@@ -672,8 +673,6 @@ document.addEventListener('DOMContentLoaded', () => {
         isStreaming = false; publishLive();
         startStopBtn.textContent = 'Start';
         setRouteStatus('Ready');
-        showNotification('Real-time streaming stopped.', 'info');
-        logActivity('Session ended - streaming stopped', 'info');
         updateMainMicLevel(0); // Reset mic level display
         updateStartAvailability();
 
@@ -682,7 +681,11 @@ document.addEventListener('DOMContentLoaded', () => {
             window.resetLatencyChart();
         }
 
-        showNotification('Real-time streaming stopped.', 'info');
+        // Only report "stopped" when we were actually streaming — not on page load or idle teardowns.
+        if (wasStreaming) {
+            showNotification('Real-time streaming stopped.', 'info');
+            logActivity('Session ended - streaming stopped', 'info');
+        }
     }
 
     // Start prepares the selected route, then opens capture. Stop is terminal at every await.

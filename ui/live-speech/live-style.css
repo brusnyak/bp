@@ -52,9 +52,10 @@ a { color: var(--primary-color); text-underline-offset: .2em; }
 .divider { display: none; }
 .more { margin-top: 1.5rem; border-top: 1px solid var(--border-color); }
 summary { padding: 1rem 0; font-weight: 600; }
-.more-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; margin: .5rem 0 1.5rem; }
-.more-grid details summary { padding: 0 0 .5rem; font-size: .85rem; }
-.more-grid details select { margin: .5rem 0; }
+.more-section { margin: 0.5rem 0 1.25rem; padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: 0.75rem; background: var(--surface-color); }
+.more-section h2 { margin: 0 0 0.75rem; font-size: 0.9rem; font-weight: 700; color: var(--text-color); text-transform: uppercase; letter-spacing: 0.08em; }
+.more-grid { display: none; }
+
 .room-create { display: flex; flex-wrap: wrap; gap: .5rem; }
 .room-create input { flex: 1 1 120px; min-width: 0; }
 .diagnostics { border-top: 1px solid var(--border-color); }
