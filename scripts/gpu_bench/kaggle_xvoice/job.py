@@ -1,30 +1,19 @@
 #!/usr/bin/env python3
-"""Kaggle T4 kernel: X-Voice zero-shot voice cloning benchmark (fixed standalone env).
+"""Standalone X-Voice T4 benchmark. No BP imports or project-environment installs.
 
-Tests X-Voice (sunnyxrxrx/X-Voice, flow-matching DiT, IPA input) on Kaggle Tesla T4 GPU:
-- SK and CZ both listed among 30 langs (paper tables 5-6)
-- Code MIT, weights CC-BY-NC (thesis OK, product no)
-- 0.4B model, PyTorch; vendor RTF 0.073 on RTX 4090
-
-FIXES vs prior attempt:
-- ctranslate2==4.5.0 pin doesn't exist on PyPI → install ctranslate2 without version constraint
-- Import path is `x_voice` (underscore) not `xvoice`
-- Python >=3.11 required; Kaggle default is 3.13.16 (compatible)
-- Uses `uv pip install --python` with direct venv binary (no `source activate`, no conda)
-
-License: code MIT, weights CC-BY-NC (non-commercial).
-
-Run: kaggle kernels push -p scripts/gpu_bench/kaggle_xvoice --accelerator NvidiaTeslaT4 -t 1800
-Outputs: /kaggle/working/xvoice_{en,sk,cs}.wav + xvoice_report.json
+Source: https://github.com/sunnyxrxrx/X-Voice/tree/817bcdd9f8173eb01c7d5c895858b1d93780d9d0
+README.md; infer_cli_stage{1,2}.py; utils_infer.py; XVoice_Base_Stage{1,2}.yaml.
+Code MIT; HF XRXRX/X-Voice weights CC-BY-NC. Batch only, no streaming.
+Run only on Kaggle; this file re-executes itself inside isolated Python 3.11 venvs.
 """
 import json, os, shutil, subprocess, sys, time, traceback
 from pathlib import Path
 
 OUT = Path("/kaggle/working")
-REPORT = OUT / "xvoice_report.json"
+REPORT = OUT / "results.json"
 T0 = time.time()
 R = {"schema": 1, "status": "running", "steps": [], "errors": [], "tts": {}, "infrastructure": {}}
-SERVER_PROC = None
+OUT.mkdir(parents=True, exist_ok=True)
 
 
 def save():
@@ -39,247 +28,476 @@ def step(name, **kw):
     print(f"[{time.time() - T0:7.1f}s] {name} {kw}", flush=True)
     save()
 
+import gc
+import statistics
+import unicodedata
+import wave
 
-def sh(cmd, timeout=900):
-    p = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout)
-    return p.returncode, (p.stdout + p.stderr)[-4000:]
-
-
-# ---------------------------------------------------------------------------
-# 0. Environment + GPU check
-# ---------------------------------------------------------------------------
-step("env", python=sys.version, cwd=os.getcwd())
-rc, out = sh("nvidia-smi --query-gpu=name,driver_version,memory.total --format=csv,noheader", 60)
-step("gpu", output=out.strip())
-
-rc, out = sh("python3 -c 'import torch; print(torch.__version__); print(torch.cuda.is_available()); print(torch.version.cuda)'", 30)
-R["infrastructure"]["torch"] = out.strip() if rc == 0 else "not_installed"
-save()
-
-# ---------------------------------------------------------------------------
-# 1. Install uv + Python 3.11 venv (X-Voice requires Python >=3.11)
-# ---------------------------------------------------------------------------
-step("install_uv")
-rc, out = sh("pip install uv", 120)
-step("uv_install", rc=rc, output=out[-200:] if rc != 0 else "ok")
-
-step("uv_python_311")
-rc, out = sh("uv python install 3.11", 300)
-step("uv_python_install", rc=rc, output=out[-500:] if rc != 0 else "ok")
-
-if rc != 0:
-    step("uv_python_failed", error=out[-500:])
-    R["status"] = "failed"; save(); sys.exit(1)
-
-VENV_DIR = "/tmp/xvoice-venv"
-step("create_venv")
-rc, out = sh(f"uv venv --python 3.11 {VENV_DIR}", 120)
-step("venv_create", rc=rc, output=out[-300:] if rc != 0 else "ok")
-
-if rc != 0:
-    step("venv_failed", error=out[-500:])
-    R["status"] = "failed"; save(); sys.exit(1)
-
-VENV_PYTHON = f"{VENV_DIR}/bin/python"
-UV_PIP_INSTALL = f"uv pip install --python {VENV_PYTHON}"
-
-rc, out = sh(f"{VENV_PYTHON} --version", 30)
-step("venv_python_version", output=out.strip() if rc == 0 else "failed")
-
-# Disable SSL verification for fastlid model downloads (Kaggle cert issues)
-rc, out = sh(f"{VENV_PIP} install certifi", 120)
-step("certifi_install", rc=rc, output=out[-200:] if rc != 0 else "ok")
-
-# ---------------------------------------------------------------------------
-# 2. Install ctranslate2 first (X-Voice pins ==4.5.0 which doesn't exist on PyPI;
-#    install without version constraint, then install X-Voice)
-#    Use `uv pip install --python` (venv has no pip binary of its own)
-# ---------------------------------------------------------------------------
-step("install_ctranslate2")
-rc, out = sh(f"{UV_PIP_INSTALL} --upgrade pip uv", 120)
-step("pip_upgrade", rc=rc, output=out[-200:] if rc != 0 else "ok")
-
-rc, out = sh(f"{UV_PIP_INSTALL} ctranslate2", 300)
-step("ctranslate2_install", rc=rc, output=out[-500:] if rc != 0 else "ok")
-
-if rc != 0:
-    step("ctranslate2_failed", error=out[-500:])
-    # Continue anyway — X-Voice may work with a newer ctranslate2
-
-# Install system deps for IPA/espeak-ng (libespeak-1 doesn't exist on Ubuntu 24.04)
-rc, out = sh("apt-get update -qq && apt-get install -y -qq espeak-ng", 300)
-step("espeak_ng", rc=rc, output=out[-300:] if rc != 0 else "ok")
-
-# ---------------------------------------------------------------------------
-# 3. Install X-Voice from GitHub
-# ---------------------------------------------------------------------------
-step("install_xvoice")
-rc, out = sh(f"{UV_PIP_INSTALL} git+https://github.com/sunnyxrxrx/X-Voice.git", 900)
-step("xvoice_pip", rc=rc, output=out[-800:] if rc != 0 else "ok")
-
-if rc != 0:
-    step("xvoice_pip_failed", error=out[-500:])
-    R["status"] = "failed"; save(); sys.exit(1)
-
-save()
-
-# ---------------------------------------------------------------------------
-# 4. Find staged BP repo for voice reference files
-# ---------------------------------------------------------------------------
-step("repo_lookup")
-src = next((p for p in Path("/kaggle/input").rglob("app.py")
-            if (p.parent / "benchmark-provenance.json").is_file()), None)
-repo = src.parent if src else None
-step("repo", path=str(repo) if repo else "none")
-
-candidates_by_lang = {
+REV = "817bcdd9f8173eb01c7d5c895858b1d93780d9d0"
+SOURCE = Path("/tmp/xvoice-source")
+TTS_PY = "/tmp/xvoice-venv/bin/python"
+ASR_PY = "/tmp/xvoice-asr-venv/bin/python"
+SELF = str(Path(__file__).resolve())
+LANGS = ("en", "sk", "cs")
+TEXTS = {
+    "en": {
+        "short": "Hello, this is a test of real-time speech translation.",
+        "long": "During our international meeting today, each participant will hear translated speech in their own language while the system preserves the original speaker's voice and meaning.",
+    },
+    "sk": {
+        "short": "Dobrý deň, toto je test prekladov reči v reálnom čase.",
+        "long": "Počas dnešného medzinárodného stretnutia bude každý účastník počuť preloženú reč vo svojom jazyku, pričom systém zachová hlas pôvodného rečníka a presný význam všetkých jeho slov.",
+    },
+    "cs": {
+        "short": "Dobrý den, toto je test překladu řeči v reálném čase.",
+        "long": "Během dnešního mezinárodního setkání bude každý účastník slyšet přeloženou řeč ve svém jazyce, přičemž systém zachová hlas původního řečníka a přesný význam všech jeho slov.",
+    },
+}
+CANDIDATES = {
     "en": ["speaker_voices/me_en_rainbow.m4a", "processed/testaudio/en_paced.wav"],
     "sk": ["speaker_voices/me_sk_trhove.m4a", "processed/testaudio/sk_paced.wav"],
     "cs": ["speaker_voices/me_cs_staromestske.m4a", "processed/testaudio/cs_paced.wav"],
 }
 
-def find_file(paths):
-    for p in paths:
-        cand = Path(".") / p
-        if cand.is_file():
-            return str(cand)
-        if repo:
-            cand2 = repo / p
-            if cand2.is_file():
-                return str(cand2)
-    return None
 
-voice_files = {}
-for lang, paths in candidates_by_lang.items():
-    ref = find_file(paths)
-    if ref:
-        wav_path = OUT / f"ref_{lang}.wav"
-        rc, out = sh(f'ffmpeg -y -v error -i {ref} -t 10 -ac 1 -ar 24000 {wav_path}', 60)
-        if rc == 0:
-            voice_files[lang] = str(wav_path)
-            step("ref", lang=lang, wav=str(wav_path))
-        else:
-            step("ref_fail", lang=lang, error=out[-200:])
-    else:
-        step("ref_missing", lang=lang)
+def error(where, exc, **context):
+    record = {"stage": where, "error": f"{type(exc).__name__}: {exc}", **context}
+    R["errors"].append(record)
+    step("error", **record)
+    return record
 
-if not voice_files:
-    step("warning", msg="no reference voice files found — synthesizing fallback audio")
-    import wave, struct, math
-    for lang in ("en", "sk", "cs"):
-        wav_path = OUT / f"ref_{lang}.wav"
-        sr = 24000
-        duration = 5.0
-        freq = 440 if lang == "en" else (520 if lang == "sk" else 600)
-        frames = []
-        for i in range(int(sr * duration)):
-            t = i / sr
-            sample = int(16000 * math.sin(2 * math.pi * freq * t) * (0.5 + 0.5 * math.sin(2 * math.pi * 0.5 * t)))
-            frames.append(struct.pack('<h', sample))
-        with wave.open(str(wav_path), 'wb') as wf:
-            wf.setnchannels(1)
-            wf.setsampwidth(2)
-            wf.setframerate(sr)
-            wf.writeframes(b''.join(frames))
-        voice_files[lang] = str(wav_path)
-        step("ref_synth", lang=lang, wav=str(wav_path))
 
-# ---------------------------------------------------------------------------
-# 5. Run X-Voice per language via CLI
-# ---------------------------------------------------------------------------
-step("run_xvoice")
-import torch
-
-# Check the installed package structure
-rc, out = sh(f"{VENV_PYTHON} -c 'import x_voice; print(x_voice.__file__)'", 30)
-step("xvoice_import_check", rc=rc, output=out[-500:] if rc != 0 else "ok")
-
-test_texts = {
-    "en": "Hello, this is a test of real-time speech translation.",
-    "sk": "Dobrý deň, toto je test prekladov reči v reálnom čase.",
-    "cs": "Dobrý den, toto je test překladu řeči v reálném čase.",
-}
-
-for lang in ("en", "sk", "cs"):
-    step("tts", lang=lang)
-    try:
-        ref_wav = voice_files[lang]
-        t0 = time.perf_counter()
-
-        # X-Voice CLI: x-voice_infer-gradio or python -m x_voice.infer.infer_cli_stage1
-        # The package provides a CLI entry point; try direct Python import first
-        audio = None
+def run(cmd, timeout=900, cwd=None, env=None):
+    """No shell interpolation; record commands, return codes and complete disk logs."""
+    name = f"command_{len(R['steps']):04d}.log"
+    log = OUT / name
+    started = time.perf_counter()
+    with log.open("w") as stream:
         try:
-            # Try importing the model class
-            from x_voice.models.model import XVoiceModel
-            model = XVoiceModel.from_pretrained("sunnyxrxrx/X-Voice", device="cuda")
-            audio = model.synthesize(test_texts[lang], reference_audio=ref_wav, language=lang)
-        except (ImportError, AttributeError, Exception) as e:
-            step("import_fallback", lang=lang, reason=str(e)[:200])
-            # Try CLI approach
-            cli_script = f"{VENV_DIR}/bin/x-voice_infer-gradio"
-            import shutil as shutil_mod
-            if shutil_mod.which("x-voice_infer-gradio"):
-                cli_cmd = f"PYTHONHTTPSVERIFY=0 x-voice_infer-gradio --text '{test_texts[lang]}' --reference_audio {ref_wav} --language {lang} --output /tmp/xvoice_out_{lang}.wav"
-            else:
-                cli_cmd = f"PYTHONHTTPSVERIFY=0 {VENV_PYTHON} -m x_voice.infer.infer_cli_stage1 --text '{test_texts[lang]}' --reference_audio {ref_wav} --language {lang} --output /tmp/xvoice_out_{lang}.wav"
-            rc, out = sh(cli_cmd, 600)
-            step("cli_run", lang=lang, rc=rc, output=out[-500:] if rc != 0 else "ok")
-            if rc == 0 and os.path.exists(f"/tmp/xvoice_out_{lang}.wav"):
-                import soundfile as sf
-                audio_path = f"/tmp/xvoice_out_{lang}.wav"
-                info = sf.info(audio_path)
-                audio = True  # marker
-                audio_s = info.frames / info.samplerate
-                wall_s = time.perf_counter() - t0
-                rtf = wall_s / audio_s if audio_s > 0 else None
-                out_path = OUT / f"xvoice_{lang}.wav"
-                shutil.copy2(audio_path, str(out_path))
-                R["tts"][lang] = {
-                    "device": "cuda" if torch.cuda.is_available() else "cpu",
-                    "wall_s": round(wall_s, 3),
-                    "audio_s": round(audio_s, 2),
-                    "rtf": round(rtf, 3) if rtf else None,
-                    "output_wav": str(out_path),
-                    "voice_clone": True,
-                    "method": "cli",
-                }
-                step("tts_done", lang=lang, rtf=round(rtf, 3) if rtf else None)
-                continue
+            proc = subprocess.run(cmd, cwd=cwd, env=env, stdout=stream,
+                                  stderr=subprocess.STDOUT, timeout=timeout)
+            rc = proc.returncode
+        except subprocess.TimeoutExpired:
+            rc = 124
+    step("command", command=cmd, rc=rc, wall_s=time.perf_counter() - started,
+         log=str(log), tail=log.read_text(errors="replace")[-2000:])
+    if rc:
+        raise RuntimeError(f"command rc={rc}: {cmd}; see {log}")
+    return log.read_text(errors="replace")
 
-        if audio is not None:
-            import soundfile as sf
-            import numpy as np
-            if hasattr(audio, 'numpy'):
-                audio = audio.numpy()
-            if hasattr(audio, 'cpu'):
-                audio = audio.cpu()
-            audio = np.asarray(audio, dtype='float32').squeeze()
-            sr = getattr(model, 'sampling_rate', 24000)
-            out_path = OUT / f"xvoice_{lang}.wav"
-            sf.write(str(out_path), audio, sr)
-            audio_s = len(audio) / sr
-            wall_s = time.perf_counter() - t0
-            rtf = wall_s / audio_s if audio_s > 0 else None
-            R["tts"][lang] = {
-                "device": "cuda" if torch.cuda.is_available() else "cpu",
-                "wall_s": round(wall_s, 3),
-                "audio_s": round(audio_s, 2),
-                "rtf": round(rtf, 3) if rtf else None,
-                "output_wav": str(out_path),
-                "voice_clone": True,
-                "method": "python_api",
-            }
-            step("tts_done", lang=lang, rtf=round(rtf, 3) if rtf else None)
-        else:
-            step("tts_no_audio", lang=lang)
-            R["tts"][lang] = {"error": "no audio output"}
-    except Exception as e:
-        step("tts_fail", lang=lang, err=f"{type(e).__name__}: {str(e)[:300]}")
-        R["errors"].append(f"{lang}: {type(e).__name__}: {str(e)[:500]}")
-        R["tts"][lang] = {"error": str(e)[:500]}
+
+def isolated_env():
+    env = os.environ.copy()
+    for name in ("VIRTUAL_ENV", "PYTHONPATH", "PYTHONHOME"):
+        env.pop(name, None)
+    env.update(HF_HOME="/tmp/xvoice-hf", TORCH_HOME="/tmp/xvoice-torch",
+               XDG_CACHE_HOME="/tmp/xvoice-cache", UV_CACHE_DIR="/tmp/xvoice-uv",
+               PYTHONNOUSERSITE="1", TOKENIZERS_PARALLELISM="false")
+    return env
+
+
+def prepare_references():
+    references = {}
+    for lang in LANGS:
+        try:
+            roots = [Path.cwd()]
+            # Reuse old staged-repo discovery; also handle datasets without app.py.
+            roots += sorted({p.parent for p in Path("/kaggle/input").rglob("app.py")
+                             if (p.parent / "benchmark-provenance.json").is_file()})
+            matches = [root / rel for root in roots for rel in CANDIDATES[lang]
+                       if (root / rel).is_file()]
+            if not matches:
+                matches = sorted(Path("/kaggle/input").rglob(f"me_{lang}_*.m4a"))
+            if not matches:
+                matches = sorted(Path("/kaggle/input").rglob(f"{lang}_paced.wav"))
+            if not matches:
+                raise FileNotFoundError(f"No real {lang} reference in {CANDIDATES[lang]}")
+            dest = OUT / f"ref_{lang}.wav"
+            run(["ffmpeg", "-y", "-v", "error", "-i", str(matches[0]), "-t", "10",
+                 "-ac", "1", "-ar", "24000", "-c:a", "pcm_s16le", str(dest)], 60)
+            with wave.open(str(dest)) as wav:
+                duration = wav.getnframes() / wav.getframerate()
+                if wav.getnchannels() != 1 or abs(duration - 10) > 0.01:
+                    raise ValueError(f"Reference must be 10 s mono, got {duration} s")
+            references[lang] = {"source": str(matches[0]), "wav": str(dest),
+                                "audio_s": duration}
+            step("reference", lang=lang, **references[lang])
+        except Exception as exc:
+            error("reference", exc, lang=lang)
+    R["references"] = references
+    save()
+    if not references:
+        raise RuntimeError("No valid real reference clips; no synthetic fallback allowed")
+
+
+def asr_worker(mode):
+    """ASR uses CPU int8 in its own venv, never X-Voice's CT2/torch environment."""
+    from faster_whisper import WhisperModel
+    started = time.perf_counter()
+    model = WhisperModel("large-v3-turbo", device="cpu", compute_type="int8",
+                         download_root="/tmp/xvoice-asr-models")
+    R["asr"] = {"model": "large-v3-turbo", "device": "cpu", "compute_type": "int8",
+                "model_load_s": time.perf_counter() - started, "items": {}}
+    manifest = json.loads((OUT / "manifest.json").read_text())
+    items = manifest["references"] if mode == "references" else manifest["outputs"]
+    for key, item in items.items():
+        try:
+            started = time.perf_counter()
+            segments, info = model.transcribe(item["wav"], language=item["lang"],
+                                               beam_size=5, vad_filter=False)
+            text = " ".join(segment.text.strip() for segment in segments).strip()
+            if not text:
+                raise ValueError("Empty ASR transcript")
+            result = {"text": text, "transcription_s": time.perf_counter() - started,
+                      "language": info.language}
+            if mode == "outputs":
+                expected = normalise(item["text"])
+                actual = normalise(text)
+                result.update(reference_words=expected, hypothesis_words=actual,
+                              wer=word_error(expected, actual))
+            R["asr"]["items"][key] = result
+            step("asr_done", item=key, **result)
+        except Exception as exc:
+            R["asr"]["items"][key] = error("asr", exc, item=key)
     save()
 
-R["status"] = "complete"
-save()
-print("X-Voice kernel complete.", flush=True)
+
+def normalise(text):
+    # Preserve diacritics, lowercase and strip Unicode punctuation before splitting.
+    return "".join(c for c in text.lower()
+                   if not unicodedata.category(c).startswith("P")).split()
+
+
+def word_error(reference, hypothesis):
+    row = list(range(len(hypothesis) + 1))
+    for i, word in enumerate(reference, 1):
+        new = [i]
+        for j, other in enumerate(hypothesis, 1):
+            new.append(min(new[-1] + 1, row[j] + 1, row[j - 1] + (word != other)))
+        row = new
+    return row[-1] / len(reference)
+
+
+def tts_worker():
+    # Import once; both stages, all languages and repeats share this one process.
+    import numpy as np
+    import soundfile as sf
+    import torch
+    from hydra.utils import get_class
+    from omegaconf import OmegaConf
+    from x_voice.infer import utils_infer as u
+
+    manifest = json.loads((OUT / "manifest.json").read_text())
+    R.update(models={}, outputs={}, auto_detect_lang=False,
+             timing="non-streaming; first_audio_latency_s equals full inference wall_s",
+             reference_preprocessing="10 s mono crop; upstream silence trimming disabled")
+    if not torch.cuda.is_available() or "sm_75" not in torch.cuda.get_arch_list():
+        raise RuntimeError("CUDA T4 sm_75 support required")
+    device = "cuda:0"
+    R["infrastructure"] = {"torch": torch.__version__, "cuda": torch.version.cuda,
+                            "arch_list": torch.cuda.get_arch_list(),
+                            "gpu": torch.cuda.get_device_name(0)}
+    for stage in ("stage1", "stage2"):
+        model = vocoder = srp = getter = None
+        try:
+            cfg = OmegaConf.load(SOURCE / f"src/x_voice/configs/XVoice_Base_{stage.title()}.yaml")
+            arc = OmegaConf.to_container(cfg.model.arch, resolve=True)
+            model_cls = get_class(f"x_voice.model.{cfg.model.backbone}")
+            tokenizer = cfg.model.tokenizer
+            kwargs = dict(mel_spec_type=cfg.model.mel_spec.mel_spec_type,
+                          vocab_file=manifest["weights"]["vocab"], device=device,
+                          tokenizer=tokenizer, tokenizer_path=cfg.model.get("tokenizer_path"),
+                          dataset_name=cfg.datasets.name,
+                          mel_spec_kwargs=OmegaConf.to_container(cfg.model.mel_spec, resolve=True))
+            torch.cuda.synchronize()
+            started = time.perf_counter()
+            # Public CLI's model construction, with explicit HF checkpoint paths.
+            if stage == "stage1":
+                model = u.load_model(model_cls, arc, manifest["weights"][stage], **kwargs)
+            else:
+                if not cfg.model.sft or cfg.model.use_total_text:
+                    raise ValueError("Expected Stage2 drop-text config")
+                model = u.load_model_sft(model_cls, arc, manifest["weights"][stage],
+                                         use_total_text=False, **kwargs)
+            model.eval()
+            torch.cuda.synchronize()
+            model_s = time.perf_counter() - started
+            started = time.perf_counter()
+            # YAML's local vocoder path is absent on Kaggle; use documented HF loader.
+            vocoder = u.load_vocoder(vocoder_name="vocos", is_local=False,
+                                     device=device, hf_cache_dir="/tmp/xvoice-hf")
+            vocoder.eval()
+            torch.cuda.synchronize()
+            vocoder_s = time.perf_counter() - started
+            srp_s = 0.0
+            if stage == "stage2":
+                started = time.perf_counter()
+                srp = u.load_srp_model(
+                    str(SOURCE / "src/rate_pred/configs/SpeedPredict_Multilingual.yaml"),
+                    manifest["weights"]["srp"], device)
+                srp.eval()
+                torch.cuda.synchronize()
+                srp_s = time.perf_counter() - started
+            load_s = model_s + vocoder_s + srp_s
+            R["models"][stage] = dict(model_load_s=load_s, load_model_s=model_s,
+                                       load_vocoder_s=vocoder_s, load_srp_s=srp_s)
+            getter = u.get_ipa_tokenizer_cache(tokenizer, cfg.model.get("stress", True))
+            lang_map = getattr(model.transformer, "lang_to_id", {})
+            step("model_loaded", model=stage, **R["models"][stage])
+            for lang in LANGS:
+                for nfe in (32, 16):
+                    for length, text in TEXTS[lang].items():
+                        key = f"xvoice_{stage}_nfe{nfe}_{lang}_{length}"
+                        entry = {"lang": lang, "text": text, "nfe_step": nfe,
+                                 "model": stage, "model_load_s": load_s,
+                                 "streaming": False, "status": "running", "repeats": []}
+                        R["tts"][key] = entry
+                        try:
+                            if lang not in cfg.model.arch.languages:
+                                entry["status"] = "unsupported"
+                                continue
+                            ref = manifest["references"][lang]
+                            if not ref.get("text", "").strip():
+                                raise ValueError("Reference ASR transcript required; auto-ASR forbidden")
+                            # Stage2 CLI parses [main|lang] into text + nested language spans.
+                            tagged = f"[main|{lang}]{text}"
+                            voice, parsed_lang = u.parse_voice_lang_tag(
+                                tagged[1:tagged.index("]")], voice_names=["main"])
+                            if voice != "main" or parsed_lang != lang:
+                                raise ValueError("Unexpected Stage2 language-tag parse")
+                            gen_text = tagged.split("]", 1)[1] if stage == "stage2" else text
+                            common = dict(nfe_step_value=nfe, device_name=device,
+                                          # Also bypass internal fastlid calls despite explicit spans.
+                                          dominant_lang=[lang], layered=(stage == "stage2"),
+                                          cfg_strength_value=2.0 if stage == "stage1" else 2.5,
+                                          cfg_strength2_value=0.0 if stage == "stage1" else 4.0,
+                                          cfg_schedule_value=None if stage == "stage1" else "square",
+                                          cfg_decay_time_value=0.6)
+                            def synthesize():
+                                args = ([gen_text], [[(lang, gen_text)]], tokenizer, getter,
+                                        model, vocoder, lang_map)
+                                if stage == "stage1":
+                                    return u.infer_xvoice_process(
+                                        ref["wav"], ref["text"], args[0], lang, *args[1:],
+                                        sp_type="syllable", **common)
+                                return u.infer_xvoice_droptext_process(
+                                    ref["wav"], *args, srp, **common)
+
+                            # One warm-up per stage/language/NFE/text, excluded from medians.
+                            with torch.inference_mode():
+                                torch.manual_seed(1234)
+                                warm = synthesize()
+                                torch.cuda.synchronize()
+                                del warm
+                            entry["warmup_complete"] = True
+                            for repeat in range(3):
+                                try:
+                                    torch.manual_seed(1234 + repeat)
+                                    torch.cuda.synchronize()
+                                    torch.cuda.reset_peak_memory_stats()
+                                    started = time.perf_counter()
+                                    with torch.inference_mode():
+                                        audio, sr, _ = synthesize()
+                                    torch.cuda.synchronize()
+                                    wall = time.perf_counter() - started
+                                    peak = torch.cuda.max_memory_allocated() / 1024**2
+                                    # Upstream returns list of arrays for batched text input.
+                                    if isinstance(audio, list):
+                                        audio = np.concatenate(audio)
+                                    audio = np.asarray(audio, dtype=np.float32).reshape(-1)
+                                    duration = len(audio) / sr
+                                    if duration <= 0 or not np.isfinite(audio).all():
+                                        raise ValueError("Invalid or empty generated audio")
+                                    wav = OUT / f"{key}_r{repeat + 1}.wav"
+                                    sf.write(wav, audio, sr)
+                                    item = dict(wall_s=wall, first_audio_latency_s=wall,
+                                                audio_s=duration, rtf=wall / duration,
+                                                peak_gpu_mb=peak, wav=str(wav), repeat=repeat + 1)
+                                    entry["repeats"].append(item)
+                                    R["outputs"][wav.stem] = dict(wav=str(wav), lang=lang, text=text)
+                                    save()
+                                    del audio
+                                except Exception as exc:
+                                    error("repeat", exc, key=key, repeat=repeat + 1)
+                            if len(entry["repeats"]) != 3:
+                                raise RuntimeError("Incomplete repeats; no three-repeat median")
+                            for metric in ("wall_s", "first_audio_latency_s", "audio_s", "rtf", "peak_gpu_mb"):
+                                entry[metric] = statistics.median(x[metric] for x in entry["repeats"])
+                            representative = sorted(entry["repeats"], key=lambda x: x["wall_s"])[1]
+                            dest = OUT / f"{key}.wav"
+                            shutil.copyfile(representative["wav"], dest)
+                            entry.update(output_wav=str(dest), status="ok",
+                                         representative_repeat=representative["repeat"])
+                            R["outputs"][key] = dict(wav=str(dest), lang=lang, text=text)
+                            if stage == "stage1" and nfe == 32 and length == "short":
+                                alias = OUT / f"xvoice_{lang}.wav"
+                                shutil.copyfile(dest, alias)
+                                entry["default_output_wav"] = str(alias)
+                            step("tts_done", key=key, wall_s=entry["wall_s"], rtf=entry["rtf"])
+                        except Exception as exc:
+                            entry.update(status="failed", error=str(exc))
+                            error("tts", exc, key=key)
+                        finally:
+                            save()
+        except Exception as exc:
+            R["models"][stage] = error("model_load", exc, model=stage)
+            for lang in LANGS:
+                R["tts"][f"{stage}_{lang}"] = {"status": "failed", "error": str(exc)}
+        finally:
+            model = vocoder = srp = getter = None
+            gc.collect()
+            torch.cuda.empty_cache()
+            save()
+
+
+def install_dependencies():
+    """Read the real upstream dependency list; bypass only its CT2 pin."""
+    import tomllib
+    with (SOURCE / "pyproject.toml").open("rb") as stream:
+        deps = tomllib.load(stream)["project"]["dependencies"]
+    constraints = OUT / "torch-constraints.txt"
+    probe = json.loads(subprocess.check_output(
+        [TTS_PY, "-c", "import torch; print(__import__('json').dumps({'version':torch.__version__}))"], text=True))
+    version = probe["version"].split("+")[0]
+    codec = "0.7.0" if version == "2.8.0" else "0.5.0"
+    constraints.write_text(f"torch=={version}\ntorchaudio=={version}\ntorchcodec=={codec}\n")
+    deps = ["ctranslate2" if d == "ctranslate2==4.5.0" else d for d in deps]
+    run(["uv", "pip", "install", "--python", TTS_PY, "--constraint", str(constraints),
+         *deps], 1800, env=isolated_env())
+    run(["uv", "pip", "install", "--python", TTS_PY, "--no-deps", str(SOURCE)],
+        300, env=isolated_env())
+    R["infrastructure"]["dependency_strategy"] = "upstream deps with unpinned CT2; repo --no-deps"
+    run(["uv", "pip", "freeze", "--python", TTS_PY], env=isolated_env())
+
+
+def download_weights():
+    from huggingface_hub import hf_hub_download
+    names = {"stage1": "XVoice_Base_Stage1/model_600000.safetensors",
+             "stage2": "XVoice_Base_Stage2/model_70000.safetensors",
+             "vocab": "XVoice_Base_Stage1/vocab.txt",
+             "srp": "SpeedPredictor/model_28000.safetensors"}
+    weights = {}
+    for key, name in names.items():
+        try:
+            weights[key] = hf_hub_download("XRXRX/X-Voice", name,
+                                           cache_dir="/tmp/xvoice-hf")
+            step("weight", name=name, path=weights[key])
+        except Exception as exc:
+            error("weight", exc, name=name)
+    R["weights"] = weights
+    save()
+
+
+def child(mode, python, report):
+    try:
+        run([python, SELF, mode, str(report)], 3600, env=isolated_env())
+    except Exception:
+        if report.is_file():
+            R.setdefault("failed_children", {})[mode] = json.loads(report.read_text())
+            save()
+        raise
+    return json.loads(report.read_text())
+
+
+def main():
+    R.update(schema=2, source_revision=REV, licence={"code": "MIT", "weights": "CC-BY-NC"},
+             texts=TEXTS, repeats=3, warmups=1)
+    try:
+        step("env", python=sys.version, cwd=os.getcwd())
+        run(["nvidia-smi", "--query-gpu=name,driver_version,memory.total", "--format=csv,noheader"], 60)
+        prepare_references()
+        run([sys.executable, "-m", "pip", "install", "uv"], 180)
+        run(["uv", "python", "install", "3.11"], 300, env=isolated_env())
+        for path in ("/tmp/xvoice-venv", "/tmp/xvoice-asr-venv"):
+            run(["uv", "venv", "--python", "3.11", path], 120, env=isolated_env())
+        run(["git", "clone", "https://github.com/sunnyxrxrx/X-Voice.git", str(SOURCE)], 300)
+        run(["git", "checkout", "--detach", REV], 60, cwd=str(SOURCE))
+        for version, index in (("2.8.0", "cu128"), ("2.7.1", "cu128"), ("2.7.1", "cu126")):
+            try:
+                run(["uv", "pip", "install", "--python", TTS_PY, "--reinstall",
+                     f"torch=={version}", f"torchaudio=={version}", "--index-url",
+                     f"https://download.pytorch.org/whl/{index}"], 900, env=isolated_env())
+                run([TTS_PY, "-c", "import torch; print(torch.__version__, torch.version.cuda, torch.cuda.get_arch_list()); assert torch.cuda.is_available(); assert 'sm_75' in torch.cuda.get_arch_list(); x=torch.ones(1,device='cuda'); print((x+x).cpu())"], 60,
+                    env=isolated_env())
+                R["infrastructure"]["torch_build"] = {"version": version, "index": index}
+                break
+            except Exception as exc:
+                error("torch_candidate", exc, version=version, index=index)
+        else:
+            raise RuntimeError("No tested torch build supports T4 sm_75")
+        child("deps", TTS_PY, OUT / "deps.json")
+        R["infrastructure"]["dependency_strategy"] = "unpinned CT2, constrained torch, repo --no-deps"
+        env = isolated_env()
+        env["PATH"] = f"/tmp/xvoice-venv/bin:{env['PATH']}"
+        run(["bash", "src/x_voice/prepare_ipa.sh"], 1200, cwd=str(SOURCE), env=env)
+        # ASR installs are completely separate from the X-Voice resolver.
+        run(["uv", "pip", "install", "--python", ASR_PY, "faster-whisper"], 600, env=isolated_env())
+        run(["uv", "pip", "freeze", "--python", ASR_PY], env=isolated_env())
+        manifest = {"references": {lang: dict(ref, lang=lang)
+                                    for lang, ref in R["references"].items()}}
+        manifest_path = OUT / "manifest.json"
+        manifest_path.write_text(json.dumps(manifest, ensure_ascii=False))
+        refs = child("references", ASR_PY, OUT / "reference_asr.json")
+        R["reference_asr"] = refs
+        for lang, ref in manifest["references"].items():
+            item = refs["asr"]["items"].get(lang, {})
+            ref.update(text=item.get("text", ""), transcription_s=item.get("transcription_s"))
+        weights = child("weights", TTS_PY, OUT / "weights.json")
+        manifest["weights"] = weights["weights"]
+        R["weights"] = weights
+        manifest_path.write_text(json.dumps(manifest, ensure_ascii=False))
+        tts = child("tts", TTS_PY, OUT / "tts.json")
+        R["tts"] = tts["tts"]
+        R["models"] = tts.get("models", {})
+        R["tts_infrastructure"] = tts["infrastructure"]
+        R["errors"].extend(tts["errors"])
+        manifest["outputs"] = tts.get("outputs", {})
+        manifest_path.write_text(json.dumps(manifest, ensure_ascii=False))
+        try:
+            asr = child("outputs", ASR_PY, OUT / "output_asr.json")
+            R["round_trip_asr"] = asr
+            R["errors"].extend(asr["errors"])
+            for key, entry in R["tts"].items():
+                if entry.get("status") != "ok":
+                    continue
+                items = asr["asr"]["items"]
+                entry["asr"] = items.get(key)
+                wers = []
+                for repeat in entry["repeats"]:
+                    repeat["asr"] = items.get(Path(repeat["wav"]).stem)
+                    if repeat["asr"] and "wer" in repeat["asr"]:
+                        wers.append(repeat["asr"]["wer"])
+                entry["wer_median"] = statistics.median(wers) if len(wers) == 3 else None
+                entry["asr_status"] = "ok" if len(wers) == 3 else "incomplete"
+        except Exception as exc:
+            error("round_trip_asr", exc)
+        good = sum(entry.get("status") == "ok" and entry.get("asr_status") == "ok"
+                   for entry in R["tts"].values())
+        R["successful_configurations"] = good
+        R["expected_configurations"] = 24
+        R["status"] = "complete" if good == 24 else "partial" if good else "failed"
+    except Exception as exc:
+        error("setup", exc)
+        for lang in LANGS:
+            R["tts"].setdefault(f"setup_{lang}", {"status": "blocked", "error": str(exc)})
+        R["status"] = "failed"
+    finally:
+        save()
+
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        REPORT = Path(sys.argv[2])
+        try:
+            {"deps": install_dependencies, "weights": download_weights,
+             "tts": tts_worker, "references": lambda: asr_worker("references"),
+             "outputs": lambda: asr_worker("outputs")}[sys.argv[1]]()
+            R["status"] = "partial" if R["errors"] else "complete"
+        except Exception as exc:
+            error(sys.argv[1], exc)
+            R["status"] = "failed"
+            raise
+        finally:
+            save()
+    else:
+        main()
