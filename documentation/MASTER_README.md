@@ -60,7 +60,7 @@ All model research is consolidated in `documentation/model_landscape_2026-10.md`
 | **XTTS v2** (Coqui) | **No Slovak**; Czech yes, English yes (17 langs) | Non-commercial (CPML) | 0.52-0.63 T4 | ✅ Yes (first chunk 0.45-0.48 s) | **Measured 2026-11-15 (T4, 3 repeats):** EN word error 0%, CS 4-10%, 1.9-2.5 GB GPU. Usable for EN/CS cloning; not for Slovak. Evidence `evidence/2026-11-15/kaggle_xtts_t4_results.json` |
 | **X-Voice** (F5 lineage) | **Yes: sk, cs, en measured** (30 langs) | Code MIT, weights CC-BY-NC | Stage1 0.37-0.47 (16 steps), 0.7-0.89 (32 steps) T4 | ❌ No (whole phrase: 2.2-2.7 s for a 3-5 s sentence at 16 steps) | **Measured 2026-11-15 (T4, 3 repeats):** word error 0-11% EN/SK/CS, < 1.3 GB GPU. Best cross-lingual clone quality of the three, too slow per phrase on a T4 for the 2 s goal; paper reports RTF 0.073 on an RTX 4090. Evidence `evidence/2026-11-15/kaggle_xvoice_t4_results.json` |
 | **Pocket TTS** (Kyutai 100M) | No official SK | MIT | 0.63 T4 | ✅ Yes | No native SK, too slow on T4, cloning needs HF auth |
-| **Higgs Audio v3** (Boson 4B) | Likely (100+ langs) | Non-commercial | — | ? | ❌ Failed on Kaggle (flashinfer compile timeout >5 min) |
+| **Higgs Audio v3** (Boson 4B) | sk, cs in vendor's top tier (unmeasured per language) | Non-commercial | 1.2-1.3 T4 (slower than real time) | PCM stream first chunk 1.5 s (sk, cs) | **Serves on a T4 in fp16 (model load 166 s, 14.2 GB GPU) but output is not intelligible: ASR round trip word error 100% on all 18 runs, transcripts are noise hallucinations ('Thank you', URL). T4 has no bf16; needs an Ampere-or-newer GPU with 24 GB.** Evidence `evidence/2026-11-15/kaggle_higgs_t4_fp16_results.json` |
 | **Fish Audio S2-Pro** | Unverified (80+ langs) | Non-commercial | — | ? | ❌ Discarded — needs ≥24GB VRAM, T4 has 16GB |
 | Kokoro 82M | EN only | Apache-2.0 | 0.03 T4 | ✅ Yes | EN TTS only, no SK |
 | Qwen3-TTS | EN only | Apache-2.0 | — | ? | EN zero-shot cloning, no SK |
@@ -78,7 +78,7 @@ All kernels pushed to private Kaggle account `yegorby`, Tesla T4 GPU, one poller
 | Pocket TTS | `yegorby/bp-kyutai-pocket-tts-t4` | Kyutai Pocket TTS 100M | ✅ complete | RTF 0.63 on T4, EN catalog voice works, no native SK, cloning needs HF auth |
 | X-Voice | `yegorby/bp-x-voice-t4` | X-Voice (F5 lineage, SK+CZ native) | ✅ complete (v9) | Stage1/Stage2 x 16/32 steps x en/sk/cs, see table above |
 | XTTS v2 | `yegorby/bp-xtts-voice-clone-t4` | Coqui XTTS v2 | ✅ complete (v15) | EN/CS measured, SK unsupported |
-| Higgs Audio v3 | `yegorby/bp-higgs-audio-v3-t4` | Boson Higgs Audio v3 4B | ❌ error | flashinfer CUDA compile timeout >5 min |
+| Higgs Audio v3 | `yegorby/bp-higgs-audio-v3-t4` | Boson Higgs Audio v3 4B | ✅ ran (v11), output unusable | serves in fp16 on T4, garbage audio, see table above |
 | Fish Audio S2-Pro | — | fishaudio/s2-pro | ❌ discarded | Needs ≥24GB VRAM, T4 has 16GB |
 
 **Check status:** `kaggle kernels status yegorby/<slug>`
@@ -130,9 +130,9 @@ Runs the same E2E test across multiple TTS engines and compares against baseline
 
 | # | Action | Where | Acceptance | Needs |
 |---|--------|-------|------------|-------|
-| 1 | Wait for XTTS v13 Kaggle result; read `xtts_report.json` | Kaggle `yegorby/bp-xtts-voice-clone-t4` | RTF, first-audio latency per language | Kaggle slot free |
-| 2 | Fix X-Voice (ctranslate2 + fastlid SSL) and re-push | Kaggle `yegorby/bp-x-voice-t4` | Successful SK synth with RTF | Kaggle slot free |
-| 3 | Fix Higgs Audio v3 (flashinfer compile timeout) and re-push | Kaggle `yegorby/bp-higgs-audio-v3-t4` | Server ready + TTS per language | Kaggle slot free |
+| 1 | ~~Wait for XTTS result~~ DONE 2026-11-15 | Kaggle `yegorby/bp-xtts-voice-clone-t4` | EN/CS measured, SK unsupported | done |
+| 2 | ~~Fix X-Voice~~ DONE 2026-11-15 | Kaggle `yegorby/bp-x-voice-t4` | sk/cs/en measured | done |
+| 3 | ~~Fix Higgs~~ DONE 2026-11-15: serves, audio garbage on T4 (no bf16) | Kaggle `yegorby/bp-higgs-audio-v3-t4` | needs Ampere+ 24 GB to retest | handler GPU |
 | 4 | Run E2E streaming tests locally with Piper baseline | Mac, `scripts/live/e2e_streaming_test.py` | per-segment lag under 2 s goal | Server running, load < 10 |
 | 5 | Run E2E compare across all TTS engines | Mac + Kaggle results | comparison table vs baselines | All kernels complete |
 | 6 | Pick voice route: Piper fallback vs. cloned voice | Owner decision | documented in this file | Ear check / Kaggle data |
@@ -142,9 +142,9 @@ Runs the same E2E test across multiple TTS engines and compares against baseline
 
 ---
 
-## 5. Handler message — postponed
+## 5. Handler message
 
-**Do not message Ivan Minárik until Kaggle TTS tests are complete and voice route is decided.** The DM drafted earlier (Slovak, asking for uni server / better laptop with GPU) is on hold. Once we have conclusive data (XTTS/X-Voice/Higgs results + E2E comparison), send the minimized DM asking for compute access.
+Draft ready: `documentation/HANDLER_MESSAGE_2026-11-17.md` (Slovak + English). Owner approves the text, then sends it on Monday 2026-11-17. Nothing has been sent.
 
 ---
 

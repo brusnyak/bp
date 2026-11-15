@@ -1,0 +1,1401 @@
+{
+ "schema": 2,
+ "status": "complete",
+ "steps": [
+  {
+   "t": 0.0,
+   "step": "env",
+   "python": "3.13.16 (main, Oct  1 2026, 15:40:24) [GCC 13.3.0]",
+   "executable": "/usr/bin/python3",
+   "cwd": "/kaggle/working"
+  },
+  {
+   "t": 0.4,
+   "step": "command",
+   "argv": [
+    "nvidia-smi"
+   ],
+   "rc": 0,
+   "output": "Sun Nov 15 07:05:41 2026       \n+-----------------------------------------------------------------------------------------+\n| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |\n+-----------------------------------------+------------------------+----------------------+\n| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |\n| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |\n|                                         |                        |               MIG M. |\n|=========================================+========================+======================|\n|   0  Tesla T4                       Off |   00000000:00:04.0 Off |                    0 |\n| N/A   43C    P8              9W /   70W |       0MiB /  15360MiB |      0%      Default |\n|                                         |                        |                  N/A |\n+-----------------------------------------+------------------------+----------------------+\n|   1  Tesla T4                       Off |   00000000:00:05.0 Off |                    0 |\n| N/A   53C    P8              9W /   70W |       0MiB /  15360MiB |      0%      Default |\n|                                         |                        |                  N/A |\n+-----------------------------------------+------------------------+----------------------+\n\n+-----------------------------------------------------------------------------------------+\n| Processes:                                                                              |\n|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |\n|        ID   ID                                                               Usage      |\n|=========================================================================================|\n|  No running processes found                                                             |\n+-----------------------------------------------------------------------------------------+\n"
+  },
+  {
+   "t": 6.4,
+   "step": "command",
+   "argv": [
+    "/usr/bin/python3",
+    "-m",
+    "pip",
+    "install",
+    "uv"
+   ],
+   "rc": 0,
+   "output": "Collecting uv\n  Downloading uv-0.13.8-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (11 kB)\nDownloading uv-0.13.8-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (17.4 MB)\n   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 17.4/17.4 MB 156.2 MB/s  0:00:00\nInstalling collected packages: uv\nSuccessfully installed uv-0.13.8\n"
+  },
+  {
+   "t": 7.6,
+   "step": "command",
+   "argv": [
+    "uv",
+    "python",
+    "install",
+    "3.12"
+   ],
+   "rc": 0,
+   "output": "Downloading cpython-3.12.16-linux-x86_64-gnu (download) (33.1MiB)\n Downloaded cpython-3.12.16-linux-x86_64-gnu (download)\nInstalled Python 3.12.16 in 1.21s\n + cpython-3.12.16-linux-x86_64-gnu (python3.12)\nwarning: `/root/.local/bin` is not on your PATH. To use installed Python executables, run `export PATH=\"/root/.local/bin:$PATH\"` or `uv python update-shell`.\n"
+  },
+  {
+   "t": 7.8,
+   "step": "command",
+   "argv": [
+    "uv",
+    "venv",
+    "--python",
+    "3.12",
+    "/tmp/higgs-tts3-eval/tts"
+   ],
+   "rc": 0,
+   "output": "warning: The `--system` flag has no effect, `uv venv` always ignores virtual environments when finding a Python interpreter; did you mean `--no-managed-python`?\nUsing CPython 3.12.16\nCreating virtual environment at: tts\nActivate with: source tts/bin/activate\n"
+  },
+  {
+   "t": 40.3,
+   "step": "command",
+   "argv": [
+    "uv",
+    "pip",
+    "install",
+    "--python",
+    "/tmp/higgs-tts3-eval/tts/bin/python",
+    "torch==2.14.1"
+   ],
+   "rc": 0,
+   "output": "Using Python 3.12.16 environment at: tts\nResolved 29 packages in 149ms\nDownloading networkx (2.0MiB)\nDownloading sympy (6.0MiB)\nDownloading nvidia-cuda-runtime (2.1MiB)\nDownloading nvidia-nvjitlink (44.5MiB)\nDownloading nvidia-cusparselt-cu13 (162.3MiB)\nDownloading nvidia-nccl-cu13 (206.0MiB)\nDownloading nvidia-cufft (204.2MiB)\nDownloading nvidia-cufile (1.2MiB)\nDownloading torch (528.9MiB)\nDownloading nvidia-cuda-cupti (10.2MiB)\nDownloading nvidia-nvshmem-cu13 (57.6MiB)\nDownloading cuda-bindings (8.0MiB)\nDownloading nvidia-cusparse (139.2MiB)\nDownloading nvidia-curand (56.8MiB)\nDownloading nvidia-cublas (403.5MiB)\nDownloading nvidia-cuda-nvrtc (86.0MiB)\nDownloading nvidia-cudnn-cu13 (527.5MiB)\nDownloading triton (236.5MiB)\nDownloading nvidia-cusolver (191.6MiB)\n Downloaded nvidia-cufile\n Downloaded networkx\n Downloaded nvidia-cuda-runtime\n Downloaded sympy\n Downloaded cuda-bindings\n Downloaded nvidia-cuda-cupti\n Downloaded nvidia-nvjitlink\n Downloaded nvidia-curand\n Downloaded nvidia-nvshmem-cu13\n Downloaded nvidia-cuda-nvrtc\n Downloaded nvidia-cusparse\n Downloaded nvidia-cusparselt-cu13\n Downloaded nvidia-cusolver\n Downloaded nvidia-cufft\n Downloaded nvidia-nccl-cu13\n Downloaded triton\n Downloaded nvidia-cublas\n Downloaded nvidia-cudnn-cu13\n Downloaded torch\nPrepared 29 packages in 31.87s\nInstalled 29 packages in 300ms\n + cuda-bindings==13.5.0\n + cuda-pathfinder==1.9.0\n + cuda-toolkit==13.0.3.0\n + filelock==4.2.10\n + fsspec==2026.9.0\n + jinja2==3.1.6\n + markupsafe==3.0.4\n + mpmath==1.3.0\n + networkx==3.7\n + nvidia-cublas==13.1.1.3\n + nvidia-cuda-cupti==13.0.85\n + nvidia-cuda-nvrtc==13.0.88\n + nvidia-cuda-runtime==13.0.96\n + nvidia-cudnn-cu13==9.24.0.43\n + nvidia-cufft==12.0.0.61\n + nvidia-cufile==1.15.1.6\n + nvidia-curand==10.4.0.35\n + nvidia-cusolver==12.0.4.66\n + nvidia-cusparse==12.6.3.3\n + nvidia-cusparselt-cu13==0.8.1\n + nvidia-nccl-cu13==2.30.7\n + nvidia-nvjitlink==13.5.37\n + nvidia-nvshmem-cu13==3.4.5\n + nvidia-nvtx==13.0.85\n + setuptools==84.2.1\n + sympy==1.14.0\n + torch==2.14.1\n + triton==3.8.0\n + typing-extensions==4.16.0\n"
+  },
+  {
+   "t": 52.7,
+   "step": "command",
+   "argv": [
+    "/tmp/higgs-tts3-eval/tts/bin/python",
+    "-I",
+    "-c",
+    "\nimport json, subprocess, torch, traceback\nr = {'torch': torch.__version__, 'cuda': torch.version.cuda,\n     'arch_list': torch.cuda.get_arch_list(), 'cuda_available': torch.cuda.is_available()}\nr['sm_75_in_arch_list'] = 'sm_75' in r['arch_list']\nr['nvidia_smi'] = subprocess.check_output(['nvidia-smi'], text=True)\nr['fp16_matmul_ok'] = False\ntry:\n    r['device'] = torch.cuda.get_device_name(0)\n    r['capability'] = list(torch.cuda.get_device_capability(0))\n    a = torch.ones((32, 32), device='cuda', dtype=torch.float16)\n    b = a @ a\n    torch.cuda.synchronize()\n    r['fp16_matmul_value'] = b[0, 0].item()\n    r['fp16_matmul_ok'] = bool(torch.isfinite(b).all().item() and b[0, 0].item() == 32)\nexcept Exception:\n    r['matmul_error'] = traceback.format_exc()\nr['supported'] = r['sm_75_in_arch_list'] and r['fp16_matmul_ok']\nprint('GATE_JSON=' + json.dumps(r))\n"
+   ],
+   "rc": 0,
+   "output": "GATE_JSON={\"torch\": \"2.14.1+cu130\", \"cuda\": \"13.0\", \"arch_list\": [\"sm_75\", \"sm_80\", \"sm_86\", \"sm_90\", \"sm_100\", \"sm_120\"], \"cuda_available\": true, \"sm_75_in_arch_list\": true, \"nvidia_smi\": \"Sun Nov 15 07:06:33 2026       \\n+-----------------------------------------------------------------------------------------+\\n| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |\\n+-----------------------------------------+------------------------+----------------------+\\n| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |\\n| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |\\n|                                         |                        |               MIG M. |\\n|=========================================+========================+======================|\\n|   0  Tesla T4                       Off |   00000000:00:04.0 Off |                    0 |\\n| N/A   43C    P8             11W /   70W |       3MiB /  15360MiB |      0%      Default |\\n|                                         |                        |                  N/A |\\n+-----------------------------------------+------------------------+----------------------+\\n|   1  Tesla T4                       Off |   00000000:00:05.0 Off |                    0 |\\n| N/A   51C    P8              9W /   70W |       0MiB /  15360MiB |      0%      Default |\\n|                                         |                        |                  N/A |\\n+-----------------------------------------+------------------------+----------------------+\\n\\n+-----------------------------------------------------------------------------------------+\\n| Processes:                                                                              |\\n|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |\\n|        ID   ID                                                               Usage      |\\n|=========================================================================================|\\n|  No running processes found                                                             |\\n+-----------------------------------------------------------------------------------------+\\n\", \"fp16_matmul_ok\": true, \"device\": \"Tesla T4\", \"capability\": [7, 5], \"fp16_matmul_value\": 32.0, \"supported\": true}\n/tmp/higgs-tts3-eval/tts/lib/python3.12/site-packages/torch/_subclasses/functional_tensor.py:368: UserWarning: Failed to initialize NumPy: No module named 'numpy' (Triggered internally at /__w/pytorch/pytorch/torch/csrc/utils/tensor_numpy.cpp:84.)\n  cpu = _conversion_method_template(device=torch.device(\"cpu\"))\n"
+  },
+  {
+   "t": 107.3,
+   "step": "command",
+   "argv": [
+    "uv",
+    "pip",
+    "install",
+    "--python",
+    "/tmp/higgs-tts3-eval/tts/bin/python",
+    "--prerelease=allow",
+    "sglang-omni==0.2.0"
+   ],
+   "rc": 0,
+   "output": "lang\n Downloaded pyarrow\n Downloaded llvmlite\n Downloaded flashinfer-python\n Downloaded nvidia-nvvm\n Downloaded nixl-cu13\n Downloaded nvidia-cutlass-dsl-libs-cu13\n Downloaded nvidia-cutlass-dsl-libs-cu12\n Downloaded tokenspeed-triton\n Downloaded pynini\n Downloaded lingua-language-detector\n Downloaded onnxruntime-gpu\n Downloaded sglang-kernel\nPrepared 253 packages in 44.78s\nInstalled 253 packages in 6.88s\n + accelerate==1.15.0\n + addict==2.4.0\n + aiohappyeyeballs==2.7.1\n + aiohttp==3.14.5\n + aiosignal==1.4.0\n + airportsdata==20261103\n + annotated-doc==0.0.6\n + annotated-types==0.8.0\n + anthropic==2.8.0\n + anyio==4.16.0\n + apache-tvm-ffi==0.1.11\n + asttokens==3.0.2\n + attrs==26.1.0\n + audioread==3.1.0\n + av==19.0.2\n + blobfile==3.0.0\n + brotli==1.2.1\n + build==1.6.1\n + cache-dit==1.3.0\n + cdifflib==1.2.9\n + certifi==2026.10.23\n + cffi==2.1.1\n + charset-normalizer==3.5.2\n + click==8.5.1\n + cloudpickle==3.1.2\n + compressed-tensors==0.18.0\n + cryptography==50.0.2\n + cuda-core==1.2.2\n + cuda-python==13.5.0\n + cuda-tile==1.6.0rc5\n + cython==3.3.1\n + datasets==5.2.0\n + decorator==5.3.1\n + decord==0.6.0\n + diffusers==0.37.0\n + dill==0.4.1\n + diskcache==5.6.3\n + distro==1.9.0\n + docstring-parser==0.18.0\n + dots-tts==0.2.1\n + easydict==1.14\n + editdistance==0.8.1\n + einops==0.9.0.dev0\n + einx==0.4.3\n + executing==2.3.0\n + fastapi==0.163.0\n + flash-attn-4==4.0.0b39\n + flashinfer-python==0.7.1\n + flatbuffers==25.12.19\n + frozendict==2.5.1\n + frozenlist==1.8.0\n + gguf==0.19.0\n + gradio==7.0.0.dev0\n + gradio-client==2.8.0.dev0\n + groovy==0.1.2\n + grpcio==1.85.1\n + grpcio-health-checking==1.85.1\n + grpcio-reflection==1.85.1\n + h11==0.16.0\n + hf-gradio==0.4.1\n + hf-xet==1.8.0\n + httpcore==1.0.9\n + httpcore2==2.16.0\n + httpx==0.28.1\n + httpx2==2.16.0\n + huggingface-hub==1.33.0\n + humming-kernels==0.1.12\n + hydra-core==1.4.0rc3\n + idna==3.20\n + imageio==2.36.0\n + imageio-ffmpeg==0.5.1\n + importlib-metadata==10.2.0\n + importlib-resources==7.1.0\n + inflect==7.6.0\n + iniconfig==2.3.1\n + interegular==0.3.3\n + ipython==9.18.1\n + ipython-pygments-lexers==1.1.1\n + jaraco-functools==4.6.0\n + jedi==0.20.1\n + jiter==0.19.0\n + jiwer==4.0.0\n + joblib==1.6.0\n + jsonschema==4.26.0\n + jsonschema-specifications==2025.9.1\n + kernels==0.14.1\n + kernels-data==0.16.2\n + langcodes==3.5.1\n + language-data==1.4.0\n + lark==1.3.1\n + lazy-importer==0.1.0\n + lazy-loader==0.6\n + librosa==1.0.1\n + lingua-language-detector==2.2.0\n + llguidance==1.9.1\n + llvmlite==0.47.0\n + logger==1.4\n + loguru==0.8.0\n + lxml==7.0.0b1\n + marisa-trie==1.4.1\n + markdown-it-py==4.3.0\n + matplotlib-inline==0.2.2\n + mdurl==0.1.2\n + mistral-common==1.13.1\n + ml-dtypes==0.6.0\n + modelscope==1.40.3\n + modelscope-hub==0.7.1\n + mooncake-transfer-engine-cuda13==0.3.14\n + more-itertools==11.2.1\n + msgpack==1.2.4\n + msgspec==0.22.0\n + multidict==7.2.1\n + multiprocess==0.70.19\n + narwhals==2.28.0\n + nccl-extensions==0.2.0\n + nccl4py==0.6.0\n + nemo-text-processing==1.2.0\n + nest-asyncio==1.6.0\n + ninja==1.13.2\n + nixl-cu13==1.5.2\n + numba==0.65.1\n + numpy==2.3.5\n + nvidia-cuda-cccl==13.3.5.0.6\n + nvidia-cuda-crt==13.5.37\n + nvidia-cuda-nvcc==13.5.37\n + nvidia-cudnn-frontend==1.32.3\n + nvidia-cutlass-dsl==4.8.0\n + nvidia-cutlass-dsl-libs-base==4.8.0\n + nvidia-cutlass-dsl-libs-core==4.8.0\n + nvidia-cutlass-dsl-libs-cu12==4.8.0\n + nvidia-cutlass-dsl-libs-cu13==4.8.0\n + nvidia-mathdx==25.6.0\n + nvidia-ml-py==13.615.71\n + nvidia-nvvm==13.5.37\n + nvshmem4py-cu13==0.4.1\n + omegaconf==2.4.1rc2\n + onnxruntime-gpu==1.32.0\n + openai==2.6.1\n + openai-harmony==0.0.4\n + openai-whisper==20250625\n + opentelemetry-api==1.45.2\n + orjson==3.13.0\n + outlines==0.1.11\n + outlines-core==0.1.26\n + packaging==26.3\n + pandas==3.1.1\n + parso==0.8.7\n + partial-json-parser==0.2.1.1.post7\n + pexpect==4.9.0\n + pillow==13.0.0\n + platformdirs==4.14.5\n + pluggy==1.7.0\n + pooch==1.9.0\n + prometheus-client==0.26.0\n + prompt-toolkit==3.0.53\n + propcache==0.5.4\n + protobuf==7.37.0rc3\n + psutil==7.2.2\n + ptyprocess==0.7.0\n + pure-eval==0.2.4\n + py-spy==0.4.3\n + pyarrow==26.0.1\n + pybase64==1.5.2\n + pycountry==26.2.16\n + pycparser==3.12\n + pycryptodomex==3.24.2\n + pydantic==2.14.3\n + pydantic-core==2.50.4\n + pydantic-extra-types==2.11.1\n + pydub==0.25.1\n + pygments==2.21.0\n + pynini==2.1.6.post1\n + pyproject-hooks==1.3.3\n + pytest==9.2.0\n + pytest-asyncio==2.0.0a1\n + python-dateutil==4.0.0\n + python-multipart==0.0.33\n + pytz==2026.6\n + pyyaml==6.0.3\n + pyzmq==27.3.0\n + quack-kernels==0.6.5\n + qwen-vl-utils==0.0.11\n + rapidfuzz==3.14.6\n + referencing==0.37.0\n + regex==2026.11.9\n + requests==2.34.2\n + rich==15.0.0\n + rpds-py==2026.9.1\n + s3prl==0.4.18\n + sacremoses==0.2.0\n + safehttpx==0.2.0\n + safetensors==0.9.0rc1\n + scikit-learn==1.9.1\n + scipy==1.18.1\n + semantic-version==2.10.0\n + sentencepiece==0.2.1\n + setproctitle==1.3.8\n + sgl-deep-ep==0.1.2.post1\n + sgl-deep-gemm==0.2.2\n + sglang==0.5.22\n + sglang-kernel==0.4.9\n + sglang-omni==0.2.0\n + shellingham==1.5.4\n + silero-vad==6.2.3\n + smg-grpc-proto==0.5.0\n + smg-grpc-servicer==0.16.0\n + sniffio==1.3.1\n + soundfile==0.13.1\n + sox==1.5.0\n + soxr==1.1.0\n + stack-data==0.6.3\n + starlette==1.10.0\n + tabulate==0.10.0\n + threadpoolctl==3.8.0\n + tiktoken==0.14.0\n + tilelang==0.1.12\n + timm==1.0.16\n + tokenizers==0.23.2\n + tokenspeed-mla==0.1.8\n + tokenspeed-triton==3.9.10.post20261028\n + tomlkit==0.14.0\n + torch-c-dlpack-ext==0.1.5\n + torch-einops-utils==0.2.6\n + torch-memory-saver==0.0.10\n + torchaudio==2.11.0\n + torchcodec==0.17.0\n + torchdiffeq==0.2.5\n + torchvision==0.29.1\n + tqdm==4.70.1\n + traitlets==5.16.1\n + transformers==5.19.0\n + truststore==0.10.5\n + typeguard==4.6.0\n + typer==0.29.1\n + typing-inspection==0.4.5\n + tzdata==2026.6\n + urllib3==2.8.0\n + uvicorn==0.54.0\n + uvloop==0.23.0\n + watchfiles==1.3.0\n + wcwidth==0.9.4\n + websockets==17.4\n + wetextprocessing==1.3.0\n + wget==3.2\n + wrapt==2.6.0.dev1\n + x-transformers==2.31.20\n + xgrammar==0.2.7\n + xxhash==4.1.0\n + yarl==1.25.1\n + z3-solver==4.15.4.0\n + zhon==2.1.1\n + zipp==4.1.2\n + zstandard==0.25.0\n"
+  },
+  {
+   "t": 110.7,
+   "step": "command",
+   "argv": [
+    "/tmp/higgs-tts3-eval/tts/bin/python",
+    "-I",
+    "-c",
+    "\nimport json, subprocess, torch, traceback\nr = {'torch': torch.__version__, 'cuda': torch.version.cuda,\n     'arch_list': torch.cuda.get_arch_list(), 'cuda_available': torch.cuda.is_available()}\nr['sm_75_in_arch_list'] = 'sm_75' in r['arch_list']\nr['nvidia_smi'] = subprocess.check_output(['nvidia-smi'], text=True)\nr['fp16_matmul_ok'] = False\ntry:\n    r['device'] = torch.cuda.get_device_name(0)\n    r['capability'] = list(torch.cuda.get_device_capability(0))\n    a = torch.ones((32, 32), device='cuda', dtype=torch.float16)\n    b = a @ a\n    torch.cuda.synchronize()\n    r['fp16_matmul_value'] = b[0, 0].item()\n    r['fp16_matmul_ok'] = bool(torch.isfinite(b).all().item() and b[0, 0].item() == 32)\nexcept Exception:\n    r['matmul_error'] = traceback.format_exc()\nr['supported'] = r['sm_75_in_arch_list'] and r['fp16_matmul_ok']\nprint('GATE_JSON=' + json.dumps(r))\n"
+   ],
+   "rc": 0,
+   "output": "GATE_JSON={\"torch\": \"2.14.1+cu130\", \"cuda\": \"13.0\", \"arch_list\": [\"sm_75\", \"sm_80\", \"sm_86\", \"sm_90\", \"sm_100\", \"sm_120\"], \"cuda_available\": true, \"sm_75_in_arch_list\": true, \"nvidia_smi\": \"Sun Nov 15 07:07:31 2026       \\n+-----------------------------------------------------------------------------------------+\\n| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |\\n+-----------------------------------------+------------------------+----------------------+\\n| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |\\n| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |\\n|                                         |                        |               MIG M. |\\n|=========================================+========================+======================|\\n|   0  Tesla T4                       Off |   00000000:00:04.0 Off |                    0 |\\n| N/A   42C    P8             13W /   70W |       3MiB /  15360MiB |      0%      Default |\\n|                                         |                        |                  N/A |\\n+-----------------------------------------+------------------------+----------------------+\\n|   1  Tesla T4                       Off |   00000000:00:05.0 Off |                    0 |\\n| N/A   51C    P8             14W /   70W |       0MiB /  15360MiB |      0%      Default |\\n|                                         |                        |                  N/A |\\n+-----------------------------------------+------------------------+----------------------+\\n\\n+-----------------------------------------------------------------------------------------+\\n| Processes:                                                                              |\\n|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |\\n|        ID   ID                                                               Usage      |\\n|=========================================================================================|\\n|  No running processes found                                                             |\\n+-----------------------------------------------------------------------------------------+\\n\", \"fp16_matmul_ok\": true, \"device\": \"Tesla T4\", \"capability\": [7, 5], \"fp16_matmul_value\": 32.0, \"supported\": true}\n"
+  },
+  {
+   "t": 110.8,
+   "step": "command",
+   "argv": [
+    "uv",
+    "pip",
+    "freeze",
+    "--python",
+    "/tmp/higgs-tts3-eval/tts/bin/python"
+   ],
+   "rc": 0,
+   "output": "accelerate==1.15.0\naddict==2.4.0\naiohappyeyeballs==2.7.1\naiohttp==3.14.5\naiosignal==1.4.0\nairportsdata==20261103\nannotated-doc==0.0.6\nannotated-types==0.8.0\nanthropic==2.8.0\nanyio==4.16.0\napache-tvm-ffi==0.1.11\nasttokens==3.0.2\nattrs==26.1.0\naudioread==3.1.0\nav==19.0.2\nblobfile==3.0.0\nbrotli==1.2.1\nbuild==1.6.1\ncache-dit==1.3.0\ncdifflib==1.2.9\ncertifi==2026.10.23\ncffi==2.1.1\ncharset-normalizer==3.5.2\nclick==8.5.1\ncloudpickle==3.1.2\ncompressed-tensors==0.18.0\ncryptography==50.0.2\ncuda-bindings==13.5.0\ncuda-core==1.2.2\ncuda-pathfinder==1.9.0\ncuda-python==13.5.0\ncuda-tile==1.6.0rc5\ncuda-toolkit==13.0.3.0\ncython==3.3.1\ndatasets==5.2.0\ndecorator==5.3.1\ndecord==0.6.0\ndiffusers==0.37.0\ndill==0.4.1\ndiskcache==5.6.3\ndistro==1.9.0\ndocstring-parser==0.18.0\ndots-tts==0.2.1\neasydict==1.14\neditdistance==0.8.1\neinops==0.9.0.dev0\neinx==0.4.3\nexecuting==2.3.0\nfastapi==0.163.0\nfilelock==4.2.10\nflash-attn-4==4.0.0b39\nflashinfer-python==0.7.1\nflatbuffers==25.12.19\nfrozendict==2.5.1\nfrozenlist==1.8.0\nfsspec==2026.9.0\ngguf==0.19.0\ngradio==7.0.0.dev0\ngradio-client==2.8.0.dev0\ngroovy==0.1.2\ngrpcio==1.85.1\ngrpcio-health-checking==1.85.1\ngrpcio-reflection==1.85.1\nh11==0.16.0\nhf-gradio==0.4.1\nhf-xet==1.8.0\nhttpcore==1.0.9\nhttpcore2==2.16.0\nhttpx==0.28.1\nhttpx2==2.16.0\nhuggingface-hub==1.33.0\nhumming-kernels==0.1.12\nhydra-core==1.4.0rc3\nidna==3.20\nimageio==2.36.0\nimageio-ffmpeg==0.5.1\nimportlib-metadata==10.2.0\nimportlib-resources==7.1.0\ninflect==7.6.0\niniconfig==2.3.1\ninteregular==0.3.3\nipython==9.18.1\nipython-pygments-lexers==1.1.1\njaraco-functools==4.6.0\njedi==0.20.1\njinja2==3.1.6\njiter==0.19.0\njiwer==4.0.0\njoblib==1.6.0\njsonschema==4.26.0\njsonschema-specifications==2025.9.1\nkernels==0.14.1\nkernels-data==0.16.2\nlangcodes==3.5.1\nlanguage-data==1.4.0\nlark==1.3.1\nlazy-importer==0.1.0\nlazy-loader==0.6\nlibrosa==1.0.1\nlingua-language-detector==2.2.0\nllguidance==1.9.1\nllvmlite==0.47.0\nlogger==1.4\nloguru==0.8.0\nlxml==7.0.0b1\nmarisa-trie==1.4.1\nmarkdown-it-py==4.3.0\nmarkupsafe==3.0.4\nmatplotlib-inline==0.2.2\nmdurl==0.1.2\nmistral-common==1.13.1\nml-dtypes==0.6.0\nmodelscope==1.40.3\nmodelscope-hub==0.7.1\nmooncake-transfer-engine-cuda13==0.3.14\nmore-itertools==11.2.1\nmpmath==1.3.0\nmsgpack==1.2.4\nmsgspec==0.22.0\nmultidict==7.2.1\nmultiprocess==0.70.19\nnarwhals==2.28.0\nnccl-extensions==0.2.0\nnccl4py==0.6.0\nnemo-text-processing==1.2.0\nnest-asyncio==1.6.0\nnetworkx==3.7\nninja==1.13.2\nnixl-cu13==1.5.2\nnumba==0.65.1\nnumpy==2.3.5\nnvidia-cublas==13.1.1.3\nnvidia-cuda-cccl==13.3.5.0.6\nnvidia-cuda-crt==13.5.37\nnvidia-cuda-cupti==13.0.85\nnvidia-cuda-nvcc==13.5.37\nnvidia-cuda-nvrtc==13.0.88\nnvidia-cuda-runtime==13.0.96\nnvidia-cudnn-cu13==9.24.0.43\nnvidia-cudnn-frontend==1.32.3\nnvidia-cufft==12.0.0.61\nnvidia-cufile==1.15.1.6\nnvidia-curand==10.4.0.35\nnvidia-cusolver==12.0.4.66\nnvidia-cusparse==12.6.3.3\nnvidia-cusparselt-cu13==0.8.1\nnvidia-cutlass-dsl==4.8.0\nnvidia-cutlass-dsl-libs-base==4.8.0\nnvidia-cutlass-dsl-libs-core==4.8.0\nnvidia-cutlass-dsl-libs-cu12==4.8.0\nnvidia-cutlass-dsl-libs-cu13==4.8.0\nnvidia-mathdx==25.6.0\nnvidia-ml-py==13.615.71\nnvidia-nccl-cu13==2.30.7\nnvidia-nvjitlink==13.5.37\nnvidia-nvshmem-cu13==3.4.5\nnvidia-nvtx==13.0.85\nnvidia-nvvm==13.5.37\nnvshmem4py-cu13==0.4.1\nomegaconf==2.4.1rc2\nonnxruntime-gpu==1.32.0\nopenai==2.6.1\nopenai-harmony==0.0.4\nopenai-whisper==20250625\nopentelemetry-api==1.45.2\norjson==3.13.0\noutlines==0.1.11\noutlines-core==0.1.26\npackaging==26.3\npandas==3.1.1\nparso==0.8.7\npartial-json-parser==0.2.1.1.post7\npexpect==4.9.0\npillow==13.0.0\nplatformdirs==4.14.5\npluggy==1.7.0\npooch==1.9.0\nprometheus-client==0.26.0\nprompt-toolkit==3.0.53\npropcache==0.5.4\nprotobuf==7.37.0rc3\npsutil==7.2.2\nptyprocess==0.7.0\npure-eval==0.2.4\npy-spy==0.4.3\npyarrow==26.0.1\npybase64==1.5.2\npycountry==26.2.16\npycparser==3.12\npycryptodomex==3.24.2\npydantic==2.14.3\npydantic-core==2.50.4\npydantic-extra-types==2.11.1\npydub==0.25.1\npygments==2.21.0\npynini==2.1.6.post1\npyproject-hooks==1.3.3\npytest==9.2.0\npytest-asyncio==2.0.0a1\npython-dateutil==4.0.0\npython-multipart==0.0.33\npytz==2026.6\npyyaml==6.0.3\npyzmq==27.3.0\nquack-kernels==0.6.5\nqwen-vl-utils==0.0.11\nrapidfuzz==3.14.6\nreferencing==0.37.0\nregex==2026.11.9\nrequests==2.34.2\nrich==15.0.0\nrpds-py==2026.9.1\ns3prl==0.4.18\nsacremoses==0.2.0\nsafehttpx==0.2.0\nsafetensors==0.9.0rc1\nscikit-learn==1.9.1\nscipy==1.18.1\nsemantic-version==2.10.0\nsentencepiece==0.2.1\nsetproctitle==1.3.8\nsetuptools==84.2.1\nsgl-deep-ep==0.1.2.post1\nsgl-deep-gemm==0.2.2\nsglang==0.5.22\nsglang-kernel==0.4.9\nsglang-omni==0.2.0\nshellingham==1.5.4\nsilero-vad==6.2.3\nsmg-grpc-proto==0.5.0\nsmg-grpc-servicer==0.16.0\nsniffio==1.3.1\nsoundfile==0.13.1\nsox==1.5.0\nsoxr==1.1.0\nstack-data==0.6.3\nstarlette==1.10.0\nsympy==1.14.0\ntabulate==0.10.0\nthreadpoolctl==3.8.0\ntiktoken==0.14.0\ntilelang==0.1.12\ntimm==1.0.16\ntokenizers==0.23.2\ntokenspeed-mla==0.1.8\ntokenspeed-triton==3.9.10.post20261028\ntomlkit==0.14.0\ntorch==2.14.1\ntorch-c-dlpack-ext==0.1.5\ntorch-einops-utils==0.2.6\ntorch-memory-saver==0.0.10\ntorchaudio==2.11.0\ntorchcodec==0.17.0\ntorchdiffeq==0.2.5\ntorchvision==0.29.1\ntqdm==4.70.1\ntraitlets==5.16.1\ntransformers==5.19.0\ntriton==3.8.0\ntruststore==0.10.5\ntypeguard==4.6.0\ntyper==0.29.1\ntyping-extensions==4.16.0\ntyping-inspection==0.4.5\ntzdata==2026.6\nurllib3==2.8.0\nuvicorn==0.54.0\nuvloop==0.23.0\nwatchfiles==1.3.0\nwcwidth==0.9.4\nwebsockets==17.4\nwetextprocessing==1.3.0\nwget==3.2\nwrapt==2.6.0.dev1\nx-transformers==2.31.20\nxgrammar==0.2.7\nxxhash==4.1.0\nyarl==1.25.1\nz3-solver==4.15.4.0\nzhon==2.1.1\nzipp==4.1.2\nzstandard==0.25.0\nUsing Python 3.12.16 environment at: tts\n"
+  },
+  {
+   "t": 110.8,
+   "step": "command",
+   "argv": [
+    "uv",
+    "venv",
+    "--python",
+    "3.12",
+    "/tmp/higgs-tts3-eval/asr"
+   ],
+   "rc": 0,
+   "output": "warning: The `--system` flag has no effect, `uv venv` always ignores virtual environments when finding a Python interpreter; did you mean `--no-managed-python`?\nUsing CPython 3.12.16\nCreating virtual environment at: asr\nActivate with: source asr/bin/activate\n"
+  },
+  {
+   "t": 112.1,
+   "step": "command",
+   "argv": [
+    "uv",
+    "pip",
+    "install",
+    "--python",
+    "/tmp/higgs-tts3-eval/asr/bin/python",
+    "faster-whisper",
+    "soundfile",
+    "numpy"
+   ],
+   "rc": 0,
+   "output": "Using Python 3.12.16 environment at: asr\nResolved 26 packages in 182ms\nDownloading soundfile (1.3MiB)\nDownloading numpy (16.0MiB)\nDownloading onnxruntime (26.5MiB)\nDownloading faster-whisper (1.1MiB)\nDownloading tokenizers (3.2MiB)\nDownloading ctranslate2 (40.8MiB)\n Downloaded faster-whisper\n Downloaded soundfile\n Downloaded tokenizers\n Downloaded numpy\n Downloaded onnxruntime\n Downloaded ctranslate2\nPrepared 8 packages in 981ms\nInstalled 26 packages in 43ms\n + anyio==4.16.0\n + av==19.0.2\n + cffi==2.1.1\n + click==8.5.1\n + ctranslate2==4.9.0\n + faster-whisper==1.2.1\n + filelock==4.2.10\n + flatbuffers==25.12.19\n + fsspec==2026.9.0\n + h11==0.16.0\n + hf-xet==1.8.0\n + httpcore2==2.16.0\n + httpx2==2.16.0\n + huggingface-hub==2.4.0\n + idna==3.20\n + numpy==2.5.4\n + onnxruntime==1.32.0\n + packaging==26.3\n + protobuf==7.36.2\n + pycparser==3.12\n + pyyaml==6.0.3\n + soundfile==0.14.0\n + tokenizers==0.23.3\n + tqdm==4.70.1\n + truststore==0.10.5\n + typing-extensions==4.16.0\n"
+  },
+  {
+   "t": 112.1,
+   "step": "command",
+   "argv": [
+    "uv",
+    "pip",
+    "freeze",
+    "--python",
+    "/tmp/higgs-tts3-eval/asr/bin/python"
+   ],
+   "rc": 0,
+   "output": "anyio==4.16.0\nav==19.0.2\ncffi==2.1.1\nclick==8.5.1\nctranslate2==4.9.0\nfaster-whisper==1.2.1\nfilelock==4.2.10\nflatbuffers==25.12.19\nfsspec==2026.9.0\nh11==0.16.0\nhf-xet==1.8.0\nhttpcore2==2.16.0\nhttpx2==2.16.0\nhuggingface-hub==2.4.0\nidna==3.20\nnumpy==2.5.4\nonnxruntime==1.32.0\npackaging==26.3\nprotobuf==7.36.2\npycparser==3.12\npyyaml==6.0.3\nsoundfile==0.14.0\ntokenizers==0.23.3\ntqdm==4.70.1\ntruststore==0.10.5\ntyping-extensions==4.16.0\nUsing Python 3.12.16 environment at: asr\n"
+  },
+  {
+   "t": 118.8,
+   "step": "command",
+   "argv": [
+    "ffmpeg",
+    "-nostdin",
+    "-y",
+    "-v",
+    "error",
+    "-i",
+    "/kaggle/input/datasets/yegorby/bp-t4-assets-20261105/speaker_voices/me_en_rainbow.m4a",
+    "-t",
+    "10",
+    "-ac",
+    "1",
+    "-ar",
+    "24000",
+    "-c:a",
+    "pcm_s16le",
+    "/tmp/higgs-tts3-eval/ref_en.wav"
+   ],
+   "rc": 0,
+   "output": ""
+  },
+  {
+   "t": 119.1,
+   "step": "command",
+   "argv": [
+    "ffmpeg",
+    "-nostdin",
+    "-y",
+    "-v",
+    "error",
+    "-i",
+    "/kaggle/input/datasets/yegorby/bp-t4-assets-20261105/speaker_voices/me_sk_script.m4a",
+    "-t",
+    "10",
+    "-ac",
+    "1",
+    "-ar",
+    "24000",
+    "-c:a",
+    "pcm_s16le",
+    "/tmp/higgs-tts3-eval/ref_sk.wav"
+   ],
+   "rc": 0,
+   "output": ""
+  },
+  {
+   "t": 119.3,
+   "step": "command",
+   "argv": [
+    "ffmpeg",
+    "-nostdin",
+    "-y",
+    "-v",
+    "error",
+    "-i",
+    "/kaggle/input/datasets/yegorby/bp-t4-assets-20261105/speaker_voices/me_cs_staromestske.m4a",
+    "-t",
+    "10",
+    "-ac",
+    "1",
+    "-ar",
+    "24000",
+    "-c:a",
+    "pcm_s16le",
+    "/tmp/higgs-tts3-eval/ref_cs.wav"
+   ],
+   "rc": 0,
+   "output": ""
+  },
+  {
+   "t": 181.5,
+   "step": "command",
+   "argv": [
+    "/tmp/higgs-tts3-eval/asr/bin/python",
+    "-I",
+    "-c",
+    "\nimport json, sys, time, traceback\nimport numpy as np, soundfile as sf\nfrom faster_whisper import WhisperModel\n\ndef load16k(path):\n    # decode with soundfile, not PyAV: PyAV/faster-whisper kwarg clash failed twice on 2026-11-15\n    x, sr = sf.read(path, dtype='float32', always_2d=True)\n    x = x.mean(axis=1)\n    if sr != 16000:\n        n = int(round(len(x) * 16000 / sr))\n        x = np.interp(np.linspace(0, len(x) - 1, n), np.arange(len(x)), x).astype('float32')\n    return x\njobs = json.loads(sys.argv[1])\nt = time.perf_counter()\n# CPU int8 avoids CUDA-12 ASR libraries colliding with the CUDA-13 TTS stack.\nmodel = WhisperModel('large-v3-turbo', device='cpu', compute_type='int8',\n                     download_root=sys.argv[2])\nload_s = time.perf_counter() - t\nresults = {}\nfor job in jobs:\n    try:\n        t = time.perf_counter()\n        segments, info = model.transcribe(load16k(job['path']), language=job['lang'], beam_size=5)\n        text = ' '.join(s.text.strip() for s in segments)\n        results[job['path']] = {'text': text, 'wall_s': time.perf_counter() - t,\n                                'language': info.language}\n    except Exception:\n        results[job['path']] = {'error': traceback.format_exc()}\nprint('ASR_JSON=' + json.dumps({'model_load_s': load_s, 'device': 'cpu',\n      'compute_type': 'int8', 'model': 'large-v3-turbo', 'results': results}))\n",
+    "[{\"path\": \"/tmp/higgs-tts3-eval/ref_en.wav\", \"lang\": \"en\"}, {\"path\": \"/tmp/higgs-tts3-eval/ref_sk.wav\", \"lang\": \"sk\"}, {\"path\": \"/tmp/higgs-tts3-eval/ref_cs.wav\", \"lang\": \"cs\"}]",
+    "/tmp/higgs-tts3-eval/asr-models"
+   ],
+   "rc": 0,
+   "output": "ASR_JSON={\"model_load_s\": 18.683522410999956, \"device\": \"cpu\", \"compute_type\": \"int8\", \"model\": \"large-v3-turbo\", \"results\": {\"/tmp/higgs-tts3-eval/ref_en.wav\": {\"text\": \"When the sunlight strikes rainbows in the air, they act as a prism and form a rainbow. The rainbow is a division of white light into\", \"wall_s\": 13.954847227999949, \"language\": \"en\"}, \"/tmp/higgs-tts3-eval/ref_sk.wav\": {\"text\": \"Dobre rano, a v\\u00edtece v tejto \\u0161iv\\u00fd ok\\u00e1\\u0161ke prekladu r\\u00e9\\u010d\\u00ed v re\\u00e1lnom \\u010dasu. Hvor\\u00edm po-\\u00e1nkl\\u00edck\\u00fd, a m\\u00f4\\u017eeme...\", \"wall_s\": 14.453358431000026, \"language\": \"sk\"}, \"/tmp/higgs-tts3-eval/ref_cs.wav\": {\"text\": \"V\\u010dera od poldne jsem \\u0161el na starom\\u011bstsk\\u00e9 nem\\u011bst\\u00ed. Potkal jsem tam star\\u00e9ho kamar\\u00e1da, kter\\u00fd prod\\u00e1val h\\u016f\\u017eky.\", \"wall_s\": 14.275251457000024, \"language\": \"cs\"}}}\nWarning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.\n"
+  },
+  {
+   "t": 204.3,
+   "step": "command",
+   "argv": [
+    "/tmp/higgs-tts3-eval/tts/bin/sgl-omni",
+    "serve",
+    "--help"
+   ],
+   "rc": 0,
+   "output": "me                  <str>                  Model name for          │\n│                                                      /v1/models (default:    │\n│                                                      pipeline name).         │\n│ --allowed-local-media…        <str>                  Directory that local    │\n│                                                      media references in     │\n│                                                      chat and TTS requests   │\n│                                                      must resolve inside.    │\n│                                                      file:// references are  │\n│                                                      disabled when this is   │\n│                                                      omitted; bare local     │\n│                                                      paths stay allowed by   │\n│                                                      default but are also    │\n│                                                      restricted to this      │\n│                                                      directory once it is    │\n│                                                      configured.             │\n│ --allowed-media-domai…        <list[str]>            Restrict remote media   │\n│                                                      references to this      │\n│                                                      domain. Repeat the flag │\n│                                                      to allow multiple       │\n│                                                      domains. When omitted,  │\n│                                                      remote HTTP(S)          │\n│                                                      references from any     │\n│                                                      public host are         │\n│                                                      allowed.                │\n│ --tts-batch-max-items         <int>                  Maximum number of items │\n│                                                      accepted by             │\n│                                                      /v1/audio/speech/batch. │\n│                                                      [default: 32]           │\n│ --mem-fraction-static         <float>                Set                     │\n│                                                      engine.mem_fraction_st… │\n│                                                      on every SGLang engine  │\n│                                                      stage. A dotted         │\n│                                                      per-stage flag          │\n│                                                      (--<stage>.engine.mem_… │\n│                                                      overrides this for that │\n│                                                      stage. If omitted,      │\n│                                                      SGLang chooses the      │\n│                                                      value automatically.    │\n│ --stage-offload-compo…        <str>                  Comma-separated         │\n│                                                      components to run       │\n│                                                      request-serially, each  │\n│                                                      offloading itself from  │\n│                                                      the GPU before the next │\n│                                                      one runs.               │\n│ --log-level                   <debug|info|warning|e  Log level (default:     │\n│                               rror|critical>         info).                  │\n│                                                      [default: info]         │\n│ --enable-realtime,--e…        <bool>                 Mount the OpenAI        │\n│                                                      Realtime WebSocket      │\n│                                                      endpoint at             │\n│                                                      /v1/realtime.           │\n│ --skip-server-warmup,…        <bool>                 Report ready without    │\n│                                                      sending the pipeline's  │\n│                                                      warmup requests first.  │\n│ --realtime-session-up…        <float>                Set the timeout for the │\n│                                                      first session.update,   │\n│                                                      in seconds. Use         │\n│                                                      --enable-realtime with  │\n│                                                      this option. If you do  │\n│                                                      not set this option,    │\n│                                                      the server uses the     │\n│                                                      pipeline configuration. │\n│ --realtime-idle-timeo…        <float>                Set the idle timeout    │\n│                                                      for shared sessions, in │\n│                                                      seconds. Use            │\n│                                                      --enable-realtime with  │\n│                                                      this option. If you do  │\n│                                                      not set this option,    │\n│                                                      the server uses the     │\n│                                                      pipeline configuration. │\n│ --help                        <bool>                 Show this message and   │\n│                                                      exit.                   │\n╰──────────────────────────────────────────────────────────────────────────────╯\n\nFailed to import torchada: No module named 'torchada'. MUSA platform compatibility will not work.\n"
+  },
+  {
+   "t": 204.3,
+   "step": "command",
+   "argv": [
+    "/tmp/higgs-tts3-eval/tts/bin/python",
+    "-I",
+    "-c",
+    "\nimport importlib.util, pathlib\nroot = pathlib.Path(importlib.util.find_spec('sglang_omni').origin).parent\nfor rel in ['models/higgs_tts/config.py', 'models/higgs_tts/engine_builder.py',\n            'models/higgs_tts/stages.py', 'serve/protocol.py', 'cli/serve.py']:\n    print('SOURCE', rel)\n    for line in (root / rel).read_text().splitlines():\n        if any(s in line for s in ('dtype', 'attention_backend', 'process=', 'stream_format', 'parse_extra_args')):\n            print(line)\n"
+   ],
+   "rc": 0,
+   "output": "SOURCE models/higgs_tts/config.py\n            process=\"tts_frontend\",\n            process=\"tts_frontend\",\n            process=\"pipeline\",\n            process=\"pipeline\",\nSOURCE models/higgs_tts/engine_builder.py\n        dtype: str,\n        del dtype\n            \"dtype\": \"bfloat16\",\nSOURCE models/higgs_tts/stages.py\n    storage_dtype = torch.int32\n    output_dtype = torch.long\n    dtype: str = \"bfloat16\",\n    codec = get_or_load_codec(checkpoint_dir, device, dtype)\n    dtype: str = \"bfloat16\",\n    codec = get_or_load_codec(checkpoint_dir, device, dtype)\n                dtype=torch.long,\nSOURCE serve/protocol.py\n    dtype: str = Field(min_length=1)\n        itemsize = _SERIALIZED_DTYPE_ITEMSIZE.get(self.dtype)\n            raise ValueError(f\"unsupported tensor dtype {self.dtype!r}\")\n                f\"for shape={self.shape} dtype={self.dtype}\"\n    stream_format: Literal[\"audio\", \"sse\"] = \"audio\"\n    dtypes: list[str]\nSOURCE cli/serve.py\n        extra_args = config_manager.parse_extra_args(ctx.args)\n"
+  },
+  {
+   "t": 204.3,
+   "step": "serve_attempt",
+   "dtype": "float16",
+   "argv": [
+    "/tmp/higgs-tts3-eval/tts/bin/sgl-omni",
+    "serve",
+    "--model-path",
+    "bosonai/higgs-tts-3-4b",
+    "--port",
+    "8000",
+    "--allowed-local-media-path",
+    "/tmp/higgs-tts3-eval",
+    "--audio_encoder.factory.device",
+    "cpu",
+    "--audio_encoder.factory.dtype",
+    "float32",
+    "--tts_engine.engine.dtype",
+    "float16",
+    "--vocoder.factory.dtype",
+    "float16",
+    "--tts_engine.engine.attention_backend",
+    "triton",
+    "--tts_engine.engine.disable_cuda_graph",
+    "true"
+   ],
+   "log": "/kaggle/working/serve_float16.log"
+  },
+  {
+   "t": 370.5,
+   "step": "server_ready",
+   "dtype": "float16",
+   "model_load_s": 166.12916209399998
+  },
+  {
+   "t": 550.5,
+   "step": "error",
+   "stage": "protocol_pcm",
+   "lang": "en",
+   "error": "TimeoutError: timed out"
+  },
+  {
+   "t": 550.6,
+   "step": "error",
+   "stage": "protocol_card_sse",
+   "lang": "en",
+   "error": "HTTPError: HTTP Error 400: Bad Request"
+  },
+  {
+   "t": 550.7,
+   "step": "error",
+   "stage": "protocol_explicit_sse",
+   "lang": "en",
+   "error": "HTTPError: HTTP Error 400: Bad Request"
+  },
+  {
+   "t": 697.2,
+   "step": "error",
+   "stage": "protocol_card_sse",
+   "lang": "sk",
+   "error": "HTTPError: HTTP Error 400: Bad Request"
+  },
+  {
+   "t": 697.2,
+   "step": "error",
+   "stage": "protocol_explicit_sse",
+   "lang": "sk",
+   "error": "HTTPError: HTTP Error 400: Bad Request"
+  },
+  {
+   "t": 798.1,
+   "step": "error",
+   "stage": "protocol_card_sse",
+   "lang": "cs",
+   "error": "HTTPError: HTTP Error 400: Bad Request"
+  },
+  {
+   "t": 798.2,
+   "step": "error",
+   "stage": "protocol_explicit_sse",
+   "lang": "cs",
+   "error": "HTTPError: HTTP Error 400: Bad Request"
+  },
+  {
+   "t": 1145.9,
+   "step": "command",
+   "argv": [
+    "/tmp/higgs-tts3-eval/asr/bin/python",
+    "-I",
+    "-c",
+    "\nimport json, sys, time, traceback\nimport numpy as np, soundfile as sf\nfrom faster_whisper import WhisperModel\n\ndef load16k(path):\n    # decode with soundfile, not PyAV: PyAV/faster-whisper kwarg clash failed twice on 2026-11-15\n    x, sr = sf.read(path, dtype='float32', always_2d=True)\n    x = x.mean(axis=1)\n    if sr != 16000:\n        n = int(round(len(x) * 16000 / sr))\n        x = np.interp(np.linspace(0, len(x) - 1, n), np.arange(len(x)), x).astype('float32')\n    return x\njobs = json.loads(sys.argv[1])\nt = time.perf_counter()\n# CPU int8 avoids CUDA-12 ASR libraries colliding with the CUDA-13 TTS stack.\nmodel = WhisperModel('large-v3-turbo', device='cpu', compute_type='int8',\n                     download_root=sys.argv[2])\nload_s = time.perf_counter() - t\nresults = {}\nfor job in jobs:\n    try:\n        t = time.perf_counter()\n        segments, info = model.transcribe(load16k(job['path']), language=job['lang'], beam_size=5)\n        text = ' '.join(s.text.strip() for s in segments)\n        results[job['path']] = {'text': text, 'wall_s': time.perf_counter() - t,\n                                'language': info.language}\n    except Exception:\n        results[job['path']] = {'error': traceback.format_exc()}\nprint('ASR_JSON=' + json.dumps({'model_load_s': load_s, 'device': 'cpu',\n      'compute_type': 'int8', 'model': 'large-v3-turbo', 'results': results}))\n",
+    "[{\"path\": \"/kaggle/working/higgs_en_short_r1.wav\", \"lang\": \"en\"}, {\"path\": \"/kaggle/working/higgs_en_short_r2.wav\", \"lang\": \"en\"}, {\"path\": \"/kaggle/working/higgs_en_short_r3.wav\", \"lang\": \"en\"}, {\"path\": \"/kaggle/working/higgs_en_long_r1.wav\", \"lang\": \"en\"}, {\"path\": \"/kaggle/working/higgs_en_long_r2.wav\", \"lang\": \"en\"}, {\"path\": \"/kaggle/working/higgs_en_long_r3.wav\", \"lang\": \"en\"}, {\"path\": \"/kaggle/working/higgs_sk_short_r1.wav\", \"lang\": \"sk\"}, {\"path\": \"/kaggle/working/higgs_sk_short_r2.wav\", \"lang\": \"sk\"}, {\"path\": \"/kaggle/working/higgs_sk_short_r3.wav\", \"lang\": \"sk\"}, {\"path\": \"/kaggle/working/higgs_sk_long_r1.wav\", \"lang\": \"sk\"}, {\"path\": \"/kaggle/working/higgs_sk_long_r2.wav\", \"lang\": \"sk\"}, {\"path\": \"/kaggle/working/higgs_sk_long_r3.wav\", \"lang\": \"sk\"}, {\"path\": \"/kaggle/working/higgs_cs_short_r1.wav\", \"lang\": \"cs\"}, {\"path\": \"/kaggle/working/higgs_cs_short_r2.wav\", \"lang\": \"cs\"}, {\"path\": \"/kaggle/working/higgs_cs_short_r3.wav\", \"lang\": \"cs\"}, {\"path\": \"/kaggle/working/higgs_cs_long_r1.wav\", \"lang\": \"cs\"}, {\"path\": \"/kaggle/working/higgs_cs_long_r2.wav\", \"lang\": \"cs\"}, {\"path\": \"/kaggle/working/higgs_cs_long_r3.wav\", \"lang\": \"cs\"}]",
+    "/tmp/higgs-tts3-eval/asr-models"
+   ],
+   "rc": 0,
+   "output": "ASR_JSON={\"model_load_s\": 9.489637002000109, \"device\": \"cpu\", \"compute_type\": \"int8\", \"model\": \"large-v3-turbo\", \"results\": {\"/kaggle/working/higgs_en_short_r1.wav\": {\"text\": \"Thank you.\", \"wall_s\": 13.08499576500003, \"language\": \"en\"}, \"/kaggle/working/higgs_en_short_r2.wav\": {\"text\": \"Thank you.\", \"wall_s\": 13.055560731000014, \"language\": \"en\"}, \"/kaggle/working/higgs_en_short_r3.wav\": {\"text\": \"Thank you.\", \"wall_s\": 13.202353764999998, \"language\": \"en\"}, \"/kaggle/working/higgs_en_long_r1.wav\": {\"text\": \"You\", \"wall_s\": 12.956760430000031, \"language\": \"en\"}, \"/kaggle/working/higgs_en_long_r2.wav\": {\"text\": \"You\", \"wall_s\": 13.136295573000098, \"language\": \"en\"}, \"/kaggle/working/higgs_en_long_r3.wav\": {\"text\": \"Thank you.\", \"wall_s\": 13.182383261999803, \"language\": \"en\"}, \"/kaggle/working/higgs_sk_short_r1.wav\": {\"text\": \"\\u010eakujem.\", \"wall_s\": 13.303655083999956, \"language\": \"sk\"}, \"/kaggle/working/higgs_sk_short_r2.wav\": {\"text\": \"\\u010eakujem za pozornos\\u0165.\", \"wall_s\": 13.459953460000179, \"language\": \"sk\"}, \"/kaggle/working/higgs_sk_short_r3.wav\": {\"text\": \"\\u010eakujem za pozornos\\u0165\", \"wall_s\": 13.310450719000073, \"language\": \"sk\"}, \"/kaggle/working/higgs_sk_long_r1.wav\": {\"text\": \"\\u010eakujem.\", \"wall_s\": 13.04447366799991, \"language\": \"sk\"}, \"/kaggle/working/higgs_sk_long_r2.wav\": {\"text\": \"\\u010eakujem.\", \"wall_s\": 13.286658558, \"language\": \"sk\"}, \"/kaggle/working/higgs_sk_long_r3.wav\": {\"text\": \"\\u010eakujem.\", \"wall_s\": 13.04880503000004, \"language\": \"sk\"}, \"/kaggle/working/higgs_cs_short_r1.wav\": {\"text\": \"www.hradeckralove.org\", \"wall_s\": 13.080965086000106, \"language\": \"cs\"}, \"/kaggle/working/higgs_cs_short_r2.wav\": {\"text\": \"www.hradeckralove.org\", \"wall_s\": 13.164243702000022, \"language\": \"cs\"}, \"/kaggle/working/higgs_cs_short_r3.wav\": {\"text\": \"www.hradeckralove.org\", \"wall_s\": 13.146609279999893, \"language\": \"cs\"}, \"/kaggle/working/higgs_cs_long_r1.wav\": {\"text\": \"www.hradeckralove.org\", \"wall_s\": 13.10119070099995, \"language\": \"cs\"}, \"/kaggle/working/higgs_cs_long_r2.wav\": {\"text\": \"www.hradeckralove.org\", \"wall_s\": 13.106016978999833, \"language\": \"cs\"}, \"/kaggle/working/higgs_cs_long_r3.wav\": {\"text\": \"www.hradeckralove.org\", \"wall_s\": 13.196704460999854, \"language\": \"cs\"}}}\n"
+  }
+ ],
+ "errors": [
+  {
+   "stage": "protocol_pcm",
+   "lang": "en",
+   "error": "TimeoutError: timed out"
+  },
+  {
+   "stage": "protocol_card_sse",
+   "lang": "en",
+   "error": "HTTPError: HTTP Error 400: Bad Request"
+  },
+  {
+   "stage": "protocol_explicit_sse",
+   "lang": "en",
+   "error": "HTTPError: HTTP Error 400: Bad Request"
+  },
+  {
+   "stage": "protocol_card_sse",
+   "lang": "sk",
+   "error": "HTTPError: HTTP Error 400: Bad Request"
+  },
+  {
+   "stage": "protocol_explicit_sse",
+   "lang": "sk",
+   "error": "HTTPError: HTTP Error 400: Bad Request"
+  },
+  {
+   "stage": "protocol_card_sse",
+   "lang": "cs",
+   "error": "HTTPError: HTTP Error 400: Bad Request"
+  },
+  {
+   "stage": "protocol_explicit_sse",
+   "lang": "cs",
+   "error": "HTTPError: HTTP Error 400: Bad Request"
+  }
+ ],
+ "tts": {
+  "en": {
+   "status": "ok",
+   "reference": {
+    "path": "/tmp/higgs-tts3-eval/ref_en.wav",
+    "source": "/kaggle/input/datasets/yegorby/bp-t4-assets-20261105/speaker_voices/me_en_rainbow.m4a",
+    "audio_s": 10.0,
+    "text": "When the sunlight strikes rainbows in the air, they act as a prism and form a rainbow. The rainbow is a division of white light into"
+   },
+   "model_load_s": 166.12916209399998,
+   "cases": {
+    "short": {
+     "text": "Hello, this is a test of real-time speech translation.",
+     "word_count": 9,
+     "runs": [
+      {
+       "first_audio_latency_s": 5.294921380000005,
+       "wall_s": 5.294926229999987,
+       "audio_s": 4.2,
+       "rtf": 1.2606967214285683,
+       "streaming": "non-streaming",
+       "requested_protocol": "non-streaming",
+       "content_type": "audio/wav",
+       "output_wav": "/kaggle/working/higgs_en_short_r1.wav",
+       "peak_gpu_mb": 13985.0,
+       "gpu_memory_method": "nvidia-smi GPU0 total used MiB, sampled every 0.2s; includes server resident memory",
+       "samples": 24,
+       "errors": [],
+       "repeat": 1,
+       "model_load_s": 166.12916209399998,
+       "asr": {
+        "text": "Thank you.",
+        "wall_s": 13.08499576500003,
+        "language": "en",
+        "wer": 1.0,
+        "word_errors": 9,
+        "reference_words": 9,
+        "normalised_reference": "hello this is a test of realtime speech translation",
+        "normalised_hypothesis": "thank you"
+       }
+      },
+      {
+       "first_audio_latency_s": 5.374663091999992,
+       "wall_s": 5.374668662999966,
+       "audio_s": 3.96,
+       "rtf": 1.3572395613636277,
+       "streaming": "non-streaming",
+       "requested_protocol": "non-streaming",
+       "content_type": "audio/wav",
+       "output_wav": "/kaggle/working/higgs_en_short_r2.wav",
+       "peak_gpu_mb": 13985.0,
+       "gpu_memory_method": "nvidia-smi GPU0 total used MiB, sampled every 0.2s; includes server resident memory",
+       "samples": 24,
+       "errors": [],
+       "repeat": 2,
+       "model_load_s": 166.12916209399998,
+       "asr": {
+        "text": "Thank you.",
+        "wall_s": 13.055560731000014,
+        "language": "en",
+        "wer": 1.0,
+        "word_errors": 9,
+        "reference_words": 9,
+        "normalised_reference": "hello this is a test of realtime speech translation",
+        "normalised_hypothesis": "thank you"
+       }
+      },
+      {
+       "first_audio_latency_s": 5.333037749000027,
+       "wall_s": 5.333043208000049,
+       "audio_s": 4.24,
+       "rtf": 1.2577932094339739,
+       "streaming": "non-streaming",
+       "requested_protocol": "non-streaming",
+       "content_type": "audio/wav",
+       "output_wav": "/kaggle/working/higgs_en_short_r3.wav",
+       "peak_gpu_mb": 13985.0,
+       "gpu_memory_method": "nvidia-smi GPU0 total used MiB, sampled every 0.2s; includes server resident memory",
+       "samples": 24,
+       "errors": [],
+       "repeat": 3,
+       "model_load_s": 166.12916209399998,
+       "asr": {
+        "text": "Thank you.",
+        "wall_s": 13.202353764999998,
+        "language": "en",
+        "wer": 1.0,
+        "word_errors": 9,
+        "reference_words": 9,
+        "normalised_reference": "hello this is a test of realtime speech translation",
+        "normalised_hypothesis": "thank you"
+       }
+      }
+     ],
+     "warmup": {
+      "first_audio_latency_s": 62.26452753000001,
+      "wall_s": 62.26453522700001,
+      "audio_s": 4.72,
+      "rtf": 13.191638819279664,
+      "streaming": "non-streaming",
+      "requested_protocol": "non-streaming",
+      "content_type": "audio/wav",
+      "output_wav": "/kaggle/working/higgs_en_short_warmup.wav"
+     },
+     "median": {
+      "model_load_s": 166.12916209399998,
+      "first_audio_latency_s": 5.333037749000027,
+      "wall_s": 5.333043208000049,
+      "audio_s": 4.2,
+      "rtf": 1.2606967214285683,
+      "peak_gpu_mb": 13985.0,
+      "wer": 1.0
+     },
+     "status": "ok",
+     "streaming": "non-streaming",
+     "output_wav": "/kaggle/working/higgs_en.wav",
+     "representative_source": "/kaggle/working/higgs_en_short_r3.wav",
+     "asr": {
+      "text": "Thank you.",
+      "wall_s": 13.202353764999998,
+      "language": "en",
+      "wer": 1.0,
+      "word_errors": 9,
+      "reference_words": 9,
+      "normalised_reference": "hello this is a test of realtime speech translation",
+      "normalised_hypothesis": "thank you"
+     }
+    },
+    "long": {
+     "text": "During our international meeting today, the interpreter will translate every spoken sentence clearly, preserve the original meaning, and help all participants understand each other better.",
+     "word_count": 25,
+     "runs": [
+      {
+       "first_audio_latency_s": 15.181755510000016,
+       "wall_s": 15.181764754000028,
+       "audio_s": 12.48,
+       "rtf": 1.216487560416669,
+       "streaming": "non-streaming",
+       "requested_protocol": "non-streaming",
+       "content_type": "audio/wav",
+       "output_wav": "/kaggle/working/higgs_en_long_r1.wav",
+       "peak_gpu_mb": 14151.0,
+       "gpu_memory_method": "nvidia-smi GPU0 total used MiB, sampled every 0.2s; includes server resident memory",
+       "samples": 66,
+       "errors": [],
+       "repeat": 1,
+       "model_load_s": 166.12916209399998,
+       "asr": {
+        "text": "You",
+        "wall_s": 12.956760430000031,
+        "language": "en",
+        "wer": 1.0,
+        "word_errors": 25,
+        "reference_words": 25,
+        "normalised_reference": "during our international meeting today the interpreter will translate every spoken sentence clearly preserve the original meaning and help all participants understand each other better",
+        "normalised_hypothesis": "you"
+       }
+      },
+      {
+       "first_audio_latency_s": 14.593141834999983,
+       "wall_s": 14.59315013999992,
+       "audio_s": 11.8,
+       "rtf": 1.236707638983044,
+       "streaming": "non-streaming",
+       "requested_protocol": "non-streaming",
+       "content_type": "audio/wav",
+       "output_wav": "/kaggle/working/higgs_en_long_r2.wav",
+       "peak_gpu_mb": 14189.0,
+       "gpu_memory_method": "nvidia-smi GPU0 total used MiB, sampled every 0.2s; includes server resident memory",
+       "samples": 63,
+       "errors": [],
+       "repeat": 2,
+       "model_load_s": 166.12916209399998,
+       "asr": {
+        "text": "You",
+        "wall_s": 13.136295573000098,
+        "language": "en",
+        "wer": 1.0,
+        "word_errors": 25,
+        "reference_words": 25,
+        "normalised_reference": "during our international meeting today the interpreter will translate every spoken sentence clearly preserve the original meaning and help all participants understand each other better",
+        "normalised_hypothesis": "you"
+       }
+      },
+      {
+       "first_audio_latency_s": 15.114647334999972,
+       "wall_s": 15.114654468000026,
+       "audio_s": 12.28,
+       "rtf": 1.2308350543973963,
+       "streaming": "non-streaming",
+       "requested_protocol": "non-streaming",
+       "content_type": "audio/wav",
+       "output_wav": "/kaggle/working/higgs_en_long_r3.wav",
+       "peak_gpu_mb": 14189.0,
+       "gpu_memory_method": "nvidia-smi GPU0 total used MiB, sampled every 0.2s; includes server resident memory",
+       "samples": 66,
+       "errors": [],
+       "repeat": 3,
+       "model_load_s": 166.12916209399998,
+       "asr": {
+        "text": "Thank you.",
+        "wall_s": 13.182383261999803,
+        "language": "en",
+        "wer": 1.0,
+        "word_errors": 25,
+        "reference_words": 25,
+        "normalised_reference": "during our international meeting today the interpreter will translate every spoken sentence clearly preserve the original meaning and help all participants understand each other better",
+        "normalised_hypothesis": "thank you"
+       }
+      }
+     ],
+     "warmup": {
+      "first_audio_latency_s": 14.152329707000035,
+      "wall_s": 14.152338380999936,
+      "audio_s": 11.56,
+      "rtf": 1.2242507249999943,
+      "streaming": "non-streaming",
+      "requested_protocol": "non-streaming",
+      "content_type": "audio/wav",
+      "output_wav": "/kaggle/working/higgs_en_long_warmup.wav"
+     },
+     "median": {
+      "model_load_s": 166.12916209399998,
+      "first_audio_latency_s": 15.114647334999972,
+      "wall_s": 15.114654468000026,
+      "audio_s": 12.28,
+      "rtf": 1.2308350543973963,
+      "peak_gpu_mb": 14189.0,
+      "wer": 1.0
+     },
+     "status": "ok",
+     "streaming": "non-streaming",
+     "output_wav": "/kaggle/working/higgs_en_long.wav",
+     "representative_source": "/kaggle/working/higgs_en_long_r3.wav",
+     "asr": {
+      "text": "Thank you.",
+      "wall_s": 13.182383261999803,
+      "language": "en",
+      "wer": 1.0,
+      "word_errors": 25,
+      "reference_words": 25,
+      "normalised_reference": "during our international meeting today the interpreter will translate every spoken sentence clearly preserve the original meaning and help all participants understand each other better",
+      "normalised_hypothesis": "thank you"
+     }
+    }
+   },
+   "protocol_probes": [
+    {
+     "mode": "pcm",
+     "status": "failed",
+     "stage": "protocol_pcm",
+     "lang": "en",
+     "error": "TimeoutError: timed out"
+    },
+    {
+     "mode": "card_sse",
+     "status": "failed",
+     "stage": "protocol_card_sse",
+     "lang": "en",
+     "error": "HTTPError: HTTP Error 400: Bad Request"
+    },
+    {
+     "mode": "explicit_sse",
+     "status": "failed",
+     "stage": "protocol_explicit_sse",
+     "lang": "en",
+     "error": "HTTPError: HTTP Error 400: Bad Request"
+    }
+   ]
+  },
+  "sk": {
+   "status": "ok",
+   "reference": {
+    "path": "/tmp/higgs-tts3-eval/ref_sk.wav",
+    "source": "/kaggle/input/datasets/yegorby/bp-t4-assets-20261105/speaker_voices/me_sk_script.m4a",
+    "audio_s": 10.0,
+    "text": "Dobre rano, a vítece v tejto šivý okáške prekladu réčí v reálnom času. Hvorím po-ánklícký, a môžeme..."
+   },
+   "model_load_s": 166.12916209399998,
+   "cases": {
+    "short": {
+     "text": "Dobrý deň, toto je test prekladov reči v reálnom čase.",
+     "word_count": 10,
+     "runs": [
+      {
+       "first_audio_latency_s": 1.4971658230000457,
+       "wall_s": 5.617814852000038,
+       "audio_s": 4.28,
+       "rtf": 1.3125735635514106,
+       "streaming": "pcm",
+       "requested_protocol": "pcm",
+       "content_type": "audio/pcm",
+       "output_wav": "/kaggle/working/higgs_sk_short_r1.wav",
+       "peak_gpu_mb": 14189.0,
+       "gpu_memory_method": "nvidia-smi GPU0 total used MiB, sampled every 0.2s; includes server resident memory",
+       "samples": 25,
+       "errors": [],
+       "repeat": 1,
+       "model_load_s": 166.12916209399998,
+       "asr": {
+        "text": "Ďakujem.",
+        "wall_s": 13.303655083999956,
+        "language": "sk",
+        "wer": 1.0,
+        "word_errors": 10,
+        "reference_words": 10,
+        "normalised_reference": "dobrý deň toto je test prekladov reči v reálnom čase",
+        "normalised_hypothesis": "ďakujem"
+       }
+      },
+      {
+       "first_audio_latency_s": 1.574187228000028,
+       "wall_s": 5.23735886999998,
+       "audio_s": 3.88,
+       "rtf": 1.3498347603092733,
+       "streaming": "pcm",
+       "requested_protocol": "pcm",
+       "content_type": "audio/pcm",
+       "output_wav": "/kaggle/working/higgs_sk_short_r2.wav",
+       "peak_gpu_mb": 14189.0,
+       "gpu_memory_method": "nvidia-smi GPU0 total used MiB, sampled every 0.2s; includes server resident memory",
+       "samples": 24,
+       "errors": [],
+       "repeat": 2,
+       "model_load_s": 166.12916209399998,
+       "asr": {
+        "text": "Ďakujem za pozornosť.",
+        "wall_s": 13.459953460000179,
+        "language": "sk",
+        "wer": 1.0,
+        "word_errors": 10,
+        "reference_words": 10,
+        "normalised_reference": "dobrý deň toto je test prekladov reči v reálnom čase",
+        "normalised_hypothesis": "ďakujem za pozornosť"
+       }
+      },
+      {
+       "first_audio_latency_s": 1.480964116999985,
+       "wall_s": 5.199250008999911,
+       "audio_s": 3.96,
+       "rtf": 1.312941921464624,
+       "streaming": "pcm",
+       "requested_protocol": "pcm",
+       "content_type": "audio/pcm",
+       "output_wav": "/kaggle/working/higgs_sk_short_r3.wav",
+       "peak_gpu_mb": 14189.0,
+       "gpu_memory_method": "nvidia-smi GPU0 total used MiB, sampled every 0.2s; includes server resident memory",
+       "samples": 24,
+       "errors": [],
+       "repeat": 3,
+       "model_load_s": 166.12916209399998,
+       "asr": {
+        "text": "Ďakujem za pozornosť",
+        "wall_s": 13.310450719000073,
+        "language": "sk",
+        "wer": 1.0,
+        "word_errors": 10,
+        "reference_words": 10,
+        "normalised_reference": "dobrý deň toto je test prekladov reči v reálnom čase",
+        "normalised_hypothesis": "ďakujem za pozornosť"
+       }
+      }
+     ],
+     "warmup": {
+      "first_audio_latency_s": 1.4742998550000266,
+      "wall_s": 5.280492285000037,
+      "audio_s": 4.0,
+      "rtf": 1.3201230712500092,
+      "streaming": "pcm",
+      "requested_protocol": "pcm",
+      "content_type": "audio/pcm",
+      "output_wav": "/kaggle/working/higgs_sk_short_warmup.wav"
+     },
+     "median": {
+      "model_load_s": 166.12916209399998,
+      "first_audio_latency_s": 1.4971658230000457,
+      "wall_s": 5.23735886999998,
+      "audio_s": 3.96,
+      "rtf": 1.312941921464624,
+      "peak_gpu_mb": 14189.0,
+      "wer": 1.0
+     },
+     "status": "ok",
+     "streaming": "pcm",
+     "output_wav": "/kaggle/working/higgs_sk.wav",
+     "representative_source": "/kaggle/working/higgs_sk_short_r2.wav",
+     "asr": {
+      "text": "Ďakujem za pozornosť.",
+      "wall_s": 13.459953460000179,
+      "language": "sk",
+      "wer": 1.0,
+      "word_errors": 10,
+      "reference_words": 10,
+      "normalised_reference": "dobrý deň toto je test prekladov reči v reálnom čase",
+      "normalised_hypothesis": "ďakujem za pozornosť"
+     }
+    },
+    "long": {
+     "text": "Počas medzinárodného stretnutia bude tlmočník jasne prekladať každú vyslovenú vetu, zachová pôvodný význam a pomôže všetkým účastníkom lepšie porozumieť ostatným aj pri zložitých odborných témach.",
+     "word_count": 25,
+     "runs": [
+      {
+       "first_audio_latency_s": 1.4229752190000227,
+       "wall_s": 16.529260867000062,
+       "audio_s": 13.72,
+       "rtf": 1.2047566229591882,
+       "streaming": "pcm",
+       "requested_protocol": "pcm",
+       "content_type": "audio/pcm",
+       "output_wav": "/kaggle/working/higgs_sk_long_r1.wav",
+       "peak_gpu_mb": 14189.0,
+       "gpu_memory_method": "nvidia-smi GPU0 total used MiB, sampled every 0.2s; includes server resident memory",
+       "samples": 72,
+       "errors": [],
+       "repeat": 1,
+       "model_load_s": 166.12916209399998,
+       "asr": {
+        "text": "Ďakujem.",
+        "wall_s": 13.04447366799991,
+        "language": "sk",
+        "wer": 1.0,
+        "word_errors": 25,
+        "reference_words": 25,
+        "normalised_reference": "počas medzinárodného stretnutia bude tlmočník jasne prekladať každú vyslovenú vetu zachová pôvodný význam a pomôže všetkým účastníkom lepšie porozumieť ostatným aj pri zložitých odborných témach",
+        "normalised_hypothesis": "ďakujem"
+       }
+      },
+      {
+       "first_audio_latency_s": 1.4664664599999924,
+       "wall_s": 16.94238479699993,
+       "audio_s": 14.2,
+       "rtf": 1.1931256899295728,
+       "streaming": "pcm",
+       "requested_protocol": "pcm",
+       "content_type": "audio/pcm",
+       "output_wav": "/kaggle/working/higgs_sk_long_r2.wav",
+       "peak_gpu_mb": 14189.0,
+       "gpu_memory_method": "nvidia-smi GPU0 total used MiB, sampled every 0.2s; includes server resident memory",
+       "samples": 73,
+       "errors": [],
+       "repeat": 2,
+       "model_load_s": 166.12916209399998,
+       "asr": {
+        "text": "Ďakujem.",
+        "wall_s": 13.286658558,
+        "language": "sk",
+        "wer": 1.0,
+        "word_errors": 25,
+        "reference_words": 25,
+        "normalised_reference": "počas medzinárodného stretnutia bude tlmočník jasne prekladať každú vyslovenú vetu zachová pôvodný význam a pomôže všetkým účastníkom lepšie porozumieť ostatným aj pri zložitých odborných témach",
+        "normalised_hypothesis": "ďakujem"
+       }
+      },
+      {
+       "first_audio_latency_s": 1.509787805999963,
+       "wall_s": 18.04729871699999,
+       "audio_s": 14.96,
+       "rtf": 1.206370235093582,
+       "streaming": "pcm",
+       "requested_protocol": "pcm",
+       "content_type": "audio/pcm",
+       "output_wav": "/kaggle/working/higgs_sk_long_r3.wav",
+       "peak_gpu_mb": 14189.0,
+       "gpu_memory_method": "nvidia-smi GPU0 total used MiB, sampled every 0.2s; includes server resident memory",
+       "samples": 78,
+       "errors": [],
+       "repeat": 3,
+       "model_load_s": 166.12916209399998,
+       "asr": {
+        "text": "Ďakujem.",
+        "wall_s": 13.04880503000004,
+        "language": "sk",
+        "wer": 1.0,
+        "word_errors": 25,
+        "reference_words": 25,
+        "normalised_reference": "počas medzinárodného stretnutia bude tlmočník jasne prekladať každú vyslovenú vetu zachová pôvodný význam a pomôže všetkým účastníkom lepšie porozumieť ostatným aj pri zložitých odborných témach",
+        "normalised_hypothesis": "ďakujem"
+       }
+      }
+     ],
+     "warmup": {
+      "first_audio_latency_s": 1.5722095119999722,
+      "wall_s": 18.53795844499996,
+      "audio_s": 15.52,
+      "rtf": 1.1944560853737087,
+      "streaming": "pcm",
+      "requested_protocol": "pcm",
+      "content_type": "audio/pcm",
+      "output_wav": "/kaggle/working/higgs_sk_long_warmup.wav"
+     },
+     "median": {
+      "model_load_s": 166.12916209399998,
+      "first_audio_latency_s": 1.4664664599999924,
+      "wall_s": 16.94238479699993,
+      "audio_s": 14.2,
+      "rtf": 1.2047566229591882,
+      "peak_gpu_mb": 14189.0,
+      "wer": 1.0
+     },
+     "status": "ok",
+     "streaming": "pcm",
+     "output_wav": "/kaggle/working/higgs_sk_long.wav",
+     "representative_source": "/kaggle/working/higgs_sk_long_r2.wav",
+     "asr": {
+      "text": "Ďakujem.",
+      "wall_s": 13.286658558,
+      "language": "sk",
+      "wer": 1.0,
+      "word_errors": 25,
+      "reference_words": 25,
+      "normalised_reference": "počas medzinárodného stretnutia bude tlmočník jasne prekladať každú vyslovenú vetu zachová pôvodný význam a pomôže všetkým účastníkom lepšie porozumieť ostatným aj pri zložitých odborných témach",
+      "normalised_hypothesis": "ďakujem"
+     }
+    }
+   },
+   "protocol_probes": [
+    {
+     "status": "ok",
+     "first_audio_latency_s": 4.9300103229999195,
+     "wall_s": 8.769580307999945,
+     "audio_s": 3.96,
+     "rtf": 2.214540481818168,
+     "streaming": "pcm",
+     "requested_protocol": "pcm",
+     "content_type": "audio/pcm",
+     "output_wav": "/kaggle/working/higgs_sk_probe_pcm.wav",
+     "peak_gpu_mb": 14189.0,
+     "gpu_memory_method": "nvidia-smi GPU0 total used MiB, sampled every 0.2s; includes server resident memory",
+     "samples": 38,
+     "errors": []
+    },
+    {
+     "mode": "card_sse",
+     "status": "failed",
+     "stage": "protocol_card_sse",
+     "lang": "sk",
+     "error": "HTTPError: HTTP Error 400: Bad Request"
+    },
+    {
+     "mode": "explicit_sse",
+     "status": "failed",
+     "stage": "protocol_explicit_sse",
+     "lang": "sk",
+     "error": "HTTPError: HTTP Error 400: Bad Request"
+    }
+   ]
+  },
+  "cs": {
+   "status": "ok",
+   "reference": {
+    "path": "/tmp/higgs-tts3-eval/ref_cs.wav",
+    "source": "/kaggle/input/datasets/yegorby/bp-t4-assets-20261105/speaker_voices/me_cs_staromestske.m4a",
+    "audio_s": 10.0,
+    "text": "Včera od poldne jsem šel na staroměstské neměstí. Potkal jsem tam starého kamaráda, který prodával hůžky."
+   },
+   "model_load_s": 166.12916209399998,
+   "cases": {
+    "short": {
+     "text": "Dobrý den, toto je test překladu řeči v reálném čase.",
+     "word_count": 10,
+     "runs": [
+      {
+       "first_audio_latency_s": 1.479303701000049,
+       "wall_s": 6.128186505000031,
+       "audio_s": 4.76,
+       "rtf": 1.2874341397058888,
+       "streaming": "pcm",
+       "requested_protocol": "pcm",
+       "content_type": "audio/pcm",
+       "output_wav": "/kaggle/working/higgs_cs_short_r1.wav",
+       "peak_gpu_mb": 14189.0,
+       "gpu_memory_method": "nvidia-smi GPU0 total used MiB, sampled every 0.2s; includes server resident memory",
+       "samples": 27,
+       "errors": [],
+       "repeat": 1,
+       "model_load_s": 166.12916209399998,
+       "asr": {
+        "text": "www.hradeckralove.org",
+        "wall_s": 13.080965086000106,
+        "language": "cs",
+        "wer": 1.0,
+        "word_errors": 10,
+        "reference_words": 10,
+        "normalised_reference": "dobrý den toto je test překladu řeči v reálném čase",
+        "normalised_hypothesis": "wwwhradeckraloveorg"
+       }
+      },
+      {
+       "first_audio_latency_s": 1.5873307670000258,
+       "wall_s": 6.418038078000109,
+       "audio_s": 4.84,
+       "rtf": 1.326040925206634,
+       "streaming": "pcm",
+       "requested_protocol": "pcm",
+       "content_type": "audio/pcm",
+       "output_wav": "/kaggle/working/higgs_cs_short_r2.wav",
+       "peak_gpu_mb": 14189.0,
+       "gpu_memory_method": "nvidia-smi GPU0 total used MiB, sampled every 0.2s; includes server resident memory",
+       "samples": 29,
+       "errors": [],
+       "repeat": 2,
+       "model_load_s": 166.12916209399998,
+       "asr": {
+        "text": "www.hradeckralove.org",
+        "wall_s": 13.164243702000022,
+        "language": "cs",
+        "wer": 1.0,
+        "word_errors": 10,
+        "reference_words": 10,
+        "normalised_reference": "dobrý den toto je test překladu řeči v reálném čase",
+        "normalised_hypothesis": "wwwhradeckraloveorg"
+       }
+      },
+      {
+       "first_audio_latency_s": 1.4385548159998507,
+       "wall_s": 5.621989119999853,
+       "audio_s": 4.4,
+       "rtf": 1.2777247999999664,
+       "streaming": "pcm",
+       "requested_protocol": "pcm",
+       "content_type": "audio/pcm",
+       "output_wav": "/kaggle/working/higgs_cs_short_r3.wav",
+       "peak_gpu_mb": 14189.0,
+       "gpu_memory_method": "nvidia-smi GPU0 total used MiB, sampled every 0.2s; includes server resident memory",
+       "samples": 25,
+       "errors": [],
+       "repeat": 3,
+       "model_load_s": 166.12916209399998,
+       "asr": {
+        "text": "www.hradeckralove.org",
+        "wall_s": 13.146609279999893,
+        "language": "cs",
+        "wer": 1.0,
+        "word_errors": 10,
+        "reference_words": 10,
+        "normalised_reference": "dobrý den toto je test překladu řeči v reálném čase",
+        "normalised_hypothesis": "wwwhradeckraloveorg"
+       }
+      }
+     ],
+     "warmup": {
+      "first_audio_latency_s": 1.4953525529999752,
+      "wall_s": 6.319867101999989,
+      "audio_s": 4.92,
+      "rtf": 1.2845258337398353,
+      "streaming": "pcm",
+      "requested_protocol": "pcm",
+      "content_type": "audio/pcm",
+      "output_wav": "/kaggle/working/higgs_cs_short_warmup.wav"
+     },
+     "median": {
+      "model_load_s": 166.12916209399998,
+      "first_audio_latency_s": 1.479303701000049,
+      "wall_s": 6.128186505000031,
+      "audio_s": 4.76,
+      "rtf": 1.2874341397058888,
+      "peak_gpu_mb": 14189.0,
+      "wer": 1.0
+     },
+     "status": "ok",
+     "streaming": "pcm",
+     "output_wav": "/kaggle/working/higgs_cs.wav",
+     "representative_source": "/kaggle/working/higgs_cs_short_r1.wav",
+     "asr": {
+      "text": "www.hradeckralove.org",
+      "wall_s": 13.080965086000106,
+      "language": "cs",
+      "wer": 1.0,
+      "word_errors": 10,
+      "reference_words": 10,
+      "normalised_reference": "dobrý den toto je test překladu řeči v reálném čase",
+      "normalised_hypothesis": "wwwhradeckraloveorg"
+     }
+    },
+    "long": {
+     "text": "Během mezinárodního setkání bude tlumočník jasně překládat každou vyslovenou větu, zachová původní význam a pomůže všem účastníkům lépe porozumět ostatním i při složitých odborných tématech.",
+     "word_count": 25,
+     "runs": [
+      {
+       "first_audio_latency_s": 1.5648479970000153,
+       "wall_s": 18.210747768000147,
+       "audio_s": 15.04,
+       "rtf": 1.2108209952127758,
+       "streaming": "pcm",
+       "requested_protocol": "pcm",
+       "content_type": "audio/pcm",
+       "output_wav": "/kaggle/working/higgs_cs_long_r1.wav",
+       "peak_gpu_mb": 14189.0,
+       "gpu_memory_method": "nvidia-smi GPU0 total used MiB, sampled every 0.2s; includes server resident memory",
+       "samples": 79,
+       "errors": [],
+       "repeat": 1,
+       "model_load_s": 166.12916209399998,
+       "asr": {
+        "text": "www.hradeckralove.org",
+        "wall_s": 13.10119070099995,
+        "language": "cs",
+        "wer": 1.0,
+        "word_errors": 25,
+        "reference_words": 25,
+        "normalised_reference": "během mezinárodního setkání bude tlumočník jasně překládat každou vyslovenou větu zachová původní význam a pomůže všem účastníkům lépe porozumět ostatním i při složitých odborných tématech",
+        "normalised_hypothesis": "wwwhradeckraloveorg"
+       }
+      },
+      {
+       "first_audio_latency_s": 1.4809620990001804,
+       "wall_s": 19.90460112100004,
+       "audio_s": 16.48,
+       "rtf": 1.2078034660800996,
+       "streaming": "pcm",
+       "requested_protocol": "pcm",
+       "content_type": "audio/pcm",
+       "output_wav": "/kaggle/working/higgs_cs_long_r2.wav",
+       "peak_gpu_mb": 14189.0,
+       "gpu_memory_method": "nvidia-smi GPU0 total used MiB, sampled every 0.2s; includes server resident memory",
+       "samples": 86,
+       "errors": [],
+       "repeat": 2,
+       "model_load_s": 166.12916209399998,
+       "asr": {
+        "text": "www.hradeckralove.org",
+        "wall_s": 13.106016978999833,
+        "language": "cs",
+        "wer": 1.0,
+        "word_errors": 25,
+        "reference_words": 25,
+        "normalised_reference": "během mezinárodního setkání bude tlumočník jasně překládat každou vyslovenou větu zachová původní význam a pomůže všem účastníkům lépe porozumět ostatním i při složitých odborných tématech",
+        "normalised_hypothesis": "wwwhradeckraloveorg"
+       }
+      },
+      {
+       "first_audio_latency_s": 1.4740505159998065,
+       "wall_s": 19.329211421999844,
+       "audio_s": 15.96,
+       "rtf": 1.2111034725563812,
+       "streaming": "pcm",
+       "requested_protocol": "pcm",
+       "content_type": "audio/pcm",
+       "output_wav": "/kaggle/working/higgs_cs_long_r3.wav",
+       "peak_gpu_mb": 14189.0,
+       "gpu_memory_method": "nvidia-smi GPU0 total used MiB, sampled every 0.2s; includes server resident memory",
+       "samples": 83,
+       "errors": [],
+       "repeat": 3,
+       "model_load_s": 166.12916209399998,
+       "asr": {
+        "text": "www.hradeckralove.org",
+        "wall_s": 13.196704460999854,
+        "language": "cs",
+        "wer": 1.0,
+        "word_errors": 25,
+        "reference_words": 25,
+        "normalised_reference": "během mezinárodního setkání bude tlumočník jasně překládat každou vyslovenou větu zachová původní význam a pomůže všem účastníkům lépe porozumět ostatním i při složitých odborných tématech",
+        "normalised_hypothesis": "wwwhradeckraloveorg"
+       }
+      }
+     ],
+     "warmup": {
+      "first_audio_latency_s": 1.7078157240000564,
+      "wall_s": 17.859760997999956,
+      "audio_s": 14.64,
+      "rtf": 1.2199290299180297,
+      "streaming": "pcm",
+      "requested_protocol": "pcm",
+      "content_type": "audio/pcm",
+      "output_wav": "/kaggle/working/higgs_cs_long_warmup.wav"
+     },
+     "median": {
+      "model_load_s": 166.12916209399998,
+      "first_audio_latency_s": 1.4809620990001804,
+      "wall_s": 19.329211421999844,
+      "audio_s": 15.96,
+      "rtf": 1.2108209952127758,
+      "peak_gpu_mb": 14189.0,
+      "wer": 1.0
+     },
+     "status": "ok",
+     "streaming": "pcm",
+     "output_wav": "/kaggle/working/higgs_cs_long.wav",
+     "representative_source": "/kaggle/working/higgs_cs_long_r3.wav",
+     "asr": {
+      "text": "www.hradeckralove.org",
+      "wall_s": 13.196704460999854,
+      "language": "cs",
+      "wer": 1.0,
+      "word_errors": 25,
+      "reference_words": 25,
+      "normalised_reference": "během mezinárodního setkání bude tlumočník jasně překládat každou vyslovenou větu zachová původní význam a pomůže všem účastníkům lépe porozumět ostatním i při složitých odborných tématech",
+      "normalised_hypothesis": "wwwhradeckraloveorg"
+     }
+    }
+   },
+   "protocol_probes": [
+    {
+     "status": "ok",
+     "first_audio_latency_s": 4.7227611700000125,
+     "wall_s": 9.016050316000019,
+     "audio_s": 4.48,
+     "rtf": 2.012511231250004,
+     "streaming": "pcm",
+     "requested_protocol": "pcm",
+     "content_type": "audio/pcm",
+     "output_wav": "/kaggle/working/higgs_cs_probe_pcm.wav",
+     "peak_gpu_mb": 14189.0,
+     "gpu_memory_method": "nvidia-smi GPU0 total used MiB, sampled every 0.2s; includes server resident memory",
+     "samples": 39,
+     "errors": []
+    },
+    {
+     "mode": "card_sse",
+     "status": "failed",
+     "stage": "protocol_card_sse",
+     "lang": "cs",
+     "error": "HTTPError: HTTP Error 400: Bad Request"
+    },
+    {
+     "mode": "explicit_sse",
+     "status": "failed",
+     "stage": "protocol_explicit_sse",
+     "lang": "cs",
+     "error": "HTTPError: HTTP Error 400: Bad Request"
+    }
+   ]
+  }
+ },
+ "infrastructure": {
+  "initial_t4_gate": {
+   "torch": "2.14.1+cu130",
+   "cuda": "13.0",
+   "arch_list": [
+    "sm_75",
+    "sm_80",
+    "sm_86",
+    "sm_90",
+    "sm_100",
+    "sm_120"
+   ],
+   "cuda_available": true,
+   "sm_75_in_arch_list": true,
+   "nvidia_smi": "Sun Nov 15 07:06:33 2026       \n+-----------------------------------------------------------------------------------------+\n| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |\n+-----------------------------------------+------------------------+----------------------+\n| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |\n| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |\n|                                         |                        |               MIG M. |\n|=========================================+========================+======================|\n|   0  Tesla T4                       Off |   00000000:00:04.0 Off |                    0 |\n| N/A   43C    P8             11W /   70W |       3MiB /  15360MiB |      0%      Default |\n|                                         |                        |                  N/A |\n+-----------------------------------------+------------------------+----------------------+\n|   1  Tesla T4                       Off |   00000000:00:05.0 Off |                    0 |\n| N/A   51C    P8              9W /   70W |       0MiB /  15360MiB |      0%      Default |\n|                                         |                        |                  N/A |\n+-----------------------------------------+------------------------+----------------------+\n\n+-----------------------------------------------------------------------------------------+\n| Processes:                                                                              |\n|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |\n|        ID   ID                                                               Usage      |\n|=========================================================================================|\n|  No running processes found                                                             |\n+-----------------------------------------------------------------------------------------+\n",
+   "fp16_matmul_ok": true,
+   "device": "Tesla T4",
+   "capability": [
+    7,
+    5
+   ],
+   "fp16_matmul_value": 32.0,
+   "supported": true
+  },
+  "installed_stack_t4_gate": {
+   "torch": "2.14.1+cu130",
+   "cuda": "13.0",
+   "arch_list": [
+    "sm_75",
+    "sm_80",
+    "sm_86",
+    "sm_90",
+    "sm_100",
+    "sm_120"
+   ],
+   "cuda_available": true,
+   "sm_75_in_arch_list": true,
+   "nvidia_smi": "Sun Nov 15 07:07:31 2026       \n+-----------------------------------------------------------------------------------------+\n| NVIDIA-SMI 580.178.04             Driver Version: 580.178.04     CUDA Version: 13.0     |\n+-----------------------------------------+------------------------+----------------------+\n| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |\n| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |\n|                                         |                        |               MIG M. |\n|=========================================+========================+======================|\n|   0  Tesla T4                       Off |   00000000:00:04.0 Off |                    0 |\n| N/A   42C    P8             13W /   70W |       3MiB /  15360MiB |      0%      Default |\n|                                         |                        |                  N/A |\n+-----------------------------------------+------------------------+----------------------+\n|   1  Tesla T4                       Off |   00000000:00:05.0 Off |                    0 |\n| N/A   51C    P8             14W /   70W |       0MiB /  15360MiB |      0%      Default |\n|                                         |                        |                  N/A |\n+-----------------------------------------+------------------------+----------------------+\n\n+-----------------------------------------------------------------------------------------+\n| Processes:                                                                              |\n|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |\n|        ID   ID                                                               Usage      |\n|=========================================================================================|\n|  No running processes found                                                             |\n+-----------------------------------------------------------------------------------------+\n",
+   "fp16_matmul_ok": true,
+   "device": "Tesla T4",
+   "capability": [
+    7,
+    5
+   ],
+   "fp16_matmul_value": 32.0,
+   "supported": true
+  },
+  "installed_source_excerpt": "SOURCE models/higgs_tts/config.py\n            process=\"tts_frontend\",\n            process=\"tts_frontend\",\n            process=\"pipeline\",\n            process=\"pipeline\",\nSOURCE models/higgs_tts/engine_builder.py\n        dtype: str,\n        del dtype\n            \"dtype\": \"bfloat16\",\nSOURCE models/higgs_tts/stages.py\n    storage_dtype = torch.int32\n    output_dtype = torch.long\n    dtype: str = \"bfloat16\",\n    codec = get_or_load_codec(checkpoint_dir, device, dtype)\n    dtype: str = \"bfloat16\",\n    codec = get_or_load_codec(checkpoint_dir, device, dtype)\n                dtype=torch.long,\nSOURCE serve/protocol.py\n    dtype: str = Field(min_length=1)\n        itemsize = _SERIALIZED_DTYPE_ITEMSIZE.get(self.dtype)\n            raise ValueError(f\"unsupported tensor dtype {self.dtype!r}\")\n                f\"for shape={self.shape} dtype={self.dtype}\"\n    stream_format: Literal[\"audio\", \"sse\"] = \"audio\"\n    dtypes: list[str]\nSOURCE cli/serve.py\n        extra_args = config_manager.parse_extra_args(ctx.args)\n",
+  "jit_strategy": {
+   "attempt": "tts_engine.engine.attention_backend=triton; disable_cuda_graph=true",
+   "limit": "Avoids FlashInfer attention selection; imports or other kernels may still JIT. No global no-JIT guarantee.",
+   "reference_encoding": "CPU float32; preserve cookbook default separate processes"
+  }
+ },
+ "model": "bosonai/higgs-tts-3-4b",
+ "license": "Research and non-commercial; not a production adoption test",
+ "texts": {
+  "en": {
+   "short": "Hello, this is a test of real-time speech translation.",
+   "long": "During our international meeting today, the interpreter will translate every spoken sentence clearly, preserve the original meaning, and help all participants understand each other better."
+  },
+  "sk": {
+   "short": "Dobrý deň, toto je test prekladov reči v reálnom čase.",
+   "long": "Počas medzinárodného stretnutia bude tlmočník jasne prekladať každú vyslovenú vetu, zachová pôvodný význam a pomôže všetkým účastníkom lepšie porozumieť ostatným aj pri zložitých odborných témach."
+  },
+  "cs": {
+   "short": "Dobrý den, toto je test překladu řeči v reálném čase.",
+   "long": "Během mezinárodního setkání bude tlumočník jasně překládat každou vyslovenou větu, zachová původní význam a pomůže všem účastníkům lépe porozumět ostatním i při složitých odborných tématech."
+  }
+ },
+ "supported_languages": [
+  "en",
+  "sk",
+  "cs"
+ ],
+ "support_source": "Model card production-quality tier; language quality is unmeasured here",
+ "elapsed_s": 1145.9,
+ "reference_asr": {
+  "model_load_s": 18.683522410999956,
+  "device": "cpu",
+  "compute_type": "int8",
+  "model": "large-v3-turbo",
+  "results": {
+   "/tmp/higgs-tts3-eval/ref_en.wav": {
+    "text": "When the sunlight strikes rainbows in the air, they act as a prism and form a rainbow. The rainbow is a division of white light into",
+    "wall_s": 13.954847227999949,
+    "language": "en"
+   },
+   "/tmp/higgs-tts3-eval/ref_sk.wav": {
+    "text": "Dobre rano, a vítece v tejto šivý okáške prekladu réčí v reálnom času. Hvorím po-ánklícký, a môžeme...",
+    "wall_s": 14.453358431000026,
+    "language": "sk"
+   },
+   "/tmp/higgs-tts3-eval/ref_cs.wav": {
+    "text": "Včera od poldne jsem šel na staroměstské neměstí. Potkal jsem tam starého kamaráda, který prodával hůžky.",
+    "wall_s": 14.275251457000024,
+    "language": "cs"
+   }
+  }
+ },
+ "serve_attempts": [
+  {
+   "dtype": "float16",
+   "argv": [
+    "/tmp/higgs-tts3-eval/tts/bin/sgl-omni",
+    "serve",
+    "--model-path",
+    "bosonai/higgs-tts-3-4b",
+    "--port",
+    "8000",
+    "--allowed-local-media-path",
+    "/tmp/higgs-tts3-eval",
+    "--audio_encoder.factory.device",
+    "cpu",
+    "--audio_encoder.factory.dtype",
+    "float32",
+    "--tts_engine.engine.dtype",
+    "float16",
+    "--vocoder.factory.dtype",
+    "float16",
+    "--tts_engine.engine.attention_backend",
+    "triton",
+    "--tts_engine.engine.disable_cuda_graph",
+    "true"
+   ],
+   "log": "/kaggle/working/serve_float16.log",
+   "last_health_error": "<urlopen error [Errno 111] Connection refused>",
+   "status": "healthy",
+   "model_load_s": 166.12916209399998,
+   "model_load_definition": "CLI launch to healthy; includes download, initialization and server warmup",
+   "health": {
+    "status": "healthy",
+    "running": true,
+    "stages": [
+     "preprocessing",
+     "audio_encoder",
+     "tts_engine",
+     "vocoder"
+    ],
+    "entry_stage": "preprocessing",
+    "total_requests": 0,
+    "pending_completions": 0,
+    "request_states": {},
+    "stream_delivery": {
+     "stream_backlog_bytes": 0,
+     "open_stream_count": 0,
+     "generation_finished_stream_count": 0,
+     "longest_reader_idle_s": 0.0,
+     "failed_stream_count": 0
+    }
+   }
+  }
+ ],
+ "last_gpu_sample": {
+  "peak_gpu_mb": 14189.0,
+  "gpu_memory_method": "nvidia-smi GPU0 total used MiB, sampled every 0.2s; includes server resident memory",
+  "samples": 83,
+  "errors": []
+ },
+ "round_trip_asr": {
+  "model_load_s": 9.489637002000109,
+  "device": "cpu",
+  "compute_type": "int8",
+  "model": "large-v3-turbo"
+ }
+}
