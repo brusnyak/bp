@@ -74,6 +74,20 @@ TEXTS = {
 }
 # Clean Python subprocesses cannot inherit the project import path/venv.
 ENV = os.environ.copy()
+# 2026-11-15 run: FlashInfer JIT link failed with "cannot find -lcuda" (no libcuda.so dev symlink on Kaggle): provide one
+def _libcuda_link():
+    import glob
+    cands = glob.glob('/usr/lib/x86_64-linux-gnu/libcuda.so.1') + glob.glob('/usr/local/nvidia/lib64/libcuda.so.1') + glob.glob('/usr/lib64/libcuda.so.1')
+    if not cands:
+        return
+    d = '/tmp/cudalink'
+    os.makedirs(d, exist_ok=True)
+    link = d + '/libcuda.so'
+    if not os.path.exists(link):
+        os.symlink(cands[0], link)
+    ENV['LIBRARY_PATH'] = d + ':' + ENV.get('LIBRARY_PATH', '')
+    ENV['LD_LIBRARY_PATH'] = d + ':' + ENV.get('LD_LIBRARY_PATH', '')
+_libcuda_link()
 for key in ('PYTHONPATH', 'PYTHONHOME', 'VIRTUAL_ENV'):
     ENV.pop(key, None)
 ENV.update(HF_HOME=str(WORK / 'hf'), UV_CACHE_DIR=str(WORK / 'uv-cache'),
@@ -260,7 +274,7 @@ for rel in ['models/higgs_tts/config.py', 'models/higgs_tts/engine_builder.py',
     }
     attempts = R['serve_attempts'] = []
     overall_deadline = time.monotonic() + 720
-    for dtype in ('bfloat16', 'float16'):
+    for dtype in ('float16', 'bfloat16'):
         log = OUT / f'serve_{dtype}.log'
         cmd = [cli, 'serve', '--model-path', MODEL, '--port', '8000',
                '--allowed-local-media-path', str(WORK),
@@ -278,7 +292,7 @@ for rel in ['models/higgs_tts/config.py', 'models/higgs_tts/engine_builder.py',
                 SERVER_PROC = subprocess.Popen(cmd, cwd=WORK, env=ENV, stdout=output,
                                                stderr=subprocess.STDOUT, start_new_session=True)
             # Reserve six minutes for fp16 if bf16 stalls; total health budget <=12m.
-            deadline = min(overall_deadline, time.monotonic() + (350 if dtype == 'bfloat16' else 720))
+            deadline = min(overall_deadline, time.monotonic() + (720 if dtype == 'float16' else 350))
             step('serve_attempt', **attempt)
             while time.monotonic() < deadline:
                 if SERVER_PROC.poll() is not None:
