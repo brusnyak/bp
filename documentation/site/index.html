@@ -1,127 +1,111 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Live Speech Translation — status and evidence</title><style>
-body{font:16px/1.6 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;max-width:900px;margin:0 auto;padding:1.5rem 1rem;color:#222;background:#fff}
-h1{font-size:1.5rem;margin:0 0 .25rem 0}
-.sub{color:#555;font-size:.95rem;margin-bottom:1rem}
-header{border-bottom:2px solid #e5e5e5;padding-bottom:1rem;margin-bottom:1.5rem}
-.verdict{background:#eef6ff;border-left:4px solid #2563eb;padding:.6rem .9rem;margin-bottom:1rem;border-radius:4px}
-.verdict strong{color:#1d4ed8}
-.tags{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem}
-.tag{background:#f1f5f9;border:1px solid #cbd5e1;color:#334155;padding:.15rem .5rem;border-radius:999px;font-size:.8rem}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin-bottom:1.5rem}
-.card{border:1px solid #e5e5e5;border-radius:8px;padding:1rem;background:#fafafa}
-.card h3{margin:0 0 .5rem 0;font-size:.95rem;color:#111}
-.card p{margin:0;font-size:.88rem;color:#334155}
-h2{font-size:1.1rem;margin:1.5rem 0 .5rem 0;border-bottom:1px solid #e5e5e5;padding-bottom:.25rem}
-.intro{color:#444;font-size:.9rem;margin-bottom:.6rem}
-table{border-collapse:collapse;width:100%;margin:.4rem 0 1.2rem 0;font-size:.88rem}
-th,td{border-bottom:1px solid #e5e5e1;padding:.45rem .5rem;text-align:left;vertical-align:top}
-th{background:#f8fafc;font-weight:600;color:#334155}
-tr:nth-child(even) td{background:#fcfcfc}
-code{background:#f1f5f9;padding:0 .2rem;border-radius:3px;font-size:.85rem}
-.small{color:#555;font-size:.82rem}
-.footer{border-top:1px solid #e5e5e1;margin-top:2rem;padding-top:1rem;color:#555;font-size:.8rem}
-.works{border:1px solid #dcfce7;background:#f0fdf4;border-radius:8px;padding:.8rem 1rem;margin-bottom:1rem}
-.works h3{margin:0 0 .4rem 0;color:#166534;font-size:.95rem}
-.works ul{margin:0;padding-left:1.1rem;color:#14532d;font-size:.88rem}
-.works li{margin-bottom:.25rem}
-.notbuilt{border:1px solid #fee2e2;background:#fef2f2;border-radius:8px;padding:.8rem 1rem;margin-bottom:1rem}
-.notbuilt h3{margin:0 0 .4rem 0;color:#991b1b;font-size:.95rem}
-.notbuilt ul{margin:0;padding-left:1.1rem;color:#7f1d1d;font-size:.88rem}
-.notbuilt li{margin-bottom:.25rem}
-@media (max-width:640px){table{font-size:.8rem} th,td{padding:.35rem .4rem}}
-</style></head><body>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Local speech translation and live captions. Install on your own machine, choose a language, and route translated speech to headphones or a meeting.">
+<meta name="color-scheme" content="light dark">
+<title>Live Speech Translation — local audio and captions</title>
+<style>:root{color-scheme:light dark;--ink:#222;--muted:#505966;--bg:#fff;--surface:#f8fafc;--line:#cbd5e1;--accent:#1d4ed8;--tint:#eef6ff;--focus:#1d4ed8;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+@media(prefers-color-scheme:dark){:root{--ink:#e8edf5;--muted:#b5c0d0;--bg:#10151d;--surface:#19222f;--line:#46556a;--accent:#9bc3ff;--tint:#172c48;--focus:#9bc3ff}}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:1rem}body{margin:0;background:var(--bg);color:var(--ink);font-size:1rem;line-height:1.65}main,header,footer{max-width:1060px;margin:auto;padding:1.5rem}header{padding-top:3rem;border-bottom:1px solid var(--line)}h1{font-size:clamp(2rem,6vw,3rem);line-height:1.1;letter-spacing:-.025em;margin:0 0 1rem}h2{font-size:1.55rem;line-height:1.25;margin:0 0 1rem}h3{font-size:1.05rem;margin:0 0 .5rem}p{max-width:72ch;margin:.65rem 0}section{padding:2.5rem 0;border-bottom:1px solid var(--line)}a{color:var(--accent);text-underline-offset:.2em}a:hover{text-decoration-thickness:2px}a:focus-visible,summary:focus-visible,.table-wrap:focus-visible{outline:3px solid var(--focus);outline-offset:4px}::selection{background:var(--accent);color:var(--bg)}nav{display:flex;gap:.6rem 1.2rem;flex-wrap:wrap;margin:1.5rem 0 .5rem}nav a{padding:.35rem 0}nav[aria-label="On this page"]{font-size:.9rem;margin:0}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.9em;overflow-wrap:anywhere}p code,li code,td code{background:var(--surface);padding:.1rem .25rem}pre{padding:1rem;background:var(--surface);border:1px solid var(--line);border-radius:6px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;margin:.6rem 0 1rem}pre code{font-size:.88rem}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.card,.callout{padding:1.2rem;border:1px solid var(--line);border-radius:8px;background:var(--surface)}.callout{background:var(--tint);margin:1rem 0}.card p:last-child{margin-bottom:0}.small,.source{font-size:.88rem;color:var(--muted)}.source{overflow-wrap:anywhere;margin-top:.75rem}.table-wrap{overflow:auto;max-width:100%;margin:.8rem 0;scrollbar-color:var(--line) var(--surface)}table{width:100%;border-collapse:collapse;font-size:.91rem;font-variant-numeric:tabular-nums}caption{text-align:left;font-weight:600;padding:.4rem 0}th,td{padding:.75rem .6rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:var(--surface)}td:first-child,th:first-child{padding-left:.3rem}table.models{min-width:850px}table.routes{min-width:540px}.pipeline{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;list-style:none;padding:1rem 0;margin:1rem 0}.pipeline li{display:flex;align-items:center;gap:.5rem}.pipeline li:not(:last-child)::after{content:'→';color:var(--muted)}.pipeline span{padding:.4rem .65rem;border:1px solid var(--line);border-radius:5px;background:var(--surface)}ol.steps{padding-left:1.5rem}ol.steps>li{padding-left:.25rem;margin:1rem 0}ul{padding-left:1.3rem}li{margin:.4rem 0}footer{color:var(--muted);font-size:.9rem;padding-bottom:3rem}.skip{position:absolute;top:-5rem;left:1rem;background:var(--bg);padding:.5rem}.skip:focus{top:1rem}summary{cursor:pointer;padding:.5rem 0;color:var(--accent)}@media(max-width:640px){header,main,footer{padding-left:1rem;padding-right:1rem}.grid{grid-template-columns:1fr}section{padding:2rem 0}h2{font-size:1.35rem}th,td{padding:.6rem .45rem}.table-wrap{border:1px solid var(--line);padding:.25rem .5rem}header{padding-top:2rem}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
 <header>
-  <h1>Live Speech Translation</h1>
-  <p class="sub">Real-time speech translation that runs on your own machine: speak English, hear German, Slovak or Czech a moment later, with live captions. Research prototype. Numbers on this page are generated from saved receipts in the repository and verified by <code>make check-docs</code>.</p>
+<h1>Live Speech Translation</h1>
+<p>Speak in one language. Hear translated speech and read live captions.</p>
+<p>Recognition, translation and voice run locally on your own machine.</p>
+<p>Use a browser to control it, headphones to listen, or an audio cable to feed a meeting.</p>
+<nav aria-label="Get started"><a href="#quick-start">Install and run</a><a href="#routes">Check your language</a><a href="../INTEGRATION.md">Connect a room</a><a href="https://github.com/brusnyak/bp">Source on GitHub</a></nav>
 </header>
-
-<div class="verdict">
-  <strong>Verdict:</strong> one speaker, one direction runs live on a laptop (English → Slovak/Czech/German). Median lag 0.5-1.8 s on generated English on the M1 Pro Mac; the 2 s goal is met there but <strong>Slovak input under 2 s is not viable on this Mac</strong> — it needs a faster GPU (T4/L4/A10) or a streaming-native recogniser. German and Slovak are validated end to end through the real server on a Kaggle T4. Room mode is built and unit-tested; its real-model test is pending.
-</div>
-
-<div class="tags"><span class="tag">local-first, no cloud</span><span class="tag">EN↔SK/DE/CS</span><span class="tag">local speech translation</span><span class="tag">measured 2026-11-07</span></div>
-
-<h2>At a glance</h2>
-<div class="grid">
-  <div class="card">
-    <h3>What works today</h3>
-    <p>EN→SK, EN→DE, EN→CS live on your own machine. Slovak output uses the kinit fine-tune (6.5% WER on native Slovak FLEURS; 19.8% on a non-native speaker's own reading). German validated end to end on a T4.</p>
-  </div>
-  <div class="card">
-    <h3>Goal</h3>
-    <p>Median lag ≤ 2 s, voice starts mid-sentence, drift ≤ 0.5 s/min. Met on generated English on the Mac; not yet on real Slovak speech.</p>
-  </div>
-  <div class="card">
-    <h3>Main blocker</h3>
-    <p>Slovak input under 2 s needs better compute. Whisper turbo is ~0.7 s/call on the Mac; Nemotron scores 28% on Slovak. Route: Nemotron 3.5 Slovak baseline on a T4 (~30 min), then fine-tune.</p>
-  </div>
-  <div class="card">
-    <h3>Voice</h3>
-    <p>Piper is generic but fast (~0.15 s/piece). OmniVoice clones zero-shot (~0.66 s/piece) but is batch/QC only, not streaming. Listening review is pending before selecting the route.</p>
-  </div>
-</div>
-
-<h2>Speech recognition by language</h2>
-<p class="intro">Mean word error on Kaggle T4, FLEURS read speech, 60 clips per language. Lower is better.</p>
-<table>
-  <tr><th>Language</th><th>Whisper large-v3-turbo</th><th>Parakeet v3</th><th>Whisper small</th><th>Whisper base</th></tr>
-  <tr><td>German</td><td>4.8%</td><td>6.3%</td><td>10.9%</td><td>18.1%</td></tr><tr><td>English</td><td>4.5%</td><td>5.1%</td><td>6.1%</td><td>8.6%</td></tr><tr><td>French</td><td>6.9%</td><td>5.0%</td><td>14.8%</td><td>25.6%</td></tr><tr><td>Polish</td><td>7.7%</td><td>9.9%</td><td>19.6%</td><td>37.9%</td></tr><tr><td>Czech</td><td>11.6%</td><td>14.0%</td><td>37.8%</td><td>67.3%</td></tr><tr><td>Slovak</td><td>10.7%</td><td>9.9%</td><td>37.8%</td><td>64.6%</td></tr>
-</table>
-<p class="small">Slovak with the kinit fine-tune: 6.5% (plain turbo 10.7%). On a non-native speaker's own reading: 19.8%.</p>
-
-<h2>Whole chain for a 10 s utterance</h2>
-<p class="intro">Seconds, median of 25 clips on Kaggle T4; voice runs on CPU. Total in bold.</p>
-<table>
-  <tr><th>Direction</th><th>Recognition</th><th>Translation</th><th>Voice</th><th>Total</th></tr>
-  <tr><td>cs-&gt;en</td><td>0.50</td><td>0.24</td><td>0.53</td><td><b>1.31</b></td></tr><tr><td>de-&gt;en</td><td>0.46</td><td>0.28</td><td>0.57</td><td><b>1.33</b></td></tr><tr><td>en-&gt;cs</td><td>0.42</td><td>0.28</td><td>0.64</td><td><b>1.41</b></td></tr><tr><td>en-&gt;de</td><td>0.40</td><td>0.30</td><td>0.52</td><td><b>1.21</b></td></tr><tr><td>en-&gt;fr</td><td>0.42</td><td>0.30</td><td>0.52</td><td><b>1.24</b></td></tr><tr><td>en-&gt;sk</td><td>0.42</td><td>0.26</td><td>0.47</td><td><b>1.14</b></td></tr><tr><td>fr-&gt;en</td><td>0.48</td><td>0.26</td><td>0.82</td><td><b>1.57</b></td></tr><tr><td>pl-&gt;en</td><td>0.46</td><td>0.22</td><td>0.47</td><td><b>1.15</b></td></tr><tr><td>sk-&gt;en</td><td>0.47</td><td>0.24</td><td>0.47</td><td><b>1.34</b></td></tr>
-</table>
-
-<h2>Streaming: delay versus accuracy</h2>
-<p class="intro">T4 simulation, word-commit delay and word error (Whisper turbo). No setting reached under 1 s with under 10% error.</p>
-<table>
-  <tr><th>Strategy</th><th>English reading</th><th>German speech</th></tr>
-  <tr><td>English to German, independent 2 s chunks (current live route)</td><td>1.17 s / 19.1%</td><td>1.23 s / 33.1%</td></tr><tr><td>English to German, growing buffer every 1.0 s, commit agreed words</td><td>2.31 s / 5.0%</td><td>2.34 s / 11.2%</td></tr><tr><td>English to German, same, every 0.5 s</td><td>1.45 s / 12.3%</td><td>1.36 s / 23.9%</td></tr>
-</table>
-
-<h2>Real server end to end</h2>
-<p class="intro">Kaggle T4, a test speaker's 60 s English reading replayed through the live route at 1×. Delay measured after each segment ends.</p>
-<table>
-  <tr><th>Route</th><th>Status</th><th>Delay median / p90</th><th>First-word delay</th><th>Transcript error</th></tr>
-  <tr><td>English to German, 2 s chunks</td><td><span class='tag'>works</span></td><td>3.89 s / 5.34 s</td><td>6.01 s</td><td>22.1%</td></tr><tr><td>English to German, agreement every 1.0 s</td><td><span class='tag'>recommended on a GPU</span></td><td>1.56 s / 2.55 s</td><td>3.67 s</td><td>21.3%</td></tr><tr><td>English to German, agreement every 0.5 s</td><td><span class='tag'>collapses — do not use</span></td><td>17.88 s / 23.54 s</td><td>20.59 s</td><td>47.5%</td></tr><tr><td>English to Slovak, 2 s chunks</td><td><span class='tag'>works</span></td><td>1.97 s / 2.88 s</td><td>4.05 s</td><td>23.8%</td></tr><tr><td>English to Slovak, agreement every 1.0 s</td><td><span class='tag'>same as chunks</span></td><td>1.89 s / 3.10 s</td><td>3.92 s</td><td>23.0%</td></tr>
-</table>
-
-<h2>Against Google, Microsoft and OpenAI</h2>
-<p class="intro">Read from their own pages (2026-11-08). We compete on behaviour and on running locally — not on measured quality (no side-by-side test exists).</p>
-<table>
-  <tr><th></th><th>Google Gemini Live Translate</th><th>Microsoft Teams Interpreter</th><th>OpenAI gpt-realtime-translate</th><th>This project</th></tr>
-  <tr><td>Design</td><td>one speech-to-speech model; keeps intonation, pacing, pitch</td><td>cascade: recognition, translation, voice</td><td>streaming speech-to-speech model</td><td>cascade (same as Microsoft)</td></tr>
-  <tr><td>Lag</td><td>"a few seconds behind" (no number)</td><td>not stated</td><td>not stated</td><td>3.0–3.6 s on M1 Pro (goal 3.0 s); ~2.3–2.9 s on T4 simulation at 6–17% word error</td></tr>
-  <tr><td>Access</td><td>paid Google plan / API preview</td><td>Copilot or Teams Premium licence</td><td>API, usage-priced</td><td>runs on your own machine; no cloud, licence, or per-minute fee</td></tr>
-</table>
-
-<div class="works">
-  <h3>Honest status — works</h3>
-  <ul>
-    <li>EN→SK, EN→DE, EN→CS live on a laptop; local-first, no audio leaves the machine</li>
-    <li>German end to end through the real server on a T4, zero server errors</li>
-    <li>Room mode built and unit-tested (many listeners, each own language)</li>
-    <li>Docs numbers verified against receipts (<code>make check-docs</code> 57/57)</li>
-  </ul>
-</div>
-<div class="notbuilt">
-  <h3>Honest status — not yet built / validated</h3>
-  <ul>
-    <li>Slovak input under 2 s (needs GPU or streaming recogniser)</li>
-    <li>Room mode real-model test pending</li>
-    <li>Cloned voice for other people; fresh-install Linux/Windows retest pending</li>
-    <li>Side-by-side test vs Google/Microsoft/OpenAI</li>
-  </ul>
-</div>
-
-<div class="footer">
-  <p><strong>Source &amp; install:</strong> <a href="https://github.com/brusnyak/bp">github.com/brusnyak/bp</a> · <a href="https://github.com/brusnyak/bp/blob/main/documentation/STATUS.md">Status</a> · <a href="https://github.com/brusnyak/bp/blob/main/documentation/LANGUAGES.md">Languages</a> · <a href="https://github.com/brusnyak/bp/blob/main/documentation/BENCHMARKS.md">Benchmarks</a></p>
-  <p>Quick start: <code>git clone https://github.com/brusnyak/bp.git &amp;&amp; cd bp &amp;&amp; python3.11 scripts/setup.py --profile mac --langs de,sk &amp;&amp; make run PRESET=mac</code> then open <code>http://localhost:8000</code>.</p>
-  <p class="small">Regenerate this page: <code>python3 scripts/build_site.py</code> (reads receipts in <code>documentation/evidence/2026-11-07/</code>), then publish to <code>gh-pages</code>/<code>docs/index.html</code>.</p>
-</div>
-</body></html>
+<main id="content">
+<nav aria-label="On this page"><a href="#what">What it is</a><a href="#speed">Speed</a><a href="#voices">Voices</a><a href="#hardware">Hardware</a><a href="#room">Conference rooms</a><a href="#test">Test it</a><a href="#licences">Licences</a><a href="#limits">Limits</a></nav>
+<section id="what">
+<h2>What it is</h2>
+<p>A standalone tool for translated speech and captions during calls and presentations. Install the models once; the default pipeline then runs without a cloud speech service.</p>
+<ol class="pipeline" aria-label="All-local audio pipeline"><li><span>Mic</span></li><li><span>VAD</span></li><li><span>Speech recognition</span></li><li><span>Translation</span></li><li><span>Voice</span></li><li><span>Speakers / captions</span></li></ol>
+<p class="small">VAD detects speech and pauses. The processing host handles every stage; room listeners receive audio and captions over your network.</p>
+</section>
+<section id="quick-start">
+<h2>Quick start</h2>
+<p>Requires Python 3.11 or 3.12, Git, ffmpeg and internet access for installation. Setup downloads dependencies and model weights. Start with generic Piper voices; personal recordings are not included.</p>
+<ol class="steps">
+<li>Clone the repository.<pre><code>git clone https://github.com/brusnyak/bp.git
+cd bp</code></pre></li>
+<li>Set up the profile for your machine. This example installs Czech, Slovak and German with English.<pre><code>python3.11 scripts/setup.py --profile mac --langs cs,sk,de</code></pre><p class="small">Apple Silicon: <code>mac</code>. NVIDIA CUDA: replace it with <code>nvidia</code>. Other laptops: use <code>cpu</code>. On Windows use your Python 3.11 executable.</p></li>
+<li>Run with the matching profile.<pre><code>make run PRESET=mac</code></pre><p class="small">Use <code>PRESET=nvidia</code> or <code>PRESET=cpu</code> for the other profiles. Windows: run <code>.venv\Scripts\python.exe app.py</code>; the Makefile's preset loader requires a POSIX shell.</p></li>
+<li>Open <a href="http://localhost:8000">http://localhost:8000</a> in Chrome or Edge. Use <strong>Try it as a guest</strong> or sign in.</li>
+<li>Select the languages, prepare the route, choose <strong>Microphone</strong> and <strong>Output</strong>, then use <strong>Test microphone</strong>. Wear headphones and press <strong>Start</strong>.</li>
+</ol>
+<p class="source">Commands: <a href="../../README.md#quick-start">README quick start</a>, <a href="../../Makefile">Makefile</a>, <a href="../../scripts/setup.py">setup.py</a>. The standard Mac installer prepares Whisper; the Nemotron result below uses a separately provisioned streaming engine.</p>
+</section>
+<section id="routes">
+<h2>What works today</h2>
+<p>Choose a route, then check the installed assets. A declared language pack or a recognition score alone does not establish translation quality.</p>
+<div class="table-wrap" role="region" aria-label="Language routes, scroll horizontally on small screens" tabindex="0"><table class="routes"><thead><tr><th>Direction</th><th>Use today</th><th>Evidence and boundary</th></tr></thead><tbody>
+<tr><td>English → Slovak</td><td>Live laptop route; Slovak output remains experimental</td><td>Generated English replay measured below. <a href="../evidence/2026-11-15/D_wait05.json">Route receipt</a>; human meaning and listening review still needed.</td></tr>
+<tr><td>English → Czech</td><td>Available with generic Piper</td><td><a href="../LANGUAGES.md">Language measurements</a>; no matching Nemotron live-route result claimed.</td></tr>
+<tr><td>English → German</td><td>Live route tested on a GPU</td><td><a href="../BENCHMARKS.md">T4 route test</a>; settings differ from the Mac run below.</td></tr>
+<tr><td>German → English</td><td>Available; live use needs testing on your machine</td><td><a href="../LANGUAGES.md">Recognition, translation and whole-chain measurements</a> are component evidence, not sustained meeting acceptance.</td></tr>
+<tr><td>Czech → English</td><td>Primary pair; latency depends on profile</td><td><a href="../LANGUAGES.md">Czech route evidence</a>; see <a href="../../README.md#saved-measurements">saved measurements</a> for onset-to-first-audio timing.</td></tr>
+<tr><td>Slovak → English</td><td>Experimental; low lag needs a faster GPU</td><td><a href="../LANGUAGES.md">Slovak recognition evidence</a>; accented speech can be substantially worse. Low-lag GPU operation remains unproven.</td></tr>
+</tbody></table></div>
+</section>
+<section id="speed">
+<h2>Speed and accuracy</h2>
+<p>Mac M1 Pro, 16 GB · English → Slovak · 60 s generated test-audio replay window (44.46 s of input) · Nemotron streaming recognition + Piper voice. <strong>One run each, generated audio.</strong></p>
+<div class="table-wrap" role="region" aria-label="Mac route results" tabindex="0"><table><thead><tr><th>Setting</th><th>Median lag</th><th>p90 lag</th><th>Drift</th><th>Recognition word error</th></tr></thead><tbody><tr><td>Wait 0.5 s</td><td>0.79 s</td><td>1.39 s</td><td>-0.05 s/min</td><td>5.2%</td></tr><tr><td>Previous setting</td><td>0.75 s</td><td>1.80 s</td><td>See receipt</td><td>See receipt</td></tr></tbody></table></div>
+<p>Lag is measured from a speech fragment's estimated end to the start of translated audio in a simulated sequential player. It includes the playback queue; it is not physical microphone-to-speaker delay. p90 means nine out of ten fragments were at or below that delay. Negative drift means the lag did not grow.</p>
+<p class="source">Sources: <a href="../evidence/2026-11-15/D_wait05.json">D_wait05.json</a> / <a href="../evidence/2026-11-15/D_wait05.score.txt">score</a>; <a href="../evidence/2026-11-15/A_baseline.json">A_baseline.json</a> / <a href="../evidence/2026-11-15/A_baseline.score.txt">score</a>. Recognition error does not measure translation meaning or voice identity. These short runs do not establish performance in a room.</p>
+</section>
+<section id="voices">
+<h2>Voice cloning</h2>
+<p>Piper is the live default: a generic voice, without cloning. The cloning comparisons below are isolated synthesis tests on a <strong>Kaggle Tesla T4, 16 GB</strong>, with <strong>median timing over three repeats</strong> per case after warm-up. They do not establish full-route streaming quality.</p>
+<p class="small">Scroll the comparison horizontally on a phone. RTF is generation time divided by audio duration: below 1 means faster than playback. GPU memory is approximate; receipts record MiB.</p>
+<div class="table-wrap" role="region" aria-label="Voice model comparison, scroll horizontally" tabindex="0"><table class="models"><thead><tr><th>Model</th><th>Languages / delivery</th><th>Time to audio / RTF</th><th>Word error</th><th>GPU memory</th><th>Weight terms / evidence</th></tr></thead><tbody>
+<tr><td>XTTS v2</td><td>English, Czech; no Slovak. Streams audio chunks.</td><td>First audio ≈0.45–0.48 s; RTF 0.52–0.63</td><td>English 0%; Czech 4–10%</td><td>1.9–2.5 GB</td><td>Non-commercial CPML. <a href="../evidence/2026-11-15/kaggle_xtts_t4_results.json">XTTS receipt</a></td></tr>
+<tr><td>X-Voice</td><td>English, Slovak, Czech among 30 advertised languages. Whole phrase only.</td><td>Stage 1 short sentence: 2.2–2.7 s at 16 steps; 4.0–5.1 s at 32 steps. RTF 0.37–0.47 at 16 steps.</td><td>0–11% across stage 1 repeats; case medians 0–8%</td><td>&lt;1.3 GB across tested stages</td><td>CC-BY-NC weights; MIT code. <a href="../evidence/2026-11-15/kaggle_xvoice_t4_results.json">X-Voice receipt</a></td></tr>
+<tr><td>Higgs Audio v3 4B</td><td>English, Slovak, Czech tested; T4 fp16 output failed intelligibility.</td><td>RTF 1.2–1.3; speed is unusable without intelligible speech</td><td>100%</td><td>14.2 GB</td><td>Research / non-commercial; review exact model terms. <a href="../evidence/2026-11-15/kaggle_higgs_t4_fp16_results.json">Higgs receipt</a></td></tr>
+<tr><td>Piper</td><td>Generic voices; no zero-shot cloning</td><td>RTF ≈0.04 CPU baseline; saved short-piece probe 0.07. Live default</td><td>Voice-specific; no comparable clone score</td><td>CPU</td><td>GPL runtime; voice terms vary. <a href="../evidence/2026-11-10/tts_probe_v2_omnivoice_piper.json">CPU probe</a></td></tr>
+<tr><td>OmniVoice</td><td>Batch only for this tool</td><td>Not accepted for live streaming</td><td>Listening review needed</td><td>GPU</td><td>Review weight terms. <a href="../../NOTICE.md">Notice</a></td></tr>
+<tr><td>Fish Audio S2-Pro</td><td>Candidate; not a tested live route</td><td>Not measured here</td><td>Not measured here</td><td>At least 24 GB recommended</td><td>Review model terms before use</td></tr>
+</tbody></table></div>
+<p class="small">X-Voice's short test is one sentence, roughly 3–5 s of speech; stage 1 actually generated 4.6–6.0 s of audio. Longer sentences take longer. Stage 2 was slower and reached 20% median word error in one case; stage 1 is the configuration summarised here. Its paper reports RTF 0.073 on an RTX 4090; that is a publisher result, not measured here (<a href="https://arxiv.org/abs/2605.05611">paper</a>).</p>
+<p class="small">The T4 lacks native bf16. Higgs served in fp16 but was not intelligible; Ampere or newer with 24 GB is the recommended test target, <strong>untested there</strong>. Automated round-trip ASR error is a proxy for intelligibility, not a human listening or voice-identity verdict.</p>
+<aside class="callout"><h3>Which should I use?</h3><ul><li><strong>Live default → Piper.</strong> Start here for a working audio path.</li><li><strong>Czech / English clone with streaming → XTTS.</strong> Best tested synthesis candidate; non-commercial weights and live-route validation still apply.</li><li><strong>Slovak clone → X-Voice on a fast GPU.</strong> Unproven for live use; it waits for a whole phrase.</li></ul></aside>
+</section>
+<section id="hardware">
+<h2>Hardware</h2>
+<div class="grid"><article class="card"><h3>On a laptop</h3><p>Piper voice and Whisper recognition run locally. Apple Silicon offers MLX; Nemotron streaming has a measured English-input route on the M1 Pro. Optional engines need their own packages and assets. CPU-only machines have less latency headroom.</p></article><article class="card"><h3>With an NVIDIA GPU</h3><p>Use GPU compute for cloning experiments and low-lag Slovak input. Ampere or newer with 24 GB is recommended for those experiments, not a proven route guarantee. A T4 can test XTTS and X-Voice but failed intelligible Higgs output.</p></article></div>
+<p class="source"><a href="../LANGUAGES.md">Language and hardware profiles</a> · <a href="#voices">Measured voice memory</a>. Leave headroom for recognition, translation and voice together; isolated model memory does not prove they fit concurrently.</p>
+</section>
+<section id="room">
+<h2>Use it in a conference room</h2>
+<div class="grid"><article class="card"><h3>Feed a meeting or AV mixer</h3><p>Select a virtual cable in the live page's <strong>Output</strong> control, then choose that cable as the meeting application's microphone. Use BlackHole on macOS, VB-Cable on Windows, or a PipeWire/PulseAudio virtual sink on Linux. Keep the source microphone isolated from playback.</p></article><article class="card"><h3>Let listeners choose a language</h3><p>Open <strong>More → Audience broadcast (room mode) → Start room</strong>. Share the audience link or QR code. Listeners open it on their phones, select a language and listen with earbuds. Subtitles can also pop out from the Translation panel.</p></article></div>
+<p>For phone access, serve HTTPS on a trusted network:</p><pre><code>BP_HTTPS=1 BP_HOST=0.0.0.0 make run</code></pre>
+<p>Trust the certificate on each device or provide a trusted certificate. Room mode is experimental; test your actual listener count, network and audio path before an event.</p>
+<p><a href="../INTEGRATION.md">Integration guide: routing, API, deployment checklist and troubleshooting</a></p>
+</section>
+<section id="test">
+<h2>Run your own accuracy test</h2>
+<ol><li>Read and record the matching language in <a href="../reading_script_multilingual.md">the multilingual reading script</a>. Use the actual microphone and room; keep the original recording.</li><li>Score recognition against that script with installed local models.<pre><code>.venv/bin/python scripts/score_reading.py recording.wav en</code></pre></li><li>For a route test, use a prepared, running local backend and replay a recording at real time. These commands are for your own test, after setup.<pre><code>.venv/bin/python scripts/live/paced_replay.py recording.wav --base http://localhost:8000 --src en --tgt sk --tts piper --seconds 60 --out processed/replay.json
+.venv/bin/python scripts/live/score_success.py processed/replay.json reference.json --rate 1.0</code></pre><p class="small"><code>reference.json</code> must describe that recording: <code>text</code> plus <code>sentences</code> entries with <code>text</code>, <code>start</code> and <code>end</code> in seconds. Generated fixtures come from <a href="../../scripts/live/make_test_audio.py">make_test_audio.py</a>. Replay does not score translation meaning; have a bilingual listener review it.</p></li></ol>
+<div class="grid"><article class="card"><h3>Read the scores</h3><p>Word error rate (WER) counts substitutions, missing words and extra words relative to the reference. Lower is better. RTF below 1 means synthesis keeps up with playback. Neither measures translation meaning or whether a clone sounds like its speaker.</p></article><article class="card"><h3>Read the latency chart</h3><p>In <strong>More → Diagnostics: latency and activity log</strong>, each fragment has a stacked bar: hold → STT → MT → TTS-first → queue. Hold is waiting for enough speech; the chart’s Queue / other part is unattributed server time, not measured browser backlog. The 2 s line is a goal, not a promise. Compare the playback backlog separately: a growing backlog means audio is falling behind.</p></article></div>
+<p class="source">Methods: <a href="../../scripts/score_reading.py">score_reading.py</a>, <a href="../../scripts/live/paced_replay.py">paced_replay.py</a>, <a href="../../scripts/live/score_success.py">score_success.py</a>, <a href="../BENCHMARKS.md">benchmarks</a>. First runs may fetch models in scoring tools; provision them before testing offline.</p>
+</section>
+<section id="licences">
+<h2>Licences</h2>
+<p>The code is MIT. Model weights, voice checkpoints and runtimes have their own terms; an open-source code licence does not grant commercial rights to every model.</p>
+<ul><li>Piper runtime: GPL-3.0-or-later, installed separately. Check each voice's licence before redistribution.</li><li>XTTS v2 weights: non-commercial CPML. X-Voice weights: CC-BY-NC. NLLB and SeamlessM4T also carry non-commercial restrictions.</li><li>Higgs and other optional engines need model-specific review. A runtime warning or an available engine does not grant permission.</li></ul>
+<p class="source"><a href="../../LICENSE">MIT licence</a> · <a href="../../NOTICE.md">Third-party notice</a> · <a href="../LICENSE_INVENTORY_2026-11-06.md">Licence inventory</a>. The inventory is a starting point; check the exact checkpoint version's terms.</p>
+</section>
+<section id="limits">
+<h2>Known limits</h2>
+<ul><li>One speaker at a time; overlapping speakers are not separated.</li><li>Noise, accents, language and hardware can change recognition quality and delay.</li><li>Slovak input and cloned voices remain experimental. Successful generation alone does not establish identity or intelligibility.</li><li>Room mode needs validation with your actual devices, languages and listener count.</li><li>Fresh-install and output-device behaviour vary across platforms. Chrome or Edge is required for browser output selection.</li><li>Installation downloads models. Processing stays on the host; optional Google sign-in contacts Google. Shared use needs access, retention and recording policies.</li></ul>
+</section>
+</main>
+<footer><p><a href="../INDEX.md">Documentation</a> · <a href="../../README.md">Repository guide</a> · <a href="../INTEGRATION.md">Integration</a></p><p>Created by Yegor Brusnyak, MIT licence</p></footer>
+</body>
+</html>

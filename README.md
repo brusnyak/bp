@@ -1,145 +1,80 @@
 # Live Speech Translation
 
-Real-time speech translation that runs on your own machine: speak English, hear German, Slovak or Czech a moment later, with live captions on both sides. A research prototype for local meeting translation, with measured routes and experimental features.
+Local speech translation and live captions for calls and presentations. Recognition, translation and generic Piper speech run on your own machine. Personal voice cloning and Slovak input remain experimental.
 
-[![Watch the demo](https://img.youtube.com/vi/_-jwEyGxDYs/maxresdefault.jpg)](https://www.youtube.com/watch?v=_-jwEyGxDYs)
+**[Start with the product site](documentation/site/index.html)** — setup, language routes, measured speed, voice choices, hardware and room integration. Open the HTML file in a browser after cloning. GitHub's file viewer shows its source.
 
-*Click the image to watch the demo on YouTube.*
+Microphone → VAD → speech recognition → translation → voice → speakers / captions. All processing is local after model installation; room listeners receive output over your network.
 
-## What it does
+## Quick start
 
-Microphone → voice-activity detection → speech recognition (STT) → machine translation (MT) → speech synthesis (TTS) → browser playback and captions. Everything runs locally; no audio leaves the machine unless you choose a cloud route.
+Requires Git, Python 3.11 or 3.12, and ffmpeg. Setup downloads dependencies and models; allow disk space and internet access for installation.
+
+```sh
+git clone https://github.com/brusnyak/bp.git
+cd bp
+python3.11 scripts/setup.py --profile mac --langs cs,sk,de
+make run PRESET=mac
+```
+
+Use `mac` for Apple Silicon, `nvidia` for NVIDIA CUDA, or `cpu` for other machines; match the setup profile and `PRESET`. Add `--dev` for test dependencies. On Windows use a Python 3.11 executable for setup, then `.venv\Scripts\python.exe app.py`; the Makefile's preset loader requires a POSIX shell.
+
+Open **http://localhost:8000** in Chrome or Edge. Choose **Try it as a guest** or sign in, select the languages, prepare the route, then choose **Microphone** and **Output**. Use **Test microphone**, wear headphones and press **Start**. Use **Stop** to end capture and queued playback.
+
+The standard Mac setup prepares Whisper. The faster Nemotron streaming result on the product site uses separately provisioned assets; cloning the repository does not install that configuration automatically. Generic voices are included by setup; personal models and recordings are not shipped.
+
+## Choose a route
 
 | Direction | Status |
-|-----------|--------|
-| English → Slovak | Works; the demo route |
-| English → German | Works end to end through the real server on a GPU (`documentation/LANGUAGES.md`); not yet run through the browser UI or on a Mac |
-| English → Czech | Works |
-| Slovak / Czech → English | Experimental: recognition errors are still common on Slovak and Czech speech |
-| Other packs (`languages/packs/`) | Declared; need installed models and a test before use |
+|---|---|
+| English → Czech | Available with Piper; Czech↔English is the primary pair |
+| English → Slovak | Live laptop route measured on generated English; experimental language coverage |
+| English → German | Live route tested on a T4; check your own hardware |
+| German → English | Available; component measurements do not prove sustained live performance |
+| Czech → English | Route measured on a T4; latency depends on profile |
+| Slovak → English | Experimental; low-lag operation needs faster GPU testing |
 
-**Speed and accuracy (measured 2026-11-07; every number below is checked against its saved receipt by `make check-docs`):**
+See [language evidence](documentation/LANGUAGES.md) and the [product site's route table](documentation/site/index.html#routes). Installation and model loading alone do not establish translation meaning or speech quality.
+
+## Connect a call or room
+
+Select a virtual audio device under **Output**, then select its recording end as the meeting application's microphone. For listener phones, open **More → Audience broadcast (room mode) → Start room** and share the link or QR code. Room mode remains experimental.
+
+The [integration guide](documentation/INTEGRATION.md) covers BlackHole, VB-Cable, PipeWire/PulseAudio, subtitles, HTTPS, the HTTP/WebSocket contract and an AV/IT deployment checklist.
+
+## Commands and developer reference
+
+| Command | Purpose |
+|---|---|
+| `make test` | Backend regression suites; requires setup with test dependencies |
+| `make check-docs` | Verify marked measurements against saved receipts |
+| `python3 scripts/check_public_tree.py` | Check tracked public text |
+| `.venv/bin/python scripts/build_site.py` | Rebuild the product site from its template, CSS and receipts |
+| `python3 scripts/check_site_links.py` | Check local site links and anchors without a server |
+| `.venv/bin/python scripts/bp.py selftest` | Check assets and configuration |
+
+[Documentation index](documentation/INDEX.md) · [API and Python SDK](documentation/sdk.md) · [Reading script](documentation/reading_script_multilingual.md) · [Benchmark methods](documentation/BENCHMARKS.md)
+
+## Privacy and licences
+
+The default speech pipeline runs on the processing host without cloud ASR, translation or TTS. Installation downloads models. Optional Google sign-in contacts Google. Shared use needs access, consent and retention policies; uploaded recordings stay on the host.
+
+Code: MIT. Models, voices and runtimes retain their own terms. Piper's runtime is GPL-3.0-or-later; each voice needs its own review. XTTS v2 weights use non-commercial CPML and X-Voice weights use CC-BY-NC. Review [NOTICE.md](NOTICE.md) and the [licence inventory](documentation/LICENSE_INVENTORY_2026-11-06.md) before distributing or operating a shared service. An engine being selectable does not grant commercial rights.
+
+## Saved measurements
+
+<details>
+<summary>Earlier measured configurations and receipt-checked values</summary>
+
+Saved measurements from the earlier Whisper configurations. These are different engines, data and clocks from the Nemotron result on the product site. Marked numbers are checked by `make check-docs`.
 
 - **Live route, EN→SK, M1 Pro, delay from end of speech to the first translated audio** (`scripts/live/paced_replay.py` at 1×, evidence in `documentation/evidence/2026-11-07/`): Whisper `base` median <!-- claim:paced:fw_base_lag_median -->0.82<!-- /claim --> s; `mlx-whisper` large-v3-turbo median <!-- claim:paced:mlx_lag_median -->1.01<!-- /claim --> s; turbo with the pause mirror (below) median <!-- claim:paced:mlx_prosody_lag_median -->1.19<!-- /claim --> s, p90 <!-- claim:paced:mlx_prosody_lag_p90 -->2.65<!-- /claim --> s. An earlier "0.39 s first audio" figure could not be reproduced and was removed.
 - **Speech recognition, Kaggle T4, mean word error on FLEURS read speech (60 clips per language)**, German: base 18.1%, small <!-- claim:stt:whisper-small:de:wer -->10.9<!-- /claim -->%, large-v3-turbo <!-- claim:stt:whisper-large-v3-turbo:de:wer -->4.8<!-- /claim -->%, Parakeet v3 <!-- claim:stt:parakeet-tdt-v3:de:wer -->6.3<!-- /claim -->%. Czech: turbo <!-- claim:stt:whisper-large-v3-turbo:cs:wer -->11.6<!-- /claim -->% (base 67%). Slovak: turbo <!-- claim:stt:whisper-large-v3-turbo:sk:wer -->10.7<!-- /claim -->%, Parakeet <!-- claim:stt:parakeet-tdt-v3:sk:wer -->9.9<!-- /claim -->%. Turbo wins German, Czech, Polish and English; Parakeet wins French and Slovak by under 2 points. Full table: `documentation/evidence/2026-11-07/lang_matrix.json`. Parakeet ran on CPU in that run (no CUDA provider), so its speed there is not a GPU number.
 - **Translation, same T4 run, chrF on 200 opus-100 test sentences (relative scores):** German→English Opus-MT <!-- claim:mt:opus-mt:de:to_en:chrf -->57.9<!-- /claim --> versus NLLB-1.3B 54.6; Opus-MT won every language/direction cell measured, 4–8× faster.
 - **CS→EN on Kaggle T4, full route (`route_receipt.json`):** default profile p50 <!-- claim:kaggle:default:p50 -->3.48<!-- /claim --> s, p95 <!-- claim:kaggle:default:p95 -->4.13<!-- /claim --> s from speech onset to first audio. The shorter 1.0 s-segment profile reaches p50 1.87 s / p95 4.26 s (choppier output). Earlier figures of 1.86/4.22 s belonged to that profile, not the default.
-**Streaming foundation (Kaggle T4 simulation, offline replay of the test speaker's English reading and a 2-minute German FLEURS stream; `documentation/evidence/2026-11-07/stream_sim.json`).** Latency is the time from a word being spoken until it is committed. Independent 2 s chunks (the current live route) with Whisper turbo: median <!-- claim:sim:en-owner|turbo|chunk-2.0:lat -->1.17<!-- /claim --> s but <!-- claim:sim:en-owner|turbo|chunk-2.0:wer -->19.1<!-- /claim -->% word error (German <!-- claim:sim:de-fleurs|turbo|chunk-2.0:wer -->33.1<!-- /claim -->%), because words are cut at chunk edges. Decoding the growing buffer every 1.0 s and committing only words two consecutive decodes agree on: median <!-- claim:sim:en-owner|turbo|agree-1.0:lat -->2.31<!-- /claim --> s and <!-- claim:sim:en-owner|turbo|agree-1.0:wer -->5.0<!-- /claim -->% error (German <!-- claim:sim:de-fleurs|turbo|agree-1.0:wer -->11.2<!-- /claim -->%). A 0.5 s step gives <!-- claim:sim:en-owner|turbo|agree-0.5:lat -->1.45<!-- /claim --> s and <!-- claim:sim:en-owner|turbo|agree-0.5:wer -->12.3<!-- /claim -->% but the engine falls up to 2 s behind; 0.3 s collapses (queue of 30 s). Parakeet is cheap per step (real-time factor 0.1–0.3) and reaches 1.2 s at 0.3 s steps, with <!-- claim:sim:en-owner|parakeet|agree-0.3:wer -->26.4<!-- /claim -->% error. No setting reached under 1 s with under 10% error.
+**Streaming foundation (Kaggle T4 simulation, offline replay of the test speaker's English reading and a 2-minute German FLEURS stream; `documentation/evidence/2026-11-07/stream_sim.json`).** Latency is the time from a word being spoken until it is committed. Independent 2 s chunks (the measured configuration) with Whisper turbo: median <!-- claim:sim:en-owner|turbo|chunk-2.0:lat -->1.17<!-- /claim --> s but <!-- claim:sim:en-owner|turbo|chunk-2.0:wer -->19.1<!-- /claim -->% word error (German <!-- claim:sim:de-fleurs|turbo|chunk-2.0:wer -->33.1<!-- /claim -->%), because words are cut at chunk edges. Decoding the growing buffer every 1.0 s and committing only words two consecutive decodes agree on: median <!-- claim:sim:en-owner|turbo|agree-1.0:lat -->2.31<!-- /claim --> s and <!-- claim:sim:en-owner|turbo|agree-1.0:wer -->5.0<!-- /claim -->% error (German <!-- claim:sim:de-fleurs|turbo|agree-1.0:wer -->11.2<!-- /claim -->%). A 0.5 s step gives <!-- claim:sim:en-owner|turbo|agree-0.5:lat -->1.45<!-- /claim --> s and <!-- claim:sim:en-owner|turbo|agree-0.5:wer -->12.3<!-- /claim -->% but the engine falls up to 2 s behind; 0.3 s collapses (queue of 30 s). Parakeet is cheap per step (real-time factor 0.1–0.3) and reaches 1.2 s at 0.3 s steps, with <!-- claim:sim:en-owner|parakeet|agree-0.3:wer -->26.4<!-- /claim -->% error. No setting reached under 1 s with under 10% error.
 
-- **Your own voice matters:** the same Slovak script scores 11.5% word error when read by a Slovak Piper voice and 35.4% when read by a non-native speaker (large-v3-turbo, Mac). Slovak→English is experimental for that reason; the model is not the only limit.
-- **Test status:** 124 backend tests pass on macOS (`make test`, 2026-11-08). CI: Ubuntu and Windows pass; the macOS job failed once on `vad_tests.py::test_vad_long_speech_streaming` (timing-sensitive; passes locally).
 
-## How it compares with Google, Microsoft and OpenAI (read from their own pages 2026-11-08; details and sources in `documentation/NEAR_REALTIME_GOAL.md`)
+</details>
 
-The goal is to match what the three ship, not to beat it: the translated voice starts while the speaker is still talking and stays a few seconds behind.
-
-| | Google (Gemini 3.5 Live Translate) | Microsoft (Teams Interpreter) | OpenAI (gpt-realtime-translate) | This project |
-|---|---|---|---|---|
-| Design | One speech-to-speech model; keeps the speaker's intonation, pacing and pitch | Cascade: recognition, English text, translation, voice; can simulate the speaker's voice | Streaming speech-to-speech model | Cascade: recognition, translation, voice (same design as Microsoft) |
-| Lag | "a few seconds behind" (no number published) | not stated | not stated | 3.0-3.6 s median on an M1 Pro, goal 2.0 s (maintainer 2026-11-10, was 3.0 s); about 2.3-2.9 s on a Kaggle T4 simulation at 6-17% word error (`documentation/STATUS.md`) |
-| Slovak | On the Meet language list | not read | On the language list | Output and input work; Slovak input needs the Slovak fine-tune (17.7% vs 45% plain turbo on the test speaker's speech) |
-| Access | Meet: paid Google plan; developers: Live API preview | Copilot or Teams Premium licence, guests excluded | API, usage-priced | Runs on your own machine; no cloud, licence or per-minute fee; you supply the hardware |
-| Voice | Replicated inside the model (Google's docs call consistency uneven in the API) | Simulated voice | not read | Piper voices live; a cloned voice is being re-evaluated (OmniVoice clones zero-shot on a GPU but does not stream, so it is batch/QC only, maintainer 2026-11-10); pitch contour is not carried across languages |
-
-**Where it competes:** same behaviour (mid-sentence start, lag of a few seconds, on the best settings measured so far), same architecture as Microsoft's, and it is the only one of the four that runs without a cloud account, subscription or licence, with your own audio staying local.
-
-**Where it does not:** no side-by-side test against the three exists, so "comparable" means the same behaviour class, not the same quality. On a 16 GB M1 Pro the lag sits 1.0-1.6 s above the 2 s goal (3.0-3.6 s measured); the streaming recogniser (Voxtral Realtime) that should remove that floor is wired in but not yet proven and needs a GPU machine (`documentation/STATUS.md`, "Mac ceiling"). Pitch and intonation transfer across languages is not built.
-
-## Quick start
-
-```bash
-git clone https://github.com/brusnyak/bp.git
-cd bp
-python3.11 scripts/setup.py --profile mac --langs de,sk   # venv, dependencies, .env, voices, models for your hardware
-make run PRESET=mac                                         # http://localhost:8000
-```
-
-Profiles: `mac` (Apple Silicon, MLX), `nvidia` (CUDA), `cpu`; languages `de,sk,cs,fr,pl` (see `documentation/LANGUAGES.md` for the measured best configuration per language, `documentation/DEMO.md` for a presentation walkthrough). Add `--dev` for the test dependencies. Needs Python 3.11 or 3.12 and ffmpeg.
-
-Open **http://localhost:8000** in Chrome or Edge (plain HTTP on `localhost` counts as a secure page, so the microphone works and there is no certificate warning). Press **Try it as a guest** (or create an account), pick the direction, press **Initialize**, run the sound check, then **Start**.
-
-- Use headphones, or route playback to a virtual cable (BlackHole on macOS, VB-Cable on Windows), so the translation does not feed back into the microphone. The app detects a virtual cable and offers it as an output.
-- Another device on the network (phone, second laptop) needs HTTPS: run `BP_HTTPS=1 BP_HOST=0.0.0.0 make run`. This uses the self-signed certificate in `certs/`, which browsers warn about once.
-- Safari and Firefox cannot choose the audio output device.
-
-### Useful commands
-
-| Command | Purpose |
-|---------|---------|
-| `make test` | Backend regression suite (offline) |
-| `make demo-check` | Pre-flight for a live demo: assets and the running server |
-| `.venv/bin/python scripts/bp.py selftest` | Asset and configuration checks |
-| `python3 scripts/live/paced_replay.py <audio> --src en --tgt sk` | Replay a recording through the real WebSocket route at real time; reports per-segment lag |
-
-### Configuration (environment variables)
-
-| Variable | Default | Effect |
-|----------|---------|--------|
-| `BP_GUEST` | on for loopback | `1` allows no-account guest sessions on a network-exposed server, `0` disables them. Guests cannot manage voices |
-| `BP_PORT` / `BP_HOST` | `8000` / `localhost` | Listen address. Anything other than loopback exposes open registration: use only on a trusted network |
-| `BP_HTTPS` | off | `1` serves HTTPS with `certs/` |
-| `BP_VAD_MAX_SEGMENT_S`, `BP_VAD_SILENCE_S` | `3.0`, `0.25` | Longest segment and pause that closes it. Shorter = lower delay, choppier translation |
-| `BP_SILENCE_RMS` | `0` (off) | Pre-VAD volume gate. The old default `0.02` dropped quiet speech |
-| `BP_STT_STEP_S` | `0.5` | STT step interval (seconds) — how often to run STT on the audio buffer |
-| `BP_STT_WINDOW_S` | `2.0` | STT audio window size (seconds) |
-| `BP_SILENCE_GAP_S` | `0.3` | Gap between words that starts a new phrase (seconds) |
-| `BP_UTTERANCE_SILENCE_S` | `0.8` | Silence that ends an utterance (seconds) |
-| `BP_MIN_UTTERANCE_S` | `1.0` | Minimum utterance length for STT (seconds) |
-| `BP_ENABLE_RATE_LIMIT` | off on loopback, on otherwise | Limits registration, login and uploads. `0` disables, `1` forces on |
-| `BP_LOG_SESSIONS` | off | `1` writes transcripts and translations to `processed/sessions/` (personal data; tell participants) |
-| `BP_INCREMENTAL` | off | Accurate streaming route: decodes the growing buffer and commits words two decodes agree on. On in the `nvidia` preset with `BP_INCR_STEP_S=1.0` (validated on a T4: English to German delay 3.9 s to 1.6 s). A step below 1.0 s collapses the queue |
-| `BP_SK_STT_MODEL` | built-in | Slovak recognition model name or CTranslate2 directory |
-| `BP_STT_ENGINE` | `faster_whisper` | Speech recognition engine. `mlx_whisper` = large-v3-turbo on the Apple GPU (macOS arm64; `pip install mlx-whisper`) |
-| `BP_MLX_MODEL` | `mlx-community/whisper-large-v3-turbo` | Model repo for `mlx_whisper` |
-| `BP_PROSODY` | `1` | Mirror the speaker's pauses and speaking pace in the translated audio (Piper voices). `0` = play phrases back-to-back as before |
-| `BP_PROSODY_EXTRA_LAG_S` | `0.6` | Slack that makes pause mirroring possible: more mimicry = more delay (median +0.18 s measured) |
-| `BP_PROSODY_MAX_LEAD_S`, `BP_PAUSE_COMMA_S`, `BP_PAUSE_SENTENCE_S` | `2.0`, `0.25`, `0.5` | Longest pause added before a segment; silence after a comma / sentence end inside one translation |
-| `BP_STT_HALLUCINATION_GUARD` | `1` | Drop loops ("1-1-1-…"), caption credits and stock phrases on short noise slices (mlx engine). `0` disables |
-| `BP_ROOM_MAX_LISTENERS`, `BP_ROOM_MAX_LANGS` | `50`, `6` | Room mode limits: listeners per room and distinct languages (each language costs one translation and one voice) |
-| `BP_STT_CONTEXT` | `0` | `1` feeds the previous sentence to the recogniser as context. Off: its first live test produced a repetition loop |
-| `BP_DEVICE`, `BP_MT_DEVICE` | auto | `cpu` or `cuda` for STT and MT |
-
-## The stack
-
-| Stage | Default engine | Licence | Optional |
-|-------|---------------|---------|----------|
-| VAD | WebRTC VAD | BSD-3 | Silero VAD |
-| STT (EN) | Whisper `base` int8 via faster-whisper (what `setup.py` installs) | MIT | `mlx-whisper` large-v3-turbo on Apple Silicon (`BP_STT_ENGINE=mlx_whisper`, recommended), faster-whisper large-v3-turbo on CUDA, Parakeet TDT v3 (CC-BY-4.0, not installed by setup) |
-| STT (SK/CZ) | Whisper `small-sk`/`small` int8 | MIT | `large-v3-turbo` (10.7% Slovak / 11.6% Czech on T4, see above); `kinit/whisper-large-v3-turbo-sk` via `BP_SK_STT_MODEL` needs CTranslate2 conversion, untested here |
-| MT | Opus-MT, CTranslate2 int8 | CC-BY-4.0 | MADLAD-3B (CUDA) |
-| TTS | Piper | GPL-3.0-or-later runtime (not bundled; user installs via `setup.py --dev`); each voice has its own licence | Kokoro 82M (English), OmniVoice cloning (GPU, research) |
-
-## Project structure
-
-| Path | Purpose |
-|------|---------|
-| `app.py` | FastAPI app, WebSocket server, serves the UI |
-| `backend/` | STT/MT/TTS/VAD engines, model pooling, registry, pipeline |
-| `languages/packs/*.json` | Language packs: models, voice, segmentation per direction |
-| `ui/` | Browser interface (plain HTML/CSS/JS, installable PWA) |
-| `scripts/` | Setup, CLI (`bp.py`), benchmarks, Kaggle jobs (`scripts/gpu_bench/`) |
-| `test/` | pytest suites; Node playback tests: `node --test test/session_playback_test.cjs` |
-| `documentation/` | technical report draft, findings, research, runbooks |
-
-More: `PRODUCT.md` (positioning), `documentation/STATUS.md` (where the project stands), `AGENTS.md` (project memory), `documentation/implementation-2026-11-04/` (latest measurements).
-
-## Integration (conference rooms and meeting applications)
-
-| Mode | Status | How |
-|------|--------|-----|
-| One person, one direction, into Teams/Zoom | Works | Browser session plus a virtual audio cable (BlackHole, VB-Cable) as playback device and meeting microphone |
-| Captions only | Works | Live page subtitle strip and pop-out window |
-| Per-seat broadcast (one speaker, many listeners, each with their own language and earbuds) | Built and unit-tested; real-model test pending | Speaker: normal session with `?room=ID` on the live page. Listeners: `/ui/listen/listen.html?room=ID`. One translation and voice per language, not per listener. `documentation/STATUS.md` |
-| Multi-speaker meeting with overlap | Not built | One stream per participant is the cheapest route; speaker separation is future work |
-
-Interface contract: `POST /api/guest` or `/api/login` returns a token; open `ws://HOST/ws?token=TOKEN`, send the config message, stream 16 kHz audio; read `transcription_result`, `translation_result` and binary WAV `tts_audio` messages. Capacity measured on one T4 (English to Slovak, continuous speech): about 4 simultaneous sessions with median lag under 1.5 s, 8 sessions 3.7 s.
-
-## Privacy
-
-Recognition, translation and synthesis run locally. Session logs are off by default. Sign-in uses a local database; Google sign-in is optional and talks to Google. Voice recordings you upload stay on the machine, are tied to your account and are not used outside it. A shared deployment needs its own retention and access policy.
-
-## Status and licence
-
-**Not yet a commercial release.** The honest state, with what works, what is built but not yet validated (room mode with one voice and language per listener), what is not built (cloned voices for listeners) and what to do next, is in [`documentation/STATUS.md`](documentation/STATUS.md). Measurements and how to reproduce them: [`documentation/BENCHMARKS.md`](documentation/BENCHMARKS.md).
-
-Licences: this repository is MIT and ships no model weights; `setup.py` downloads each model from its publisher, so you accept each model's licence when you choose it (list: `documentation/LICENSE_INVENTORY_2026-11-06.md`; Piper is GPL-3.0-or-later and is installed separately, OmniVoice and XTTS weights are non-commercial). If you run it as a shared service for other people you are the operator: pick models whose licences allow that. The registry gate (`backend/registry.py`) blocks engines marked non-commercial in commercial mode but is not a legal audit.
+Created by Yegor Brusnyak, MIT licence
