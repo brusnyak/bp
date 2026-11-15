@@ -446,7 +446,7 @@
     .matrix-scroll { overflow: visible; }
   }
 
-  /* Handler reading surface: concise summary, evidence table, optional archive. */
+  /* reviewer reading surface: concise summary, evidence table, optional archive. */
   .wrap { max-width: 1120px; }
   .topbar { padding-bottom: 4px; }
   .matrix-scroll { padding: 12px 16px; }
@@ -529,7 +529,7 @@
 </head>
 <body>
   <aside role="note" style="padding:1rem;max-width:75ch;margin:1rem auto">
-    <strong>Aktualizácia 4. 11. 2026:</strong> Opravy autentifikácie, hlasov, prípravy zvuku a zastavenia sú lokálne overované; produkt nie je komerčne pripravený ani integrovaný do LHC. Nový T4 test OmniVoice dokončil 12 TTS prípadov a 9 simulovaných časových plánov. Prvé celé frázy boli dostupné za 0,56–1,04 s, no simulované oneskorenie prehrávania SK dosiahlo 7–8 s. Nejde o test živého STT→MT→TTS ani natívneho streamovania. Sluchová kvalita a identita klonu čakajú na posúdenie. Staršie údaje nižšie sú archív; pozri documentation/implementation-2026-11-04/RESULTS.md. Zverejnená GitHub Pages kópia nebola týmto lokálnym zásahom aktualizovaná.
+    <strong>Aktualizácia 4. 11. 2026:</strong> Opravy autentifikácie, hlasov, prípravy zvuku a zastavenia sú lokálne overované; produkt nie je komerčne pripravený ani integrovaný do conference-room. Nový T4 test OmniVoice dokončil 12 TTS prípadov a 9 simulovaných časových plánov. Prvé celé frázy boli dostupné za 0,56–1,04 s, no simulované oneskorenie prehrávania SK dosiahlo 7–8 s. Nejde o test živého STT→MT→TTS ani natívneho streamovania. Sluchová kvalita a identita klonu čakajú na posúdenie. Staršie údaje nižšie sú archív; pozri documentation/implementation-2026-11-04/RESULTS.md. Zverejnená GitHub Pages kópia nebola týmto lokálnym zásahom aktualizovaná.
   </aside>
 <a class="skip-link" href="#main-content">Preskočiť na obsah</a>
 
@@ -549,7 +549,7 @@
 
   <header class="hero">
     <h1>Lokálny preklad reči.<br>Čo funguje a čo treba overiť.</h1>
-    <p class="lede">Prototyp bakalárskej práce pre online konferencie. Anglický vstup má zaznamenaný živý beh; <b>slovenský vstup zostáva experimentálny</b>. Tento prehľad oddeľuje merania komponentov od overenia celej jazykovej cesty.</p>
+    <p class="lede">Lokálny výskumný prototyp pre online konferencie. Anglický vstup má zaznamenaný živý beh; <b>slovenský vstup zostáva experimentálny</b>. Tento prehľad oddeľuje merania komponentov od overenia celej jazykovej cesty.</p>
     <div class="meta-row"><span>Aktualizácia <b>3. november 2026</b></span><span>CPU baseline: <b>faster-whisper → Opus-MT → Piper</b></span><span>GPU testy: <b>Kaggle T4</b></span></div>
   </header>
 
@@ -613,7 +613,7 @@
   </section>
 
   <section id="funding">
-    <div class="sec-head"><h2>Čo má priniesť ďalší GPU test</h2><p class="sec-sub">Najprv využiť bezplatný Kaggle alebo univerzitný server. Prenájom a nové odoslanie hlasových dát vyžadujú samostatné rozhodnutie.</p></div>
+    <div class="sec-head"><h2>Čo má priniesť ďalší GPU test</h2><p class="sec-sub">Najprv využiť bezplatný Kaggle alebo dostupný GPU server. Prenájom a nové odoslanie hlasových dát vyžadujú samostatné rozhodnutie.</p></div>
     <dl class="research-questions">
       <div><dt>Presnejší slovenský vstup</dt><dd>Canary: merať slovenský prepis proti slovenskému textu. Priamy preklad do EN hodnotiť proti nezávislej anglickej referencii.</dd></div>
       <div><dt>Rýchly anglický výstup</dt><dd>Kokoro má zaznamenané RTF ~0,03 na T4 pre pripravené hlasy. Tento test nedokazuje klonovanie vlastného hlasu. Qwen3-TTS a Chatterbox ostávajú kandidáti.</dd></div>
@@ -729,8 +729,8 @@
       </div>
       <div class="tl-row">
         <div class="tl-date">2026-11-03</div>
-        <div class="tl-what">LHC — Laboratórium hybridnej komunikácie, FEI STU<small>fei.stuba.sk</small></div>
-        <div class="tl-so">B405, 4. poschodie, blok B. Laboratórium pre stretnutia s fyzicky prítomnými a diaľkovými účastníkmi. Predpokladaná cieľová integrácia: vivý preklad reči ako feature LHC hybridného stretnutia. Konkrétny software / audio rozhranie / SDK neoverené — pýtať sa vedúceho.</div>
+        <div class="tl-what">conference-room — Laboratórium hybridnej komunikácie, project project<small>project.stuba.sk</small></div>
+        <div class="tl-so">Priestor pre stretnutia s fyzicky prítomnými a diaľkovými účastníkmi. Možná integrácia: živý preklad reči počas hybridného stretnutia. Konkrétny softvér, zvukové rozhranie a SDK treba overiť pre každé nasadenie.</div>
         <span class="verdict watch">Otázka</span>
       </div>
     </div>

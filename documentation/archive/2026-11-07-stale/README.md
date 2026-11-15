@@ -1,11 +1,11 @@
 # Live Speech Translation — Project Overview
 
-> Current repair state (2026-11-04): start with `PRODUCT.md`, `documentation/implementation-2026-11-04/RESULTS.md` and `documentation/HANDOFF_NEXT_SESSION.md`. Earlier dated counts, readiness claims, media-access behavior and Kaggle failure explanations below are historical. Current contracts require authenticated explicit preparation, offline assets, target-language TTS, terminal Stop and reviewed full-route evidence. Full cloned-speech/LHC/commercial acceptance remains pending.
+> Current repair state (2026-11-04): start with `PRODUCT.md`, `documentation/implementation-2026-11-04/RESULTS.md` and `documentation/HANDOFF_NEXT_SESSION.md`. Earlier dated counts, readiness claims, media-access behavior and Kaggle failure explanations below are historical. Current contracts require authenticated explicit preparation, offline assets, target-language TTS, terminal Stop and reviewed full-route evidence. Full cloned-speech/conference-room/commercial acceptance remains pending.
 
 Real-time, local-first speech translation for online conferences. Captures microphone
 audio, transcribes (STT), translates (MT), synthesizes the translated speech (TTS), and
 plays it back — with subtitles, latency charts, and optional voice cloning. Built as a
-bachelor thesis (STU FEI, EN↔SK focus) and designed to be swap-any-engine and
+a research prototype (local deployment, EN↔SK focus) and designed to be swap-any-engine and
 configurable so it can run on a laptop or a T4-class GPU server.
 
 ## What the project is (and isn't)
@@ -39,7 +39,7 @@ configurable so it can run on a laptop or a T4-class GPU server.
 | STT (EN) | faster-whisper `base` int8 | MIT | Parakeet EN, Qwen3-ASR |
 | STT (SK) | faster-whisper `small-sk` int8 | MIT | Canary AST (STT+MT collapse, untested on SK) |
 | MT | Opus-MT CT2 int8 per pair | CC-BY-4.0 | MADLAD-3B (CUDA), NLLB (CC-BY-NC, blocked) |
-| TTS (SK) | Piper (owner fine-tune / generic) | GPL-3.0-or-later | SeamlessM4T v2 S2S (prosody, CC-BY-NC, blocked) |
+| TTS (SK) | Piper (custom fine-tune / generic) | GPL-3.0-or-later | SeamlessM4T v2 S2S (prosody, CC-BY-NC, blocked) |
 | TTS (EN) | Piper | GPL-3.0-or-later | Kokoro 82M (RTF 0.03, 1.33 GB VRAM on T4) |
 
 Default engines are commercial-safe (faster-whisper/CT2 MIT/Apache-2.0, Opus-MT CC-BY-4.0,
@@ -55,7 +55,7 @@ licence gate — they cannot be selected in the default profile without explicit
 | SK→EN | whisper-small-sk ~1.3 s | Opus-MT ~0.08 s | Piper ~0.07 s | ~1.27–1.64 s (STT-bound; experimental, WER 0.25–0.32 > 0.2 gate) |
 | CS→EN | whisper-base (CPU) poor quality | Opus-MT ~0.04 s | Piper ~0.04 s | RTF 1.127 on CPU — not trusted; near real-time on Kaggle T4 GPU (p50 1.86s, p95 4.22s) |
 
-SK→EN is the bottleneck and the weak direction — experimental only, honest about it in the thesis.
+SK→EN is the bottleneck and the weak direction — experimental only, honest about it in the technical report.
 
 ## Quick start (zero-knowledge user)
 
@@ -109,7 +109,7 @@ SK→EN quality until a challenger crosses the 0.2 WER gate.
 | `scripts/` | `setup.py`, `bp.py` CLI, bench, conversion, evaluation tooling |
 | `scripts/bp.py` | Single CLI entry: `bp language|engine|stt|e2e|selftest` |
 | `test/` | pytest suites (87 tests) |
-| `documentation/` | Thesis draft, findings, research, runbooks |
+| `documentation/` | technical report draft, findings, research, runbooks |
 | `specs/003-end-to-end-completion/` | Feature spec: any-language, swap-any-engine, plug-and-play |
 
 ## Key documents

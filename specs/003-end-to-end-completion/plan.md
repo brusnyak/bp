@@ -7,7 +7,7 @@
 
 Turn the prototype into an any-language, swap-any-engine, one-command, server-capable
 system, with Path B (real-call capture/output) as the usable-product track. The cascade
-stays the default and the thesis contribution; unified S2S engines are optional adapters.
+stays the default and the technical report contribution; unified S2S engines are optional adapters.
 Do it in four milestones, each independently demoable and gated by the existing tests +
 a new stage gate.
 
@@ -102,15 +102,15 @@ documentation/sdk.md              # public surface (FR-012)
 
 | Item | Why | Constitution tension | Resolution |
 |---|---|---|---|
-| Language packs + registry | "any language, swap anything" is explicit owner direction | VI (YAGNI): adds indirection | Indirection is the requirement here; keep wrappers thin, no new deps. |
+| Language packs + registry | "any language, swap anything" is explicit maintainer direction | VI (YAGNI): adds indirection | Indirection is the requirement here; keep wrappers thin, no new deps. |
 | Path B audio routing | no user path without it | V (plug-and-play) supports it | automate per-OS; no manual README steps. |
-| **Principle III amendment** | Slovak stays reference, but "any language" is now in scope | III currently says Slovak is the only non-negotiable pair | Amend III to "Slovak is the reference pair; any pair meeting the support bar is supported". Requires owner sign-off + version bump. |
+| **Principle III amendment** | Slovak stays reference, but "any language" is now in scope | III currently says Slovak is the only non-negotiable pair | Amend III to "Slovak is the reference pair; any pair meeting the support bar is supported". Requires maintainer sign-off + version bump. |
 
 ## Risks
 
-- **Scope**: four milestones is a lot. M1/M2 are the thesis-critical set; M3/M4 are the
+- **Scope**: four milestones is a lot. M1/M2 are the core set; M3/M4 are the
   product set. If time is short, ship M1+M2 and keep M3/M4 specified (this is exactly the
-  track split the owner asked for).
+  track split the maintainer asked for).
 - **Licence**: a tempting model (Seamless/NLLB) is non-commercial; the gate exists for this.
 - **Windows/CPU quality**: cloned voice needs a GPU; keep the Piper CPU baseline honest
   and labelled.

@@ -97,7 +97,7 @@
 |-----------|-------|
 | Parameters | 0.4B |
 | Languages | 30 including **SK and CZ** (paper tables 5-6) |
-| License | Code MIT, weights **CC-BY-NC** (thesis OK, product no) |
+| License | Code MIT, weights **CC-BY-NC** (technical report OK, product no) |
 | Size / runtime | 0.4B PyTorch; README lists Apple Silicon install variant |
 | RTF | Vendor 0.073 on RTX 4090; Mac MPS RTF 2.9–4.2 (too slow); T4 RTF 0.61–0.80 (measured) |
 | Voice cloning | Zero-shot cross-lingual cloning |
@@ -168,7 +168,7 @@
 
 | Model | SK? | Reason excluded |
 |-------|-----|----------------|
-| Parakeet-TDT v3 | Yes (25 EU langs incl SK) | Already measured: WER 0.58–0.63 on owner SK mic — accuracy not viable |
+| Parakeet-TDT v3 | Yes (25 EU langs incl SK) | Already measured: WER 0.58–0.63 on maintainer SK mic — accuracy not viable |
 | Nemotron 3.5 ASR streaming | Yes (broad tier) | Already benched negative: SK WER 0.75–0.86, language drift |
 | Canary AST | Yes (25 EU langs) | chrF++ ~52 on SK→EN — below commercial bar; speed path only |
 | SeamlessM4T v2 | SK speech-in, no SK speech-out | RTF 0.77–0.99, OOMs 16GB Mac; not SK output |
@@ -264,4 +264,4 @@ Neo browser is connected (session `opencode/rapid-alpaca`). Ready to push Kaggle
 
 ---
 
-**Handler message: POSTPONED until after Kaggle TTS standalone tests are complete (next week), per owner decision.**
+**reviewer message: POSTPONED until after Kaggle TTS standalone tests are complete (next week), per project decisions.**

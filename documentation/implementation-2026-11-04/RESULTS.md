@@ -2,7 +2,7 @@
 
 ## Verdict
 
-Reviewed configuration, authentication, voice-selection, lifecycle and evidence defects were repaired. The full cloned-speech meeting product is **not commercially ready** and LHC integration remains an audio-adapter assumption. This is a local uncommitted repair batch, not a deployment or accepted university integration.
+Reviewed configuration, authentication, voice-selection, lifecycle and evidence defects were repaired. The full cloned-speech meeting product is **not commercially ready** and conference-room integration remains an audio-adapter assumption. This is a local uncommitted repair batch, not a deployment or accepted meeting integration.
 
 ## Implemented
 
@@ -14,7 +14,7 @@ Reviewed configuration, authentication, voice-selection, lifecycle and evidence 
 - Enrollment preserves acknowledged uploads across retry, snapshots recording language, releases capture on failures and never reports processing failure as completion. Password/Google login preserve an allowlisted return destination; token console logging removed.
 - Private recordings/metadata/QC are restricted; unowned legacy recordings were not relabelled public. No public-demo consent is inferred from a null user id. The private research library is intentionally not available through the shared app. Personal research access/export remains a separate requirement.
 - Evaluator includes MT and wall timing. Source WER alone cannot verify a route; fingerprints include actual assets, code, runtime versions/settings and matching references/output hashes, with reviewed STT/meaning/intelligibility/live/policy decisions.
-- PRODUCT.md records full-cloning acceptance and provisional LHC scope. README/SDK/current entry points and local report corrected; historical documents remain dated. Hosted Pages was not published.
+- PRODUCT.md records full-cloning acceptance and provisional conference-room scope. README/SDK/current entry points and local report corrected; historical documents remain dated. Hosted Pages was not published.
 
 ## Delegation and review
 
@@ -31,7 +31,7 @@ Initial roast found five substantive issues in the first repair draft: late soun
 - Kaggle harness unittest discovery → **5 passed**, including real sample-format normalization and backlog math.
 - BrowserOS Neo, owned loopback tab only: home/live examined at 390px and 1440px; horizontal scroll equals viewport; inspected screenshots and corrected hero foreground/background/secondary CTA contrast. This is targeted visual review, not a full WCAG/projector acceptance.
 - Browser invalid-JWT test: actionable expired-sign-in state, credential cleared, Start disabled; no model preparation. Browser console read showed expected unavailable-device/no-token warnings without an observed uncaught error in that read.
-- Browser isolated in-memory account: actual registration/password login returned to requested enrollment page; authenticated live connection waited for explicit preparation; actual EN→SK models loaded while route remained experimental. No university credentials or owner account were used.
+- Browser isolated in-memory account: actual registration/password login returned to requested enrollment page; authenticated live connection waited for explicit preparation; actual EN→SK models loaded while route remained experimental. No shared deployment credentials or maintainer account were used.
 - Browser suspended-device-enumeration probe: mocked mic/recorder, cancelled preparation while enumeration awaited, then resumed it → **0 audio plays**, stopped tracks; no physical microphone captured. The fake APIs were removed by reload.
 - Demo asset check: `scripts/demo_preflight.py` passed required local assets; optional OpenVoice converter absent. Asset availability is not a clone/full-route pass.
 - JS parse checks and `git diff --check` passed at repair checkpoints. See final appended checks below for the last working-tree state.
@@ -44,11 +44,11 @@ The previous latest failure was reference WAV format validation after successful
 
 See [Kaggle report](kaggle-report.md) and [sanitized receipt](kaggle-sanitized-receipt.json). Raw outputs/reference corpus remain gitignored and must not be committed.
 
-## Remaining commercial/university gates
+## Remaining commercial/shared-deployment gates
 
 1. Human bilingual listening/identity grades for the actual clone outputs; select the exact model/voice route and processing host against that evidence.
 2. Continuous complete STT→MT→cloned-TTS→listener rehearsal on intended compute, with p50/p95 speech-end→first-audio, source loss, memory and queue growth; agree limits before measuring. GPU synthesis speed alone does not solve playback duration.
-3. Actual LHC room audio/input/return channels, echo isolation, machine/OS, permissions and supervisor acceptance. No more details were available from the owner in this chat.
+3. Actual conference-room room audio/input/return channels, echo isolation, machine/OS, permissions and reviewer acceptance. No more details were available from the maintainer in this chat.
 4. Per-OS clean-machine setup and virtual-device provisioning, physical mic/output/projector/permission/device-loss/reconnect/Stop tests, capacity and restore/support runbook.
 5. Deployment-specific privacy/retention and full code/model/voice/dataset licence inventory. Installed `piper-tts 1.3.0` metadata says GPL-3.0-or-later, matching [upstream](https://github.com/OHF-Voice/piper1-gpl); README/registry corrected from MIT. This is a factual correction, not legal clearance or permission to distribute every checkpoint. [OmniVoice upstream](https://huggingface.co/k2-fsa/OmniVoice) locates the API/model; BP's own receipts decide performance.
 6. Approve public demo assets separately, and reconcile/publish the separate hosted report only with explicit authorization. No remote git push, deployment or publication occurred.

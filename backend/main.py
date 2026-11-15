@@ -522,7 +522,7 @@ def get_session_lock(client_info: str) -> asyncio.Lock:
     """
     Get or create a lock for a specific session to prevent race conditions.
     
-    THESIS NOTE: This lock ensures thread-safe access to session_config during
+    This lock ensures thread-safe access to session_config during
     concurrent config updates from the same client.
     """
     if client_info not in _session_locks:
@@ -2540,7 +2540,7 @@ async def handle_audio_stream(websocket: WebSocket, token: Optional[str] = None)
                     elif data["type"] == "client_event":   # browser playback timing; logged only (BP_LOG_SESSIONS=1)
                         _log_session_event(client_info, {"dir": "in", **{k: v for k, v in data.items() if k in ("type", "event", "t_ms", "duration_s", "queued_s", "rate")}})
                     elif data["type"] == "config_update":
-                        # THESIS NOTE: Use session lock to prevent race conditions when
+                        # Use session lock to prevent race conditions when
                         # multiple config updates arrive concurrently for the same session
                         session_lock = get_session_lock(client_info)
                         async with session_lock:
@@ -2900,7 +2900,7 @@ async def handle_audio_stream(websocket: WebSocket, token: Optional[str] = None)
     finally:
         logging.info(f"Client {client_info} handler finished. Cleaning up session.")
         
-        # THESIS NOTE: Critical cleanup to prevent memory leaks and ensure proper resource management
+        # Critical cleanup to prevent memory leaks and ensure proper resource management
         # 1. Remove session from active_sessions to prevent unbounded dictionary growth
         # 2. Explicitly delete model references to free GPU/CPU memory
         # 3. Clean up session lock to prevent lock dictionary growth

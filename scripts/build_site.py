@@ -95,14 +95,14 @@ html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name
 <title>Live Speech Translation — status and evidence</title><style>{css}</style></head><body>
 <header>
   <h1>Live Speech Translation</h1>
-  <p class="sub">Real-time speech translation that runs on your own machine: speak English, hear German, Slovak or Czech a moment later, with live captions. Bachelor's thesis project (STU FEI). Numbers on this page are generated from saved receipts in the repository and verified by <code>make check-docs</code>.</p>
+  <p class="sub">Real-time speech translation that runs on your own machine: speak English, hear German, Slovak or Czech a moment later, with live captions. Research prototype. Numbers on this page are generated from saved receipts in the repository and verified by <code>make check-docs</code>.</p>
 </header>
 
 <div class="verdict">
   <strong>Verdict:</strong> one speaker, one direction runs live on a laptop (English → Slovak/Czech/German). Median lag {0.5}-{1.8} s on generated English on the M1 Pro Mac; the 2 s goal is met there but <strong>Slovak input under 2 s is not viable on this Mac</strong> — it needs a faster GPU (T4/L4/A10) or a streaming-native recogniser. German and Slovak are validated end to end through the real server on a Kaggle T4. Room mode is built and unit-tested; its real-model test is pending.
 </div>
 
-<div class="tags"><span class="tag">local-first, no cloud</span><span class="tag">EN↔SK/DE/CS</span><span class="tag">bachelor's thesis, STU FEI</span><span class="tag">measured 2026-11-07</span></div>
+<div class="tags"><span class="tag">local-first, no cloud</span><span class="tag">EN↔SK/DE/CS</span><span class="tag">local speech translation</span><span class="tag">measured 2026-11-07</span></div>
 
 <h2>At a glance</h2>
 <div class="grid">
@@ -120,7 +120,7 @@ html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name
   </div>
   <div class="card">
     <h3>Voice</h3>
-    <p>Piper is generic but fast (~0.15 s/piece). OmniVoice clones zero-shot (~0.66 s/piece) but is batch/QC only, not streaming. Owner's ear check pending to pick the route.</p>
+    <p>Piper is generic but fast (~0.15 s/piece). OmniVoice clones zero-shot (~0.66 s/piece) but is batch/QC only, not streaming. Listening review is pending before selecting the route.</p>
   </div>
 </div>
 
@@ -147,7 +147,7 @@ html = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name
 </table>
 
 <h2>Real server end to end</h2>
-<p class="intro">Kaggle T4, your 60 s English reading replayed through the live route at 1×. Delay measured after each segment ends.</p>
+<p class="intro">Kaggle T4, a test speaker's 60 s English reading replayed through the live route at 1×. Delay measured after each segment ends.</p>
 <table>
   <tr><th>Route</th><th>Status</th><th>Delay median / p90</th><th>First-word delay</th><th>Transcript error</th></tr>
   {route_rows}

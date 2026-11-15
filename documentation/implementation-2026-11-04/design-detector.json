@@ -5,7 +5,7 @@
     "description": "Inter, Roboto, Fraunces, Geist, Plus Jakarta Sans, and Space Grotesk are used on so many sites they no longer feel distinctive. Each new wave of AI-generated UIs converges on the same handful of faces. Choose a face that gives your interface personality.",
     "severity": "warning",
     "category": "slop",
-    "file": "~/Documents/STU/BP/ui/auth/auth.css",
+    "file": "<checkout>/ui/auth/auth.css",
     "line": 45,
     "snippet": "font-family: 'Montserrat"
   },
@@ -15,7 +15,7 @@
     "description": "Inter, Roboto, Fraunces, Geist, Plus Jakarta Sans, and Space Grotesk are used on so many sites they no longer feel distinctive. Each new wave of AI-generated UIs converges on the same handful of faces. Choose a face that gives your interface personality.",
     "severity": "warning",
     "category": "slop",
-    "file": "~/Documents/STU/BP/ui/auth/auth.html",
+    "file": "<checkout>/ui/auth/auth.html",
     "line": 0,
     "snippet": "Primary font: montserrat"
   },
@@ -25,7 +25,7 @@
     "description": "Inter, Roboto, Fraunces, Geist, Plus Jakarta Sans, and Space Grotesk are used on so many sites they no longer feel distinctive. Each new wave of AI-generated UIs converges on the same handful of faces. Choose a face that gives your interface personality.",
     "severity": "warning",
     "category": "slop",
-    "file": "~/Documents/STU/BP/ui/enroll/enroll.html",
+    "file": "<checkout>/ui/enroll/enroll.html",
     "line": 0,
     "snippet": "Primary font: montserrat"
   },
@@ -35,7 +35,7 @@
     "description": "Dominant heading and body roles are separated by less than 1.25× at every step, leaving the size hierarchy flat. Add at least one stronger size step.",
     "severity": "warning",
     "category": "slop",
-    "file": "~/Documents/STU/BP/ui/enroll/enroll.html",
+    "file": "<checkout>/ui/enroll/enroll.html",
     "line": 0,
     "snippet": "Role sizes: body 16px, h1 16px, h2 16px (largest adjacent step 1.00:1; target 1.25:1)"
   },
@@ -45,7 +45,7 @@
     "description": "Inter, Roboto, Fraunces, Geist, Plus Jakarta Sans, and Space Grotesk are used on so many sites they no longer feel distinctive. Each new wave of AI-generated UIs converges on the same handful of faces. Choose a face that gives your interface personality.",
     "severity": "warning",
     "category": "slop",
-    "file": "~/Documents/STU/BP/ui/extra/about.html",
+    "file": "<checkout>/ui/extra/about.html",
     "line": 0,
     "snippet": "Primary font: montserrat"
   },
@@ -55,7 +55,7 @@
     "description": "Inter, Roboto, Fraunces, Geist, Plus Jakarta Sans, and Space Grotesk are used on so many sites they no longer feel distinctive. Each new wave of AI-generated UIs converges on the same handful of faces. Choose a face that gives your interface personality.",
     "severity": "warning",
     "category": "slop",
-    "file": "~/Documents/STU/BP/ui/extra/cookies.html",
+    "file": "<checkout>/ui/extra/cookies.html",
     "line": 0,
     "snippet": "Primary font: montserrat"
   },
@@ -65,7 +65,7 @@
     "description": "Inter, Roboto, Fraunces, Geist, Plus Jakarta Sans, and Space Grotesk are used on so many sites they no longer feel distinctive. Each new wave of AI-generated UIs converges on the same handful of faces. Choose a face that gives your interface personality.",
     "severity": "warning",
     "category": "slop",
-    "file": "~/Documents/STU/BP/ui/extra/faq.html",
+    "file": "<checkout>/ui/extra/faq.html",
     "line": 0,
     "snippet": "Primary font: montserrat"
   },
@@ -75,7 +75,7 @@
     "description": "Heading levels should not skip (e.g. h1 then h3 with no h2). Screen readers use heading hierarchy for navigation. Skipping levels breaks the document outline.",
     "severity": "warning",
     "category": "quality",
-    "file": "~/Documents/STU/BP/ui/extra/faq.html",
+    "file": "<checkout>/ui/extra/faq.html",
     "line": 0,
     "snippet": "<h1> \"Frequently Asked Questions\" followed by <h3> \"What is Real-Time Speech Translation?\" (missing h2)"
   },
@@ -85,7 +85,7 @@
     "description": "Inter, Roboto, Fraunces, Geist, Plus Jakarta Sans, and Space Grotesk are used on so many sites they no longer feel distinctive. Each new wave of AI-generated UIs converges on the same handful of faces. Choose a face that gives your interface personality.",
     "severity": "warning",
     "category": "slop",
-    "file": "~/Documents/STU/BP/ui/extra/feedback.html",
+    "file": "<checkout>/ui/extra/feedback.html",
     "line": 0,
     "snippet": "Primary font: montserrat"
   },
@@ -95,7 +95,7 @@
     "description": "Inter, Roboto, Fraunces, Geist, Plus Jakarta Sans, and Space Grotesk are used on so many sites they no longer feel distinctive. Each new wave of AI-generated UIs converges on the same handful of faces. Choose a face that gives your interface personality.",
     "severity": "warning",
     "category": "slop",
-    "file": "~/Documents/STU/BP/ui/extra/privacy.html",
+    "file": "<checkout>/ui/extra/privacy.html",
     "line": 0,
     "snippet": "Primary font: montserrat"
   },
@@ -105,7 +105,7 @@
     "description": "Inter, Roboto, Fraunces, Geist, Plus Jakarta Sans, and Space Grotesk are used on so many sites they no longer feel distinctive. Each new wave of AI-generated UIs converges on the same handful of faces. Choose a face that gives your interface personality.",
     "severity": "warning",
     "category": "slop",
-    "file": "~/Documents/STU/BP/ui/extra/terms.html",
+    "file": "<checkout>/ui/extra/terms.html",
     "line": 0,
     "snippet": "Primary font: montserrat"
   },
@@ -115,7 +115,7 @@
     "description": "Inter, Roboto, Fraunces, Geist, Plus Jakarta Sans, and Space Grotesk are used on so many sites they no longer feel distinctive. Each new wave of AI-generated UIs converges on the same handful of faces. Choose a face that gives your interface personality.",
     "severity": "warning",
     "category": "slop",
-    "file": "~/Documents/STU/BP/ui/home/home.html",
+    "file": "<checkout>/ui/home/home.html",
     "line": 0,
     "snippet": "Primary font: montserrat"
   },
@@ -125,7 +125,7 @@
     "description": "Generic SaaS phrases (streamline / empower / supercharge / world-class / enterprise-grade / next-generation / cutting-edge / etc) are instant AI tells. Pick a specific verb and noun that says what the product literally does.",
     "severity": "warning",
     "category": "slop",
-    "file": "~/Documents/STU/BP/ui/home/home.html",
+    "file": "<checkout>/ui/home/home.html",
     "line": 0,
     "snippet": "1 buzzword phrase: \"optimizing cutting-edge open-source\""
   },
@@ -135,7 +135,7 @@
     "description": "Inter, Roboto, Fraunces, Geist, Plus Jakarta Sans, and Space Grotesk are used on so many sites they no longer feel distinctive. Each new wave of AI-generated UIs converges on the same handful of faces. Choose a face that gives your interface personality.",
     "severity": "warning",
     "category": "slop",
-    "file": "~/Documents/STU/BP/ui/live-speech/live.html",
+    "file": "<checkout>/ui/live-speech/live.html",
     "line": 0,
     "snippet": "Primary font: montserrat"
   },
@@ -145,7 +145,7 @@
     "description": "Cards inside cards create visual noise and excessive depth. Flatten the hierarchy — use spacing, typography, and dividers instead of nesting containers.",
     "severity": "warning",
     "category": "slop",
-    "file": "~/Documents/STU/BP/ui/live-speech/live.html",
+    "file": "<checkout>/ui/live-speech/live.html",
     "line": 0,
     "snippet": "Card inside card (div)"
   },
@@ -155,7 +155,7 @@
     "description": "Colored glow shadows — a zero-offset chromatic halo (box- or text-shadow) on any background, or any colored blurred shadow on a dark background — are the default \"cool\" look of AI-generated UIs. Use neutral elevation shadows and subtle, purposeful lighting instead.",
     "severity": "warning",
     "category": "slop",
-    "file": "~/Documents/STU/BP/ui/live-speech/live.html",
+    "file": "<checkout>/ui/live-speech/live.html",
     "line": 0,
     "snippet": "Zero-offset box-shadow glow (#2e7d32)"
   },
@@ -165,7 +165,7 @@
     "description": "Text does not meet WCAG AA contrast requirements (4.5:1 for body, 3:1 for large text). Increase the contrast between text and background.",
     "severity": "warning",
     "category": "quality",
-    "file": "~/Documents/STU/BP/ui/test-stt/test-stt.html",
+    "file": "<checkout>/ui/test-stt/test-stt.html",
     "line": 0,
     "snippet": "3.7:1 (need 4.5:1) — text #ffffff on #667eea"
   },
@@ -175,7 +175,7 @@
     "description": "Text does not meet WCAG AA contrast requirements (4.5:1 for body, 3:1 for large text). Increase the contrast between text and background.",
     "severity": "warning",
     "category": "quality",
-    "file": "~/Documents/STU/BP/ui/test-stt/test-stt.html",
+    "file": "<checkout>/ui/test-stt/test-stt.html",
     "line": 0,
     "snippet": "2.2:1 (need 4.5:1) — text #a0aec0 on #f7fafc"
   },
@@ -185,7 +185,7 @@
     "description": "Purple/violet gradients and cyan-on-dark are the most recognizable tells of AI-generated UIs. A gradient in one of those hues is the tell on its own; flat neon ink on a dark ground is charged once a second tell hue joins it. Choose a distinctive, intentional palette.",
     "severity": "warning",
     "category": "slop",
-    "file": "~/Documents/STU/BP/ui/test-stt/test-stt.html",
+    "file": "<checkout>/ui/test-stt/test-stt.html",
     "line": 0,
     "snippet": "Purple/violet accent colors detected"
   },
@@ -195,7 +195,7 @@
     "description": "Thick accent border on a rounded card — the border clashes with the rounded corners. Remove the border or the border-radius.",
     "severity": "warning",
     "category": "slop",
-    "file": "~/Documents/STU/BP/ui/voice-lab/lab-style.css",
+    "file": "<checkout>/ui/voice-lab/lab-style.css",
     "line": 97,
     "snippet": "border-top: 3px solid"
   },
@@ -205,7 +205,7 @@
     "description": "Inter, Roboto, Fraunces, Geist, Plus Jakarta Sans, and Space Grotesk are used on so many sites they no longer feel distinctive. Each new wave of AI-generated UIs converges on the same handful of faces. Choose a face that gives your interface personality.",
     "severity": "warning",
     "category": "slop",
-    "file": "~/Documents/STU/BP/ui/voice-lab/lab.html",
+    "file": "<checkout>/ui/voice-lab/lab.html",
     "line": 0,
     "snippet": "Primary font: montserrat"
   }

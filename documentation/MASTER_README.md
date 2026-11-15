@@ -1,8 +1,7 @@
 # BP — Master Documentation (single source of truth)
 
-**Project:** Real-time EN↔SK speech translation (bachelor's thesis, STU FEI)
-**Repo:** `~/Developer/bp-main` | **Branch:** `backend-quality-2026-11-07` | **Owner:** Yegor Brusniak
-**Status:** 31 commits ahead of `origin/main`, uncommitted (push needs owner yes)
+**Project:** Real-time EN↔SK speech translation (local speech translation)
+**Status:** 31 commits ahead of `origin/main`, uncommitted (push needs maintainer yes)
 **Last updated:** 2026-11-12
 
 ---
@@ -37,11 +36,11 @@ All model research is consolidated in `documentation/model_landscape_2026-10.md`
 ### STT — speech recognition
 | Model | Slovak? | License | Best measured WER | Verdict |
 |-------|---------|---------|-------------------|---------|
-| whisper-small-sk (incumbent) | native SK fine-tune | MIT | 0.13 FLEURS-sk / 0.26 owner mic | **Keep as SK default on CPU** |
+| whisper-small-sk (incumbent) | native SK fine-tune | MIT | 0.13 FLEURS-sk / 0.26 maintainer mic | **Keep as SK default on CPU** |
 | whisper base (EN) | n/a | MIT | 0.077 | Keep for EN |
-| large-v3-turbo | 99 langs incl SK | MIT | 0.41–0.52 owner mic | Rejected (owner mic too high) |
-| Parakeet-TDT v3 | 25 EU langs incl SK | CC-BY-4.0 | 0.58–0.63 owner mic | Speed proven, SK accuracy not |
-| Nemotron 3.5 streaming 0.6B | SK broad tier | OpenMDW | 0.75–0.86 SK owner mic | **Rejected for SK** |
+| large-v3-turbo | 99 langs incl SK | MIT | 0.41–0.52 maintainer mic | Rejected (maintainer mic too high) |
+| Parakeet-TDT v3 | 25 EU langs incl SK | CC-BY-4.0 | 0.58–0.63 maintainer mic | Speed proven, SK accuracy not |
+| Nemotron 3.5 streaming 0.6B | SK broad tier | OpenMDW | 0.75–0.86 SK maintainer mic | **Rejected for SK** |
 | Canary-1B / Flash / 180M | 25 EU langs incl SK | NVIDIA CC-BY-4.0 | 0.0477 SK FLEURS | Speed path, AST chrF++ ~52 below commercial bar |
 
 ### MT — machine translation
@@ -132,19 +131,19 @@ Runs the same E2E test across multiple TTS engines and compares against baseline
 |---|--------|-------|------------|-------|
 | 1 | ~~Wait for XTTS result~~ DONE 2026-11-15 | Kaggle `yegorby/bp-xtts-voice-clone-t4` | EN/CS measured, SK unsupported | done |
 | 2 | ~~Fix X-Voice~~ DONE 2026-11-15 | Kaggle `yegorby/bp-x-voice-t4` | sk/cs/en measured | done |
-| 3 | ~~Fix Higgs~~ DONE 2026-11-15: serves, audio garbage on T4 (no bf16) | Kaggle `yegorby/bp-higgs-audio-v3-t4` | needs Ampere+ 24 GB to retest | handler GPU |
+| 3 | ~~Fix Higgs~~ DONE 2026-11-15: serves, audio garbage on T4 (no bf16) | Kaggle `yegorby/bp-higgs-audio-v3-t4` | needs Ampere+ 24 GB to retest | reviewer GPU |
 | 4 | Run E2E streaming tests locally with Piper baseline | Mac, `scripts/live/e2e_streaming_test.py` | per-segment lag under 2 s goal | Server running, load < 10 |
 | 5 | Run E2E compare across all TTS engines | Mac + Kaggle results | comparison table vs baselines | All kernels complete |
-| 6 | Pick voice route: Piper fallback vs. cloned voice | Owner decision | documented in this file | Ear check / Kaggle data |
-| 7 | Commit working tree (31 commits ahead, uncommitted) | `git commit` + `git push` | tree clean, pushed to origin | Owner yes |
+| 6 | Pick voice route: Piper fallback vs. cloned voice | project decisions | documented in this file | Ear check / Kaggle data |
+| 7 | Commit working tree (31 commits ahead, uncommitted) | `git commit` + `git push` | tree clean, pushed to origin | maintainer yes |
 | 8 | Room mode real-model test | Kaggle `bp-room-test-t4` | speaker lag ≤ 2× baseline | After voice route decided |
-| 9 | Real-speech E2E test (non-generated audio) | Mac, `paced_replay.py` | lag ≤ 2 s median | Owner go, load < 10 |
+| 9 | Real-speech E2E test (non-generated audio) | Mac, `paced_replay.py` | lag ≤ 2 s median | maintainer go, load < 10 |
 
 ---
 
-## 5. Handler message
+## 5. reviewer message
 
-Draft ready: `documentation/HANDLER_MESSAGE_2026-11-17.md` (Slovak + English). Owner approves the text, then sends it on Monday 2026-11-17. Nothing has been sent.
+Hardware and voice-route limits: `documentation/ROUTE_LIMITS_2026-11-17.md`.
 
 ---
 
@@ -216,8 +215,8 @@ kaggle kernels push -p scripts/gpu_bench/kaggle_<name> --accelerator NvidiaTesla
 3. **Read results:** `timeout 90 kaggle kernels output yegorby/<slug> -p /tmp/<name> -q --file-pattern '<report>.json'`
 4. **Run E2E tests locally** with Piper baseline, then compare across engines.
 5. **Decide voice route** (Piper fallback vs. cloned voice).
-6. **Commit + push** (needs owner yes).
-7. **Message handler** with results + compute ask (uni server / GPU laptop).
+6. **Commit + push** (needs maintainer yes).
+7. **Message reviewer** with results + compute ask (uni server / GPU laptop).
 
 ---
 

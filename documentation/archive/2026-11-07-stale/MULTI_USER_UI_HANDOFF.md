@@ -125,7 +125,7 @@ Copy/adapt these patterns into the meeting pages:
 | Pattern | File | Use in |
 |---------|------|--------|
 | WebSocket connection + auth token | `setupWebSocket()` | Both speaker & listener |
-| Sound check (2s record + playback) | `soundCheckBtn` handler | Speaker |
+| Sound check (2s record + playback) | `soundCheckBtn` reviewer | Speaker |
 | Mic capture via AudioWorklet | `startRealtimeAudioStreaming()` | Speaker |
 | Send audio frames as base64 | `audio-processor.js` + `websocket.send()` | Speaker |
 | Sequential audio playback | `SessionPlayback` from `session-playback.js` | Listener |

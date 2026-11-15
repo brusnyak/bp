@@ -1,7 +1,7 @@
 """Segmentation-strategy matrix on a Kaggle T4 (offline, deterministic, no server).
 Question: which way of cutting speech for recognition keeps accuracy AND gives words early, per language and engine?
 Streams: generated reference speech (generic Piper voices, scripts/live/make_test_audio.py: paced / continuous / long, exact reference text), native read speech
-(FLEURS sk/de/en, 14 clips joined with 0.4 s gaps), and the owner's own recordings if the dataset carries any file named owner_<lang>*.wav with owner_<lang>*.txt.
+(FLEURS sk/de/en, 14 clips joined with 0.4 s gaps), and the test speaker's own recordings if the dataset carries any file named owner_<lang>*.wav with owner_<lang>*.txt.
 Engines: faster-whisper large-v3-turbo fp16 (plain), kinit/whisper-large-v3-turbo-sk (Slovak fine-tune, converted at run time), Parakeet TDT v3 ONNX (CUDA).
 Strategies (same clock model as the stream simulation: audio arrives in real time, a decode starts when its audio exists AND the engine is free, real cost is added):
   whole        one decode after the stream ends (accuracy ceiling, no live use)

@@ -1,6 +1,6 @@
 # Live Speech Translation
 
-Real-time speech translation that runs on your own machine: speak English, hear German, Slovak or Czech a moment later, with live captions on both sides. Built as a Bachelor's thesis project (STU FEI) and developed towards a commercial product.
+Real-time speech translation that runs on your own machine: speak English, hear German, Slovak or Czech a moment later, with live captions on both sides. A research prototype for local meeting translation, with measured routes and experimental features.
 
 [![Watch the demo](https://img.youtube.com/vi/_-jwEyGxDYs/maxresdefault.jpg)](https://www.youtube.com/watch?v=_-jwEyGxDYs)
 
@@ -24,7 +24,7 @@ Microphone → voice-activity detection → speech recognition (STT) → machine
 - **Speech recognition, Kaggle T4, mean word error on FLEURS read speech (60 clips per language)**, German: base 18.1%, small <!-- claim:stt:whisper-small:de:wer -->10.9<!-- /claim -->%, large-v3-turbo <!-- claim:stt:whisper-large-v3-turbo:de:wer -->4.8<!-- /claim -->%, Parakeet v3 <!-- claim:stt:parakeet-tdt-v3:de:wer -->6.3<!-- /claim -->%. Czech: turbo <!-- claim:stt:whisper-large-v3-turbo:cs:wer -->11.6<!-- /claim -->% (base 67%). Slovak: turbo <!-- claim:stt:whisper-large-v3-turbo:sk:wer -->10.7<!-- /claim -->%, Parakeet <!-- claim:stt:parakeet-tdt-v3:sk:wer -->9.9<!-- /claim -->%. Turbo wins German, Czech, Polish and English; Parakeet wins French and Slovak by under 2 points. Full table: `documentation/evidence/2026-11-07/lang_matrix.json`. Parakeet ran on CPU in that run (no CUDA provider), so its speed there is not a GPU number.
 - **Translation, same T4 run, chrF on 200 opus-100 test sentences (relative scores):** German→English Opus-MT <!-- claim:mt:opus-mt:de:to_en:chrf -->57.9<!-- /claim --> versus NLLB-1.3B 54.6; Opus-MT won every language/direction cell measured, 4–8× faster.
 - **CS→EN on Kaggle T4, full route (`route_receipt.json`):** default profile p50 <!-- claim:kaggle:default:p50 -->3.48<!-- /claim --> s, p95 <!-- claim:kaggle:default:p95 -->4.13<!-- /claim --> s from speech onset to first audio. The shorter 1.0 s-segment profile reaches p50 1.87 s / p95 4.26 s (choppier output). Earlier figures of 1.86/4.22 s belonged to that profile, not the default.
-**Streaming foundation (Kaggle T4 simulation, offline replay of your English reading and a 2-minute German FLEURS stream; `documentation/evidence/2026-11-07/stream_sim.json`).** Latency is the time from a word being spoken until it is committed. Independent 2 s chunks (the current live route) with Whisper turbo: median <!-- claim:sim:en-owner|turbo|chunk-2.0:lat -->1.17<!-- /claim --> s but <!-- claim:sim:en-owner|turbo|chunk-2.0:wer -->19.1<!-- /claim -->% word error (German <!-- claim:sim:de-fleurs|turbo|chunk-2.0:wer -->33.1<!-- /claim -->%), because words are cut at chunk edges. Decoding the growing buffer every 1.0 s and committing only words two consecutive decodes agree on: median <!-- claim:sim:en-owner|turbo|agree-1.0:lat -->2.31<!-- /claim --> s and <!-- claim:sim:en-owner|turbo|agree-1.0:wer -->5.0<!-- /claim -->% error (German <!-- claim:sim:de-fleurs|turbo|agree-1.0:wer -->11.2<!-- /claim -->%). A 0.5 s step gives <!-- claim:sim:en-owner|turbo|agree-0.5:lat -->1.45<!-- /claim --> s and <!-- claim:sim:en-owner|turbo|agree-0.5:wer -->12.3<!-- /claim -->% but the engine falls up to 2 s behind; 0.3 s collapses (queue of 30 s). Parakeet is cheap per step (real-time factor 0.1–0.3) and reaches 1.2 s at 0.3 s steps, with <!-- claim:sim:en-owner|parakeet|agree-0.3:wer -->26.4<!-- /claim -->% error. No setting reached under 1 s with under 10% error.
+**Streaming foundation (Kaggle T4 simulation, offline replay of the test speaker's English reading and a 2-minute German FLEURS stream; `documentation/evidence/2026-11-07/stream_sim.json`).** Latency is the time from a word being spoken until it is committed. Independent 2 s chunks (the current live route) with Whisper turbo: median <!-- claim:sim:en-owner|turbo|chunk-2.0:lat -->1.17<!-- /claim --> s but <!-- claim:sim:en-owner|turbo|chunk-2.0:wer -->19.1<!-- /claim -->% word error (German <!-- claim:sim:de-fleurs|turbo|chunk-2.0:wer -->33.1<!-- /claim -->%), because words are cut at chunk edges. Decoding the growing buffer every 1.0 s and committing only words two consecutive decodes agree on: median <!-- claim:sim:en-owner|turbo|agree-1.0:lat -->2.31<!-- /claim --> s and <!-- claim:sim:en-owner|turbo|agree-1.0:wer -->5.0<!-- /claim -->% error (German <!-- claim:sim:de-fleurs|turbo|agree-1.0:wer -->11.2<!-- /claim -->%). A 0.5 s step gives <!-- claim:sim:en-owner|turbo|agree-0.5:lat -->1.45<!-- /claim --> s and <!-- claim:sim:en-owner|turbo|agree-0.5:wer -->12.3<!-- /claim -->% but the engine falls up to 2 s behind; 0.3 s collapses (queue of 30 s). Parakeet is cheap per step (real-time factor 0.1–0.3) and reaches 1.2 s at 0.3 s steps, with <!-- claim:sim:en-owner|parakeet|agree-0.3:wer -->26.4<!-- /claim -->% error. No setting reached under 1 s with under 10% error.
 
 - **Your own voice matters:** the same Slovak script scores 11.5% word error when read by a Slovak Piper voice and 35.4% when read by a non-native speaker (large-v3-turbo, Mac). Slovak→English is experimental for that reason; the model is not the only limit.
 - **Test status:** 124 backend tests pass on macOS (`make test`, 2026-11-08). CI: Ubuntu and Windows pass; the macOS job failed once on `vad_tests.py::test_vad_long_speech_streaming` (timing-sensitive; passes locally).
@@ -36,14 +36,14 @@ The goal is to match what the three ship, not to beat it: the translated voice s
 | | Google (Gemini 3.5 Live Translate) | Microsoft (Teams Interpreter) | OpenAI (gpt-realtime-translate) | This project |
 |---|---|---|---|---|
 | Design | One speech-to-speech model; keeps the speaker's intonation, pacing and pitch | Cascade: recognition, English text, translation, voice; can simulate the speaker's voice | Streaming speech-to-speech model | Cascade: recognition, translation, voice (same design as Microsoft) |
-| Lag | "a few seconds behind" (no number published) | not stated | not stated | 3.0-3.6 s median on an M1 Pro, goal 2.0 s (owner 2026-11-10, was 3.0 s); about 2.3-2.9 s on a Kaggle T4 simulation at 6-17% word error (`documentation/STATUS.md`) |
-| Slovak | On the Meet language list | not read | On the language list | Output and input work; Slovak input needs the Slovak fine-tune (17.7% vs 45% plain turbo on the owner's speech) |
+| Lag | "a few seconds behind" (no number published) | not stated | not stated | 3.0-3.6 s median on an M1 Pro, goal 2.0 s (maintainer 2026-11-10, was 3.0 s); about 2.3-2.9 s on a Kaggle T4 simulation at 6-17% word error (`documentation/STATUS.md`) |
+| Slovak | On the Meet language list | not read | On the language list | Output and input work; Slovak input needs the Slovak fine-tune (17.7% vs 45% plain turbo on the test speaker's speech) |
 | Access | Meet: paid Google plan; developers: Live API preview | Copilot or Teams Premium licence, guests excluded | API, usage-priced | Runs on your own machine; no cloud, licence or per-minute fee; you supply the hardware |
-| Voice | Replicated inside the model (Google's docs call consistency uneven in the API) | Simulated voice | not read | Piper voices live; a cloned voice is being re-evaluated (OmniVoice clones zero-shot on a GPU but does not stream, so it is batch/QC only, owner 2026-11-10); pitch contour is not carried across languages |
+| Voice | Replicated inside the model (Google's docs call consistency uneven in the API) | Simulated voice | not read | Piper voices live; a cloned voice is being re-evaluated (OmniVoice clones zero-shot on a GPU but does not stream, so it is batch/QC only, maintainer 2026-11-10); pitch contour is not carried across languages |
 
 **Where it competes:** same behaviour (mid-sentence start, lag of a few seconds, on the best settings measured so far), same architecture as Microsoft's, and it is the only one of the four that runs without a cloud account, subscription or licence, with your own audio staying local.
 
-**Where it does not:** no side-by-side test against the three exists (spending on OpenAI or Google is not authorised), so "comparable" means the same behaviour class, not the same quality. On a 16 GB M1 Pro the lag sits 1.0-1.6 s above the 2 s goal (3.0-3.6 s measured); the streaming recogniser (Voxtral Realtime) that should remove that floor is wired in but not yet proven and needs a GPU machine (`documentation/STATUS.md`, "Mac ceiling"). Pitch and intonation transfer across languages is not built.
+**Where it does not:** no side-by-side test against the three exists, so "comparable" means the same behaviour class, not the same quality. On a 16 GB M1 Pro the lag sits 1.0-1.6 s above the 2 s goal (3.0-3.6 s measured); the streaming recogniser (Voxtral Realtime) that should remove that floor is wired in but not yet proven and needs a GPU machine (`documentation/STATUS.md`, "Mac ceiling"). Pitch and intonation transfer across languages is not built.
 
 ## Quick start
 
@@ -119,11 +119,11 @@ Open **http://localhost:8000** in Chrome or Edge (plain HTTP on `localhost` coun
 | `ui/` | Browser interface (plain HTML/CSS/JS, installable PWA) |
 | `scripts/` | Setup, CLI (`bp.py`), benchmarks, Kaggle jobs (`scripts/gpu_bench/`) |
 | `test/` | pytest suites; Node playback tests: `node --test test/session_playback_test.cjs` |
-| `documentation/` | Thesis draft, findings, research, runbooks |
+| `documentation/` | technical report draft, findings, research, runbooks |
 
 More: `PRODUCT.md` (positioning), `documentation/STATUS.md` (where the project stands), `AGENTS.md` (project memory), `documentation/implementation-2026-11-04/` (latest measurements).
 
-## Integration (conference rooms, LHC)
+## Integration (conference rooms and meeting applications)
 
 | Mode | Status | How |
 |------|--------|-----|

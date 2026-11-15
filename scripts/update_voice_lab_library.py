@@ -49,7 +49,7 @@ def main():
     sv_dir = os.path.join(REPO_ROOT, "speaker_voices")
     meta = load_json(os.path.join(sv_dir, "speaker_voices.json")) or []
     meta_by_file = {os.path.basename(m.get("path", "")): m for m in meta if m.get("path")}
-    # Featured first: the three new _b takes (owner review 2026-09-29); the rest
+    # Featured first: the three new _b takes (listening review 2026-09-29); the rest
     # stay available under a collapsed toggle in the page.
     FEATURED_VOICES = {"me_cs_staromestske.m4a", "me_en_rainbow_b.m4a", "me_sk_trhove_b.m4a"}
     voices = []
@@ -77,7 +77,7 @@ def main():
         for r in (load_json(os.path.join(qc_dir, "scores.json")) or {}).get("results", [])
     }
     by_label = {c.get("label"): c for c in manifest.get("candidates", [])}
-    # Showcase curation (owner review 2026-09-29): the A/B pair + the two decent
+    # Showcase curation (listening review 2026-09-29): the A/B pair + the two decent
     # fine-tunes stay visible; default-voice renders and superseded fine-tunes stay
     # on disk (and in candidates.json numbers) but are hidden from the showcase.
     QC_HIDDEN = {
@@ -209,7 +209,7 @@ def main():
 
     # 8. Zero-shot clones (OmniVoice outputs + receipts).
     # Reference heads (ref_*) are clone INPUTS, not outputs; legacy hello/thirty_second
-    # runs are superseded by the v2b clones (owner review 2026-09-29) — all stay on
+    # runs are superseded by the v2b clones (listening review 2026-09-29) — all stay on
     # disk with receipts, only current outputs are showcased.
     omni_dir = os.path.join(REPO_ROOT, "processed", "omnivoice")
     omni_items = []
@@ -390,12 +390,12 @@ def main():
                                    "first_chunk_s": m.get("first_chunk_s")}})
     if gpu_items:
         library["sections"].append(
-            {"id": "gpu_clones", "title": "GPU clones + speech-to-speech (cloned from the owner's 5-7 s refs)", "items": gpu_items}
+            {"id": "gpu_clones", "title": "GPU clones + speech-to-speech (cloned from the test speaker's 5-7 s refs)", "items": gpu_items}
         )
 
     out = os.path.join(REPO_ROOT, "ui", "voice-lab", "library.json")
     # Merge ear grades (scripts/grade_library.py output) so the static page
-    # can show machine advisories + owner verdicts with no backend.
+    # can show machine advisories + listening verdicts with no backend.
     grades = load_json(os.path.join(REPO_ROOT, "processed", "ear_grades.json")) or {}
     by_key = {(g.get("section"), g.get("name")): g for g in grades.get("grades", [])}
     for s in library["sections"]:
@@ -411,7 +411,7 @@ def main():
                                    "keep": ear.get("keep"),
                                    "sim": ear.get("sim"),
                                    "defects": ear.get("defects", {}),
-                                   "note": ear.get("note", "")}
+                                   "note": ""}
     with open(out, "w") as f:
         json.dump(library, f, indent=2, ensure_ascii=False)
     counts = {s["id"]: len(s["items"]) for s in library["sections"]}

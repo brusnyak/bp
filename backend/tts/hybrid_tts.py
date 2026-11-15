@@ -204,7 +204,7 @@ class HybridTTS:
 if __name__ == "__main__":
     # Test script
     engine = HybridTTS()
-    ref_wav = "~/Documents/STU/BP/test/My test speech_xtts_speaker_clean.wav"
+    ref_wav = "test/My test speech_xtts_speaker_clean.wav"
     text = "Vítam vás pri praktickej ukážke hybridného systému syntézy reči."
     
     wav, sr, lat = engine.synthesize(text, speaker_wav_path=ref_wav)

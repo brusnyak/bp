@@ -2,7 +2,7 @@
 
 ## Verdict
 
-REWORK before a general self-host or commercial release. Useful thesis prototype with working local translation components, actual T4 synthesis and paced GPU route receipts. Speed is established for specific warm configurations. Reliable meaning, stable continuous listening and a reproducible public installation are not established. The strongest achievable first release for a university operator is one declared language direction that preserves meaning, starts from a clean install with permitted public assets, delivers bounded-delay speech/captions, and stops reliably. Current work has several competing pipelines and acceptance claims ahead of their evidence.
+REWORK before a general self-host or commercial release. Useful technical report prototype with working local translation components, actual T4 synthesis and paced GPU route receipts. Speed is established for specific warm configurations. Reliable meaning, stable continuous listening and a reproducible public installation are not established. The strongest achievable first release for a shared deployment operator is one declared language direction that preserves meaning, starts from a clean install with permitted public assets, delivers bounded-delay speech/captions, and stops reliably. Current work has several competing pipelines and acceptance claims ahead of their evidence.
 
 Interpretation: “Kackle” / “Kegel” refers to Kaggle. Current request and matching prior BP references support this interpretation. No product implementation, existing documentation, models or recordings were changed by this review. New audit artifacts only. Existing dirty worktree retained; no commit/push/deploy, new remote job, model download or local GPU run. Short existing CPU tests did run.
 
@@ -105,7 +105,7 @@ The November 6 direct-pipeline report’s 0.39s first output excludes real-time 
 
 ## Architecture research and recommendation
 
-Recommendation: consolidate the existing pipeline and preserve source/context first. Keep FastAPI, browser client and engine adapters. A broad rewrite or a larger MT/LLM by default has not earned its complexity. The initial user is a university meeting/presentation operator; reliable words and bounded listening delay outrank increasing the number of advertised routes.
+Recommendation: consolidate the existing pipeline and preserve source/context first. Keep FastAPI, browser client and engine adapters. A broad rewrite or a larger MT/LLM by default has not earned its complexity. The initial user is a shared deployment meeting/presentation operator; reliable words and bounded listening delay outrank increasing the number of advertised routes.
 
 Primary sources opened this session:
 
@@ -151,7 +151,7 @@ Do not delete based on stale indexes. Use a source inventory and import/caller c
 | P0 | Correct trusted/near-real-time claims and OmniVoice code-vs-weight licensing | Every performance claim names receipt hash, route, device, metric clock and tested scope |
 | P1 | Add excluded deterministic regressions to one suite; fix real WAV fixture and source loss before optimization | Same authoritative local/CI gate, standard WAV and source-preservation/Stop tests pass |
 | P1 | Consolidate route/model config and the runtime entry point; classify bp mirror | Import graph points to one maintained source; no deletion until ownership/provenance checked |
-| P1 | Repair setup/CLI/SDK/Docker instructions against a clean checkout | Every documented primary command exercised without owner assets |
+| P1 | Repair setup/CLI/SDK/Docker instructions against a clean checkout | Every documented primary command exercised without maintainer assets |
 | P2 | Organize current docs as quickstart, operations, architecture, evaluation/evidence, contribution/security/licences; date/archive historical narratives | One maintained landing index, all links resolve; archive pages clearly historical |
 | P2 | Separate optional ML/conversion/benchmark extras and exact reproducible GPU profile | Compatible resolved versions, immutable model revisions/hash manifests, no surprise runtime fetch |
 | P2 | Move generated logs, nested code snapshots and benchmark artifacts out of ordinary source navigation | Explicit retention/provenance index; failure receipts and private assets preserved |
@@ -165,10 +165,10 @@ Recommended authoritative map: README for install/run; PRODUCT plus constitution
 3. **Install/runtime split and usable packaging.** Include imported `scripts.language_packs` in Docker; add an explicit provision step, voice/model volumes and DB persistence; qualify CPU/GPU dependency sets and native CUDA libraries. Core runtime must fail clearly without assets and avoid network calls. Current `/api/routes` can trigger `download_model(local_files_only=False)`, contradicting offline claims. `pip install -e .` needs actual package metadata. `make demo-audio` currently only checks arguments.
 4. **Secure local/shared modes.** Reject the Compose placeholder JWT secret; install or fail closed on required rate limiter; restrict room ownership/membership, guest capacity and research APIs; stop logging transcript text by default. Use one authorization/retention policy for uploads/metadata/QC. TLS/routing and virtual audio install paths must be documented and actually tested for the supported deployment.
 5. **A supported route that retains meaning.** Qualify exact ASR/MT/TTS/voice/hardware/streaming settings with independent references and bilingual listeners. Installed/available/fast never means accepted. Commercial API/server operation and open-source local use have different support burdens; publish a tested support matrix rather than “any language/any machine.”
-6. **Actual user journey and meeting delivery.** Current meeting listeners have undrained queues, Stop is bypassed in the direct handler, and voice selection is not passed to cloning. Finish that mode with two-client tests or keep it explicitly unavailable. Validate login/guest→prepare→input/output check→Start→continuous speech→device loss/reconnect→Stop on desktop/mobile browsers and actual chosen audio devices.
+6. **Actual user journey and meeting delivery.** Current meeting listeners have undrained queues, Stop is bypassed in the direct reviewer, and voice selection is not passed to cloning. Finish that mode with two-client tests or keep it explicitly unavailable. Validate login/guest→prepare→input/output check→Start→continuous speech→device loss/reconnect→Stop on desktop/mobile browsers and actual chosen audio devices.
 7. **Clean-machine release evidence.** One release candidate, one exact repository revision, supported Python versions, no warm caches/personal files. Provision public defaults, run one audio→translation→WAV smoke with a portable fixture, verify offline runtime, then exercise Windows/macOS/Linux claims in clean environments. Back up/restore accounts/voices, upgrade/restart/recovery instructions and known limits. Docker hardware health is not route readiness.
 
-LHC remains a separate integration acceptance: actual room mic/return channels, conference software, processing host/OS, permissions and named acceptance owner are not established by generic virtual-audio support. No new LHC facts were supplied here.
+conference-room remains a separate integration acceptance: actual room mic/return channels, conference software, processing host/OS, permissions and named acceptance maintainer are not established by generic virtual-audio support. No new conference-room facts were supplied here.
 
 ## Three ordered work packages
 

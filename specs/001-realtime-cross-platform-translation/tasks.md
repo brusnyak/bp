@@ -74,11 +74,11 @@ description: "Task list for the cross-platform real-time translation pipeline re
 
 ---
 
-## Phase 6: User Story 4 - Speculative decoding for perceived speed (Priority: P3, thesis research contribution)
+## Phase 6: User Story 4 - Speculative decoding for perceived speed (Priority: P3, technical report research contribution)
 
 - [x] T020 [US4] Implement SSBD (arXiv 2509.21740) around `backend/mt/ctranslate2_mt.py` — done as `backend/mt/ssbd_ctranslate2_mt.py` (`SSBDCTranslate2MT`), using CTranslate2's `score_batch` (single parallel teacher-forced forward pass) for verification and `translate_batch(target_prefix=...)` to resume from the first divergence. Adaptation from the paper's literal formula documented in the module docstring: CTranslate2's public API doesn't expose per-step output distributions during a teacher-forced pass, so a log-prob-threshold divergence check is used in place of the paper's argmax-of-biased-mixture check. A real correctness bug was found and fixed during implementation: "fully accepted" must require the draft to have actually ended on EOS (`return_end_token=True`), not just that every token individually scored above threshold — otherwise short, locally-plausible-but-incomplete drafts get returned verbatim forever as the source keeps growing. Fixed; see commit.
 - [x] T021 [US4] A/B benchmark: SSBD-augmented path vs. current path — done as `benchmark_ssbd_mt.py`, real wall-clock on this machine (M1 Pro, CPU, int8), `Helsinki-NLP/opus-mt-en-sk`, three runs (beam=4/short, beam=4/long, beam=1/long). **Result: negative, not positive.** Speedup 0.77x (beam=4, short utterances), 0.94x (beam=4, longer utterances), 0.93x (beam=1/greedy, longer utterances) — SSBD is 6-23% *slower* than the baseline in every configuration tested, not faster. Root cause, confirmed by inspecting per-increment draft reuse: on the long-utterance scenario the model reused **0 of 9-25** previous draft tokens on 4 of 5 increments, regardless of beam size (ruling out beam-search re-ranking as the cause) — `Helsinki-NLP/opus-mt-en-sk` restructures the whole sentence (word order, clause placement) as more source context arrives rather than monotonically extending its prior output, so the "previous translation is a reusable prefix" assumption SSBD depends on does not hold for this model. Translation quality was not separately evaluated since there is no latency win to trade it against.
-- [x] T022 [US4] Write-up: `documentation/ssbd_speculative_decoding_findings_2026-08.md` — full findings, explicit proven/assumed/unknown split, real numbers, hypothesis for why this is a general-purpose-sentence-NMT-model property rather than a `Helsinki-NLP/opus-mt-en-sk`-specific quirk (untested: whether a model actually trained for incremental/streaming re-translation, like the paper's Tower+ 2B, would show prefix-stable behavior where this one doesn't — flagged as future work, not tested here). **Recommendation: do not adopt SSBD in the shipped pipeline as implemented; keep as a documented negative-result thesis contribution** — this is legitimate, citable research content (a technique's assumption failing to hold for a specific model class is a real finding), just not a shipped optimization.
+- [x] T022 [US4] Write-up: `documentation/ssbd_speculative_decoding_findings_2026-08.md` — full findings, explicit proven/assumed/unknown split, real numbers, hypothesis for why this is a general-purpose-sentence-NMT-model property rather than a `Helsinki-NLP/opus-mt-en-sk`-specific quirk (untested: whether a model actually trained for incremental/streaming re-translation, like the paper's Tower+ 2B, would show prefix-stable behavior where this one doesn't — flagged as future work, not tested here). **Recommendation: do not adopt SSBD in the shipped pipeline as implemented; keep as a documented negative-result technical report contribution** — this is legitimate, citable research content (a technique's assumption failing to hold for a specific model class is a real finding), just not a shipped optimization.
 
 **Checkpoint**: All four user stories independently functional and documented.
 
@@ -146,13 +146,13 @@ from-scratch simultaneous-MT system — no viable path exists without either tra
 from scratch (its own ML project) or accepting EMMA/SeamlessStreaming's published 66% BLEU-quality
 collapse. Plugging this project's own voice cloning into Google's Gemini 3.5 Live Translate was also
 considered and rejected: closed-source, no public voice-cloning-injection API, permanent internet
-dependency, and it would eliminate this project's own technical contribution as a bachelor's thesis.
+dependency, and it would eliminate this project's own technical contribution as a research prototype.
 **Final target**: this project's own STT→MT→TTS chain, engineering-hardened to close the gap between
 today's ~4s (mostly architectural dead time, not real compute — see finding below) and the ~2-3s
 ceiling Google itself deliberately targets for the same feature. No new ML models. German-style
 reordering-heavy languages keep the existing full-utterance-wait behavior by design (already the
 correct/safe handling per the research doc — no special-casing needed). After this phase, feature
-work stops; focus moves to documentation/thesis writeup.
+work stops; focus moves to documentation/technical report writeup.
 
 - [x] T043 DONE, 2026-08-22. `_process_speech_segment_pipeline` calls converted to
   `asyncio.create_task` (tracked per-session as `active_pipeline_task`) at all 6 call sites; capture/VAD
@@ -279,7 +279,7 @@ finish speaking. Closing the 4s→2-3s compute gap itself would require a differ
 
 ## Dependencies & Execution Order
 
-- Phase 1 (Setup) → Phase 2 (Foundational, blocks everything) → Phases 3 & 4 (P1, can run in parallel once Phase 2 lands) → Phase 5 (P2) → Phase 6 (P3, thesis research, can start any time after Phase 2 since it only touches the MT stage) → Phase 7 (P2, TTS-stage only, can run in parallel with Phase 5/6 once Phase 3's baseline cloning path exists)
+- Phase 1 (Setup) → Phase 2 (Foundational, blocks everything) → Phases 3 & 4 (P1, can run in parallel once Phase 2 lands) → Phase 5 (P2) → Phase 6 (P3, technical report research, can start any time after Phase 2 since it only touches the MT stage) → Phase 7 (P2, TTS-stage only, can run in parallel with Phase 5/6 once Phase 3's baseline cloning path exists)
 - Per Constitution Principle II: do not start Phase 6 by re-evaluating S2S/Hibiki again — that question is already closed, cited in `spec.md` Edge Cases.
 - Per Constitution Principle II: do not start Phase 7 by re-litigating whether caching fixes the cloning latency — that's already measured and closed (1.9% improvement, see `spec.md` User Story 5). The open question Phase 7 actually resolves is the fine-tuning implementation, not the diagnosis.
 

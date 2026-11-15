@@ -1,6 +1,6 @@
 """TTS probe on a Kaggle T4 (2026-11-10): is per-piece synthesis fast enough for a <2 s near-real-time route? Latency and feasibility only, no quality scoring.
 Pieces: 3- and 6-word cuts of the generated Slovak and Czech test sentences (what the route's fragmenter hands to TTS).
-Arm A  OmniVoice cloned voice per piece (num_step 12 and 16), reference = first 10 s of the owner's Slovak reading (ref text auto-transcribed).
+Arm A  OmniVoice cloned voice per piece (num_step 12 and 16), reference = first 10 s of the test speaker's Slovak reading (ref text auto-transcribed).
 Arm B  Piper (sk lili, cs jirka) per piece, then OpenVoice V2 tone-colour conversion to the same reference (separate venv so installs cannot break arm A).
 Reports per piece wall time and audio length, sustained ratio (sum wall / sum audio, below 1.0 = the queue does not grow). Clips are saved in the output for an ear check.
 Writes /kaggle/working/tts_probe.json after every step; every arm is isolated, one failure does not stop the others."""

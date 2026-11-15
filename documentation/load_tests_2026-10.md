@@ -4,7 +4,7 @@ Question: can one GPU run the whole cascade (STT → MT → OmniVoice zero-shot 
 simultaneous speakers can it carry? Harness: `scripts/gpu_bench/load_bench.py` (kernel `scripts/gpu_bench/kaggle_load/`).
 Raw data: `processed/gpu_bench/load_T4/load_bench.json` (+ kernel log). Hardware: **Kaggle Tesla T4, 15.6 GB** (the session had 2×T4;
 only one was used). Models: faster-whisper `base` (EN) / `whisper-small-sk` (SK), Opus-MT CT2 float16, **OmniVoice (zero-shot clone
-of the owner's reference clip, num_step=16)**.
+of the test speaker's reference clip, num_step=16)**.
 
 **Engine split for production (decision, 2026-11-04):** OmniVoice is kept for **bulk corpus generation + QC only** (RTF 0.40–0.65 on short phrases on T4 — not real-time). The live path is **Piper SK/EN on CPU** (RTF ~0.04) for the baseline, with **Kokoro EN TTS on GPU** (RTF 0.03, 1.33 GB VRAM on T4, declared in `backend/registry.py`, ear-grading pending) as the optional EN GPU engine. No Kokoro/Piper load test has been run yet — the numbers below are OmniVoice-only and apply to the batch/QC path, not the live path.
 
@@ -12,7 +12,7 @@ All stages on the GPU, TTS serialised by a lock (one TTS worker, like the app).
 
 ## Inputs and what the numbers mean
 
-- Real speech: 33 EN + 31 SK segments (5.5–12 s) cut at pauses from the owner's own recordings, plus 3 short clips per language.
+- Real speech: 33 EN + 31 SK segments (5.5–12 s) cut at pauses from the test speaker's recordings, plus 3 short clips per language.
   Repetition: the 40 s and 3-minute scenarios cycle through the same pool.
 - No per-segment ground-truth script exists, so `wer_vs_idle` is drift against the idle (n=1) transcript, **not absolute accuracy**
   (absolute WER stays in `processed/stt_baseline.json`). It is ≈0 where nothing breaks and tells us nothing about base accuracy.
@@ -60,7 +60,7 @@ All stages on the GPU, TTS serialised by a lock (one TTS worker, like the app).
 - The bottleneck is the single serialised TTS worker: TTS takes ~3.3 s per 8 s utterance (RTF ≈ 0.4), so the lock saturates at
   ~2.4 concurrent speakers. STT time grows under load only because it competes for the same GPU.
 - Compare with the Mac (2025-11-28, Piper, 12 sessions 100 %, 15 sessions 73 %): the same order of concurrency, but there the voice is
-  the generic Piper one; here it is the owner's zero-shot clone. Different metric and engine: not a like-for-like benchmark.
+  the generic Piper one; here it is the test speaker's zero-shot clone. Different metric and engine: not a like-for-like benchmark.
 - STT drift under load stayed flat (`wer_vs_idle` ≈ 0.19–0.20 at every N; it is a constant offset from clip composition, not a trend).
   Output speech length ratio stayed ≈ 1.0, so no truncation or silent failures were observed.
 
@@ -124,7 +124,7 @@ level, so n_utts per cell is small (2-55); treat single cells as indicative.
 - **Batching (4 requests per `generate()` call, 12 steps) does not help on the T4:** at 4 continuous streams p95 first audio is 4.4 s
   (unbatched 2.0 s), at 12 meeting participants 6.2 s (unbatched 2.6 s). It only helps once the GPU is already overloaded (24 meeting
   participants: p95 12.5 s vs 19.1 s). With the GPU at 90-95 % there is no idle capacity to batch into; a larger GPU is the lever.
-- **Owner ear verdict (2026-10-02, `voice-ratings.json`, one clip per cell):** EN 12 steps 5/5 keep, EN 16 steps 5/5 keep; SK 12 steps **4/5**, SK 16 steps **2/5 ("not clear, cuts off the words")**. So 12 steps is not worse by ear (round-trip WER also equal in section 4) and is now the default (`OMNIVOICE_STEPS`, `backend/tts/omni_tts.py`). One clip each: the 16-step SK cut-off may be a one-off, not a systematic fault.
+- **Listening verdict (2026-10-02, `voice-ratings.json`, one clip per cell):** EN 12 steps 5/5 keep, EN 16 steps 5/5 keep; SK 12 steps **4/5**, SK 16 steps **2/5 ("not clear, cuts off the words")**. So 12 steps is not worse by ear (round-trip WER also equal in section 4) and is now the default (`OMNIVOICE_STEPS`, `backend/tts/omni_tts.py`). One clip each: the 16-step SK cut-off may be a one-off, not a systematic fault.
 - Same ratings, other clips: OmniVoice clones EN/SK/CS 5/5 keep, X-Voice 4/5 keep, SeamlessM4T S2ST all kill (generic voice), old Piper-based demo material 1-3 (kill).
 
 ## Not measured / limits

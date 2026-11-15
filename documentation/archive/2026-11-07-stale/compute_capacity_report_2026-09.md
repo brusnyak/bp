@@ -1,8 +1,8 @@
 # Compute capacity: what the current hardware costs us, what a CUDA box would buy
 
 **Status:** living document — opened 2026-09-29, first refresh due 2026-10-05.
-**Purpose:** support the hardware discussion with the thesis handler (possible
-NVIDIA laptop and/or a university server). Every number is labelled
+**Purpose:** support the hardware discussion with the technical report reviewer (possible
+NVIDIA laptop and/or a processing server). Every number is labelled
 `MEASURED` (produced on this project's own hardware, with the file that proves
 it) or `PROJECTED` (derived from a measured rate plus an architecture/price
 argument). **No unlabelled numbers.** Constitution II: a projection is never
@@ -26,7 +26,7 @@ hypotheses a week and testing one.
 
 | Workload | Rate | Evidence |
 |---|---|---|
-| Piper VITS fine-tune (2500 steps, batch 8, 50 clips) | **4 h 40 min → 0.149 it/s ≈ 6.7 s/step** (measured to completion 2026-09-30 01:48) | `MEASURED` `processed/overnight_hq_2026-09-30.log` (copied from /tmp 2026-10-01; checkpoints still at `/tmp/piper_finetune_work_sk/`, 6.3G — do not delete before thesis), `/tmp/piper_finetune_work_sk/…/version_0/checkpoints/last-v1.ckpt` (`global_step=2500`) |
+| Piper VITS fine-tune (2500 steps, batch 8, 50 clips) | **4 h 40 min → 0.149 it/s ≈ 6.7 s/step** (measured to completion 2026-09-30 01:48) | `MEASURED` `processed/overnight_hq_2026-09-30.log` (copied from /tmp 2026-10-01; checkpoints still at `/tmp/piper_finetune_work_sk/`, 6.3G — do not delete before technical report), `/tmp/piper_finetune_work_sk/…/version_0/checkpoints/last-v1.ckpt` (`global_step=2500`) |
 | Same, first estimate mid-run | 0.07–0.08 it/s (~13 s/step) — **2× pessimistic**; the per-epoch timer counted epochs, not batches | `MEASURED` superseded by the row above |
 | Same, on MPS instead of CPU | **slower than CPU** | `MEASURED` 2026-08, script docstring (VITS constant-padding ops leave the MPS fast path) |
 | OmniVoice bulk corpus, 30 s clip | **RTF 0.93–1.22 (MPS, float32)** | `MEASURED` `processed/omni_hq_sk/manifest.json` (50 clips), `processed/omni_hq_en/manifest.json` (15 clips) |
@@ -82,7 +82,7 @@ norm rather than a measurement, it is marked as such.
 | `make test` + live smoke | ~2–4 min | ~1–2 min | `PROJECTED` ~2× (faster-whisper on CUDA) |
 | **Voice iteration cadence** | **~1 model/day** | **~4–6 models/day** | derived from the two rows above |
 
-### 4.2 Scenario B — university server or rented CUDA (any modern NVIDIA card)
+### 4.2 Scenario B — processing server or rented CUDA (any modern NVIDIA card)
 
 Same per-hour multipliers as A; the difference is operational, not
 architectural:
@@ -94,7 +94,7 @@ architectural:
 | One-time setup | ~1–2 h: CUDA container, corpus upload, `.onnx` download | estimate |
 | Data residency | voice clips leave the Mac | **policy constraint**, see §6 |
 
-A university server is strictly better than renting *if access is granted*: no
+A processing server is strictly better than renting *if access is granted*: no
 per-hour cost, no upload of personal voice data to a third party, and
 typically the fastest card available.
 
@@ -116,7 +116,7 @@ the NVIDIA laptop is the better research box and the Mac stays the demo box.
 1. **Hypothesis throughput.** Step-count ablations (2500 vs 5000 vs 10 000),
    base-voice comparisons (jirka vs a fresh SK base) and QC experiments each
    cost a working day today. At ~1.5 h each they become same-day — which is
-   what turns a "we tried one setting" section of the thesis into a measured
+   what turns a "we tried one setting" section of the technical report into a measured
    comparison.
 2. **Parallelism.** 16 GB unified memory is the hard constraint; the runbook
    forbids running an STT spike during a train. 32 GB + 8 GB VRAM lets the
@@ -135,12 +135,12 @@ the NVIDIA laptop is the better research box and the Mac stays the demo box.
   a slow demo.
 - **Local-first constraint.** The constitution forbids cloud services in the
   pipeline. Training on a remote machine is not the pipeline, but it does move
-  personal voice recordings off the Mac — fine on a university server under the
-  owner's control; worth a sentence of disclosure if it is a rented third-party
+  personal voice recordings off the Mac — fine on a processing server under the
+  maintainer's control; worth a sentence of disclosure if it is a rented third-party
   box.
 - **All Scenario A/B/C numbers are projections.** They are anchored on two
   measured rates (0.07–0.08 it/s CPU, RTF ~1.0–1.2 on MPS) plus community norms
-  for CUDA. They must be re-labelled if ever measured, and thesis §5.2 may cite
+  for CUDA. They must be re-labelled if ever measured, and technical report §5.2 may cite
   the measured rows only.
 - **Voice quality will not improve from hardware.** More steps help; a faster
   box only lets us find out sooner.
@@ -149,9 +149,9 @@ the NVIDIA laptop is the better research box and the Mac stays the demo box.
 
 1. Do not buy before the current overnight fine-tune is ear-QC'd. If
    `me_omni_piper_sk` scores well, the Mac has already proven sufficient for
-   the thesis deliverable and the ask becomes about *research capacity*, not
+   the technical report deliverable and the ask becomes about *research capacity*, not
    *capability*.
-2. If a machine is offered, prefer **the university server** (no cost, no
+2. If a machine is offered, prefer **the processing server** (no cost, no
    third-party data transfer), then the NVIDIA laptop as the fallback.
 3. The first thing to run on new hardware is the **step-count ablation** — the
    cheapest experiment with the largest quality upside.
@@ -163,7 +163,7 @@ the NVIDIA laptop is the better research box and the Mac stays the demo box.
 
 **Decision impact:** The new voice solves the STT intelligibility issue for any synthesized SK path, while preserving real‑time product latency on CPU‑only hardware.
 
-**Next steps:** Ear‑QC verdict from the owner, register a new engine entry ( pending), update the Voice Lab library (run ), and update the demo notes if a voice switch occurs.
+**Next steps:** Ear‑QC verdict from the maintainer, register a new engine entry ( pending), update the Voice Lab library (run ), and update the demo notes if a voice switch occurs.
 
 ## 8. Refresh log
 

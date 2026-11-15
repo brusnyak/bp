@@ -25,5 +25,5 @@
     "silence_timeout_s": 0.25,
     "max_segment_s": 3.0
   },
-  "notes": "Reference pair. EN in, SK out; SK voice is the owner's fine-tune with a generic fallback."
+  "notes": "Reference pair. EN in, SK out; SK voice is the test speaker's fine-tune with a generic fallback."
 }

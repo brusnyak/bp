@@ -1,6 +1,6 @@
 # Support ticket — Microsoft Teams sign-in loop on Mac (Authenticator)
 
-Status: draft, ready to send to STU IT / Microsoft 365 helpdesk.
+Status: draft, ready to send to project IT / Microsoft 365 helpdesk.
 Fill the [BRACKETS], copy the message below into the helpdesk form or email.
 
 ## Send-to message (copy/paste)
@@ -18,13 +18,13 @@ Authenticator activation loop:
   supposed to come from the app — so the two apps keep requesting
   the code from each other and I never get past activation.
 
-Account: [STU LOGIN / UPN, e.g. xname@stuba.sk]
+Account: [project LOGIN / UPN, e.g. xname@stuba.sk]
 Affected device: Mac, macOS [VERSION], Teams build [VERSION, e.g. 24293.x],
   Authenticator on [iPhone/Android, app version].
 What I already tried: [reinstall Teams / remove account and re-add /
   Authenticator backup-restore / date-time auto-sync — delete whichever
   does not apply].
-Impact: I need Teams working for thesis-defense meetings; currently
+Impact: I need Teams working for review meetings; currently
   blocked on every sign-in attempt.
 
 Please reset my MFA/Authenticator registration (or re-issue activation)
@@ -33,7 +33,7 @@ and tell me the exact re-enrollment steps.
 Thank you,
 [NAME], [FACULTY, STUDY PROGRAMME], tel. [PHONE]
 
-## Notes for the owner
+## Notes for the maintainer
 
 - The loop described ("app asks for a code from itself") is the classic
   orphaned MFA registration: fix is server-side (admin resets the

@@ -1,7 +1,7 @@
 # Progress since the break — what is demonstrably better than the spring state (2026-09-28)
 
-Why this file exists: the thesis work was picked up again in August after a dormant
-stretch, so the handler will ask "what did you actually add?". This is the answer with a
+Why this file exists: the technical report work was picked up again in August after a dormant
+stretch, so the reviewer will ask "what did you actually add?". This is the answer with a
 source per claim, plus the honest list of what did **not** improve. Nothing here is
 estimated; every number is from a recorded measurement in this repo or from today's runs.
 

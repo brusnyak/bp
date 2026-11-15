@@ -4,7 +4,7 @@ Purpose: measure synthesis RTF on any CUDA GPU (free Colab/Kaggle T4 is enough) 
 "a GPU would make live cloned voice possible" claim from PROJECTED into MEASURED.
 
 1. Colab → upload `gpu_bench.ipynb` → Runtime: GPU → run cells; upload
-   `processed/gpu_bench/gpu_bench_upload.zip` (script + 3 reference clips of the owner, 5–7 s each;
+   `processed/gpu_bench/gpu_bench_upload.zip` (script + 3 reference clips of the test speaker, 5–7 s each;
    EN/SK/CS). Local-only file: `*.wav` is gitignored; never commit the refs.
 2. Download `results.zip` → `gpu_bench.json` + 6 wavs. Listen to the wavs (ear grade is the real metric).
 3. Paste `gpu_bench.json` numbers into `documentation/model_landscape_2026-10.md` §10.1 as MEASURED

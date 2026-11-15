@@ -2,7 +2,7 @@
 1. Python 3.11 through uv (Kaggle ships 3.13, setup.py needs 3.10-3.12).  2. `python scripts/setup.py --profile nvidia --langs de,sk,fr` (the real installer).
 3. Start the server with presets/nvidia.env only (no LD_LIBRARY_PATH: backend/cuda_libs.py must find the pip-installed CUDA libraries).
 4. Replay through the real route: EN->DE (regression), DE->EN (German speech in), SK->EN (Slovak speech in, kinit model).
-5. Export the converted translation models (en-de, de-en, en-fr) so the owner's Mac can use them without converting locally.
+5. Export the converted translation models (en-de, de-en, en-fr) so the test speaker's Mac can use them without converting locally.
 Writes /kaggle/working/fresh_install.json after every step."""
 import io, json, os, re, secrets, shutil, statistics as st, subprocess, sys, time, urllib.request
 from pathlib import Path
@@ -103,7 +103,7 @@ def run(src_l, tgt_l):
 if have['venv']:
     for s_, t_ in (('en', 'de'), ('de', 'en'), ('sk', 'en')): run(s_, t_)
 
-# 5. export the converted translation models for the owner's Mac
+# 5. export the converted translation models for the test speaker's Mac
 for pair in ('en-de', 'de-en', 'en-fr'):
     d = BP / 'ct2_models' / f'Helsinki-NLP--opus-mt-{pair}'
     if d.exists(): shutil.copytree(d, OUT / 'export' / 'ct2_models' / d.name, dirs_exist_ok=True)

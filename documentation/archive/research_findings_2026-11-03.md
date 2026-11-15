@@ -27,7 +27,7 @@ the target language. For Slovak output, every major open zero-shot voice-cloning
 | SeamlessM4T v2 (Meta) | CC-BY-NC | ✅ S2S (slk: Sp,Tx,Sp,Tx) | ~6 GB | Prosody, not identity | End-to-end speech→speech; SK output supported |
 
 **Implication:** there is no off-the-shelf open model that clones a voice into Slovak.
-The project's existing path (Piper fine-tune on the owner's voice, then generic SK output)
+The project's existing path (Piper fine-tune on the test speaker's voice, then generic SK output)
 is one of the few viable routes. Any "your own voice in Slovak" feature requires either
 (a) training a Piper/custom TTS on Slovak data, or (b) accepting prosody-preserving S2S
 (SeamlessM4T v2) without true speaker identity.
@@ -74,7 +74,7 @@ quality reference and potential offline-voice option.
 
 ## 4. STT for Slovak (the SK→EN bottleneck)
 
-| Model | License | Slovak WER (owner mic) | RTF | VRAM | Fit for T4 |
+| Model | License | Slovak WER (maintainer mic) | RTF | VRAM | Fit for T4 |
 |-------|---------|------------------------|-----|------|------------|
 | whisper-small-sk (fine-tune) | MIT | 0.2143 clean / ~0.32 mic | 0.12-0.14 | ~3.6 GB | ✅ baseline |
 | whisper-large-v3-turbo | MIT | 0.36-0.52 mic | 0.6 | ~800 MB | ❌ too slow/poor on SK |
@@ -104,7 +104,7 @@ on SK — needs GPU validation (Kaggle T4). This is the pivot candidate.
 
 | Model | License | SK? | VRAM (T4) | RTF | Cloning |
 |-------|---------|-----|-----------|-----|---------|
-| Piper (CPU) | MIT | ✅ | ~0.3 GB | 0.04 | Fine-tune (owner voice) |
+| Piper (CPU) | MIT | ✅ | ~0.3 GB | 0.04 | Fine-tune (maintainer voice) |
 | Kokoro 82M | Apache 2.0 | ❌ EN only | 1.33 GB | 0.03 | No (54 preset voices) — EN output only |
 | Chatterbox Multilingual | MIT | ❌ | 4-8 GB | ~1-2x | 5-7 s zero-shot |
 | Qwen3-TTS 0.6B | Apache 2.0 | ❌ | 4 GB | 97 ms first-packet | 3 s zero-shot |
@@ -123,7 +123,7 @@ to the cloud (GDPR, privacy, cost).
 
 **Our gap:** "your own voice" in Slovak output. No open ZS-TTS supports SK. Piper fine-tune
 is the only path; it's CPU-fast (RTF 0.04) but takes 4-8 h to train on a Mac and the voice
-quality has been kill-graded for trembling (owner 2026-10-01). Zero-shot cloning into SK
+quality has been kill-graded for trembling (maintainer 2026-10-01). Zero-shot cloning into SK
 doesn't exist yet in open source.
 
 ---
@@ -135,7 +135,7 @@ doesn't exist yet in open source.
 | STT (EN) | faster-whisper `base` int8 | Parakeet EN / Qwen3-ASR | verified |
 | STT (SK) | whisper-small-sk int8 | Canary AST (SK→EN, collapses STT+MT) | experimental — WER 0.2143 > 0.2 gate |
 | MT | Opus-MT CT2 int8 | MADLAD-3B (CUDA) | verified |
-| TTS (SK) | Piper (owner fine-tune) | SeamlessM4T v2 S2S (prosody) | Piper verified; SK clone = fine-tune only |
+| TTS (SK) | Piper (custom fine-tune) | SeamlessM4T v2 S2S (prosody) | Piper verified; SK clone = fine-tune only |
 | TTS (EN) | Piper | Kokoro 82M (RTF 0.03, 1.33 GB) | Kokoro = strong GPU EN option |
 | S2S (end-to-end) | — | SeamlessM4T v2 (CC-BY-NC) | quality reference, not live |
 

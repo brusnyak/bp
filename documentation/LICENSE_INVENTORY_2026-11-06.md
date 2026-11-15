@@ -2,7 +2,7 @@
 
 **Purpose:** Commercial-use readiness audit. Fail-closed: non-commercial and unknown-licence
 engines are blocked unless explicitly opted in. Piper is GPL-3.0-or-later (not MIT) — it is
-fine to run locally but shipping it inside a non-GPL bundle is a licence decision for the owner.
+fine to run locally but shipping it inside a non-GPL bundle is a licence decision for the maintainer.
 
 ## Pipeline components (local-first, no cloud in the pipeline)
 
@@ -13,8 +13,8 @@ fine to run locally but shipping it inside a non-GPL bundle is a licence decisio
 | Opus-MT (MT models) | Helsinki-NLP/opus-mt-* | CC-BY-4.0 | ✅ Yes | Attribution required |
 | whisper-base (STT model) | openai/whisper | MIT | ✅ Yes | EN STT, base size |
 | whisper-small-sk (STT model) | NaiveNeuron/whisper-small-sk | MIT | ✅ Yes | SK STT, flawed (Czech-like hallucinations, WER 0.25–0.32) |
-| Piper TTS | rhasspy/piper | GPL-3.0-or-later | ⚠️ Locally only | Not bundled; user installs via `scripts/setup.py --dev`. Shipping in a non-GPL bundle requires owner licence decision. |
-| sk_SK-personal-male-medium (voice) | Owner fine-tune | Owner's voice | ✅ Yes | Owner's own recording, fine-tuned from Piper base |
+| Piper TTS | rhasspy/piper | GPL-3.0-or-later | ⚠️ Locally only | Not bundled; user installs via `scripts/setup.py --dev`. Shipping in a non-GPL bundle requires maintainer licence decision. |
+| sk_SK-personal-male-medium (voice) | custom fine-tune | Test speaker's voice | ✅ Yes | Test speaker's recording, fine-tuned from Piper base |
 | en_US-john-medium (TTS voice) | rhasspy/piper voices | Public domain / CC0 | ✅ Yes | Generic English fallback |
 | sk_SK-lili-medium (TTS voice) | rhasspy/piper voices | Public domain / CC0 | ✅ Yes | Generic Slovak fallback |
 | WebRTC VAD | webrtcvad | BSD-style | ✅ Yes | Always CPU |
@@ -42,7 +42,7 @@ fine to run locally but shipping it inside a non-GPL bundle is a licence decisio
 ## Licence gate behaviour (backend/registry.py)
 
 - `commercial-ok`: ships in default profile
-- `gpl-3.0` (piper): fine to run locally; shipping in a non-GPL bundle is a licence decision for the owner
+- `gpl-3.0` (piper): fine to run locally; shipping in a non-GPL bundle is a licence decision for the maintainer
 - `non-commercial`: blocked unless `allow_noncommercial=True` (XTTS, NLLB)
 - `unknown`: blocked unless `allow_unknown=True` (confirm model card first)
 

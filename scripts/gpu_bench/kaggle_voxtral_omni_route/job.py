@@ -1,6 +1,6 @@
 """(Omni variant) Voxtral via vLLM on GPU 0 + OmniVoice cloning TTS on GPU 1 (Kaggle gives two T4s), owner voice from the first 12 s of the English reading.
 Voxtral Realtime served by vLLM (eager, T4) through the REAL route (2026-11-09): vLLM server as a sidecar process in its own venv, app.py with
-BP_STT_ENGINE=voxtral_vllm, the owner's 60 s English reading replayed at 1x with scripts/live/paced_replay.py (same replay and metrics as kaggle_route_test and
+BP_STT_ENGINE=voxtral_vllm, the test speaker's 60 s English reading replayed at 1x with scripts/live/paced_replay.py (same replay and metrics as kaggle_route_test and
 kaggle_voxtral_route, so the earlier Whisper control run (median lag 3.16 s, error 10.7%, agree_short en->de) is the comparison).
 Runs: agree_short en->de, agree_short en->sk (tts omnivoice, num_step 12).  Writes /kaggle/working/route_test.json after every run; removes the venv and the code copy at the end."""
 import glob, json, os, re, secrets, shutil, site, statistics as st, subprocess, sys, time, urllib.request

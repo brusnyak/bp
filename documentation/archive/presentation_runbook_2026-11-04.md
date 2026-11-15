@@ -1,6 +1,6 @@
 # Live presentation runbook (EN speech → SK/CS speech) — 2026-11-04
 
-Status: draft from measurements in `implementation-2026-11-04/streaming-findings.md`. Voice cloning is out of scope for the first show (owner, 2026-11-04); generic Piper voice is the live voice. Every number below names its source; anything else is `unverified`.
+Status: draft from measurements in `implementation-2026-11-04/streaming-findings.md`. Voice cloning is out of scope for the first show (maintainer, 2026-11-04); generic Piper voice is the live voice. Every number below names its source; anything else is `unverified`.
 
 ## What to expect (measured, M1 CPU, Piper, EN→SK, 45 s continuous reading)
 
@@ -33,6 +33,6 @@ Status: draft from measurements in `implementation-2026-11-04/streaming-findings
 | Stop / Start 20× including mid-sentence | no late audio after Stop |
 | Projector room, real speakers | no feedback loop (headphones or isolated output) |
 
-## Deployment checklist (beside LHC)
+## Deployment checklist (beside conference-room)
 
 Unknown until the site visit: room input/return channels, OS, install rights, who signs off. Ask for: GPU model and VRAM, OS and admin rights, how the room audio reaches a PC, whether a virtual device (BlackHole on macOS, VB-Cable on Windows) may be installed, echo isolation of the return path. `guide.md` has the virtual-device notes; README does not yet.

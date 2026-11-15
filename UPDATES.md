@@ -1,6 +1,6 @@
 # BP — Updates (pre-push)
 
-Prepared 2026-10-30. Local clone: `~/Documents/STU/BP` at GitHub `main` (`faf68ff`, 2026-10-21). These are uncommitted changes awaiting your push approval (AGENTS.md hard rule: no push without owner go-ahead).
+Prepared 2026-10-30. Local clone: `~/bp` at GitHub `main` (`faf68ff`, 2026-10-21). These are uncommitted changes awaiting your push approval (AGENTS.md hard rule: no push without maintainer go-ahead).
 
 ## 1. SK→EN STT quality tiers (`backend/main.py`)
 
@@ -15,7 +15,7 @@ Removed the old silent fallback to `large-v3-turbo` (worst of both worlds: slow 
 
 ## 2. JWT authentication on WebSocket (`backend/main.py` + `ui/live-speech/live-script.js`)
 
-**Problem:** `/ws` was unauthenticated and registration open — README itself warns not to expose to untrusted networks. A blocker for any public/university LAN deployment.
+**Problem:** `/ws` was unauthenticated and registration open — README itself warns not to expose to untrusted networks. A blocker for any public/shared LAN deployment.
 
 **Fix:**
 - `handle_audio_stream(websocket, token=None)` now requires `?token=<jwt>` query param; closes `4003` (missing) or `4003` (invalid/expired/user-not-found) otherwise.
@@ -61,15 +61,15 @@ Backend runs on `http://localhost:8000` (`BP_NO_SSL=1`). Cloudflare Quick Tunnel
 
 **This is ephemeral** — URL changes on every `cloudflared` restart, no uptime SLA. For a stable custom subdomain (e.g. `bp.yourdomain.com` or `real-time-translation-in-your-own-voice.yourdomain.com`), you must first register a domain and add it to Cloudflare (free tier); then I can create a named tunnel + DNS route.
 
-## Thesis mode / UI staleness
+## technical report mode / UI staleness
 
-**Thesis mode is present** in this clone (GitHub `main`): `ui/home/home.css` has `.thesis-mode` sections, `DESIGN.md` documents it. The UI served through the tunnel is the GitHub version.
+**technical report mode is present** in this clone (GitHub `main`): `ui/home/home.css` has `.technical report-mode` sections, `DESIGN.md` documents it. The UI served through the tunnel is the GitHub version.
 
-If you removed thesis mode in a *different* local checkout and want that removal on GitHub, **pushing my changes will not do it** — my clone still has thesis mode. You would need to either:
-(a) push your checkout with thesis mode removed, or
-(b) remove thesis mode here (`ui/home/` thesis CSS/sections) and then push.
+If you removed technical report mode in a *different* local checkout and want that removal on GitHub, **pushing my changes will not do it** — my clone still has technical report mode. You would need to either:
+(a) push your checkout with technical report mode removed, or
+(b) remove technical report mode here (`ui/home/` technical report CSS/sections) and then push.
 
-Ask if you want me to remove thesis mode from this clone before pushing.
+Ask if you want me to remove technical report mode from this clone before pushing.
 
 ## Files changed
 
@@ -85,7 +85,7 @@ New:
 
 ## Before pushing (your approval needed)
 
-AGENTS.md hard rule: no push without owner go-ahead. Confirm:
+AGENTS.md hard rule: no push without maintainer go-ahead. Confirm:
 1. Approve `git push origin main` with the above changes?
-2. Remove thesis mode from this clone before pushing? (yes/no)
+2. Remove technical report mode from this clone before pushing? (yes/no)
 3. Any other changes to fold in first (e.g. the unverified `~/bp-review-2026-10-26/` workspace modifications to `ci.yml`/`Makefile`/`sdk.md`/`language_packs.py`)?

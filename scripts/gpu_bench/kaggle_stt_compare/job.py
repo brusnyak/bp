@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Kaggle T4 kernel: STT comparison — Distil Large v3 Turbo vs Parakeet TDT v3.
 
-Tests both STT engines on the owner's three voice memos:
+Tests both STT engines on the test speaker's three voice memos:
   - Staroměstské odpoledne (CS)
   - Trhove rano (SK)
   - The Rainbow Passage (EN)

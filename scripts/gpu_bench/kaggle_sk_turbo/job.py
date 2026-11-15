@@ -1,5 +1,5 @@
 """Kaggle T4: Slovak speech recognition, incumbent vs plain turbo vs kinit/whisper-large-v3-turbo-sk.
-Data: FLEURS sk_sk test (60 clips) + the owner's script reading (private dataset bp-owner-scripts-20261107).
+Data: FLEURS sk_sk test (60 clips) + the test speaker's script reading (private dataset bp-owner-scripts-20261107).
 Converts the Hugging Face models to CTranslate2 (float16), scores WER and speed with faster-whisper.
 Writes /kaggle/working/sk_compare.json after every cell."""
 import glob, io, json, os, re, subprocess, sys, time, ctypes

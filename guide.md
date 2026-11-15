@@ -1,6 +1,6 @@
 # Project Guide: Real-Time Speech Translation System
 
-This document provides a concise technical overview of the Real-Time Speech Translation System, outlining its architecture, key technologies, and operational principles. It serves as a detailed guide for understanding the project's core components and design decisions, without the extensive detail of the full thesis.
+This document provides a concise technical overview of the Real-Time Speech Translation System, outlining its architecture, key technologies, and operational principles. It serves as a detailed guide for understanding the project's core components and design decisions, without the extensive detail of the full technical report.
 
 ## 1. Project Overview
 

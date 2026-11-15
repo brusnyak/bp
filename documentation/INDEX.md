@@ -16,7 +16,7 @@
 
 | Read | When |
 |---|---|
-| [`PLAN_2026-11-10.md`](PLAN_2026-11-10.md) | **Current plan and decisions** (2 s goal, Slovak-input result, voice options, ordered actions, owner decisions). Wins over older pages where they disagree |
+| [`PLAN_2026-11-10.md`](PLAN_2026-11-10.md) | **Current plan and decisions** (2 s goal, Slovak-input result, voice options, ordered actions, project decisions). Wins over older pages where they disagree |
 | [`HANDOFF_2026-11-10.md`](HANDOFF_2026-11-10.md) | Decisions, measured state, Kaggle kernels, ordered next steps (2026-11-10) |
 | [`evidence/2026-11-10/`](evidence/2026-11-10/) | Receipts for the plan: strategy matrix on generic audio, TTS latency probes |
 | [`STATUS.md`](STATUS.md) | Where the project stands: what works, what is measured but not built, what is not built, decisions |
@@ -34,7 +34,7 @@
 | [`model_landscape_2026-10.md`](model_landscape_2026-10.md), [`s2s_landscape_2026-10-18.md`](s2s_landscape_2026-10-18.md) | Engine research with `MEASURED`/`VENDOR` labels (October; superseded by BENCHMARKS where they overlap) |
 | [`LICENSE_INVENTORY_2026-11-06.md`](LICENSE_INVENTORY_2026-11-06.md) | Licences of engines, models and voices |
 | [`VERIFICATION_RESULTS_2026-11-06.md`](VERIFICATION_RESULTS_2026-11-06.md), [`load_tests_2026-10.md`](load_tests_2026-10.md) | Earlier verification and load measurements (read with the dates in mind) |
-| [`fundamentals.md`](fundamentals.md), [`fundamentals_deep.md`](fundamentals_deep.md), [`thesis_draft.md`](thesis_draft.md), [`piper_training_runbook.md`](piper_training_runbook.md), [`supabase_auth_db_guide.md`](supabase_auth_db_guide.md) | Background, thesis text, voice training, auth |
+| [`fundamentals.md`](fundamentals.md), [`fundamentals_deep.md`](fundamentals_deep.md), [`technical_report.md`](technical_report.md), [`piper_training_runbook.md`](piper_training_runbook.md), [`supabase_auth_db_guide.md`](supabase_auth_db_guide.md) | Background, technical report text, voice training, auth |
 
 ## New test scripts (this session)
 

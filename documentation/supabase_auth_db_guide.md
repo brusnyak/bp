@@ -2,7 +2,7 @@
 
 Status 2026-09-25: local SQLite + password login + Google ID-token login behind
 `GOOGLE_CLIENT_ID` all work without Supabase. Migrate only when multi-machine or
-handler-facing accounts matter. Nothing below blocks the demo.
+reviewer-facing accounts matter. Nothing below blocks the demo.
 
 ## A. Google login right now (no Supabase needed)
 

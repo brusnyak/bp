@@ -116,14 +116,14 @@
 | `me_sk_trhove_b.m4a` | ~109s | SK | Same as trhove | SK source B |
 | `me_cs_staromestske.m4a` | ~25s | CS | Czech Old Town Square story | CS source |
 
-**Backup:** `~/Documents/STU/BP-voice-backup/speaker_voices/` — identical copy.
+**Backup:** `~/bp-voice-backup/speaker_voices/` — identical copy.
 
 ### 4.2 Piper Models (`backend/tts/piper_models/`) — gitignored
 
 | Model | Language | Purpose |
 |-------|----------|---------|
-| `sk_SK-personal-male-medium.onnx` | SK | Owner's cloned SK voice (default SK output) |
-| `en_US-personal-v2.onnx` | EN | Owner's cloned EN voice |
+| `sk_SK-personal-male-medium.onnx` | SK | Test speaker's cloned SK voice (default SK output) |
+| `en_US-personal-v2.onnx` | EN | Test speaker's cloned EN voice |
 | `sk_SK-lili-medium.onnx` | SK | Generic SK fallback (CC0) |
 | `en_US-john-medium.onnx` | EN | Generic EN fallback (public domain) |
 | `en_US-kristin-medium.onnx` | EN | Generic EN (CC0) |
@@ -201,7 +201,7 @@
 
 | File | Purpose |
 |------|---------|
-| `ARCHITECTURE_V2.md` | **v2**: Full architecture, deployment modes, LHC fit |
+| `ARCHITECTURE_V2.md` | **v2**: Full architecture, deployment modes, conference-room fit |
 | `STREAMING_SPEC.md` | **v2**: Streaming STT→MT→TTS spec, latency budget |
 | `MULTI_SPEAKER.md` | **v2**: Multi-speaker meeting design, API endpoints |
 | `PROJECT_INDEX.md` | **v2**: This file — complete asset inventory |
@@ -257,7 +257,7 @@
 | `project_overview.md` | Project overview |
 | `project_status_2026-10-20.md` | Project status |
 | `progress_since_the_break.md` | Progress report |
-| `thesis_draft.md` | Thesis draft |
+| `technical_report.md` | technical report draft |
 | `cli_quickref.md` | CLI quickref |
 | `ci.yml.example` | CI example |
 | `supabase_auth_db_guide.md` | Auth guide |

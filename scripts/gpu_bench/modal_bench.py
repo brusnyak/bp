@@ -1,7 +1,7 @@
 """Run the GPU bench on Modal: X-Voice + OmniVoice zero-shot cloning (EN/SK/CS) and SeamlessM4T v2 S2ST.
 
   BENCH_GPU=T4   modal run scripts/gpu_bench/modal_bench.py     # also L4, A10G, L40S (Ada, ~4090-class), A100
-Needs `modal` authorised once (`modal token new`). Refs (the owner's voice, 5-7 s each) are read from
+Needs `modal` authorised once (`modal token new`). Refs (the test speaker's voice, 5-7 s each) are read from
 processed/gpu_bench/refs and uploaded to Modal for the run; outputs land in processed/gpu_bench/modal_<GPU>/.
 Image build (deps + X-Voice checkpoints) is cached after the first run.
 """

@@ -1,6 +1,6 @@
 # Demo runbook — live EN→SK in my own voice (2026-09-28)
 
-Purpose: one page to run the thesis demo from, on either laptop, without re-deriving
+Purpose: one page to run the technical report demo from, on either laptop, without re-deriving
 anything. Companion files: `documentation/monday_test_checklist.md` (the longer
 pass/fail matrix), `PLAN.md` (what is done vs open).
 
@@ -38,7 +38,7 @@ secrets, SK voice, MT models, registry, live server). Fallback assets are warnin
 Now whisper, Opus-MT and the Piper SK voice are resident; the first on-stage sentence
 is ~0.8s of compute instead of ~20s of model loading.
 
-## 2. Optional (T−8) — virtual mic + PiP, if the handler wants the "real meeting" view
+## 2. Optional (T−8) — virtual mic + PiP, if the reviewer wants the "real meeting" view
 
 - Select the virtual device (BlackHole 2ch / VB-Cable) in the live page's output dropdown,
   then set it as the microphone in Meet/Zoom/Teams.
@@ -52,7 +52,7 @@ is ~0.8s of compute instead of ~20s of model loading.
 | 2 | Speak a second sentence while the first is still playing | "…and a new utterance interrupts the old one" (barge-in) | first audio stops, new one plays |
 | 3 | Open `lab.html` | "these are the voice candidates I compared, with numbers" | personal male SK vs generic lili |
 | 4 | Play 1 lab A/B pair | "same sentence: generic Czech-base voice vs my fine-tuned SK voice" | timbre difference is audible |
-| 5 | Show `PLAN.md` + `documentation/thesis_draft.md` | "what is measured, what is still open" | — |
+| 5 | Show `PLAN.md` + `documentation/technical_report.md` | "what is measured, what is still open" | — |
 | 6 | Close with the honest gap (below) | "SK→EN speech recognition is the binding constraint; CZ is the cleaner second direction" | — |
 
 ## 4. Numbers to quote (measured, one file each)

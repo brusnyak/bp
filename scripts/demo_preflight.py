@@ -46,7 +46,7 @@ OPTIONAL = [
 ]
 
 
-# Owner-local assets: gitignored by design (personal voices cannot be re-downloaded). On a fresh clone they are expected to be
+# Optional local assets (custom voices): gitignored by design (personal voices cannot be re-downloaded). On a fresh clone they are expected to be
 # missing and the app falls back to the generic Piper voice, so they are reported as warnings there, not failures.
 OWNER_LOCAL = {
     "backend/tts/piper_models/sk_SK-personal-male-medium.onnx",
@@ -56,7 +56,7 @@ OWNER_LOCAL = {
 
 
 def is_fresh_clone(repo_root):
-    """No personal SK voice on disk = not the owner's machine."""
+    """Detect whether optional custom voice assets are installed."""
     return not os.path.exists(os.path.join(repo_root, "backend/tts/piper_models/sk_SK-personal-male-medium.onnx"))
 
 
@@ -132,7 +132,7 @@ def main():
     required = check_paths(REQUIRED, REPO_ROOT) + check_env_secrets(REPO_ROOT)
     soft = []
     if is_fresh_clone(REPO_ROOT):
-        print("Fresh clone detected (no personal SK voice): owner-local assets are warnings; the generic Piper voice is used.")
+        print("Fresh clone detected (no personal SK voice): optional local assets (custom voices) are warnings; the generic Piper voice is used.")
         required, soft = split_fresh(required)
     required_ok = report("REQUIRED (demo cannot start without these)", required)
     if soft:

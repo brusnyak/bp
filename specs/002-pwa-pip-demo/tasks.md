@@ -23,5 +23,5 @@
 - [ ] T013 Manual verify: install prompt + offline shell load on Mac Chrome + Windows Edge
   (self-signed cert may block install — fallback: plain HTTPS page, still fully functional)
 
-## Blocked on owner recordings
+## Blocked on custom recordings
 - [ ] T010 Quiet-room sessions: EN top-up + SK read (gates SK→EN liveness, sk_SK-personal build, listening QC)

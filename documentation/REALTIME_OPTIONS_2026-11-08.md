@@ -26,5 +26,5 @@ Question: is there something that already produces a transcript, a translation o
 
 1. Nothing read shows an open model that streams Slovak speech at usable accuracy. Slovak input stays on Whisper with phrase or clause cutting.
 2. English and German input have a streaming path worth testing (Voxtral Realtime), and the demo case (an English speaker, Slovak or German listeners) is exactly the accurate case.
-3. A hosted service can show what "near real time for Slovak" looks like with someone else's engineering, which settles whether the target is physically reachable. Sign-up needs the owner's decision (account creation is gated).
+3. A hosted service can show what "near real time for Slovak" looks like with someone else's engineering, which settles whether the target is physically reachable. Sign-up needs the test speaker's decision (account creation is gated).
 4. Streaming recognition into a voice without translation is what voice-agent frameworks (LiveKit Agents, Pipecat) do; that is from general knowledge, not read this session.

@@ -52,7 +52,7 @@ Raw files stay local in the two `/tmp` folders above. Preserve them before an OS
 cleanup if further audit is needed. Checked-in receipts exclude raw transcripts
 and audio; they preserve hashes and numeric results.
 
-## Handler report changes
+## reviewer report changes
 
 `reports/index-report.html`: shorter Slovak overview, directional route table,
 new Kaggle evidence section, latency adjacent to results, historical detail in

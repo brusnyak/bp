@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Kaggle T4 kernel: Piper voice fine-tuning for EN and SK.
 
-Trains Piper TTS voices on the owner's voice recordings:
+Trains Piper TTS voices on the test speaker's voice recordings:
   - EN: The Rainbow Passage (me_en_rainbow.m4a)
   - SK: Trhove rano (me_sk_trhove.m4a)
 

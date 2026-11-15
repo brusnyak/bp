@@ -1,4 +1,4 @@
-"""Real-route validation on a Kaggle T4: start the production server (app.py) from the staged code, replay the owner's English reading through
+"""Real-route validation on a Kaggle T4: start the production server (app.py) from the staged code, replay the test speaker's English reading through
 the real /ws route at 1x with scripts/live/paced_replay.py, once per route configuration, and score delay, transcript accuracy and defects.
 Configs: chunk2 (current default: independent 2 s chunks), agree10 / agree05 (BP_INCREMENTAL=1: growing buffer, commit agreed words, step 1.0 / 0.5 s).
 Targets: en->de (all configs) and en->sk (chunk2, agree10). Everything this installs and downloads is what a user's `setup.py --profile nvidia` would fetch.

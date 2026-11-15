@@ -1,6 +1,6 @@
 """Streaming foundation simulation on a Kaggle T4 (offline, deterministic, no server, no network audio).
 Question: which engine + decoding strategy gives words the earliest, without losing accuracy?
-Streams: the owner's English script reading (115 s) and a German FLEURS concatenation (~2 min, reference = concatenated transcripts).
+Streams: the test speaker's English script reading (115 s) and a German FLEURS concatenation (~2 min, reference = concatenated transcripts).
 Engines: faster-whisper large-v3-turbo fp16 (GPU), Parakeet TDT v3 ONNX (CUDA).
 Strategies: fixed chunks C in {1,2} s (independent, like the current /ws route) and small-step decoding with local agreement (LA-2):
 decode the growing buffer every S in {0.3,0.5,1.0} s, commit the words two consecutive hypotheses agree on, trim the buffer at the last committed word.

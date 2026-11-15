@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """OmniVoice latency/pace tuning on a GPU: what makes the first translated audio faster and the clone's pace match the speaker?
 
-Uses load_bench.Cascade (same STT/MT/TTS objects) on the owner's real segments. For N translated sentences per direction:
+Uses load_bench.Cascade (same STT/MT/TTS objects) on the test speaker's real segments. For N translated sentences per direction:
   A. grid  num_step {32,16,12,8} x speed {1.0,1.2,1.35}: gen time, audio length, chars/s, round-trip WER (STT of the output)
   B. first-chunk: time to synthesize only the first clause (<=6 words) vs the whole first sentence
   C. duration matching: duration = source speech seconds allocated by characters per sentence (isochrony), ratio out/in + WER

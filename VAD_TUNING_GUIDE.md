@@ -80,7 +80,7 @@ SILENCE_RMS_THRESHOLD = 0.04  # Adjusted based on your voice
 
 If you need to change the threshold:
 
-1. **Edit**: `~/Documents/STU/BP/backend/main.py`
+1. **Edit**: `<checkout>/backend/main.py`
 2. **Find line ~137**: `SILENCE_RMS_THRESHOLD = 0.04`
 3. **Change value** based on your needs:
    - Too many false triggers (clicks/noise) → **Increase** (try 0.05)

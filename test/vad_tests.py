@@ -27,7 +27,7 @@ TEST_PASSWORD = "vad-test-pw"
 
 @pytest.fixture(autouse=True)
 def isolated_vad_auth(monkeypatch):
-    """Authenticate the stream without writing a test identity to the owner's database."""
+    """Authenticate the stream without writing a test identity to the test speaker's database."""
     import backend.main as bm
     from backend.utils.db_manager import Base, get_db_session_and_engine
     engine, sessions = get_db_session_and_engine("sqlite:///:memory:")

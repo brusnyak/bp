@@ -17,7 +17,7 @@ Companion files: `model_landscape_2026-10.md` (per-component STT/MT/TTS verdicts
 In 2023 this was a research project. In 2026 it is a product feature and an API call.
 Speech-to-speech translation moved from "a cascade you assemble yourself, ~3 s latency,
 no Slovak TTS" to "one streaming API, sub-second, voice-preserving, 70+ languages
-including Slovak". The engineering problem this thesis solves is now a configuration
+including Slovak". The engineering problem this technical report solves is now a configuration
 of someone else's model, unless the value is deliberately elsewhere (local-only,
 voice identity, or a language pair nobody else serves well).
 
@@ -50,10 +50,10 @@ voice identity, or a language pair nobody else serves well).
   Qwen3-Omni, Voxtral, SeamlessStreaming. Lower latency, prosody preserved, no
   per-pair MT model to source.
 
-The unified path did not make the cascade obsolete for a **thesis**: the cascade is
+The unified path did not make the cascade obsolete for a **technical report**: the cascade is
 inspectable, measurable per stage, swappable, and runs CPU-only. That is the academic
-contribution a thesis can defend. The unified path is what a product would use, and
-using it would delete the thesis.
+contribution a technical report can defend. The unified path is what a product would use, and
+using it would delete the technical report.
 
 ---
 
@@ -137,11 +137,11 @@ speech and support far more languages out of one model.
 
 ## 9. What this changes for the project
 
-1. **Stop positioning as "a product".** Keep the cascade as the thesis contribution:
+1. **Stop positioning as "a product".** Keep the cascade as the technical report contribution:
    per-stage measurement, CPU-only, swappable, reproducible on a laptop.
 2. **Make the pipeline engine-agnostic** so a unified model (Qwen3-Omni local,
    Gemini/Azure via an optional adapter) can be dropped in as a stage, not a rewrite.
-   That is what the supervisor's "collaborate on our custom system" needs.
+   That is what the reviewer's "collaborate on our custom system" needs.
 3. **Adopt the OSS pattern, not the OSS repo, where it costs little:** AlignAtt-style
    streaming is the one upgrade worth taking from SimulStreaming/WhisperLiveKit.
 4. **Guard the licence:** never wire CC-BY-NC models (Seamless, NLLB) into a shipped
@@ -160,7 +160,7 @@ speech and support far more languages out of one model.
 | STT | faster-whisper small-sk / base | Voxtral Realtime, Qwen3-ASR-causal, Parakeet-TDT-v3 (EN) | WER on spontaneous SK + RTF |
 | MT | Opus-MT int8 per pair | NLLW / EuroLLM / a small LLM translate step | chrF/BLEU + latency + licence |
 | TTS | Piper (CPU) | OmniVoice, CosyVoice3, Qwen3-TTS, Voxtral TTS | RTF + similarity + licence |
-| Whole | cascade | Qwen3-Omni local, Gemini Live Translate adapter | Only if the thesis framing can absorb it |
+| Whole | cascade | Qwen3-Omni local, Gemini Live Translate adapter | Only if the technical report framing can absorb it |
 
 ---
 

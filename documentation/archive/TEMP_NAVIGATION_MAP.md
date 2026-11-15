@@ -1,6 +1,6 @@
 # BP — Documentation Navigation Map (temporary, 2026-11-04)
 
-> Current repair state (2026-11-04): start with `PRODUCT.md`, `documentation/implementation-2026-11-04/RESULTS.md` and `documentation/HANDOFF_NEXT_SESSION.md`. Earlier dated counts, readiness claims, media-access behavior and Kaggle failure explanations below are historical. Current contracts require authenticated explicit preparation, offline assets, target-language TTS, terminal Stop and reviewed full-route evidence. Full cloned-speech/LHC/commercial acceptance remains pending.
+> Current repair state (2026-11-04): start with `PRODUCT.md`, `documentation/implementation-2026-11-04/RESULTS.md` and `documentation/HANDOFF_NEXT_SESSION.md`. Earlier dated counts, readiness claims, media-access behavior and Kaggle failure explanations below are historical. Current contracts require authenticated explicit preparation, offline assets, target-language TTS, terminal Stop and reviewed full-route evidence. Full cloned-speech/conference-room/commercial acceptance remains pending.
 
 **Purpose:** single index so scope, state, and next steps live in files, not chat
 memory. Constitution: `.specify/memory/constitution.md` (v1.0.0, ratified 2026-08-19).
@@ -43,7 +43,7 @@ memory. Constitution: `.specify/memory/constitution.md` (v1.0.0, ratified 2026-0
 | Kaggle results (collected) | `~/bp-benchmark-2026-11-04/confirm-canary-v1/`, `confirm-nemo-v1/` | COMPLETE — 14 canary + 2 nemo cases, n=80 each |
 | Live speech UI | `ui/live-speech/live.html` | Current — virtual mic + output device select EXISTS |
 | Voice Lab | `ui/voice-lab/lab.html` | Current |
-| GitHub Pages handler page | `bp-report-pages-2026-11-03/docs/index.html` | To update LAST |
+| GitHub Pages reviewer page | `bp-report-pages-2026-11-03/docs/index.html` | To update LAST |
 
 ---
 
@@ -61,9 +61,9 @@ These are stale or partially stale per `documentation_audit_2026-11-03.md`:
 7. ✅ `AGENTS.md` §8–9 — Canary AST Kaggle done (not promoted); OmniVoice job submitted; load test split clarified
 8. ✅ `documentation/sdk.md` — Already correct (omnivoice 🔒 unknown, needs GPU)
 9. ✅ `documentation/project_status_2026-10-20.md` — CZ row fixed; OmniVoice clarified; Canary results added
-10. ✅ `thesis_draft.md` — No `[DOPLNIŤ]` marker found; clean
+10. ✅ `technical_report.md` — No `[DOPLNIŤ]` marker found; clean
 
-**Deleted already (this session):** `documentation/handler_update_2026-09.md` (replaced by GitHub Pages `docs/index.html`)
+**Deleted already (this session):** `documentation/archived_review_2026-09.md` (replaced by GitHub Pages `docs/index.html`)
 
 ---
 
@@ -104,5 +104,5 @@ These are stale or partially stale per `documentation_audit_2026-11-03.md`:
 2. Test OmniVoice on live speech / long sentences / presentation pipeline on Kaggle
 3. Pivot to CZ as primary (cs-en pack fixes: convert MT, fix STT proxy, fix TTS voice)
 4. Doc cleanup Phase 1.8 (stale files above)
-5. GitHub Pages handler page update (`bp-report-pages-2026-11-03/docs/index.html`) — LAST
+5. GitHub Pages reviewer page update (`bp-report-pages-2026-11-03/docs/index.html`) — LAST
 6. Roast/critic/review/test/configure → commercially ready

@@ -117,7 +117,7 @@ BP_STT_BEAM_SIZE=1 bp selftest    # greedy: ~2x faster, WER +0.1 on SK
 | STT | faster-whisper `small-sk` / `base` | Voxtral Realtime, Qwen3-ASR-causal, Parakeet-TDT-v3 (EN), large-v3-turbo | WER on spontaneous SK + RTF | `small-sk` has Czech hallucination bug; `large-v3-turbo` too slow on CPU (RTF 0.6) |
 | MT | Opus-MT int8 per pair | NLLW / EuroLLM / small LLM translate | chrF/BLEU + latency + licence | NLLB is CC-BY-NC (blocked by licence gate) |
 | TTS | Piper (CPU, CoreML on Mac) | OmniVoice (batch/QC only, not live), Kokoro EN GPU (optional, declared), Qwen3-TTS EN GPU (declared) | RTF + similarity + licence | Piper RTF 0.03 on CoreML — not the bottleneck |
-| Whole | cascade | Qwen3-Omni local, Gemini Live Translate adapter | Only if thesis framing absorbs it | Unified = lower latency, prosody preserved |
+| Whole | cascade | Qwen3-Omni local, Gemini Live Translate adapter | Only if technical report framing absorbs it | Unified = lower latency, prosody preserved |
 
 ---
 
@@ -141,30 +141,30 @@ BP_STT_BEAM_SIZE=1 bp selftest    # greedy: ~2x faster, WER +0.1 on SK
 
 **Canary AST (Kaggle T4, 2026-11-03)**: SK ASR WER 0.0477 (<0.2 ✅) but SK→EN AST chrF++ ~52 mean (below commercial bar). Canary = speed path (collapses STT+MT), not quality path. Cascade (Whisper→Opus-MT) remains the quality path. **Not promoted to live route.**
 
-**Recommendation for thesis**: Document honestly. Use `beam_size=5` for quality (WER 0.23–0.26) in demo, offer `beam_size=1` as "fast mode". Note that SK→EN is the weak direction and why — and that Canary AST improves STT WER but not translation quality enough for commercial use.
+**Recommendation for technical report**: Document honestly. Use `beam_size=5` for quality (WER 0.23–0.26) in demo, offer `beam_size=1` as "fast mode". Note that SK→EN is the weak direction and why — and that Canary AST improves STT WER but not translation quality enough for commercial use.
 
 ---
 
 ## 🎯 Next Steps (Priority Order)
 
-### P0 — Make it shippable for "picky old man" use
+### P0 — Make it shippable for "meeting participant" use
 1. **T022** Floating caption overlay (text, not just PiP canvas) — for real call usability
 2. ~~**T010** Wire `registry.select()`/`instantiate()` into `main.py` — **DONE** (registry wired for all stages)~~
 3. ~~**T031** Add `/health` + `/metrics` HTTP routes — **DONE**~~
 4. **T023b** Document SK→EN trade-off, make `beam_size` configurable per language pack (partial: beam_size works via env, per-pack config needs frontend)
 
 ### P1 — Polish + Voice
-5. **T029** RVC-MLX model prep: train owner voice via Applio (rent GPU ~1h), register as `rvc-mlx`
+5. **T029** RVC-MLX model prep: train maintainer voice via Applio (rent GPU ~1h), register as `rvc-mlx`
 6. **T030** `bp engine gate` CI integration (thresholds exist, need automation)
 7. ~~**T028b** Move live-test scripts out of `test/` — **DONE** (moved to `scripts/live/`)~~
 
 ### P2 — SDK + Collaboration
 8. **T024** Public `Pipeline` facade + `documentation/sdk.md` (REST/WS contract)
 9. **T025** Unified engine adapter (Qwen3-Omni local or cloud adapter)
-10. **T026** Supervisor handbook: add language, add engine, embed SDK
+10. **T026** reviewer handbook: add language, add engine, embed SDK
 
-### P3 — Thesis + Evidence
-11. **T027** Update thesis draft with measured numbers, remove `[DOPLNIŤ]` markers
+### P3 — technical report + Evidence
+11. **T027** Update technical report draft with measured numbers, remove `[DOPLNIŤ]` markers
 12. **T028** Re-run three demo gates + `interrupt_smoke_test.py`, date the runbook
 
 ### P4 — Platform

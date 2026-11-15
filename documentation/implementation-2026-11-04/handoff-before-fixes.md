@@ -2,7 +2,7 @@
 
 ## Where things stand
 
-**Handler file removed.** `documentation/handler_update_2026-09.md` deleted. Replaced by GitHub Pages page at `bp-report-pages-2026-11-03/docs/index.html` (self-contained HTML with inline model data, filters, charts, evidence index). Zero remaining `handler_update`/`handler-report` references in main repo (verified via grep).
+**reviewer file removed.** `documentation/archived_review_2026-09.md` deleted. Replaced by GitHub Pages page at `bp-report-pages-2026-11-03/docs/index.html` (self-contained HTML with inline model data, filters, charts, evidence index). Zero remaining `archived_review`/`reviewer-report` references in main repo (verified via grep).
 
 **Commercial readiness: NOT ready.** README now states this explicitly with a gap table:
 - SK→EN translation: chrF++ ~52 mean (measured n=80) — below commercial bar (~70+), not promoted to live route
@@ -28,8 +28,8 @@
 **Modified:**
 - `README.md` — commercial-readiness gap table, cs-en experimental, SK→EN Canary chrF++ note, OmniVoice=batch/QC only, honest assessment section
 - `AGENTS.md` §8-9 — Canary AST Kaggle done (not promoted), OmniVoice job submitted, load split clarified
-- `documentation/archive/2026-11-07-stale/PLAN.md` — removed handler_update reference from handler deliverable section
-- `documentation/INDEX.md` — removed handler_update row
+- `documentation/archive/2026-11-07-stale/PLAN.md` — removed archived_review reference from reviewer deliverable section
+- `documentation/INDEX.md` — removed archived_review row
 - `documentation/model_landscape_2026-10.md` — Canary AST measured, OmniVoice=batch/QC only, X-Voice/OmniVoice GPU measured
 - `documentation/load_tests_2026-10.md` — Kokoro/Piper split added, OmniVoice=batch/QC only
 - `documentation/archive/2026-11-07-stale/monday_test_checklist.md` — CZ accuracy row added, SK→EN updated with Canary results
@@ -41,7 +41,7 @@
 - `scripts/convert_models.py` — added `cs-en` to PAIRS list
 
 **Deleted:**
-- `documentation/handler_update_2026-09.md`
+- `documentation/archived_review_2026-09.md`
 
 **Created:**
 - `documentation/TEMP_NAVIGATION_MAP.md` — single index of all sources of truth
@@ -59,7 +59,7 @@
 
 ## CLI/MCP assessment
 
-**MCP NOT relevant** for thesis or commercial scope. Project already has everything via CLI + Python API:
+**MCP NOT relevant** for technical report or commercial scope. Project already has everything via CLI + Python API:
 - `scripts/bp.py` — 15+ subcommands (language, engine, stt, e2e, selftest, bench, grades, library, qc, corpus, etc.)
 - `backend/registry.py` — `select()`/`instantiate()`/`catalog()`, fail-closed licence gate
 - `backend/pipeline.py` — `Pipeline` facade
@@ -75,9 +75,9 @@ An MCP server would add protocol maintenance without new capability. Skip for no
 2. **Run `scripts/convert_models.py`** (needs your yes — creates throwaway venv, installs torch+transformers ~1GB, converts `opus-mt-cs-en` to CTranslate2 int8). Required for cs-en MT to work locally. User previously said lightweight repo preferred (convert on load, not committed to git).
 3. **Pivot to CZ primary** — cs-en pack fixed (TTS voice → Czech), MT conversion is the only blocker.
 4. **Product/design UI review** — consider running `designer`, `painter`, or `frontend-design` skill on `ui/home/home.html`, `ui/live-speech/live.html`, `ui/voice-lab/lab.html`, `ui/enroll/enroll.html`, `ui/auth/auth.html`. Customer journey: discovery → website → repo → setup → live use.
-5. **GitHub Pages handler page update** (LAST) — `bp-report-pages-2026-11-03/docs/index.html` already exists as self-contained HTML; may need updating with the honest commercial-readiness assessment from README.
+5. **GitHub Pages reviewer page update** (LAST) — `bp-report-pages-2026-11-03/docs/index.html` already exists as self-contained HTML; may need updating with the honest commercial-readiness assessment from README.
 6. **Doc cleanup verified complete** — all 9 stale files from Phase 1.8 cleaned (see navigation map).
-7. **Thesis** — update with measured numbers (Canary chrF++ ~52 below commercial bar, OmniVoice batch/QC only), remove any remaining `[DOPLNIŤ]` markers (none found in thesis_draft.md).
+7. **technical report** — update with measured numbers (Canary chrF++ ~52 below commercial bar, OmniVoice batch/QC only), remove any remaining `[DOPLNIŤ]` markers (none found in technical_report.md).
 
 ## Roast (for next session)
 
@@ -93,9 +93,9 @@ An MCP server would add protocol maintenance without new capability. Skip for no
 
 ## Machines
 
-- Main: `~/Documents/STU/BP` (Mac M1 Pro 16GB, main branch)
+- Main: `<checkout>` (Mac M1 Pro 16GB, main branch)
 - Kaggle results: `~/bp-benchmark-2026-11-04/`
 - Kaggle matrix worktree: `~/bp-kaggle-matrix-2026-11-04/` (untracked `scripts/gpu_bench/kaggle_matrix/` — do not git clean/reset)
 - ECC reference: `~/Developer/ecc-reference` (separate, read-only)
 
-🟢 Handoff file written; all handler references removed; README updated with honest commercial-readiness; doc cleanup verified complete; Kaggle OmniVoice job ERRORING (non-blocking)
+🟢 Handoff file written; all reviewer references removed; README updated with honest commercial-readiness; doc cleanup verified complete; Kaggle OmniVoice job ERRORING (non-blocking)

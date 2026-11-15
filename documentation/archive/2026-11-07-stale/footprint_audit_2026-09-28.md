@@ -2,7 +2,7 @@
 
 One question: where do the megabytes and the install minutes go, and which of them are
 removable without losing capability. Every number below was measured on the Mac M1 Pro
-(`~/Documents/STU/BP`) and the merged tree on 2026-09-28; nothing is estimated.
+(`~/bp`) and the merged tree on 2026-09-28; nothing is estimated.
 
 ## Measured totals
 
@@ -62,7 +62,7 @@ not use. torch+torchaudio+torchcodec is 345 MB more.
 
 | # | Cut | Saves | Cost / risk | Needs a decision? |
 |---|---|---|---|---|
-| 1 | Split requirements: `core` (Piper+whisper+Opus-MT+API+tests) vs `extras` (xtts, omnivoice, hybrid, eval, plotting, playwright) | **~1.5 GB venv + 1.6 GB browsers** | guard 3 torch imports; core profile loses XTTS/Hybrid by design | yes — is XTTS still in the thesis narrative? |
+| 1 | Split requirements: `core` (Piper+whisper+Opus-MT+API+tests) vs `extras` (xtts, omnivoice, hybrid, eval, plotting, playwright) | **~1.5 GB venv + 1.6 GB browsers** | guard 3 torch imports; core profile loses XTTS/Hybrid by design | yes — is XTTS still in the technical report narrative? |
 | 2 | Drop `ct2_models/` from git (`make install` already converts them) | **225 MB per clone** | install now needs torch+transformers+network (it already does) | no |
 | 3 | Drop `Helsinki-NLP--opus-mt-en-cs` (CZ target) | 75 MB | CZ leaves the product; the jirka fallback clip is the only CZ artifact kept | yes — CZ in scope? |
 | 4 | Piper voices: keep only one of `en_US-personal-medium` / `en_US-personal-v2` | 60 MB | both are registered engines (`piper_personal` vs `piper_personal_v2`) | yes — which EN voice ships? |
@@ -73,7 +73,7 @@ not use. torch+torchaudio+torchcodec is 345 MB more.
 
 **The honest limit:** items 2–8 shrink the checkout and future growth, but **clone size
 stays ~450 MB (pack) unless history is rewritten** with `git-filter-repo` — old blobs live
-in the pack forever. For a thesis repo with an audit trail, keep history and use what
+in the pack forever. For a technical report repo with an audit trail, keep history and use what
 `SETUP_WINDOWS.md` already documents: `git clone --filter=blob:none --no-checkout` +
 sparse-checkout excluding `ct2_models/`, `*.onnx`, `speaker_voices/`, `bootstrap_*`.
 Rewriting history is a separate, explicit decision — not taken here.

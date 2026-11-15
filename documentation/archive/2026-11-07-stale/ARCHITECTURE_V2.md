@@ -122,7 +122,7 @@ Expected first-phrase delay: ~0.2-0.4s on MPS with Parakeet, ~0.3-0.4s on CPU wi
 
 Each speaker is assigned a voice at enrollment:
 - Default: clean Piper voice for their language (sk_SK-lili, en_US-john, etc.)
-- Cloned: owner's fine-tuned Piper voice (sk_SK-personal-male, en_US-personal-v2)
+- Cloned: maintainer's fine-tuned Piper voice (sk_SK-personal-male, en_US-personal-v2)
 - Zero-shot: OmniVoice clone from a reference WAV (GPU only)
 
 ---
@@ -216,7 +216,7 @@ This replaces v1's "wait for segment close" (~6-8s first word).
 
 ## 9. What Gets Deleted / Changed
 
-- `backend/main.py` WebSocket handler: reworked for multi-speaker meeting rooms + streaming
+- `backend/main.py` WebSocket reviewer: reworked for multi-speaker meeting rooms + streaming
 - `backend/pipeline.py`: `translate_streaming()` becomes real streaming, not per-chunk batch
 - `backend/stt/streaming_captions.py`: becomes the core STT streaming path, not just captions
 - `backend/stt/incremental.py`: local-agreement commit moves from experimental to core
@@ -234,12 +234,12 @@ This replaces v1's "wait for segment close" (~6-8s first word).
 
 ---
 
-## 11. Open Questions (need owner input)
+## 11. Open Questions (need maintainer input)
 
 1. Should the meeting room server be a separate process from the single-user demo, or one codebase with a `--meeting` flag?
 2. Do we need speaker diarization (who spoke when) built into the server, or is per-device WebSocket enough (each speaker joins from their own laptop/phone)?
 3. Is OmniVoice acceptable as a GPU-only TTS, or should we prioritize keeping Piper CPU as the only default?
-4. What's the target first-audio latency number we want to claim for the thesis?
+4. What's the target first-audio latency number we want to claim for the technical report?
 
 ---
 
