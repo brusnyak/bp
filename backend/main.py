@@ -1,5 +1,5 @@
 import logging
-from backend.lag_trace import build_lag_trace
+from backend.lag_trace import build_lag_trace, build_lag_trace_end
 import sys
 import asyncio
 import threading
@@ -1077,7 +1077,7 @@ async def voice_lab_status():
     }
 
 # ------------------------------------------------------------------ router catalog
-from backend.catalog import build_catalog, load_curated, load_user_entries, plan_route, CURATED_PATH, LIVE_CACHE_PATH, USER_ENTRIES_PATH
+from backend.catalog import infer_profile, build_catalog, load_curated, load_user_entries, plan_route, PROFILES, hardware_for_profile, CURATED_PATH, LIVE_CACHE_PATH, USER_ENTRIES_PATH
 
 # In-memory install jobs (process lifetime). job_id -> {state, progress, current, log_tail, error, ids}
 _install_jobs: dict = {}
@@ -1204,32 +1204,45 @@ def _install_worker(job_id: str, ids: list) -> None:
     set_state("done", progress=1.0, current=None)
 
 
+def _disk_free():
+    from backend.hardware_scan import disk_free_gb
+    return disk_free_gb(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
+def _router_hardware(profile: str | None):
+    """Real machine by default; a named deployment profile when asked (planning for a server)."""
+    from backend.hardware_scan import scan_hardware
+    disk = _disk_free()
+    if profile in PROFILES:
+        return hardware_for_profile(profile, disk), profile
+    hw = scan_hardware()
+    real = {
+        "cpu_cores": hw.cpu_cores,
+        "ram_gb": hw.ram_gb,
+        "gpu": {"name": hw.gpu_name, "vram_gb": hw.vram_gb, "backend": hw.gpu} if hw.gpu != "cpu" else None,
+        "disk_free_gb": disk,
+    }
+    return real, infer_profile(real)
+
+
 @router.get("/hardware", summary="Detected hardware for the router catalog")
 async def router_hardware(session=Depends(get_current_session)):
-    from backend.hardware_scan import get_config
-    cfg = get_config()
-    hw = cfg.hardware
+    from backend.hardware_scan import scan_hardware
+    hw = scan_hardware()  # live scan, not the cached auto-config
     gpu = {"name": hw.gpu_name, "vram_gb": hw.vram_gb, "backend": hw.gpu} if hw.gpu != "cpu" else None
     return {
         "cpu_cores": hw.cpu_cores,
         "ram_gb": hw.ram_gb,
         "gpu": gpu,
-        "disk_free_gb": 0.0,
+        "disk_free_gb": _disk_free(),
     }
 
 
-@router.get("/catalog", summary="Unified model catalog: curated + live cache + user entries")
+@router.get("/catalog", summary="Unified model catalog: curated + live cache + user entries; ?profile= plans for another machine")
 async def router_catalog(stage: str | None = None, lang: str | None = None, q: str | None = None,
-                         session=Depends(get_current_session)):
-    from backend.hardware_scan import get_config
-    hw = get_config().hardware
-    hardware = {
-        "cpu_cores": hw.cpu_cores,
-        "ram_gb": hw.ram_gb,
-        "gpu": {"name": hw.gpu_name, "vram_gb": hw.vram_gb, "backend": hw.gpu},
-        "disk_free_gb": 0.0,
-    }
-    return build_catalog(hardware, stage=stage, lang=lang, q=q)
+                         profile: str | None = None, session=Depends(get_current_session)):
+    hardware, prof = _router_hardware(profile)
+    return build_catalog(hardware, stage=stage, lang=lang, q=q, profile=prof)
 
 
 @router.post("/catalog/refresh", summary="Refresh live catalog from Piper + Hugging Face (offline-capable)")
@@ -1384,17 +1397,10 @@ async def router_catalog_refresh(session=Depends(get_current_session)):
     return {"models": len(models), "errors": errors, "cache": LIVE_CACHE_PATH}
 
 
-@router.get("/route/plan", summary="Best STT/MT/TTS chain for a language pair")
-async def router_route_plan(src: str, tgt: str, session=Depends(get_current_session)):
-    from backend.hardware_scan import get_config
-    hw = get_config().hardware
-    hardware = {
-        "cpu_cores": hw.cpu_cores,
-        "ram_gb": hw.ram_gb,
-        "gpu": {"name": hw.gpu_name, "vram_gb": hw.vram_gb, "backend": hw.gpu},
-        "disk_free_gb": 0.0,
-    }
-    return plan_route(src, tgt, hardware)
+@router.get("/route/plan", summary="Best STT/MT/TTS chain for a language pair; ?profile= plans for another machine")
+async def router_route_plan(src: str, tgt: str, profile: str | None = None, session=Depends(get_current_session)):
+    hardware, prof = _router_hardware(profile)
+    return plan_route(src, tgt, hardware, profile=prof)
 
 
 @router.post("/models/install", summary="Start an install job for model ids")
@@ -1992,7 +1998,11 @@ async def _process_speech_segment_pipeline(
                     and previous_piece[0] == utterance and not previous_piece[1].rstrip().endswith((".", "!", "?", ",", ";", ":")))
     prosody_kwargs = {"length_scale": follower.scale, "pauses": True} if prosody_on else {}
 
+    sent_audio_s = 0.0
+
     async def send_audio(samples, rate):
+        nonlocal sent_audio_s
+        sent_audio_s += len(samples) / rate
         audio_buffer = io.BytesIO()
         sf.write(audio_buffer, samples, rate, format="WAV")
         await safe_send("tts_audio", audio_buffer.getvalue(), is_bytes=True)
@@ -2078,6 +2088,14 @@ async def _process_speech_segment_pipeline(
         logging.warning(f"Backend: Session {client_info}: {tts_model_choice} TTS model not initialized or produced no audio. No TTS will be performed for {_log_text(translated_text)}.")
         await safe_send("error", {"type": "error", "message": f"{tts_model_choice} TTS model not ready or invalid. No TTS output."})
         return
+    if lag_trace is not None and first_audio_sent_time is not None:
+        end_payload = build_lag_trace_end(
+            emitted_at=lag_trace["values"].get("emitted_at"), stream_origin=lag_trace["values"].get("stream_origin"),
+            playback_at=first_audio_sent_time, audio_s=sent_audio_s)
+        try:
+            await websocket.send_text(json.dumps(end_payload))
+        except Exception as exc:
+            logging.debug("Lag trace end send failed: %s", exc)
     websocket.timestamps["tts_end"].append(time.perf_counter()) # Corrected to log end time
     logging.info(f"Backend: Session {client_info}: TTS completed. Time: {tts_total_time:.2f}s")
 

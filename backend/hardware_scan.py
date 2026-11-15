@@ -71,11 +71,24 @@ def _detect_cpu() -> tuple[int, float]:
     except Exception:
         cores = 4
     try:
-        import psutil  # type: ignore
-        ram = psutil.virtual_memory().total / (1024 ** 3)
+        import os as _os
+        ram = _os.sysconf("SC_PAGE_SIZE") * _os.sysconf("SC_PHYS_PAGES") / (1024 ** 3)  # macOS + Linux, stdlib
     except Exception:
-        ram = 8.0  # safe default
+        try:
+            import psutil  # type: ignore
+            ram = psutil.virtual_memory().total / (1024 ** 3)
+        except Exception:
+            ram = 8.0  # last resort when the OS gives no answer
     return cores, round(ram, 1)
+
+
+def disk_free_gb(path: str = ".") -> float:
+    """Free space on the volume that holds the models (project root by default)."""
+    import shutil
+    try:
+        return round(shutil.disk_usage(path).free / (1024 ** 3), 1)
+    except Exception:
+        return 0.0
 
 
 def _detect_gpu() -> tuple[str, Optional[str], Optional[float]]:

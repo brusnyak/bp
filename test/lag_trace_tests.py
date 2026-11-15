@@ -9,7 +9,7 @@ def test_stream_clock_and_durations():
                             emitted_at=103, playback_at=104,
                             hold_s=.5, stt_s=.125, mt_s=.25,
                             tts_started_at=103.5, text="Hello world")
-    assert trace == dict(type="lag_trace", speech_end=2000, emit_time=3000,
+    assert trace == dict(type="lag_trace", speech_start=1000, speech_end=2000, emit_time=3000,
                         hold_ms=500, stt_ms=125, mt_ms=250, tts_first_ms=500,
                         playback_start=4000, total_ms=2000, words=2, text="Hello world")
 
@@ -94,3 +94,18 @@ async def test_one_message_and_exact_opt_in_log(enabled, monkeypatch, tmp_path):
         assert json.loads(lines[0]) == sent[0]
     else:
         assert not path.parent.exists()
+
+
+def test_trace_carries_speech_start_and_end_message_carries_playback_end():
+    from backend.lag_trace import build_lag_trace_end
+    trace = build_lag_trace(source_span=(1.0, 2.0), stream_origin=100.0, emitted_at=102.5, playback_at=103.0)
+    assert trace["speech_start"] == 1000 and trace["speech_end"] == 2000
+    end = build_lag_trace_end(emitted_at=102.5, stream_origin=100.0, playback_at=103.0, audio_s=1.5)
+    assert end["type"] == "lag_trace_end" and end["emit_time"] == trace["emit_time"]
+    assert end["playback_start"] == 3000 and end["playback_end"] == 4500
+
+
+def test_end_message_without_audio_has_no_end():
+    from backend.lag_trace import build_lag_trace_end
+    end = build_lag_trace_end(emitted_at=1.0, stream_origin=0.0, playback_at=2.0, audio_s=0.0)
+    assert end["playback_end"] is None

@@ -1,4 +1,4 @@
-.PHONY: install run test test-ui i18n demo-check demo-audio lab clean help check-docs check-public
+.PHONY: install run test test-ui i18n demo-check demo-audio lab clean help check-docs check-public check-ui
 
 # Same commands on every OS; the real work lives in scripts/setup.py.
 ifeq ($(OS),Windows_NT)
@@ -21,6 +21,9 @@ test: ## Run the backend test suite.
 
 check-public: ## Check tracked text for private project framing.
 	$(PYTHON) scripts/check_public_tree.py
+
+check-ui: ## Design-system gate: no hardcoded color/space/type/radius/motion in Live and Models CSS; token contrast.
+	python3 scripts/lint_tokens.py
 
 check-docs: ## Fail if a number quoted in the docs differs from the saved benchmark receipt (<!-- claim:ID -->value<!-- /claim -->).
 	$(PYTHON) scripts/check_readme_claims.py

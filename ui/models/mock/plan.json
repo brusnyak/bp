@@ -1,0 +1,10 @@
+{
+  "src": "en", "tgt": "sk",
+  "stt": { "id": "faster-whisper-base", "stage": "stt", "name": "Whisper base", "engine": "faster_whisper", "languages": ["en","sk"], "pair": null, "size_mb": 140, "devices": ["cpu","cuda"], "min_ram_gb": 2, "min_vram_gb": null, "streaming": false, "clone": false, "installed": true, "fit": "good", "recommended": true, "why": "General STT", "licence": { "label": "MIT", "url": "https://huggingface.co/Systran/faster-whisper-base" }, "source": { "kind": "hf", "repo": "Systran/faster-whisper-base", "files": {} }, "notes": "" },
+  "mt": { "id": "Helsinki-NLP--opus-mt-en-sk", "stage": "mt", "name": "Opus-MT EN->SK", "engine": "opus-mt", "languages": ["en","sk"], "pair": "en-sk", "size_mb": 300, "devices": ["cpu","cuda"], "min_ram_gb": 1, "min_vram_gb": null, "streaming": false, "clone": false, "installed": false, "fit": "good", "recommended": true, "why": "Default MT for en-sk", "licence": { "label": "CC-BY-4.0 (verify per pair)", "url": "https://huggingface.co/Helsinki-NLP/opus-mt-en-sk" }, "source": { "kind": "hf", "repo": "Helsinki-NLP/opus-mt-en-sk", "files": {} }, "notes": "" },
+  "tts": { "id": "piper-en_US-lessac-medium", "stage": "tts", "name": "Piper English (Lessac)", "engine": "piper", "languages": ["en"], "pair": null, "size_mb": 60, "devices": ["cpu"], "min_ram_gb": 1, "min_vram_gb": null, "streaming": true, "clone": false, "installed": true, "fit": "good", "recommended": true, "why": "CPU baseline EN voice", "licence": { "label": "GPL-3.0-or-later (runtime); voice CC0", "url": "https://huggingface.co/rhasspy/piper-voices" }, "source": { "kind": "piper", "repo": "rhasspy/piper-voices", "files": {} }, "notes": "" },
+  "missing": ["Helsinki-NLP--opus-mt-en-sk"],
+  "total_mb": 500,
+  "pivot": false,
+  "note": "Direct en-sk route. MT model not installed yet."
+}

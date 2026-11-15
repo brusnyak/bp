@@ -1,0 +1,91 @@
+/* Design tokens: the single source for the Live and Models pages (direction A, "lingonberry-quiet").
+   Load AFTER global-styles.css. Page CSS may use only var(--bp-*) for color, space, type, radius, motion and z-index.
+   scripts/lint_tokens.py enforces this and checks every text/surface pair for WCAG contrast (AA 4.5, large/UI 3.0). */
+:root {
+  /* color: light */
+  --bp-bg: #FAFAF9;
+  --bp-surface: #FFFFFF;
+  --bp-text: #1C1917;
+  --bp-muted: #57534E;
+  --bp-hairline: #E7E5E4;
+  --bp-control: #767676;
+  --bp-accent: #C41E3A;
+  --bp-on-accent: #FFFFFF;
+  --bp-success: #15803D;
+  --bp-warning: #92400E;
+  --bp-danger: #B91C1C;
+  --bp-on-danger: #FFFFFF;
+  --bp-shadow: rgba(28, 25, 23, 0.12);
+
+  /* space (4 px base) */
+  --bp-s1: 0.25rem;
+  --bp-s2: 0.5rem;
+  --bp-s3: 0.75rem;
+  --bp-s4: 1rem;
+  --bp-s5: 1.25rem;
+  --bp-s6: 1.5rem;
+  --bp-s8: 2rem;
+
+  --bp-control-h: 2.75rem;
+
+  /* type */
+  --bp-font-ui: var(--font-body, system-ui, sans-serif);
+  --bp-font-title: var(--font-heading, Georgia, serif);
+  --bp-t-xs: 0.75rem;
+  --bp-t-sm: 0.85rem;
+  --bp-t-md: 1rem;
+  --bp-t-lg: 1.25rem;
+  --bp-t-xl: 1.65rem;
+  --bp-t-2xl: 2rem;
+  --bp-t-reading: clamp(1.15rem, 1.5vw, 1.55rem);
+
+  /* radius, elevation, motion, layers */
+  --bp-r-sm: 0.25rem;
+  --bp-r-md: 0.5rem;
+  --bp-r-lg: 0.75rem;
+  --bp-r-pill: 999px;
+  --bp-elev-1: 0 1px 2px var(--bp-shadow);
+  --bp-elev-2: 0 6px 18px var(--bp-shadow);
+  --bp-dur-fast: 0.15s;
+  --bp-dur: 0.3s;
+  --bp-ease: cubic-bezier(0.2, 0, 0, 1);
+  --bp-z-skip: 100;
+  --bp-z-modal: 100;
+  --bp-z-toast: 200;
+
+  /* bridge: re-point the legacy names that shared CSS and JS still read, on these pages only */
+  --primary-color: var(--bp-accent);
+  --text-color: var(--bp-text);
+  --secondary-color: var(--bp-muted);
+  --secondary-text-grey: var(--bp-muted);
+  --surface-color: var(--bp-surface);
+  --background-color-start: var(--bp-bg);
+  --border-color: var(--bp-hairline);
+  --danger-color: var(--bp-danger);
+  --log-success-color: var(--bp-success);
+  --green: var(--bp-success);
+  --orange: var(--bp-warning);
+  --shadow-color: var(--bp-shadow);
+  --ease: var(--bp-ease);
+}
+[data-theme="dark"] {
+  --bp-bg: #141214;
+  --bp-surface: #1E1B1F;
+  --bp-text: #F5F5F4;
+  --bp-muted: #A8A29E;
+  --bp-hairline: #3A3538;
+  --bp-control: #8E8E93;
+  --bp-accent: #FF7A8A;
+  --bp-on-accent: #141214;
+  --bp-success: #4ADE80;
+  --bp-warning: #FBBF24;
+  --bp-danger: #F87171;
+  --bp-on-danger: #141214;
+  --bp-shadow: rgba(0, 0, 0, 0.5);
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { --bp-dur-fast: 0s; --bp-dur: 0s; }
+}
+
+/* pages that load this file take the token surface, not the shared marketing gradient */
+body { background: var(--bp-bg); color: var(--bp-text); }

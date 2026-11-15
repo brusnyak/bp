@@ -76,8 +76,8 @@
 
   function load() {
     if (pending) return pending;
-    pending = authed('/api/capabilities').then(function (c) { return build(fromCapabilities(c), 'capabilities'); })
-      .catch(function () { return authed('/api/routes').then(function (r) { return build(fromRoutes(r), 'routes'); }); })
+    // /api/capabilities (target contract) is not served by this backend yet: probing it only logs a 404 in every console.
+    pending = authed('/api/routes').then(function (r) { return build(fromRoutes(r), 'routes'); })
       .catch(function () { return getJson('/ui/shared/manifest.json').then(function (m) { return build(fromManifest(m), 'manifest'); }); })
       .catch(function () { return build([], 'none'); });
     return pending;

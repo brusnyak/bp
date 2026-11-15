@@ -24,7 +24,7 @@ import urllib.request
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE_DIR = os.path.join(REPO_ROOT, "cache")
 LIVE_CACHE_PATH = os.path.join(CACHE_DIR, "catalog_live.json")
-CURATED_PATH = os.path.join(REPO_ROOT, "models", "curated.json")
+CURATED_PATH = os.path.join(REPO_ROOT, "catalog", "curated.json")
 
 USER_AGENT = "bp-router/1.0"
 PIPER_VOICES_URL = "https://huggingface.co/rhasspy/piper-voices/resolve/main/voices.json"
