@@ -81,28 +81,3 @@ eval_data/
 # generated from NTREX-128 (not redistributed); rebuild with scripts/build_recording_set.py
 documentation/recording_script_sk_v2.md
 logs/
-
-# local-only working material (kept outside the public tree)
-/AGENTS.md
-/UPDATES.md
-/specs/
-/.specify/
-/.claude/
-/reports/
-/route_receipt.json
-/kernel-metadata.json
-/kaggle_gpu_test.ipynb
-/bench/audio/
-/scripts/archive/
-/test/archive/
-/documentation/archive/
-/documentation/implementation-2026-11-04/
-/documentation/MASTER_README.md
-/documentation/HANDOFF_*.md
-/documentation/PLAN_*.md
-/documentation/HANDLER_MESSAGE_*.md
-/documentation/REALTIME_OPTIONS_*.md
-/documentation/REALTIME_REVIEW_*.md
-/documentation/thesis_draft.md
-/documentation/supabase_auth_db_guide.md
-/test/*.wav
