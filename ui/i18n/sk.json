@@ -654,5 +654,15 @@
  "{n} routes with speech [many]": "{n} trasy s rečou",
  "{n} routes with speech": "{n} trás s rečou",
  "Improve this translation": "Vylepšiť tento preklad",
- "Translation correction": "Korekcia prekladu"
+ "Translation correction": "Korekcia prekladu",
+ "More": "Viac",
+ "Test microphone": "Otestovať mikrofón",
+ "Voice reference": "Hlasová vzorka",
+ "Record or choose a file": "Nahrať alebo vybrať súbor",
+ "Ready": "Pripravené",
+ "Preparing…": "Pripravujem…",
+ "Connecting…": "Pripájam…",
+ "Open audience link": "Otvoriť odkaz pre poslucháčov",
+ "Copy audience link": "Kopírovať odkaz pre poslucháčov",
+ "Microphone is open. Use headphones or isolated audio to avoid feedback.": "Mikrofón je zapnutý. Použite slúchadlá alebo oddelené zvukové kanály, aby nevznikla spätná väzba."
 }

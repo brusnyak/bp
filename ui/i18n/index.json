@@ -9,106 +9,106 @@
    "preview": false,
    "raw": 0,
    "reviewed": 1.0,
-   "strings": 432
+   "strings": 384
   },
   {
    "code": "cs",
-   "coverage": 0.91,
+   "coverage": 0.88,
    "dir": "ltr",
-   "drafts": 392,
+   "drafts": 339,
    "machine_draft": true,
    "preview": false,
    "raw": 0,
    "reviewed": 0.0,
-   "strings": 392
+   "strings": 339
   },
   {
    "code": "de",
-   "coverage": 0.91,
+   "coverage": 0.9,
    "dir": "ltr",
-   "drafts": 74,
+   "drafts": 72,
    "machine_draft": false,
    "preview": false,
    "raw": 0,
-   "reviewed": 0.74,
-   "strings": 392
+   "reviewed": 0.72,
+   "strings": 347
   },
   {
    "code": "es",
-   "coverage": 0.91,
+   "coverage": 0.88,
    "dir": "ltr",
-   "drafts": 392,
+   "drafts": 339,
    "machine_draft": true,
    "preview": false,
    "raw": 0,
    "reviewed": 0.0,
-   "strings": 392
+   "strings": 339
   },
   {
    "code": "fr",
-   "coverage": 0.91,
+   "coverage": 0.88,
    "dir": "ltr",
-   "drafts": 392,
+   "drafts": 339,
    "machine_draft": true,
    "preview": false,
    "raw": 0,
    "reviewed": 0.0,
-   "strings": 392
+   "strings": 339
   },
   {
    "code": "hu",
-   "coverage": 0.91,
+   "coverage": 0.88,
    "dir": "ltr",
-   "drafts": 392,
+   "drafts": 339,
    "machine_draft": true,
    "preview": false,
    "raw": 0,
    "reviewed": 0.0,
-   "strings": 392
+   "strings": 339
   },
   {
    "code": "pl",
-   "coverage": 0.91,
+   "coverage": 0.88,
    "dir": "ltr",
-   "drafts": 392,
+   "drafts": 339,
    "machine_draft": true,
    "preview": false,
    "raw": 0,
    "reviewed": 0.0,
-   "strings": 392
+   "strings": 339
   },
   {
    "code": "ro",
-   "coverage": 0.91,
+   "coverage": 0.88,
    "dir": "ltr",
-   "drafts": 392,
+   "drafts": 339,
    "machine_draft": true,
    "preview": false,
    "raw": 0,
    "reviewed": 0.0,
-   "strings": 392
+   "strings": 339
   },
   {
    "code": "sk",
-   "coverage": 0.91,
+   "coverage": 0.9,
    "dir": "ltr",
-   "drafts": 74,
+   "drafts": 72,
    "machine_draft": false,
    "preview": false,
    "raw": 0,
-   "reviewed": 0.74,
-   "strings": 392
+   "reviewed": 0.72,
+   "strings": 347
   },
   {
    "code": "uk",
-   "coverage": 0.91,
+   "coverage": 0.88,
    "dir": "ltr",
-   "drafts": 391,
+   "drafts": 338,
    "machine_draft": true,
    "preview": false,
    "raw": 0,
    "reviewed": 0.0,
-   "strings": 392
+   "strings": 339
   }
  ]
 }
