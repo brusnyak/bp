@@ -1,110 +1,458 @@
 <!doctype html>
-<html lang="en">
+<html lang="sk">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Local speech translation and live captions. Install on your own machine, choose a language, and route translated speech to headphones or a meeting.">
+<meta name="description" content="Lokálny preklad reči a žive titulky. Inštalujte si to vlastnoručne, zvolte si jazyk a smerujte preložený reč do slúchadiel alebo na stretnutie.">
 <meta name="color-scheme" content="light dark">
-<title>Live Speech Translation — local audio and captions</title>
-<style>:root{color-scheme:light dark;--ink:#222;--muted:#505966;--bg:#fff;--surface:#f8fafc;--line:#cbd5e1;--accent:#1d4ed8;--tint:#eef6ff;--focus:#1d4ed8;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-@media(prefers-color-scheme:dark){:root{--ink:#e8edf5;--muted:#b5c0d0;--bg:#10151d;--surface:#19222f;--line:#46556a;--accent:#9bc3ff;--tint:#172c48;--focus:#9bc3ff}}
-*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:1rem}body{margin:0;background:var(--bg);color:var(--ink);font-size:1rem;line-height:1.65}main,header,footer{max-width:1060px;margin:auto;padding:1.5rem}header{padding-top:3rem;border-bottom:1px solid var(--line)}h1{font-size:clamp(2rem,6vw,3rem);line-height:1.1;letter-spacing:-.025em;margin:0 0 1rem}h2{font-size:1.55rem;line-height:1.25;margin:0 0 1rem}h3{font-size:1.05rem;margin:0 0 .5rem}p{max-width:72ch;margin:.65rem 0}section{padding:2.5rem 0;border-bottom:1px solid var(--line)}a{color:var(--accent);text-underline-offset:.2em}a:hover{text-decoration-thickness:2px}a:focus-visible,summary:focus-visible,.table-wrap:focus-visible{outline:3px solid var(--focus);outline-offset:4px}::selection{background:var(--accent);color:var(--bg)}nav{display:flex;gap:.6rem 1.2rem;flex-wrap:wrap;margin:1.5rem 0 .5rem}nav a{padding:.35rem 0}nav[aria-label="On this page"]{font-size:.9rem;margin:0}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.9em;overflow-wrap:anywhere}p code,li code,td code{background:var(--surface);padding:.1rem .25rem}pre{padding:1rem;background:var(--surface);border:1px solid var(--line);border-radius:6px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;margin:.6rem 0 1rem}pre code{font-size:.88rem}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.card,.callout{padding:1.2rem;border:1px solid var(--line);border-radius:8px;background:var(--surface)}.callout{background:var(--tint);margin:1rem 0}.card p:last-child{margin-bottom:0}.small,.source{font-size:.88rem;color:var(--muted)}.source{overflow-wrap:anywhere;margin-top:.75rem}.table-wrap{overflow:auto;max-width:100%;margin:.8rem 0;scrollbar-color:var(--line) var(--surface)}table{width:100%;border-collapse:collapse;font-size:.91rem;font-variant-numeric:tabular-nums}caption{text-align:left;font-weight:600;padding:.4rem 0}th,td{padding:.75rem .6rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:var(--surface)}td:first-child,th:first-child{padding-left:.3rem}table.models{min-width:850px}table.routes{min-width:540px}.pipeline{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;list-style:none;padding:1rem 0;margin:1rem 0}.pipeline li{display:flex;align-items:center;gap:.5rem}.pipeline li:not(:last-child)::after{content:'→';color:var(--muted)}.pipeline span{padding:.4rem .65rem;border:1px solid var(--line);border-radius:5px;background:var(--surface)}ol.steps{padding-left:1.5rem}ol.steps>li{padding-left:.25rem;margin:1rem 0}ul{padding-left:1.3rem}li{margin:.4rem 0}footer{color:var(--muted);font-size:.9rem;padding-bottom:3rem}.skip{position:absolute;top:-5rem;left:1rem;background:var(--bg);padding:.5rem}.skip:focus{top:1rem}summary{cursor:pointer;padding:.5rem 0;color:var(--accent)}@media(max-width:640px){header,main,footer{padding-left:1rem;padding-right:1rem}.grid{grid-template-columns:1fr}section{padding:2rem 0}h2{font-size:1.35rem}th,td{padding:.6rem .45rem}.table-wrap{border:1px solid var(--line);padding:.25rem .5rem}header{padding-top:2rem}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+<title>Živý preklad reči — lokálny audio a titulky</title>
+<style>/* Design tokens: the single source for the Live and Models pages (direction A, "lingonberry-quiet").
+   Load AFTER global-styles.css. Page CSS may use only var(--bp-*) for color, space, type, radius, motion and z-index.
+   scripts/lint_tokens.py enforces this and checks every text/surface pair for WCAG contrast (AA 4.5, large/UI 3.0). */
+:root {
+  /* color: light */
+  --bp-bg: #FAFAF9;
+  --bp-surface: #FFFFFF;
+  --bp-text: #1C1917;
+  --bp-muted: #57534E;
+  --bp-hairline: #E7E5E4;
+  --bp-control: #767676;
+  --bp-accent: #C41E3A;
+  --bp-on-accent: #FFFFFF;
+  --bp-success: #15803D;
+  --bp-warning: #92400E;
+  --bp-danger: #B91C1C;
+  --bp-on-danger: #FFFFFF;
+  --bp-shadow: rgba(28, 25, 23, 0.12);
+
+  /* space (4 px base) */
+  --bp-s1: 0.25rem;
+  --bp-s2: 0.5rem;
+  --bp-s3: 0.75rem;
+  --bp-s4: 1rem;
+  --bp-s5: 1.25rem;
+  --bp-s6: 1.5rem;
+  --bp-s8: 2rem;
+
+  --bp-control-h: 2.75rem;
+
+  /* type */
+  --bp-font-ui: var(--font-body, system-ui, sans-serif);
+  --bp-font-title: var(--font-heading, Georgia, serif);
+  --bp-t-xs: 0.75rem;
+  --bp-t-sm: 0.85rem;
+  --bp-t-md: 1rem;
+  --bp-t-lg: 1.25rem;
+  --bp-t-xl: 1.65rem;
+  --bp-t-2xl: 2rem;
+  --bp-t-reading: clamp(1.15rem, 1.5vw, 1.55rem);
+
+  /* radius, elevation, motion, layers */
+  --bp-r-sm: 0.25rem;
+  --bp-r-md: 0.5rem;
+  --bp-r-lg: 0.75rem;
+  --bp-r-pill: 999px;
+  --bp-elev-1: 0 1px 2px var(--bp-shadow);
+  --bp-elev-2: 0 6px 18px var(--bp-shadow);
+  --bp-dur-fast: 0.15s;
+  --bp-dur: 0.3s;
+  --bp-ease: cubic-bezier(0.2, 0, 0, 1);
+  --bp-z-skip: 100;
+  --bp-z-modal: 100;
+  --bp-z-toast: 200;
+
+  /* bridge: re-point the legacy names that shared CSS and JS still read, on these pages only */
+  --primary-color: var(--bp-accent);
+  --text-color: var(--bp-text);
+  --secondary-color: var(--bp-muted);
+  --secondary-text-grey: var(--bp-muted);
+  --surface-color: var(--bp-surface);
+  --background-color-start: var(--bp-bg);
+  --border-color: var(--bp-hairline);
+  --danger-color: var(--bp-danger);
+  --log-success-color: var(--bp-success);
+  --green: var(--bp-success);
+  --orange: var(--bp-warning);
+  --shadow-color: var(--bp-shadow);
+  --ease: var(--bp-ease);
+}
+[data-theme="dark"] {
+  --bp-bg: #141214;
+  --bp-surface: #1E1B1F;
+  --bp-text: #F5F5F4;
+  --bp-muted: #A8A29E;
+  --bp-hairline: #3A3538;
+  --bp-control: #8E8E93;
+  --bp-accent: #FF7A8A;
+  --bp-on-accent: #141214;
+  --bp-success: #4ADE80;
+  --bp-warning: #FBBF24;
+  --bp-danger: #F87171;
+  --bp-on-danger: #141214;
+  --bp-shadow: rgba(0, 0, 0, 0.5);
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { --bp-dur-fast: 0s; --bp-dur: 0s; }
+}
+
+/* pages that load this file take the token surface, not the shared marketing gradient */
+body { background: var(--bp-bg); color: var(--bp-text); }
+
+/* ==========================================================================
+   BP — Live Speech Translation documentation
+   Compact, centered, ADHD-friendly single-file design system.
+   Self-contained: inlined into index.html by scripts/build_site.py
+   ========================================================================== */
+
+/* ---------- Design tokens ---------- */
+:root {
+  /* color: light */
+  --bp-bg: #FAFAF9;
+  --bp-surface: #FFFFFF;
+  --bp-text: #1C1917;
+  --bp-muted: #57534E;
+  --bp-hairline: #E7E5E4;
+  --bp-control: #767676;
+  --bp-accent: #C41E3A;
+  --bp-on-accent: #FFFFFF;
+  --bp-success: #15803D;
+  --bp-warning: #92400E;
+  --bp-danger: #B91C1C;
+  --bp-on-danger: #FFFFFF;
+  --bp-shadow: rgba(28, 25, 23, 0.12);
+
+  /* space (4 px base) */
+  --bp-s1: 0.25rem;
+  --bp-s2: 0.5rem;
+  --bp-s3: 0.75rem;
+  --bp-s4: 1rem;
+  --bp-s5: 1.25rem;
+  --bp-s6: 1.5rem;
+  --bp-s8: 2rem;
+
+  --bp-control-h: 2.75rem;
+
+  /* type */
+  --bp-font-ui: var(--font-body, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  --bp-font-title: var(--font-heading, Georgia, "Times New Roman", serif);
+  --bp-t-xs: 0.75rem;
+  --bp-t-sm: 0.85rem;
+  --bp-t-md: 1rem;
+  --bp-t-lg: 1.25rem;
+  --bp-t-xl: 1.65rem;
+  --bp-t-2xl: 2rem;
+
+  /* radius, elevation, motion */
+  --bp-r-sm: 0.25rem;
+  --bp-r-md: 0.5rem;
+  --bp-r-lg: 0.75rem;
+  --bp-r-pill: 999px;
+  --bp-elev-1: 0 1px 2px var(--bp-shadow);
+  --bp-dur-fast: 0.15s;
+  --bp-dur: 0.3s;
+  --bp-ease: cubic-bezier(0.2, 0, 0, 1);
+  --bp-z-skip: 100;
+
+  /* bridge tokens for shared CSS/JS */
+  --primary-color: var(--bp-accent);
+  --text-color: var(--bp-text);
+  --secondary-color: var(--bp-muted);
+  --secondary-text-grey: var(--bp-muted);
+  --surface-color: var(--bp-surface);
+  --background-color-start: var(--bp-bg);
+  --border-color: var(--bp-hairline);
+  --danger-color: var(--bp-danger);
+  --log-success-color: var(--bp-success);
+  --green: var(--bp-success);
+  --orange: var(--bp-warning);
+  --shadow-color: var(--bp-shadow);
+  --ease: var(--bp-ease);
+}
+
+[data-theme="dark"] {
+  --bp-bg: #141214;
+  --bp-surface: #1E1B1F;
+  --bp-text: #F5F5F4;
+  --bp-muted: #A8A29E;
+  --bp-hairline: #3A3538;
+  --bp-control: #8E8E93;
+  --bp-accent: #FF7A8A;
+  --bp-on-accent: #141214;
+  --bp-success: #4ADE80;
+  --bp-warning: #FBBF24;
+  --bp-danger: #F87171;
+  --bp-on-danger: #141214;
+  --bp-shadow: rgba(0, 0, 0, 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --bp-dur-fast: 0s; --bp-dur: 0s; }
+}
+
+body { background: var(--bp-bg); color: var(--bp-text); margin: 0; font-family: var(--bp-font-ui); font-size: var(--bp-t-md); line-height: 1.65; }
+html { scroll-behavior: smooth; scroll-padding-top: 1rem; }
+
+* { box-sizing: border-box; }
+
+a { color: var(--bp-accent); text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--bp-focus, var(--bp-accent)); outline-offset: 4px; }
+
+code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 0.9em; background: var(--bp-surface); padding: 0.1rem 0.25rem; border-radius: var(--bp-r-sm); border: 1px solid var(--bp-hairline); }
+pre { padding: 1rem; background: var(--bp-surface); border: 1px solid var(--bp-hairline); border-radius: var(--bp-r-md); white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; margin: 0.6rem 0 1rem; }
+pre code { font-size: 0.88rem; background: transparent; padding: 0; border: none; }
+
+.skip { position: absolute; top: -5rem; left: 1rem; background: var(--bp-bg); color: var(--bp-text); padding: 0.5rem 1rem; border: 1px solid var(--bp-hairline); border-radius: var(--bp-r-md); z-index: var(--bp-z-skip); text-decoration: none; font-weight: 600; }
+.skip:focus { top: 1rem; }
+
+/* ---------- Layout: centered column ---------- */
+main, header, footer { max-width: 640px; margin: 0 auto; padding: 1.5rem var(--bp-s4); }
+header { padding-top: 3rem; border-bottom: 1px solid var(--bp-hairline); }
+footer { color: var(--bp-muted); font-size: 0.9rem; padding-bottom: 3rem; border-top: 1px solid var(--bp-hairline); margin-top: 2rem; text-align: center; }
+
+/* ---------- Language toggle ---------- */
+.lang-toggle { display: inline-flex; gap: var(--bp-s1); margin-left: auto; flex-shrink: 0; }
+.lang-toggle button { display: inline-flex; align-items: center; min-height: var(--bp-control-h); padding-inline: var(--bp-s3); border: 1px solid var(--bp-control); border-radius: var(--bp-r-md); background: var(--bp-surface); color: var(--bp-text); font-weight: 600; font-size: var(--bp-t-sm); font-family: inherit; cursor: pointer; }
+.lang-toggle button:hover { border-color: var(--bp-accent); }
+.lang-toggle button.active { background: var(--bp-accent); border-color: var(--bp-accent); color: var(--bp-on-accent); }
+
+/* ---------- Header ---------- */
+.bp-header-inner { display: flex; align-items: center; gap: var(--bp-s6); min-height: var(--bp-control-h); padding-block: var(--bp-s3); flex-wrap: wrap; }
+.bp-brand { display: inline-flex; align-items: center; gap: var(--bp-s2); color: var(--bp-text); text-decoration: none; font-weight: 700; font-family: var(--bp-font-title); font-size: var(--bp-t-xl); }
+.bp-mark { display: grid; place-items: center; width: var(--bp-control-h); height: var(--bp-control-h); border-radius: var(--bp-r-md); background: var(--bp-accent); color: var(--bp-on-accent); font-size: var(--bp-t-sm); font-weight: 800; }
+.bp-nav { display: flex; gap: var(--bp-s1); margin-right: auto; flex-wrap: wrap; }
+.bp-nav a { display: inline-flex; align-items: center; min-height: var(--bp-control-h); padding-inline: var(--bp-s3); border-radius: var(--bp-r-md); color: var(--bp-muted); text-decoration: none; font-weight: 600; font-size: var(--bp-t-sm); }
+.bp-nav a:hover { color: var(--bp-text); background: var(--bp-bg); }
+.bp-actions { display: flex; align-items: center; gap: var(--bp-s2); flex-shrink: 0; }
+
+/* ---------- Typography ---------- */
+h1 { font-size: clamp(2rem, 6vw, 3rem); line-height: 1.1; letter-spacing: -0.025em; margin: 0 0 1rem; font-family: var(--bp-font-title); }
+h2 { font-size: 1.35rem; line-height: 1.25; margin: 0 0 1rem; font-family: var(--bp-font-title); color: var(--bp-text); }
+h3 { font-size: 1.05rem; margin: 0 0 0.5rem; font-family: var(--bp-font-title); color: var(--bp-text); }
+p { max-width: 72ch; margin: 0.65rem 0; }
+.small, .source { font-size: 0.88rem; color: var(--bp-muted); }
+.bp-sub { margin: 0 0 var(--bp-s6); color: var(--bp-muted); max-width: 60ch; font-size: var(--bp-t-lg); }
+
+/* ---------- Section ---------- */
+section { padding: 1.5rem 0; border-bottom: 1px solid var(--bp-hairline); }
+section:last-child { border-bottom: none; }
+.section-kicker { font-size: var(--bp-t-xs); font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--bp-accent); margin-bottom: var(--bp-s1); display: block; }
+
+/* ---------- Hero / tiles ---------- */
+.hero { margin-bottom: var(--bp-s8); }
+.tiles { display: flex; gap: var(--bp-s3); margin: var(--bp-s4) 0 var(--bp-s8); flex-wrap: wrap; }
+.tile { flex: 1 1 120px; min-width: 110px; padding: var(--bp-s4); border: 1px solid var(--bp-hairline); border-radius: var(--bp-r-lg); background: var(--bp-surface); text-align: center; }
+.tile .tile-label { display: block; font-size: var(--bp-t-xs); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--bp-muted); margin-bottom: var(--bp-s1); }
+.tile .tile-value { display: block; font-size: var(--bp-t-2xl); font-weight: 700; font-variant-numeric: tabular-nums; color: var(--bp-text); }
+
+/* ---------- Callouts ---------- */
+.callout { padding: 1.2rem; border: 1px solid var(--bp-hairline); border-radius: var(--bp-r-lg); background: var(--bp-tint, var(--bp-surface)); margin: 1rem 0; border-left: 4px solid var(--bp-accent); }
+.callout h3 { margin-top: 0; font-size: var(--bp-t-md); }
+.callout-quick { border-left-color: var(--bp-success); background: #f0fdf4; }
+
+/* ---------- Steps / pipeline ---------- */
+ol.steps { padding-left: 1.5rem; }
+ol.steps > li { padding-left: 0.25rem; margin: 1rem 0; }
+ul { padding-left: 1.3rem; }
+li { margin: 0.4rem 0; }
+
+.pipeline { display: flex; gap: var(--bp-s2); list-style: none; padding: 0; margin: 0 0 var(--bp-s4); flex-wrap: wrap; }
+.pipeline li { display: inline-flex; align-items: center; gap: var(--bp-s1); padding: var(--bp-s1) var(--bp-s3); border: 1px solid var(--bp-hairline); border-radius: var(--bp-r-pill); background: var(--bp-surface); font-size: var(--bp-t-sm); color: var(--bp-text); }
+
+/* ---------- Buttons ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--bp-s2); height: var(--bp-control-h); min-height: var(--bp-control-h); padding: 0 var(--bp-s4); border: 1px solid var(--bp-control); border-radius: var(--bp-r-md); background: var(--bp-surface); color: var(--bp-text); font-weight: 600; font-size: var(--bp-t-sm); text-decoration: none; font-family: inherit; cursor: pointer; }
+.btn:hover { border-color: var(--bp-accent); }
+.btn-primary { background: var(--bp-accent); border-color: var(--bp-accent); color: var(--bp-on-accent); }
+.btn-primary:hover { filter: brightness(0.92); }
+.btn-ghost { background: transparent; border-color: transparent; color: var(--bp-text); }
+.btn-ghost:hover { background: var(--bp-bg); color: var(--bp-accent); }
+table { margin: 0.8rem auto 0; border-collapse: collapse; width: 100%; font-size: 0.91rem; font-variant-numeric: tabular-nums; }
+table.models { min-width: 850px; max-width: 100%; }
+table.routes { min-width: 540px; max-width: 100%; }
+th, td { padding: 0.75rem 0.6rem; border: 1px solid var(--bp-hairline); text-align: left; vertical-align: top; }
+th { background: var(--bp-surface); color: var(--bp-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; border-top: 2px solid var(--bp-accent); }
+td:first-child, th:first-child { padding-left: 0.3rem; }
+tr:nth-child(even) td { background: rgba(0,0,0,0.02); }
+tr:hover td { background: rgba(196, 30, 58, 0.06); }
+.table-wrap { overflow: auto; max-width: 100%; margin: 0.8rem 0; }
+#limity ul { max-width: 42rem; margin: 0 auto; text-align: left; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 760px) {
+  .bp-nav { order: 3; width: 100%; justify-content: center; margin-top: var(--bp-s3); flex-wrap: wrap; }
+  .lang-toggle { order: 1; margin-left: 0; }
+  .bp-actions { order: 2; }
+  .bp-header-inner { flex-direction: column; align-items: stretch; gap: var(--bp-s3); }
+  .bp-brand { justify-content: center; }
+  main, header, footer { padding: 1rem var(--bp-s3); }
+  .tiles { flex-direction: column; }
+  table { font-size: 0.82rem; }
+  th, td { padding: 0.5rem 0.4rem; }
+}
+
+/* ---------- Hidden EN content (shown when lang=en) ---------- */
+[data-lang="en"] .sk-only { display: none !important; }
+[data-lang="sk"] .en-only { display: none !important; }
 </style>
 </head>
-<body>
-<a class="skip" href="#content">Skip to content</a>
-<header>
-<h1>Live Speech Translation</h1>
-<p>Speak in one language. Hear translated speech and read live captions.</p>
-<p>Recognition, translation and voice run locally on your own machine.</p>
-<p>Use a browser to control it, headphones to listen, or an audio cable to feed a meeting.</p>
-<nav aria-label="Get started"><a href="#quick-start">Install and run</a><a href="#routes">Check your language</a><a href="../INTEGRATION.md">Connect a room</a><a href="https://github.com/brusnyak/bp">Source on GitHub</a></nav>
+<body data-lang="sk">
+<a class="skip" href="#obsah"><span class="sk-only">Preskočiť na obsah</span><span class="en-only">Skip to content</span></a>
+
+<header class="bp-header">
+  <div class="bp-header-inner">
+    <a class="bp-brand" href="#obsah" aria-label="BP — začiatok stránky">
+      <span class="bp-mark">BP</span>
+      <span><span class="sk-only">BP · Živý preklad reči</span><span class="en-only">BP · Live speech translation</span></span>
+    </a>
+    <nav class="bp-nav" aria-label="Časti">
+      <a href="#co"><span class="sk-only">Čo to je</span><span class="en-only">What it is</span></a>
+      <a href="#kanal"><span class="sk-only">Kanál</span><span class="en-only">Channel</span></a>
+      <a href="#trasy"><span class="sk-only">Trasy</span><span class="en-only">Routes</span></a>
+      <a href="#rychlost"><span class="sk-only">Rýchlosť</span><span class="en-only">Speed</span></a>
+      <a href="#hlasy"><span class="sk-only">Hlasy</span><span class="en-only">Voices</span></a>
+      <a href="#mieszka"><span class="sk-only">Miestnosť</span><span class="en-only">Room</span></a>
+      <a href="#limity"><span class="sk-only">Limity</span><span class="en-only">Limits</span></a>
+    </nav>
+    <div class="lang-toggle">
+      <button class="lang-btn active" data-lang="sk">SK</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+    </div>
+    <div class="bp-actions">
+      <a href="http://localhost:8000" class="btn btn-primary"><span class="sk-only">Vyskúšať lokálne</span><span class="en-only">Try locally</span></a>
+      <a href="https://github.com/brusnyak/bp" class="btn btn-ghost"><span class="sk-only">Zdrojový kód</span><span class="en-only">Source code</span></a>
+    </div>
+  </div>
 </header>
-<main id="content">
-<nav aria-label="On this page"><a href="#what">What it is</a><a href="#speed">Speed</a><a href="#voices">Voices</a><a href="#hardware">Hardware</a><a href="#room">Conference rooms</a><a href="#test">Test it</a><a href="#licences">Licences</a><a href="#limits">Limits</a></nav>
-<section id="what">
-<h2>What it is</h2>
-<p>A standalone tool for translated speech and captions during calls and presentations. Install the models once; the default pipeline then runs without a cloud speech service.</p>
-<ol class="pipeline" aria-label="All-local audio pipeline"><li><span>Mic</span></li><li><span>VAD</span></li><li><span>Speech recognition</span></li><li><span>Translation</span></li><li><span>Voice</span></li><li><span>Speakers / captions</span></li></ol>
-<p class="small">VAD detects speech and pauses. The processing host handles every stage; room listeners receive audio and captions over your network.</p>
+
+<main id="obsah" class="bp-main">
+
+<!-- Hero -->
+<section id="co" class="hero">
+  <span class="section-kicker"><span class="sk-only">Čo to je</span><span class="en-only">What it is</span></span>
+  <h1><span class="sk-only">Živý preklad reči</span><span class="en-only">Live speech translation</span></h1>
+  <p class="bp-sub"><span class="sk-only">Hovorte jedným jazykom. Počúvajte preloženú reč a čítajte žive titulky. Všetko beží lokálne na vašom počítači — bez cloudovej služby pre reč.</span><span class="en-only">Speak one language. Hear translated speech and read live captions. Everything runs locally on your machine — no cloud speech service.</span></p>
+  <div class="tiles">
+    <div class="tile"><span class="tile-label"><span class="sk-only">Mediánové oneskorenie</span><span class="en-only">Median latency</span></span><span class="tile-value">0.79 s</span></div>
+    <div class="tile"><span class="tile-label"><span class="sk-only">p90 oneskorenie</span><span class="en-only">p90 latency</span></span><span class="tile-value">1.39 s</span></div>
+    <div class="tile"><span class="tile-label"><span class="sk-only">Rozpoznávanie WER</span><span class="en-only">Recognition WER</span></span><span class="tile-value">5.2%</span></div>
+  </div>
+  <p class="small"><span class="sk-only">Namerané na Mac M1 Pro · angličtina do slovenčiny · jeden beh, vygenerované audio.</span><span class="en-only">Measured on Mac M1 Pro · English → Slovak · one run, generated audio.</span></p>
 </section>
-<section id="quick-start">
-<h2>Quick start</h2>
-<p>Requires Python 3.11 or 3.12, Git, ffmpeg and internet access for installation. Setup downloads dependencies and model weights. Start with generic Piper voices; personal recordings are not included.</p>
-<ol class="steps">
-<li>Clone the repository.<pre><code>git clone https://github.com/brusnyak/bp.git
-cd bp</code></pre></li>
-<li>Set up the profile for your machine. This example installs Czech, Slovak and German with English.<pre><code>python3.11 scripts/setup.py --profile mac --langs cs,sk,de</code></pre><p class="small">Apple Silicon: <code>mac</code>. NVIDIA CUDA: replace it with <code>nvidia</code>. Other laptops: use <code>cpu</code>. On Windows use your Python 3.11 executable.</p></li>
-<li>Run with the matching profile.<pre><code>make run PRESET=mac</code></pre><p class="small">Use <code>PRESET=nvidia</code> or <code>PRESET=cpu</code> for the other profiles. Windows: run <code>.venv\Scripts\python.exe app.py</code>; the Makefile's preset loader requires a POSIX shell.</p></li>
-<li>Open <a href="http://localhost:8000">http://localhost:8000</a> in Chrome or Edge. Select the languages, choose <strong>Microphone</strong> and <strong>Output</strong>, use <strong>Test microphone</strong>, wear headphones and press <strong>Start</strong> (it prepares the route and begins capture).</li>
-</ol>
-<p class="source">Commands: <a href="../../README.md#quick-start">README quick start</a>, <a href="../../Makefile">Makefile</a>, <a href="../../scripts/setup.py">setup.py</a>. The standard Mac installer prepares Whisper; the Nemotron result below uses a separately provisioned streaming engine.</p>
+
+<!-- Channel -->
+<section id="kanal">
+  <span class="section-kicker"><span class="sk-only">Kanál</span><span class="en-only">Channel</span></span>
+  <h2><span class="sk-only">Vše-lokálny audio kanál</span><span class="en-only">Fully local audio channel</span></h2>
+  <p><span class="sk-only">Mikrofón → VAD → rozpoznávanie reči → preklad → hlas → reproduktory / titulky. VAD detekuje reč a pauzy; počúvajúci v miestnosti dostávajú audio a titulky cez vašu sieť.</span><span class="en-only">Microphone → VAD → speech recognition → translation → voice → speakers / captions. VAD detects speech and pauses; listeners in the room get audio and captions over your network.</span></p>
+  <ol class="pipeline" aria-label="Etapy kanála"><li><span>Mikrofón</span></li><li><span>VAD</span></li><li><span>Rozpoznávanie reči</span></li><li><span>Preklad</span></li><li><span>Hlas</span></li><li><span>Reproduktory / titulky</span></li></ol>
 </section>
-<section id="routes">
-<h2>What works today</h2>
-<p>Choose a route, then check the installed assets. A declared language pack or a recognition score alone does not establish translation quality.</p>
-<div class="table-wrap" role="region" aria-label="Language routes, scroll horizontally on small screens" tabindex="0"><table class="routes"><thead><tr><th>Direction</th><th>Use today</th><th>Evidence and boundary</th></tr></thead><tbody>
-<tr><td>English → Slovak</td><td>Live laptop route; Slovak output remains experimental</td><td>Generated English replay measured below. <a href="../evidence/2026-11-15/D_wait05.json">Route receipt</a>; human meaning and listening review still needed.</td></tr>
-<tr><td>English → Czech</td><td>Available with generic Piper</td><td><a href="../LANGUAGES.md">Language measurements</a>; no matching Nemotron live-route result claimed.</td></tr>
-<tr><td>English → German</td><td>Live route tested on a GPU</td><td><a href="../BENCHMARKS.md">T4 route test</a>; settings differ from the Mac run below.</td></tr>
-<tr><td>German → English</td><td>Available; live use needs testing on your machine</td><td><a href="../LANGUAGES.md">Recognition, translation and whole-chain measurements</a> are component evidence, not sustained meeting acceptance.</td></tr>
-<tr><td>Czech → English</td><td>Primary pair; latency depends on profile</td><td><a href="../LANGUAGES.md">Czech route evidence</a>; see <a href="../../README.md#saved-measurements">saved measurements</a> for onset-to-first-audio timing.</td></tr>
-<tr><td>Slovak → English</td><td>Experimental; low lag needs a faster GPU</td><td><a href="../LANGUAGES.md">Slovak recognition evidence</a>; accented speech can be substantially worse. Low-lag GPU operation remains unproven.</td></tr>
+
+<!-- Routes -->
+<section id="trasy">
+  <span class="section-kicker"><span class="sk-only">Trasy</span><span class="en-only">Routes</span></span>
+  <h2><span class="sk-only">Jazykové trasy</span><span class="en-only">Language routes</span></h2>
+  <p><span class="sk-only">Vyberte trasu, potom skontrolujte nainštalované sadby. Deklarovaný jazykový balík alebo rozpoznávacie skóre samé o sebe neprokazuje kvalitu prekladu.</span><span class="en-only">Pick a route, then check installed weights. A declared language pack or recognition score alone doesn't prove translation quality.</span></p>
+  <div class="table-wrap"><table class="routes"><thead><tr><th><span class="sk-only">Smer</span><span class="en-only">Route</span></th><th><span class="sk-only">Použitie dnes</span><span class="en-only">Use today</span></th><th><span class="sk-only">Dôkazy a hranice</span><span class="en-only">Evidence and limits</span></th></tr></thead><tbody>
+<tr><td><span class="sk-only">Angličtina → slovenčina</span><span class="en-only">English → Slovak</span></td><td><span class="sk-only">Živá trasa na notebooke; slovenský výstup ostáva experimentálny</span><span class="en-only">Live route on laptop; Slovak output remains experimental</span></td><td><span class="sk-only">Namerané vygenerované anglické opakovanie nižšie. <a href="../evidence/2026-11-15/D_wait05.json">Potvrdenie trasy</a>.</span><span class="en-only">Measured generated English repeat below. <a href="../evidence/2026-11-15/D_wait05.json">Route confirmation</a>.</span></td></tr>
+<tr><td><span class="sk-only">Angličtina → čeština</span><span class="en-only">English → Czech</span></td><td><span class="sk-only">K dispozícii s generickým hlasom Piper</span><span class="en-only">Available with generic Piper voice</span></td><td><span class="sk-only"><a href="../LANGUAGES.md">Jazykové merania</a>.</span><span class="en-only"><a href="../LANGUAGES.md">Language measurements</a>.</span></td></tr>
+<tr><td><span class="sk-only">Angličtina → nemčina</span><span class="en-only">English → German</span></td><td><span class="sk-only">Živa trasa otestovaná na GPU</span><span class="en-only">Live route tested on GPU</span></td><td><span class="sk-only"><a href="../BENCHMARKS.md">T4 test trasy</a>.</span><span class="en-only"><a href="../BENCHMARKS.md">T4 route test</a>.</span></td></tr>
+<tr><td><span class="sk-only">Nemčina → angličtina</span><span class="en-only">German → English</span></td><td><span class="sk-only">K dispozícii; potrebuje otestovať na vašom stroji</span><span class="en-only">Available; needs testing on your machine</span></td><td><span class="sk-only"><a href="../LANGUAGES.md">Komponentové merania</a>, nie prijateľosť stretnutia v reálnom čase.</span><span class="en-only"><a href="../LANGUAGES.md">Component measurements</a>, not real-time meeting acceptability.</span></td></tr>
+<tr><td><span class="sk-only">Čeština → angličtina</span><span class="en-only">Czech → English</span></td><td><span class="sk-only">Primárna pára; oneskorenie závisí na profilu</span><span class="en-only">Primary pair; latency depends on profile</span></td><td><span class="sk-only"><a href="../LANGUAGES.md">České dôkazy trasy</a>.</span><span class="en-only"><a href="../LANGUAGES.md">Czech route evidence</a>.</span></td></tr>
+<tr><td><span class="sk-only">Slovenčina → angličtina</span><span class="en-only">Slovak → English</span></td><td><span class="sk-only">Experimentálny; nízke oneskorenie potrebuje rýchlejšiu GPU</span><span class="en-only">Experimental; low latency needs a faster GPU</span></td><td><span class="sk-only"><a href="../LANGUAGES.md">Dôkazy rozpoznávania slovenčiny</a>; akcentovaná reč môže byť podstatne horšia.</span><span class="en-only"><a href="../LANGUAGES.md">Slovak recognition evidence</a>; accented speech may be much worse.</span></td></tr>
 </tbody></table></div>
 </section>
-<section id="speed">
-<h2>Speed and accuracy</h2>
-<p>Mac M1 Pro, 16 GB · English → Slovak · 60 s generated test-audio replay window (44.46 s of input) · Nemotron streaming recognition + Piper voice. <strong>One run each, generated audio.</strong></p>
-<div class="table-wrap" role="region" aria-label="Mac route results" tabindex="0"><table><thead><tr><th>Setting</th><th>Median lag</th><th>p90 lag</th><th>Drift</th><th>Recognition word error</th></tr></thead><tbody><tr><td>Wait 0.5 s</td><td>0.79 s</td><td>1.39 s</td><td>-0.05 s/min</td><td>5.2%</td></tr><tr><td>Previous setting</td><td>0.75 s</td><td>1.80 s</td><td>See receipt</td><td>See receipt</td></tr></tbody></table></div>
-<p>Lag is measured from a speech fragment's estimated end to the start of translated audio in a simulated sequential player. It includes the playback queue; it is not physical microphone-to-speaker delay. p90 means nine out of ten fragments were at or below that delay. Negative drift means the lag did not grow.</p>
-<p class="source">Sources: <a href="../evidence/2026-11-15/D_wait05.json">D_wait05.json</a> / <a href="../evidence/2026-11-15/D_wait05.score.txt">score</a>; <a href="../evidence/2026-11-15/A_baseline.json">A_baseline.json</a> / <a href="../evidence/2026-11-15/A_baseline.score.txt">score</a>. Recognition error does not measure translation meaning or voice identity. These short runs do not establish performance in a room.</p>
-</section>
-<section id="voices">
-<h2>Voice cloning</h2>
-<p>Piper is the live default: a generic voice, without cloning. The cloning comparisons below are isolated synthesis tests on a <strong>Kaggle Tesla T4, 16 GB</strong>, with <strong>median timing over three repeats</strong> per case after warm-up. They do not establish full-route streaming quality.</p>
-<p class="small">Scroll the comparison horizontally on a phone. RTF is generation time divided by audio duration: below 1 means faster than playback. GPU memory is approximate; receipts record MiB.</p>
-<div class="table-wrap" role="region" aria-label="Voice model comparison, scroll horizontally" tabindex="0"><table class="models"><thead><tr><th>Model</th><th>Languages / delivery</th><th>Time to audio / RTF</th><th>Word error</th><th>GPU memory</th><th>Weight terms / evidence</th></tr></thead><tbody>
-<tr><td>XTTS v2</td><td>English, Czech; no Slovak. Streams audio chunks.</td><td>First audio ≈0.45–0.48 s; RTF 0.52–0.63</td><td>English 0%; Czech 4–10%</td><td>1.9–2.5 GB</td><td>Non-commercial CPML. <a href="../evidence/2026-11-15/kaggle_xtts_t4_results.json">XTTS receipt</a></td></tr>
-<tr><td>X-Voice</td><td>English, Slovak, Czech among 30 advertised languages. Whole phrase only.</td><td>Stage 1 short sentence: 2.2–2.7 s at 16 steps; 4.0–5.1 s at 32 steps. RTF 0.37–0.47 at 16 steps.</td><td>0–11% across stage 1 repeats; case medians 0–8%</td><td>&lt;1.3 GB across tested stages</td><td>CC-BY-NC weights; MIT code. <a href="../evidence/2026-11-15/kaggle_xvoice_t4_results.json">X-Voice receipt</a></td></tr>
-<tr><td>Higgs Audio v3 4B</td><td>English, Slovak, Czech tested; T4 fp16 output failed intelligibility.</td><td>RTF 1.2–1.3; speed is unusable without intelligible speech</td><td>100%</td><td>14.2 GB</td><td>Research / non-commercial; review exact model terms. <a href="../evidence/2026-11-15/kaggle_higgs_t4_fp16_results.json">Higgs receipt</a></td></tr>
-<tr><td>Piper</td><td>Generic voices; no zero-shot cloning</td><td>RTF ≈0.04 CPU baseline; saved short-piece probe 0.07. Live default</td><td>Voice-specific; no comparable clone score</td><td>CPU</td><td>GPL runtime; voice terms vary. <a href="../evidence/2026-11-10/tts_probe_v2_omnivoice_piper.json">CPU probe</a></td></tr>
-<tr><td>OmniVoice</td><td>Batch only for this tool</td><td>Not accepted for live streaming</td><td>Listening review needed</td><td>GPU</td><td>Review weight terms. <a href="../../NOTICE.md">Notice</a></td></tr>
-<tr><td>Fish Audio S2-Pro</td><td>Candidate; not a tested live route</td><td>Not measured here</td><td>Not measured here</td><td>At least 24 GB recommended</td><td>Review model terms before use</td></tr>
+
+<!-- Speed & accuracy -->
+<section id="rychlost">
+  <span class="section-kicker"><span class="sk-only">Rýchlosť a presnosť</span><span class="en-only">Speed and accuracy</span></span>
+  <h2><span class="sk-only">Rýchlosť a presnosť</span><span class="en-only">Speed and accuracy</span></h2>
+  <p><span class="sk-only">Mac M1 Pro, 16 GB · angličtina → slovenčina · 60 s opakovacie okno (44,46 s vstupu) · Nemotronové streamové rozpoznávanie + Piperov hlas. <strong>Jeden beh, vygenerované audio.</strong></span><span class="en-only">Mac M1 Pro, 16 GB · English → Slovak · 60 s repetition window (44.46 s input) · Nemotron streaming recognition + Piper voice. <strong>One run, generated audio.</strong></span></p>
+  <div class="table-wrap"><table><thead><tr><th><span class="sk-only">Nastavenie</span><span class="en-only">Setting</span></th><th><span class="sk-only">Mediánové oneskorenie</span><span class="en-only">Median latency</span></th><th><span class="sk-only">p90 oneskorenie</span><span class="en-only">p90 latency</span></th><th><span class="sk-only">Drift</span><span class="en-only">Drift</span></th><th><span class="sk-only">Chyba slov pri rozpoznávaní</span><span class="en-only">Recognition word error</span></th></tr></thead><tbody>
+<tr><td><span class="sk-only">Počakajte 0,5 s</span><span class="en-only">Wait 0.5 s</span></td><td>0.79 s</td><td>1.39 s</td><td>-0.05 s/min</td><td>5.2%</td></tr>
+<tr><td><span class="sk-only">Predchádzajúce nastavenie</span><span class="en-only">Previous setting</span></td><td>0.75 s</td><td>1.80 s</td><td><span class="sk-only">Pozrite potvrdenie</span><span class="en-only">See confirmation</span></td><td><span class="sk-only">Pozrite potvrdenie</span><span class="en-only">See confirmation</span></td></tr>
 </tbody></table></div>
-<p class="small">X-Voice's short test is one sentence, roughly 3–5 s of speech; stage 1 actually generated 4.6–6.0 s of audio. Longer sentences take longer. Stage 2 was slower and reached 20% median word error in one case; stage 1 is the configuration summarised here. Its paper reports RTF 0.073 on an RTX 4090; that is a publisher result, not measured here (<a href="https://arxiv.org/abs/2605.05611">paper</a>).</p>
-<p class="small">The T4 lacks native bf16. Higgs served in fp16 but was not intelligible; Ampere or newer with 24 GB is the recommended test target, <strong>untested there</strong>. Automated round-trip ASR error is a proxy for intelligibility, not a human listening or voice-identity verdict.</p>
-<aside class="callout"><h3>Which should I use?</h3><ul><li><strong>Live default → Piper.</strong> Start here for a working audio path.</li><li><strong>Czech / English clone with streaming → XTTS.</strong> Best tested synthesis candidate; non-commercial weights and live-route validation still apply.</li><li><strong>Slovak clone → X-Voice on a fast GPU.</strong> Unproven for live use; it waits for a whole phrase.</li></ul></aside>
+  <p class="small"><span class="sk-only">Zdroje: <a href="../evidence/2026-11-15/D_wait05.json">D_wait05.json</a> / <a href="../evidence/2026-11-15/D_wait05.score.txt">skóre</a>; <a href="../evidence/2026-11-15/A_baseline.json">A_baseline.json</a> / <a href="../evidence/2026-11-15/A_baseline.score.txt">skóre</a>.</span><span class="en-only">Sources: <a href="../evidence/2026-11-15/D_wait05.json">D_wait05.json</a> / <a href="../evidence/2026-11-15/D_wait05.score.txt">score</a>; <a href="../evidence/2026-11-15/A_baseline.json">A_baseline.json</a> / <a href="../evidence/2026-11-15/A_baseline.score.txt">score</a>.</span></p>
 </section>
-<section id="hardware">
-<h2>Hardware</h2>
-<div class="grid"><article class="card"><h3>On a laptop</h3><p>Piper voice and Whisper recognition run locally. Apple Silicon offers MLX; Nemotron streaming has a measured English-input route on the M1 Pro. Optional engines need their own packages and assets. CPU-only machines have less latency headroom.</p></article><article class="card"><h3>With an NVIDIA GPU</h3><p>Use GPU compute for cloning experiments and low-lag Slovak input. Ampere or newer with 24 GB is recommended for those experiments, not a proven route guarantee. A T4 can test XTTS and X-Voice but failed intelligible Higgs output.</p></article></div>
-<p class="source"><a href="../LANGUAGES.md">Language and hardware profiles</a> · <a href="#voices">Measured voice memory</a>. Leave headroom for recognition, translation and voice together; isolated model memory does not prove they fit concurrently.</p>
+
+<!-- Voices / models -->
+<section id="hlasy">
+  <span class="section-kicker"><span class="sk-only">Hlasy</span><span class="en-only">Voices</span></span>
+  <h2><span class="sk-only">Klónenie hlasu</span><span class="en-only">Voice cloning</span></h2>
+  <p><span class="sk-only">Piper je živý predvolený: generický hlas, bez klónenia. Porovnania nižšie sú izolované testy syntézy na <strong>Kaggle Tesla T4, 16 GB</strong>.</span><span class="en-only">Piper is the live default: generic voice, no cloning. Comparisons below are isolated synthesis tests on <strong>Kaggle Tesla T4, 16 GB</strong>.</span></p>
+  <div class="table-wrap"><table class="models"><thead><tr><th><span class="sk-only">Model</span><span class="en-only">Model</span></th><th><span class="sk-only">Jazyky / doručenie</span><span class="en-only">Languages / delivery</span></th><th><span class="sk-only">Čas do audia / RTF</span><span class="en-only">Time to audio / RTF</span></th><th><span class="sk-only">Chyba slov</span><span class="en-only">Word error</span></th><th><span class="sk-only">Pamäť GPU</span><span class="en-only">GPU memory</span></th><th><span class="sk-only">Podmienky váh / dôkaz</span><span class="en-only">Weight terms / evidence</span></th></tr></thead><tbody>
+<tr><td><span class="sk-only">XTTS v2</span><span class="en-only">XTTS v2</span></td><td><span class="sk-only">Angličtina, čeština; žiadna slovenčina.</span><span class="en-only">English, Czech; no Slovak.</span></td><td><span class="sk-only">Prvé audio ≈0.45–0.48 s; RTF 0.52–0.63</span><span class="en-only">First audio ≈0.45–0.48 s; RTF 0.52–0.63</span></td><td><span class="sk-only">Angličtina 0%; čeština 4–10%</span><span class="en-only">English 0%; Czech 4–10%</span></td><td><span class="sk-only">1.9–2.5 GB</span><span class="en-only">1.9–2.5 GB</span></td><td><span class="sk-only">CPML nekomerčné. <a href="../evidence/2026-11-15/kaggle_xtts_t4_results.json">Potvrdenie XTTS</a></span><span class="en-only">CPML non-commercial. <a href="../evidence/2026-11-15/kaggle_xtts_t4_results.json">XTTS confirmation</a></span></td></tr>
+<tr><td><span class="sk-only">X-Voice</span><span class="en-only">X-Voice</span></td><td><span class="sk-only">Angličtina, slovenčina, čeština. Len celá vetu.</span><span class="en-only">English, Slovak, Czech. Whole sentence only.</span></td><td><span class="sk-only">Veta 1: 2.2–2.7 s (16 krokov); 4.0–5.1 s (32 krokov). RTF 0.37–0.47.</span><span class="en-only">Sentence 1: 2.2–2.7 s (16 steps); 4.0–5.1 s (32 steps). RTF 0.37–0.47.</span></td><td><span class="sk-only">0–11% naprieč opakovaniami etapy 1</span><span class="en-only">0–11% across stage 1 repetitions</span></td><td><span class="sk-only">&lt;1.3 GB</span><span class="en-only"><1.3 GB</span></td><td><span class="sk-only">CC-BY-NC váhy; MIT kód. <a href="../evidence/2026-11-15/kaggle_xvoice_t4_results.json">Potvrdenie X-Voice</a></span><span class="en-only">CC-BY-NC weights; MIT code. <a href="../evidence/2026-11-15/kaggle_xvoice_t4_results.json">X-Voice confirmation</a></span></td></tr>
+<tr><td><span class="sk-only">Higgs Audio v3 4B</span><span class="en-only">Higgs Audio v3 4B</span></td><td><span class="sk-only">Angličtina, slovenčina, čeština otestované; T4 fp16 zlyhal zrozumiteľnosťou.</span><span class="en-only">English, Slovak, Czech tested; T4 fp16 failed intelligibility.</span></td><td><span class="sk-only">RTF 1.2–1.3; nepoužiteľné bez zrozumiteľnej reči</span><span class="en-only">RTF 1.2–1.3; unusable without intelligible speech</span></td><td><span class="sk-only">100%</span><span class="en-only">100%</span></td><td><span class="sk-only">14.2 GB</span><span class="en-only">14.2 GB</span></td><td><span class="sk-only">Výskumná / nekomerčná. <a href="../evidence/2026-11-15/kaggle_higgs_t4_fp16_results.json">Potvrdenie Higgs</a></span><span class="en-only">Research / non-commercial. <a href="../evidence/2026-11-15/kaggle_higgs_t4_fp16_results.json">Higgs confirmation</a></span></td></tr>
+<tr><td><span class="sk-only">Piper</span><span class="en-only">Piper</span></td><td><span class="sk-only">Generické hlasy; žiadne zero-shot klónenie. Živý predvolený.</span><span class="en-only">Generic voices; no zero-shot cloning. Live default.</span></td><td><span class="sk-only">RTF ≈0.04 CPU.</span><span class="en-only">RTF ≈0.04 CPU.</span></td><td><span class="sk-only">Špecifické pre hlas; žiadne srovnateľné skóre klóna</span><span class="en-only">Voice-specific; no comparable clone score</span></td><td><span class="sk-only">CPU</span><span class="en-only">CPU</span></td><td><span class="sk-only">GPL runtime. <a href="../evidence/2026-11-10/tts_probe_v2_omnivoice_piper.json">CPU skúška</a></span><span class="en-only">GPL runtime. <a href="../evidence/2026-11-10/tts_probe_v2_omnivoice_piper.json">CPU test</a></span></td></tr>
+</tbody></table></div>
+  <p class="small"><span class="sk-only">Krátky test X-Voice je jedna veta, približne 3–5 s reči. Jeho článok hlási RTF 0.073 na RTX 4090; to je výsledok vydavateľa, nie nameraný tu (<a href="https://arxiv.org/abs/2605.05611">článok</a>).</span><span class="en-only">Short X-Voice test is one sentence, roughly 3–5 s of speech. Its paper reports RTF 0.073 on RTX 4090; that's the publisher's result, not measured here (<a href="https://arxiv.org/abs/2605.05611">paper</a>).</span></p>
+  <aside class="callout callout-quick"><h3><span class="sk-only">Aký ma mám použiť?</span><span class="en-only">Which should I use?</span></h3><ul>
+  <li><span class="sk-only"><strong>Živý predvolený → Piper.</strong> Začnite tu pre funkčnú audio trasu.</span><span class="en-only"><strong>Live default → Piper.</strong> Start here for a working audio route.</span></li>
+  <li><span class="sk-only"><strong>Klóne čeština / angličtina so streamovaním → XTTS.</strong> Najlepšie otestovaný kandidát syntézy.</span><span class="en-only"><strong>Czech / English clones with streaming → XTTS.</strong> Best-tested synthesis candidate.</span></li>
+  <li><span class="sk-only"><strong>Klóne slovenčina → X-Voice na rýchlej GPU.</strong> Neoverené pre živé použitie.</span><span class="en-only"><strong>Slovak clones → X-Voice on a fast GPU.</strong> Unverified for live use.</span></li>
+  </ul></aside>
 </section>
-<section id="room">
-<h2>Use it in a conference room</h2>
-<div class="grid"><article class="card"><h3>Feed a meeting or AV mixer</h3><p>Select a virtual cable in the live page's <strong>Output</strong> control, then choose that cable as the meeting application's microphone. Use BlackHole on macOS, VB-Cable on Windows, or a PipeWire/PulseAudio virtual sink on Linux. Keep the source microphone isolated from playback.</p></article><article class="card"><h3>Let listeners choose a language</h3><p>Open <strong>More → Audience broadcast (room mode) → Start room</strong>. Share the audience link or QR code. Listeners open it on their phones, select a language and listen with earbuds. Subtitles can also pop out from the Translation panel.</p></article></div>
-<p>For phone access, serve HTTPS on a trusted network:</p><pre><code>BP_HTTPS=1 BP_HOST=0.0.0.0 make run</code></pre>
-<p>Trust the certificate on each device or provide a trusted certificate. Room mode is experimental; test your actual listener count, network and audio path before an event.</p>
-<p><a href="../INTEGRATION.md">Integration guide: routing, API, deployment checklist and troubleshooting</a></p>
+
+<!-- Room -->
+<section id="mieszka">
+  <span class="section-kicker"><span class="sk-only">Miestnosť</span><span class="en-only">Room</span></span>
+  <h2><span class="sk-only">Konferenčná miestnosť</span><span class="en-only">Conference room</span></h2>
+  <p><span class="sk-only">V ovládacom prvku <strong>Výstup</strong> zvolte virtuálny kábel (macOS: BlackHole, Windows: VB-Cable, Linux: PipeWire) a nastavte ho ako mikrofón stretnutia. Posluchovia otvoria odkaz alebo QR kód v telefóne, zvolí si jazyk a počúvajú so slúchadlami.</span><span class="en-only">In <strong>Output</strong> choose a virtual cable (macOS: BlackHole, Windows: VB-Cable, Linux: PipeWire) and set it as the meeting microphone. Listeners open the link or QR code on their phone, choose a language, and listen with headphones.</span></p>
+  <pre><code>BP_HTTPS=1 BP_HOST=0.0.0.0 make run</code></pre>
+  <p class="small"><span class="sk-only">Režim miestnosti je experimentálny — overte ho so skutočnými zariadeniami pred udalosťou.</span><span class="en-only">Room mode is experimental — verify it with real devices before the event.</span></p>
 </section>
-<section id="test">
-<h2>Run your own accuracy test</h2>
-<ol><li>Read and record the matching language in <a href="../reading_script_multilingual.md">the multilingual reading script</a>. Use the actual microphone and room; keep the original recording.</li><li>Score recognition against that script with installed local models.<pre><code>.venv/bin/python scripts/score_reading.py recording.wav en</code></pre></li><li>For a route test, use a prepared, running local backend and replay a recording at real time. These commands are for your own test, after setup.<pre><code>.venv/bin/python scripts/live/paced_replay.py recording.wav --base http://localhost:8000 --src en --tgt sk --tts piper --seconds 60 --out processed/replay.json
-.venv/bin/python scripts/live/score_success.py processed/replay.json reference.json --rate 1.0</code></pre><p class="small"><code>reference.json</code> must describe that recording: <code>text</code> plus <code>sentences</code> entries with <code>text</code>, <code>start</code> and <code>end</code> in seconds. Generated fixtures come from <a href="../../scripts/live/make_test_audio.py">make_test_audio.py</a>. Replay does not score translation meaning; have a bilingual listener review it.</p></li></ol>
-<div class="grid"><article class="card"><h3>Read the scores</h3><p>Word error rate (WER) counts substitutions, missing words and extra words relative to the reference. Lower is better. RTF below 1 means synthesis keeps up with playback. Neither measures translation meaning or whether a clone sounds like its speaker.</p></article><article class="card"><h3>Read the latency chart</h3><p>In <strong>More → Diagnostics: latency and activity log</strong>, each fragment has a stacked bar: hold → STT → MT → TTS-first → queue. Hold is waiting for enough speech; the chart’s Queue / other part is unattributed server time, not measured browser backlog. The 2 s line is a goal, not a promise. Compare the playback backlog separately: a growing backlog means audio is falling behind.</p></article></div>
-<p class="source">Methods: <a href="../../scripts/score_reading.py">score_reading.py</a>, <a href="../../scripts/live/paced_replay.py">paced_replay.py</a>, <a href="../../scripts/live/score_success.py">score_success.py</a>, <a href="../BENCHMARKS.md">benchmarks</a>. First runs may fetch models in scoring tools; provision them before testing offline.</p>
+
+<!-- Limits -->
+<section id="limity">
+  <span class="section-kicker"><span class="sk-only">Limity</span><span class="en-only">Limits</span></span>
+  <h2><span class="sk-only">Známé limity</span><span class="en-only">Known limits</span></h2>
+  <ul>
+    <li><span class="sk-only">Jeden hovoriaci naraz; prekrývajúci sa hovoriaci nie sú oddelení.</span><span class="en-only">One speaker at a time; overlapping speakers aren't separated.</span></li>
+    <li><span class="sk-only">Slovenský vstup a klónené hlasy ostávajú experimentálne.</span><span class="en-only">Slovak input and cloned voices remain experimental.</span></li>
+    <li><span class="sk-only">Hluk, akcenty, jazyk a hardvér menia kvalitu a oneskorenie.</span><span class="en-only">Noise, accents, language, and hardware change quality and latency.</span></li>
+    <li><span class="sk-only">Chrome alebo Edge je potrebné pre výber výstupu v prehliadači.</span><span class="en-only">Chrome or Edge is required for browser output selection.</span></li>
+  </ul>
 </section>
-<section id="licences">
-<h2>Licences</h2>
-<p>The code is MIT. Model weights, voice checkpoints and runtimes have their own terms; an open-source code licence does not grant commercial rights to every model.</p>
-<ul><li>Piper runtime: GPL-3.0-or-later, installed separately. Check each voice's licence before redistribution.</li><li>XTTS v2 weights: non-commercial CPML. X-Voice weights: CC-BY-NC. NLLB and SeamlessM4T also carry non-commercial restrictions.</li><li>Higgs and other optional engines need model-specific review. A runtime warning or an available engine does not grant permission.</li></ul>
-<p class="source"><a href="../../LICENSE">MIT licence</a> · <a href="../../NOTICE.md">Third-party notice</a> · <a href="../LICENSE_INVENTORY_2026-11-06.md">Licence inventory</a>. The inventory is a starting point; check the exact checkpoint version's terms.</p>
-</section>
-<section id="limits">
-<h2>Known limits</h2>
-<ul><li>One speaker at a time; overlapping speakers are not separated.</li><li>Noise, accents, language and hardware can change recognition quality and delay.</li><li>Slovak input and cloned voices remain experimental. Successful generation alone does not establish identity or intelligibility.</li><li>Room mode needs validation with your actual devices, languages and listener count.</li><li>Fresh-install and output-device behaviour vary across platforms. Chrome or Edge is required for browser output selection.</li><li>Installation downloads models. Processing stays on the host; shared use needs access, retention and recording policies.</li></ul>
-</section>
+
 </main>
-<footer><p><a href="../INDEX.md">Documentation</a> · <a href="../../README.md">Repository guide</a> · <a href="../INTEGRATION.md">Integration</a></p><p>Created by Yegor Brusnyak, MIT licence</p></footer>
+
+<footer>
+<p><a href="../INDEX.md"><span class="sk-only">Dokumentácia</span><span class="en-only">Documentation</span></a> · <a href="../../README.md"><span class="sk-only">Sprievodca úložiska</span><span class="en-only">Repository guide</span></a> · <a href="../INTEGRATION.md"><span class="sk-only">Integracia</span><span class="en-only">Integration</span></a></p>
+<p><span class="sk-only">Vytvoril Yegor Brusnyak, MIT licencia</span><span class="en-only">By Yegor Brusnyak, MIT license</span></p>
+</footer>
+
+<script>
+  var skDesc = 'Lokálny preklad reči a žive titulky. Inštalujte si to vlastnoručne, zvolte si jazyk a smerujte preložený reč do slúchadiel alebo na stretnutie.';
+  var enDesc = 'Local speech translation and live captions. Install on your own machine, choose a language, and route translated speech to headphones or a meeting.';
+  var skTitle = 'Živý preklad reči — lokálny audio a titulky';
+  var enTitle = 'Live speech translation — local audio and captions';
+  (function(){
+    var btns = document.querySelectorAll('.lang-btn');
+    var skOnly = document.querySelectorAll('.sk-only');
+    var enOnly = document.querySelectorAll('.en-only');
+    function setLang(lang){
+      document.documentElement.lang = lang;
+      document.body.setAttribute('data-lang', lang);
+      var meta = document.querySelector('meta[name="description"]');
+      var title = document.querySelector('title');
+      if (lang === 'en') {
+        if (meta) meta.setAttribute('content', enDesc);
+        if (title) title.textContent = enTitle;
+      } else {
+        if (meta) meta.setAttribute('content', skDesc);
+        if (title) title.textContent = skTitle;
+      }
+      btns.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-lang') === lang); b.setAttribute('aria-pressed', b.getAttribute('data-lang') === lang); });
+      skOnly.forEach(function(el){ el.style.display = (lang === 'sk') ? '' : 'none'; });
+      enOnly.forEach(function(el){ el.style.display = (lang === 'en') ? '' : 'none'; });
+      localStorage.setItem('bp-lang', lang);
+    }
+    btns.forEach(function(b){
+      b.addEventListener('click', function(){ setLang(b.getAttribute('data-lang')); });
+    });
+    var saved = localStorage.getItem('bp-lang');
+    if (saved === 'en') { setLang('en'); }
+  })();
+</script>
 </body>
 </html>
