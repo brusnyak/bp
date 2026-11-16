@@ -44,7 +44,7 @@ def main():
     higgs = [case['median'] for lang in receipt('kaggle_higgs_t4_fp16_results.json')['tts'].values()
              for case in lang['cases'].values()]
     values = {
-        'css': (SITE / 'site.css').read_text(encoding='utf-8'),
+        'css': (ROOT / 'ui' / 'tokens.css').read_text(encoding='utf-8') + '\n' + (SITE / 'site.css').read_text(encoding='utf-8'),
         'lag': f'{current[0]:.2f}', 'p90': f'{current[1]:.2f}',
         'drift': f'{current[2]:.2f}', 'wer': f'{current[3]:.1f}',
         'previous_lag': f'{previous[0]:.2f}', 'previous_p90': f'{previous[1]:.2f}',
