@@ -1,0 +1,312 @@
+{
+ "runs": {
+  "baseline": {
+   "speaker_lag_median_s": 1.97,
+   "speaker_lag_p90_s": 3.04,
+   "speaker_segments": 34,
+   "speaker_with_audio": 24,
+   "server_errors": 0,
+   "wall_s": 92
+  },
+  "room3": {
+   "speaker_lag_median_s": 6.96,
+   "speaker_lag_p90_s": 8.14,
+   "speaker_segments": 31,
+   "speaker_with_audio": 22,
+   "server_errors": 0,
+   "wall_s": 82,
+   "room_parts_median_s": {
+    "fr": {
+     "queue": 0.0,
+     "mt": 0.51,
+     "tts": 0.43,
+     "send": 0.01,
+     "phrases": 44
+    },
+    "de": {
+     "queue": 0.0,
+     "mt": 0.53,
+     "tts": 0.46,
+     "send": 0.01,
+     "phrases": 44
+    },
+    "sk": {
+     "queue": 0.0,
+     "mt": 0.59,
+     "tts": 0.39,
+     "send": 0.01,
+     "phrases": 44
+    }
+   }
+  },
+  "room3_mtgpu": {
+   "speaker_lag_median_s": 4.0,
+   "speaker_lag_p90_s": 5.32,
+   "speaker_segments": 32,
+   "speaker_with_audio": 22,
+   "server_errors": 0,
+   "wall_s": 82,
+   "room_parts_median_s": {
+    "sk": {
+     "queue": 0.0,
+     "mt": 0.07,
+     "tts": 0.53,
+     "send": 0.01,
+     "phrases": 44
+    },
+    "fr": {
+     "queue": 0.0,
+     "mt": 0.07,
+     "tts": 0.52,
+     "send": 0.01,
+     "phrases": 44
+    },
+    "de": {
+     "queue": 0.0,
+     "mt": 0.07,
+     "tts": 0.53,
+     "send": 0.01,
+     "phrases": 44
+    }
+   }
+  },
+  "room12": {
+   "speaker_lag_median_s": 7.23,
+   "speaker_lag_p90_s": 8.16,
+   "speaker_segments": 32,
+   "speaker_with_audio": 22,
+   "server_errors": 0,
+   "wall_s": 82,
+   "room_parts_median_s": {
+    "fr": {
+     "queue": 0.0,
+     "mt": 0.52,
+     "tts": 0.45,
+     "send": 0.03,
+     "phrases": 44
+    },
+    "de": {
+     "queue": 0.0,
+     "mt": 0.52,
+     "tts": 0.45,
+     "send": 0.03,
+     "phrases": 44
+    },
+    "sk": {
+     "queue": 0.0,
+     "mt": 0.54,
+     "tts": 0.36,
+     "send": 0.03,
+     "phrases": 44
+    }
+   }
+  }
+ },
+ "log": [
+  {
+   "t": 21.7,
+   "m": "staged",
+   "src": "/kaggle/input/datasets/yegorby/bp-code-20261107",
+   "audio": "/kaggle/input/datasets/yegorby/bp-owner-scripts-20261107/en_script_reading.m4a"
+  },
+  {
+   "t": 46.6,
+   "m": "pip",
+   "rc": 0,
+   "tail": "ggingface-hub<3.0,>=1.32.0, but you have huggingface-hub 0.36.2 which is incompatible.\ngoogle-adk 2.7.1 requires google-auth[pyopenssl]>=2.47, but you have google-auth 2.35.0 which is incompatible.\ngoogle-adk 2.7.1 requires websockets<16,>=15.0.1, but you have websockets 12.0 which is incompatible.\n"
+  },
+  {
+   "t": 48.1,
+   "m": "voice",
+   "v": "en_US-john-medium",
+   "rc": 0
+  },
+  {
+   "t": 49.6,
+   "m": "voice",
+   "v": "de_DE-thorsten-medium",
+   "rc": 0
+  },
+  {
+   "t": 51.6,
+   "m": "voice",
+   "v": "sk_SK-lili-medium",
+   "rc": 0
+  },
+  {
+   "t": 54.9,
+   "m": "voice",
+   "v": "fr_FR-siwis-medium",
+   "rc": 0
+  },
+  {
+   "t": 99.3,
+   "m": "mt_convert",
+   "pair": "en-de",
+   "rc": 0,
+   "tail": ""
+  },
+  {
+   "t": 122.3,
+   "m": "mt_convert",
+   "pair": "en-sk",
+   "rc": 0,
+   "tail": ""
+  },
+  {
+   "t": 141.2,
+   "m": "mt_convert",
+   "pair": "en-fr",
+   "rc": 0,
+   "tail": ""
+  },
+  {
+   "t": 247.1,
+   "m": "run",
+   "run": "baseline",
+   "speaker_lag_median_s": 1.97,
+   "speaker_lag_p90_s": 3.04,
+   "speaker_segments": 34,
+   "speaker_with_audio": 24,
+   "server_errors": 0,
+   "wall_s": 92,
+   "listener_summary": {}
+  },
+  {
+   "t": 258.8,
+   "m": "room created",
+   "name": "room3",
+   "room": "k8zUFh-O",
+   "resp": "{'room_id': 'k8zUFh-O', 'listen_path': '/ui/listen/listen.html?room=k8zUFh-O', 'listen_url': 'http://172.19.2.2:8013/ui/"
+  },
+  {
+   "t": 349.0,
+   "m": "run",
+   "run": "room3",
+   "speaker_lag_median_s": 6.96,
+   "speaker_lag_p90_s": 8.14,
+   "speaker_segments": 31,
+   "speaker_with_audio": 22,
+   "server_errors": 0,
+   "wall_s": 82,
+   "room_parts_median_s": {
+    "fr": {
+     "queue": 0.0,
+     "mt": 0.51,
+     "tts": 0.43,
+     "send": 0.01,
+     "phrases": 44
+    },
+    "de": {
+     "queue": 0.0,
+     "mt": 0.53,
+     "tts": 0.46,
+     "send": 0.01,
+     "phrases": 44
+    },
+    "sk": {
+     "queue": 0.0,
+     "mt": 0.59,
+     "tts": 0.39,
+     "send": 0.01,
+     "phrases": 44
+    }
+   },
+   "listener_summary": {}
+  },
+  {
+   "t": 360.7,
+   "m": "room created",
+   "name": "room3_mtgpu",
+   "room": "sGzGiFTX",
+   "resp": "{'room_id': 'sGzGiFTX', 'listen_path': '/ui/listen/listen.html?room=sGzGiFTX', 'listen_url': 'http://172.19.2.2:8013/ui/"
+  },
+  {
+   "t": 450.7,
+   "m": "run",
+   "run": "room3_mtgpu",
+   "speaker_lag_median_s": 4.0,
+   "speaker_lag_p90_s": 5.32,
+   "speaker_segments": 32,
+   "speaker_with_audio": 22,
+   "server_errors": 0,
+   "wall_s": 82,
+   "room_parts_median_s": {
+    "sk": {
+     "queue": 0.0,
+     "mt": 0.07,
+     "tts": 0.53,
+     "send": 0.01,
+     "phrases": 44
+    },
+    "fr": {
+     "queue": 0.0,
+     "mt": 0.07,
+     "tts": 0.52,
+     "send": 0.01,
+     "phrases": 44
+    },
+    "de": {
+     "queue": 0.0,
+     "mt": 0.07,
+     "tts": 0.53,
+     "send": 0.01,
+     "phrases": 44
+    }
+   },
+   "listener_summary": {}
+  },
+  {
+   "t": 462.4,
+   "m": "room created",
+   "name": "room12",
+   "room": "dMQQgpLm",
+   "resp": "{'room_id': 'dMQQgpLm', 'listen_path': '/ui/listen/listen.html?room=dMQQgpLm', 'listen_url': 'http://172.19.2.2:8013/ui/"
+  },
+  {
+   "t": 552.4,
+   "m": "run",
+   "run": "room12",
+   "speaker_lag_median_s": 7.23,
+   "speaker_lag_p90_s": 8.16,
+   "speaker_segments": 32,
+   "speaker_with_audio": 22,
+   "server_errors": 0,
+   "wall_s": 82,
+   "room_parts_median_s": {
+    "fr": {
+     "queue": 0.0,
+     "mt": 0.52,
+     "tts": 0.45,
+     "send": 0.03,
+     "phrases": 44
+    },
+    "de": {
+     "queue": 0.0,
+     "mt": 0.52,
+     "tts": 0.45,
+     "send": 0.03,
+     "phrases": 44
+    },
+    "sk": {
+     "queue": 0.0,
+     "mt": 0.54,
+     "tts": 0.36,
+     "send": 0.03,
+     "phrases": 44
+    }
+   },
+   "listener_summary": {}
+  },
+  {
+   "t": 555.9,
+   "m": "done",
+   "wall_s": 556
+  }
+ ],
+ "env": {
+  "gpu": "Tesla T4\nTesla T4",
+  "cpus": 4
+ },
+ "status": "done"
+}

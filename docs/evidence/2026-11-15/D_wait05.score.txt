@@ -1,0 +1,6 @@
+strategy=agree_short audio=processed/testaudio/en_paced.wav rate=1.0 segments=27 with_audio=27
+  PASS  1 median lag <= 2.0 s: 0.792
+  PASS  1 p90 lag <= 4.5 s: 1.387
+  PASS  2 early start >= 50% of 8+ word sentences: 1.0
+  PASS  3 lag growth <= 0.5 s/min: -0.05
+  PASS  4 recognition error <= 8% (percent of reference words): 5.2
