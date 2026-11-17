@@ -1,0 +1,3779 @@
+{
+ "cells": {
+  "cs_continuous|turbo|whole": {
+   "WER": 0.063,
+   "latency_median_s": 25.63,
+   "latency_p90_s": 43.46,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.024,
+   "words": 79,
+   "text": "Dobré ráno a vítejte u této živé ukázky překladů řeči. Mluvím anglicky a za vteřinu či dvě uslyšíte němčinu nebo slovenštinu. Systém poslouchá přes mikrofon a určuje, kdy věta skončila. Nejtrve se slova rozpoznají, poté se přeloží a nakonec se znovu vysloví. Vše probíhá na tomto počítači bez sloudové služby. Spoždění je časový odstup mezi mými slovy a hlasem, který slyšíte. Naším cílem je, aby spoždění bylo dostatečně krátké pro přirozený rozhovor. Tichá místnost je důležitější než drahý mikrofon."
+  },
+  "cs_continuous|turbo|pause": {
+   "WER": 0.089,
+   "latency_median_s": 3.71,
+   "latency_p90_s": 11.19,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.053,
+   "words": 81,
+   "text": "Dobré ráno a vítejte u této živé ukázky překladů řeči. Mluvím anglicky a za vteřinu či dvě uslyšíte němčinu nebo slovenštinu. Systém poslouchá přes mikrofon a určuje, kdy věta skončila. Nejtrve se slova rozpoznají, poté se představí. se přeloží a nakonec se znovu vysloví. Vše probíhá na tomto počítači bez sloudové služby. Spoždění je časový odstup mezi mými slovy a hlasem, který slyšíte. Naším cílem je, aby spoždění bylo dostatečně krátké pro přirozený rozhovor. Tichá místnost je důležitější než drahý mikrofon."
+  },
+  "cs_continuous|turbo|clause": {
+   "WER": 0.215,
+   "latency_median_s": 2.01,
+   "latency_p90_s": 3.83,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.102,
+   "words": 91,
+   "text": "Dobré ráno a vítejte u této živé ukázky překladu. kladu řeči. Mluvím anglicky a za vteřinu či dvě uslyšíte němáho záležitosti. Němčinu nebo Slovenštinu. Systém poslouchá přes mikrofon a určuje, kdy vyšel. kdy věta skončila. Nejtrve se slova rozpoznají po těch. Poté se přeloží a nakonec se znovu vysloví. Vše probíhá na tomto počítači bez sloudové služby. Záležitá výzby. Spoždění je časový odstup mezi mými slovy a hlavními. a hlasem, který slyšíte. Naším cílem je, aby spoždění bylo dostatečné. Krátké pro přirozený rozhovor. Tichá místnost je důležitější než drahý mikrofon. fun."
+  },
+  "cs_continuous|turbo|chunk-2.0": {
+   "WER": 0.696,
+   "latency_median_s": 1.07,
+   "latency_p90_s": 1.8,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.17,
+   "words": 116,
+   "text": "Dobré ráno a vítejte u této živé ukázky překvěděl. Mluvím. anglicky a za vteřinu čas. či dvě uslyšíte Němčinu. nebo slovenštinu. Si slovenštinu. Představník a určuje, kdy věta skončila. Nejtrve se slova rozpoznají poté, se přeloží a nakonec se znovu vysloví. probíhá na tomto počítači bestloadové služby. Spoždění je časový odstup mezi mými slovy. a hlasem, který slyší Naším cílem je významný významný významný významný významný významný významný významný významný významný významný významný významný významný významný významný významný významný významný významný významný významný významný významný"
+  },
+  "cs_continuous|turbo|agree-1.0": {
+   "WER": 0.063,
+   "latency_median_s": 2.26,
+   "latency_p90_s": 3.09,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.325,
+   "words": 80,
+   "text": "Dobré ráno a vítejte u této živé ukázky překladu řeči. Mluvím anglicky a za vteřinu či dvě uslyšíte Němčinu nebo Slovenštinu. Systém poslouchá přes mikrofon a určuje, kdy věta skončila. Nejtrve se slova rozpoznají, poté se přeloží a nakonec se znovu vysloví. Vše probíhá na na tomto počítači bez sloudové služby. Spoždění je časový odstup mezi mými slovy a hlasem, který slyšíte. Naším cílem je, aby spoždění bylo dostatečně krátké pro přirozený rozhovor. Tichá místnost je důležitější než Drahý mikrofon."
+  },
+  "cs_continuous|turbo|agree-0.5": {
+   "WER": 0.114,
+   "latency_median_s": 1.28,
+   "latency_p90_s": 1.69,
+   "max_wait_for_engine_s": 0.59,
+   "compute_RTF": 0.643,
+   "words": 78,
+   "text": "Dobré ráno a vítejte u této živé ukázky překladů řeči. Mluvím anglicky a za vteřinu či dvě uslyšíte Němčinu nebo Slovenštinu. Systém poslouchá přes mikrofon a určuje, kdy věta skončila. Nejtrve se slova rozpoznají poté se přeloží a nakonec se znovu vysloví. Vše probíhá na tomto počítači bestloadové služby. Spoždění je časový odstup mezi mými slovy a který slyšíte. Naším cílem je, aby spoždění bylo dostatečně krátké pro přirozený rozhovor. Tichá místnost je důležitější než drahý microphone. na."
+  },
+  "cs_long|turbo|whole": {
+   "WER": 0.083,
+   "latency_median_s": 26.02,
+   "latency_p90_s": 45.54,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.022,
+   "words": 70,
+   "text": "Dobré ráno, dnes vám chci ukázat tři věci. Za prvé, jak systém poslouchá. Za druhé, jak překládá. A za třetí, proč záleží na pauzách. Když přestanu mluvit, hlas by měl přestat také. A když udělám pauzu, měli byste slyšet pauzu. Schůzka začíná ve 9 .45 .14. v místnosti 2 .17. Pan Novák z Bratislavy představí výsledky 3 .250 měření. Cílové spoždění je 800 milisekund a chybovost musí zůstat po 10%."
+  },
+  "cs_long|turbo|pause": {
+   "WER": 0.083,
+   "latency_median_s": 2.17,
+   "latency_p90_s": 6.01,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.099,
+   "words": 72,
+   "text": "Dobré ráno. Dnes vám chci ukázat tři věci. Za prvé. Jak systém poslouchá. Za druhé. Jak překládá? A za třetí. Proč záleží na pauzách? Když přestanu mluvit, Hlas by měl přestat také. A když udělám pauzu, Měli byste slyšet pauzu. Schůzka začíná ve 9 .45 .14. března v místnosti 2 .17. Pan Novák z Bratislavy představí výsledky 3 .250 měření. Cílové spoždění je 800 ms a chybovost musí zůstat po 10 %."
+  },
+  "cs_long|turbo|clause": {
+   "WER": 0.139,
+   "latency_median_s": 1.63,
+   "latency_p90_s": 3.19,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.118,
+   "words": 73,
+   "text": "Dobré ráno. Dnes vám chci ukázat tři věci. Za prvé. Jak systém poslouchá. Za druhé. Jak překládá? A za třetí. Proč záleží na pauzách? Když přestanu mluvit, Hlas by měl přestat také. A když udělám pauzu, Měli byste slyšet pauzu. Schůzka začíná ve 9 .45 .14. břeží. v místnosti 2 .17. Pan Novák z Bratislavy představí výsledky 3200. 250 měření. Cílové spoždění je 800 ms a chybové způsob. musí zůstat po 10 %."
+  },
+  "cs_long|turbo|chunk-2.0": {
+   "WER": 0.333,
+   "latency_median_s": 0.78,
+   "latency_p90_s": 1.77,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.164,
+   "words": 78,
+   "text": "Dobré ráno. Dnes vám chci ukázat třeba. Za prvé jak systém posloučuje. Za druhé Jak překládat? A za třetí... Proč záleží na pauze? Když přestáváme se vzpět, Mluvit hl Vás by měl přestat také. A když udělám pak Měli byste se vytvořit. slyšet pauzu. Zkůzka začíná ve 9 .40. 35. 14. března v místnosti 2 .7 Pan Nováčka z Bratislavy představí Výsledky 3 250 měření. Cílové způsobné je 800 milisvíců. a chybovost musí zůstat po 10 % cent."
+  },
+  "cs_long|turbo|agree-1.0": {
+   "WER": 0.181,
+   "latency_median_s": 2.46,
+   "latency_p90_s": 3.9,
+   "max_wait_for_engine_s": 0.33,
+   "compute_RTF": 0.351,
+   "words": 71,
+   "text": "Dobré ráno. Dnes vám chci ukázat 3 věci. Za prvé, jak jak systém poslouchá. Za A 2. Jak překládá? A za třetí, proč záleží na pauzách. Když přestanu mluvit, Hlas by měl přestat také. A když udělám pauzu. měli byste slyšet pauzu. Schůzka začíná ve 9 .45 .14. v místnosti 2 .17 Pan Novák z Bratislavy představí výsledky 3250 měření. Cílové spoždění je 800 a chybovost musí zůstat po 10 %."
+  },
+  "cs_long|turbo|agree-0.5": {
+   "WER": 0.208,
+   "latency_median_s": 1.33,
+   "latency_p90_s": 2.19,
+   "max_wait_for_engine_s": 0.31,
+   "compute_RTF": 0.682,
+   "words": 75,
+   "text": "Dobré ráno. Dnes vám chci ukázat z 3 věci. Za prvé. Jak jak systém poslouchá. Za A druhé, Jak překládá. A za třetí... Proč záleží na pauzách. Když přestanu mluvit Hlas by měl přestat také. A když udělám pauzu. měli byste slyšet pauzu. Schůzka začíná ve 9 .45 15 14. března v místnosti 2 Pan Novák z Bratislavy představí výsledky 3250 měření. Cílové spoždění je 800 ms. A chybovost může zůstat po 10 %. cent."
+  },
+  "cs_paced|turbo|whole": {
+   "WER": 0.076,
+   "latency_median_s": 29.3,
+   "latency_p90_s": 49.14,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.024,
+   "words": 79,
+   "text": "Dobré ráno a vítejte u této živé ukázky překladů řeči. Mluvím anglicky a za vteřinu či dvě uslyšíte němčinu nebo slovenštinu. Systém poslouchá přes mikrofon a učuje, kdy věta skončila. Nejtrve se slova rozpoznají, poté se přeloží a nakonec se znovu vysloví. Vše probíhá na tomto počítači bez sloudové služby. Spoždění je časový odstup mezi mými slovy a hlasem, který slyšíte. Naším cílem je, aby spoždění bylo dostatečně krátké pro přirozený rozhovor. Tichá místnost je důležitější než drahý mikrofon."
+  },
+  "cs_paced|turbo|pause": {
+   "WER": 0.089,
+   "latency_median_s": 3.54,
+   "latency_p90_s": 5.85,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.06,
+   "words": 78,
+   "text": "Dobré ráno a vítejte u této živé ukázky překladů řeči. Mluvím anglicky a za vteřinu či dvě uslyšíte němčinu nebo slovenštinu. Systém poslouchá přes mikrofon a učuje, kdy věta skončila. Nejtrve se slova rozpoznají, poté se přeloží a nakonec se znovu vysloví. Vše probíhá na tomto počítači bestloadové služby. Spoždění je časový odstup mezi mými slovy a hlasem, který slyšíte. Naším cílem je, aby spoždění bylo dostatečně krátké pro přirozený rozhovor. Tichá místnost je důležitější než drahý mikrofon."
+  },
+  "cs_paced|turbo|clause": {
+   "WER": 0.19,
+   "latency_median_s": 1.79,
+   "latency_p90_s": 3.76,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.116,
+   "words": 86,
+   "text": "Dobré ráno a vítejte u této živé ukázky překvět. překladů řeči. Mluvím anglicky a za vteřinu či dvě uslyšíte někdy. Němčinu nebo Slovenštinu. Systém poslouchá přes mikrofon a učuje, kdy vyšel. Divěta skončila. Nejtrve se slova rozpoznají, poté se přeloží a... a nakonec se znovu vysloví. Vše probíhá na tomto počítači bestloadové služení. služby. Spoždění je časový odstup mezi mými slovy a významným. a hlasem, který slyšíte. Naším cílem je... aby spoždění bylo dostatečně krátké pro přirozený rozhovor. Tichá místnost je důležitější než drahý mikrofon. fun."
+  },
+  "cs_paced|turbo|chunk-2.0": {
+   "WER": 0.278,
+   "latency_median_s": 1.06,
+   "latency_p90_s": 1.9,
+   "max_wait_for_engine_s": 0.26,
+   "compute_RTF": 0.176,
+   "words": 83,
+   "text": "Dobré ráno, avítete u této živé ukázky překvěděl. kladu řeči. Mluvím anglicky a zavřejmě. či dvě uslyšíte někdo. Němčinu nebo Slovenštinu. System poslední slouchá přes mikrofon a učí. Učuje, kdy věta skončila. Nejtrve se slova rozpoznají poté se přeloží a nakonec se znovu vysloví. Vše probíhá na tomto přímo. počítači bestloadové Svůsoběvé služby. Spoždění je časový odstavní. Vstup mezi mými slovy a hrátmi. který slyšíte. Naším cílem je, aby spoždění bylo dostatečně krátké pro přirozený rozhovor. Tichá místnost je důležitější než drahý. microphone."
+  },
+  "cs_paced|turbo|agree-1.0": {
+   "WER": 0.127,
+   "latency_median_s": 2.19,
+   "latency_p90_s": 3.17,
+   "max_wait_for_engine_s": 0.26,
+   "compute_RTF": 0.373,
+   "words": 79,
+   "text": "Dobré ráno a vítejte u této živé ukázky překladů řeči. Mluvím anglicky a za vteřinu či dvě uslyšíte Němčinu nebo Slovenštinu. Systém poslouchá přes mikrofon a učuje, kdy věta skončila. Nejtrve se slova rozpoznají, poté se přeloží a nakonec se znovu vysloví. Vše probíhá na tomto počítači bestloadové služby. Spoždění je časový odstup mezi mými slovy a který slyšíte. Naším cílem je, aby aby spoždění bylo dostatečně krátké pro přirozený rozhovor. Tichá místnost je důležitější než drahý mikrofon. Konec."
+  },
+  "cs_paced|turbo|agree-0.5": {
+   "WER": 0.177,
+   "latency_median_s": 1.16,
+   "latency_p90_s": 1.79,
+   "max_wait_for_engine_s": 0.67,
+   "compute_RTF": 0.696,
+   "words": 82,
+   "text": "Dobré ráno, a vítejte u této živé ukázky překladů řeči. Mluvím anglicky a za vteřinu či dvě uslyšíte Němčinu nebo slovenštinu. Systém poslouchá přes mikrofon a učuje, kdy věta skončila. Nejtrve se slova rozpoznají poté se přeloží a A nakonec se znovu vysloví. Vše probíhá na tomto počítači bestloadové služby. Spoždění je časový odstup mezi mými slovy a který slyšíte. Naším cílem je... aby spoždění bylo dostatečně krátké pro přirozený rozhovoru. Tichá místnost je důležitější než Drahý mikrofon. Konec. Titulky vytvořil JohnyX."
+  },
+  "de_continuous|turbo|whole": {
+   "WER": 0.021,
+   "latency_median_s": 17.01,
+   "latency_p90_s": 29.05,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.032,
+   "words": 93,
+   "text": "Guten Morgen und willkommen zu dieser live Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach ein bis zwei Sekunden Deutsch oder Slowakisch. Das System hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, dann übersetzt und schließlich wieder gesprochen. Alles läuft auf diesem Computer, ohne Klutdienst. Die Verzögerung ist die Zeit zwischen meinen Worten und der Stimme, die Sie hören. Unser Ziel ist eine Verzögerung, die kurz genug für ein natürliches Gespräch ist. Ein ruhiger Raum ist wichtiger als ein teures Mikrofon."
+  },
+  "de_continuous|turbo|pause": {
+   "WER": 0.021,
+   "latency_median_s": 3.62,
+   "latency_p90_s": 12.86,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.06,
+   "words": 93,
+   "text": "Guten Morgen und willkommen zu dieser live Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach ein bis zwei Sekunden Deutsch oder Slowakisch. Das System hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, dann übersetzt und schließlich wieder gesprochen. Alles läuft auf diesem Computer, ohne Klutdienst. Die Verzögerung ist die Zeit zwischen meinen Worten und der Stimme, die Sie hören. Unser Ziel ist eine Verzögerung, die kurz genug für ein natürliches Gespräch ist. Ein ruhiger Raum ist wichtiger als ein teures Mikrofon."
+  },
+  "de_continuous|turbo|clause": {
+   "WER": 0.032,
+   "latency_median_s": 2.48,
+   "latency_p90_s": 3.96,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.099,
+   "words": 95,
+   "text": "Guten Morgen und willkommen zu dieser live Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach ein bis zwei Sekunden Deutsch oder Slowake. Bakush. Das System hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, dann übersetzt und schließlich wieder gesprochen. Alles läuft auf diesem Computer ohne Clued -Dienst. Die Verzögerung ist die Zeit zwischen meinen Worten und der Stimme, die Sie hören. Unser Ziel ist eine Verzögerung, die kurz genug für ein natürliches Gespräch ist. Ein ruhiger Raum ist wichtiger als ein teures Mik"
+  },
+  "de_continuous|turbo|chunk-2.0": {
+   "WER": 0.138,
+   "latency_median_s": 1.2,
+   "latency_p90_s": 2.05,
+   "max_wait_for_engine_s": 0.2,
+   "compute_RTF": 0.179,
+   "words": 102,
+   "text": "Guten Morgen und willkommen zu dieser Langehörigen. leife Vorführung der Sprachübersetzung. Ich spreche Englisch und siehe. Sie hören nach 1 bis 2 Sekunden Deutsch oder Slowakisch. Das System hört über die über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, dann übersetzt und schließlich wieder gesprochen. Alles läuft. läuft auf diesem Computer ohne Clued -Dienst. Die Verzögerung ist die Zeit zu zwischen meinen Worten und der Stimme, die Sie hören. Unser Ziel ist eine Verzögerung. die kurz genug für ein natürliches Gefühl ist. Ein ruhiger Raum ist"
+  },
+  "de_continuous|turbo|agree-1.0": {
+   "WER": 0.032,
+   "latency_median_s": 2.24,
+   "latency_p90_s": 3.09,
+   "max_wait_for_engine_s": 0.21,
+   "compute_RTF": 0.364,
+   "words": 91,
+   "text": "Guten Morgen und willkommen zu dieser live Vorführung der Sprachübersetzung. Ich spreche Englisch und sie hören nach ein bis zwei Sekunden Deutsch oder Slowakisch. Das System hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, dann übersetzt und schließlich wieder gesprochen. Alles läuft auf diesem Computer, Ohne Die Verzögerung ist die Zeit zwischen meinen und der Stimme, die Sie hören. Unser Ziel ist eine Verzögerung, die kurz genug für ein natürliches Gespräch ist. Ein ruhiger Raum ist wichtiger als ein teures Mikrofon."
+  },
+  "de_continuous|turbo|agree-0.5": {
+   "WER": 0.064,
+   "latency_median_s": 1.24,
+   "latency_p90_s": 1.69,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.667,
+   "words": 95,
+   "text": "Guten Morgen! und willkommen zu dieser live Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach ein bis zwei Sekunden Deutsch oder Das Das System hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, dann übersetzt und schließlich wieder gesprochen. Alles läuft auf diesen Computer ohne Glutdienst, Die Verzögerung ist die Zeit zwischen meinen Worten und der Stimme, die Sie hören. Unser Ziel ist eine Verzögerung, die kurz genug für ein natürliches Gespräch ist. Ein ruhiger Raum ist wichtiger als ein teures Mikrofon. Vielen D"
+  },
+  "de_continuous|parakeet|whole": {
+   "WER": 0.032,
+   "latency_median_s": 16.46,
+   "latency_p90_s": 28.17,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.013,
+   "words": 93,
+   "text": "Guten Morgen und willkommen zu dieser live Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach ein bis zwei Sekunden Deutsch oder Slowakisch. Das System hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, dann übersetzt und schließlich wieder gesprochen. Alles läuft auf diesem Computer, ohne Klutdienst. Die Verzögerung ist die Zeit zwischen meinen Pforten und der Stimme, die Sie hören. Unser Ziel ist eine Verzögerung, die kurz genug für ein natürliches Gespräch ist. Ein ruhiger Raum ist wichtiger als ein teures Mikrofon."
+  },
+  "de_continuous|parakeet|pause": {
+   "WER": 0.032,
+   "latency_median_s": 3.45,
+   "latency_p90_s": 12.63,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.018,
+   "words": 92,
+   "text": "Guten Morgen und willkommen zu dieser Live-Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach ein bis zwei Sekunden Deutsch oder Slowakisch. Das System hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, dann übersetzt und schließlich wieder gesprochen. Alles läuft auf diesem Computer, ohne Clutdienst. Die Verzögerung ist die Zeit zwischen meinen Pforten und der Stimme, die Sie hören. Unser Ziel ist eine Verzögerung, die kurz genug für ein natürliches Gespräch ist. Ein ruhiger Raum ist wichtiger als ein teures Mikrofon."
+  },
+  "de_continuous|parakeet|clause": {
+   "WER": 0.043,
+   "latency_median_s": 2.27,
+   "latency_p90_s": 3.75,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.024,
+   "words": 93,
+   "text": "Guten Morgen und willkommen zu dieser Live-Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach ein bis zwei Sekunden Deutsch oder Slowak. Backish. Das System hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, dann übersetzt und schließlich wieder gesprochen. Alles läuft auf diesem Computer, ohne Clut-Dienst. Die Verzögerung ist die Zeit zwischen meinen Pforten und der Stimme, die Sie hören. Unser Ziel ist eine Verzögerung, die kurz genug für ein natürliches Gespräch ist. Ein ruhiger Raum ist wichtiger als ein teures Mik"
+  },
+  "de_continuous|parakeet|chunk-2.0": {
+   "WER": 0.096,
+   "latency_median_s": 1.0,
+   "latency_p90_s": 1.64,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.022,
+   "words": 98,
+   "text": "Guten Morgen und willkommen zu dieser Lösung. Live Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie. Sie hören nach ein bis zwei Sekunden Deutsch. oder Slowakisch. Das System hört Über das Mikrofon zu und entscheidet. Wann ein Satz zu Ende ist? Zuerst werden die Wörter erkannt, dann übersetzt. und schließlich wieder gesprochen. läuft auf diesem Computer ohne ClutD. Die Verzögerung ist die Zeit zu. zwischen meinen Worten und der Stimme, die Sie hören. Unser Ziel ist eine Verzögerung der Ziel. Die kurz genug für ein natürliches Gespräch. Gespräch ist. Ein ruhiger Raum ist wichtiger"
+  },
+  "de_continuous|parakeet|agree-1.0": {
+   "WER": 0.106,
+   "latency_median_s": 2.01,
+   "latency_p90_s": 3.05,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.093,
+   "words": 90,
+   "text": "Guten Morgen und willkommen zu dieser Diese live Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach Ein bis zwei Sekunden Deutsch oder Slowakisch. Das System hört über das Mikrofon zu Und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, Dann übersetzt und schließlich wieder gesprochen. Alles läuft auf diesem Computer Ohne Clutdienst. Die Verzögerung ist die Zeit zwischen meinen Pforten und der Stimme, die Sie hören. Unser Ziel ist eine Verzögerung, die kurz genug Ein ruhiger Raum ist Ist wichtiger als ein teures Mikrofon."
+  },
+  "de_continuous|parakeet|agree-0.5": {
+   "WER": 0.223,
+   "latency_median_s": 1.26,
+   "latency_p90_s": 2.03,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.159,
+   "words": 96,
+   "text": "Guten Morgen. und willkommen zu dieser Diese live Vorführung der Sprachübersetzung. Ich spreche Englisch Englisch Und Sie hören nach ein bis zwei Sekunden Deutsch oder Das System hört Hört über das Mikrofon zu zu und entscheidet, wann ein Satz zu Ende Zuerst Erst werden die Wörter erkannt. Dann übersetzt und schließlich Schließlich wieder gesprochen. Alles läuft auf diesem Diesen Computer Ohne Clutdienst. Die Verzögerung ist die Die Zeit zwischen meinen Pforten und der Stimme, die Sie hören. Unser Ziel ist eine ist eine Verzögerung, die kurz Ein ruhiger Ruhiger Raum ist wichtiger als ein teure"
+  },
+  "de_long|turbo|whole": {
+   "WER": 0.047,
+   "latency_median_s": 20.69,
+   "latency_p90_s": 37.14,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.025,
+   "words": 85,
+   "text": "Guten Morgen. Heute möchte ich Ihnen drei Dinge zeigen. Erstens, wie das System zuhört. Zweitens, wie es übersetzt. Und drittens, warum die Pausen wichtig sind. Wenn ich aufhöre zu sprechen, sollte die Stimme auch aufhören. Und wenn ich eine Pause mache, sollten Sie eine Pause hören. Das Treffen beginnt am 14. März um 9 .45 Uhr in Raum 2 .17. Herr Nowak aus Bratislava präsentiert die Ergebnisse von 3 .250 Messungen. Das Latenziel liegt bei 800 Millisekunden und die Fehlerrate muss unter 10 % bleiben."
+  },
+  "de_long|turbo|pause": {
+   "WER": 0.071,
+   "latency_median_s": 1.83,
+   "latency_p90_s": 5.15,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.125,
+   "words": 85,
+   "text": "Guten Morgen. Heute möchte ich Ihnen drei Dinge zeigen. Erstens wie das System zuhört. zweitens Wie ist übersetzt? Und drittens. Warum die Pausen wichtig sind Wenn ich aufhöre zu sprechen, sollte die Stimme auch aufhören. Und wenn ich eine Pause mache. Sollten Sie eine Pause hören. Das Treffen beginnt am 14. März um 9 .45 Uhr in Raum 2 .17. Herr Nowak aus Bratislava präsentiert die Ergebnisse von 3 .250 Messungen. Das Latenziel liegt bei 800 ms und die Fehlerrate muss unter 10 % bleiben."
+  },
+  "de_long|turbo|clause": {
+   "WER": 0.118,
+   "latency_median_s": 1.53,
+   "latency_p90_s": 3.58,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.15,
+   "words": 89,
+   "text": "Guten Morgen. Heute möchte ich Ihnen drei Dinge zeigen. Erstens wie das System zuhört. zweitens Wie ist übersetzt? Und drittens. Warum die Pausen wichtig sind Wenn ich aufhöre zu sprechen, sollte die Stimme auch aufhören. Und wenn ich eine Pause mache. Sollten Sie eine Pause hören. Das Treffen beginnt am 14. März um 9 .45 Uhr in Rath. in Raum 2 .17. Herr Nowak aus Bratislava präsentiert die Ergebnisse von 3 .200 Jahren. 250 Messungen. Das Latenziel liegt bei 800 ms und die Fehlerrate muss unter 10 % bleiben."
+  },
+  "de_long|turbo|chunk-2.0": {
+   "WER": 0.2,
+   "latency_median_s": 1.31,
+   "latency_p90_s": 2.08,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.167,
+   "words": 84,
+   "text": "Guten Morgen. Heute möchte ich Ihnen drei Dinge zeigen. Erstens, wie das System zuhört. Zweitens Wie ist übersetzt? Und drittens, warum die Pause? Wenn ich aufhöre, Hörer zu sprechen, sollte die Sch... auch aufhören. Und wenn ich eine Pause mache. Sollten Sie eine Pause hören. Das Treffen beginnt am 14. März 9 .45 Uhr in Raum. 2 .17 JOWAK aus Bratislava präsentiert die Ergebnisse von 3 .200 150 Messungen. Das Latentziel liegt bei 800 Millisie Sekunden und die Fehlerrate muss unternehmen. 10 % bleiben."
+  },
+  "de_long|turbo|agree-1.0": {
+   "WER": 0.094,
+   "latency_median_s": 2.2,
+   "latency_p90_s": 3.02,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.352,
+   "words": 84,
+   "text": "Guten Morgen. Heute möchte ich Ihnen drei Dinge zeigen. 1. Erstens, wie das System zuhört. Zweitens, wie es übersetzt. Und drittens, Warum die Pausen wichtig sind Wenn ich aufhöre zu sprechen, sollte die Stimme auch aufhören. und wenn ich eine Pause mache, Sollten Sie eine Pause hören. Das Treffen beginnt am März um 9 .45 Uhr in Raum 2 .17 Herr Nowak aus Bratislava präsentiert die Ergebnisse von 3 1250 Messungen. Das Latenziel liegt bei 800 und die Fehlerrate muss unter 10 % bleiben."
+  },
+  "de_long|turbo|agree-0.5": {
+   "WER": 0.141,
+   "latency_median_s": 1.21,
+   "latency_p90_s": 1.78,
+   "max_wait_for_engine_s": 0.05,
+   "compute_RTF": 0.667,
+   "words": 87,
+   "text": "Guten Morgen. Heute möchte ich Ihnen drei Dinge zeigen. 1. Erstens, wie das System zuhört. Zweitens, Wie ist übersetzt. Und drittens, Warum die Pausen wichtig sind. Wenn ich aufhöre zu sprechen. Sollte die Stimme auch aufhören. Und wenn ich eine Pause mache. Sollten Sie eine Pause hören. Das Das Treffen beginnt am 14. März um 9 1 .45 Uhr in Raum 2 .17 Herr Nowak aus Bratislava präsentiert die Ergebnisse von 3200 150 Das Das Latentziel liegt bei 800 und die Fehlerrate muss unter 10 % bleiben."
+  },
+  "de_long|parakeet|whole": {
+   "WER": 0.129,
+   "latency_median_s": 20.14,
+   "latency_p90_s": 36.2,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.011,
+   "words": 85,
+   "text": "Guten Morgen. Heute möchte ich Ihnen drei Dinge zeigen. Erstens, wie das System zuhört. Zweitens, wie es übersetzt. Und 3. Warum die Pausen wichtig sind. Wenn ich aufhöre zu sprechen, sollte die Stimme auch aufhören. Und wenn ich eine Pause mache, sollten Sie eine Pause hören. Das Treffen beginnt am 14. März um 9.05 Uhr und 45 Uhr in Raum 2.17 Uhr. Herr Novak aus Bratislava präsentiert die Ergebnisse von 3250 Messungen. Das Latenziel liegt bei 800 Millisekunden und die Fehlerrate muss unter 10% bleiben."
+  },
+  "de_long|parakeet|pause": {
+   "WER": 0.188,
+   "latency_median_s": 1.65,
+   "latency_p90_s": 4.84,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.036,
+   "words": 87,
+   "text": "Guten Morgen. Heute möchte ich Ihnen drei Dinge zeigen. Erstens wie das System zuhört. Zweitens Wie ist übersetzt? Und drittens. Warum die Pausen wichtig sind. Wenn ich aufhöre zu sprechen, Sollte die Stimme auch aufhören. Und wenn ich eine Pause mache, Sollten Sie eine Pause hören. Das Treffen beginnt am vierzehn. März um neun Uhr fünf und vierzig Uhr in Raum zwei Punkt siebzehn. Herr Novak aus Bratislava präsentiert die Ergebnisse von 3250 Messungen. Das Latenziel liegt bei 800 Millisekunden und die Fehlerrate muss unter 10% bleiben."
+  },
+  "de_long|parakeet|clause": {
+   "WER": 0.165,
+   "latency_median_s": 1.36,
+   "latency_p90_s": 3.34,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.042,
+   "words": 91,
+   "text": "Guten Morgen. Heute möchte ich Ihnen drei Dinge zeigen. Erstens wie das System zuhört. Zweitens Wie ist übersetzt? Und drittens. Warum die Pausen wichtig sind. Wenn ich aufhöre zu sprechen, Sollte die Stimme auch aufhören. Und wenn ich eine Pause mache, Sollten Sie eine Pause hören. Das Treffen beginnt am vierzehn. März um neun Uhr fünf und vierzig Uhr in Rheinland. in Raum 2.17. Herr Novak aus Bratislava präsentiert die Ergebnisse von drei tausend 250 Messungen. Das Latenziel liegt bei 800 Millisekunden und die Fehlerrate muss unterzählen. unter zehn Prozent bleiben."
+  },
+  "de_long|parakeet|chunk-2.0": {
+   "WER": 0.388,
+   "latency_median_s": 0.82,
+   "latency_p90_s": 1.64,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.021,
+   "words": 88,
+   "text": "Guten Morgen. Heute möchte ich... Ihnen drei Dinge zeigen. Erstens, wie das System zuhört. Zweitens. Wie ist übersetzt? Drittens, warum die Pause? Wenn ich aufhöre, Hörer zu sprechen, sollte die Und wenn ich das nicht mehr auf dem Fall ist, eine Pause mache. Sollten Sie eine Pause hören. Treffen beginnt am 14. März um neun Uhr fünf und vierzig Uhr in Raum. 2.17 Herrn Lovak aus Bratislava präsentiert die Ergebnisse von 3200. 150 Messungen. Das Latenziel liegt bei acht hundert. Sekunden und die Fehlerrate muss unternehmen. 10% bleiben."
+  },
+  "de_long|parakeet|agree-1.0": {
+   "WER": 0.224,
+   "latency_median_s": 2.0,
+   "latency_p90_s": 2.99,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.086,
+   "words": 91,
+   "text": "Guten Morgen. Heute möchte ich Ihnen drei Dinge zeigen. Erstens, Wie das System zuhört. 2. Wie ist übersetzt? Und drittens, Warum die Pausen wichtig sind. Wenn ich aufhöre zu sprechen, Sollte die Stimme auch aufhören. Und wenn ich eine Pause mache, Sollten Sie eine Pause hören. Das Treffen beginnt am Am 14. März um 9.05 Uhr und Und 40 Uhr in Raum 2.17. Herr Herr Novak aus Bratislava präsentiert die Ergebnisse von Von 3250 Das Das Latenziel liegt bei 800 Millisekunden und die Und die Fehlerrate muss unter 10% bleiben. Yeah."
+  },
+  "de_long|parakeet|agree-0.5": {
+   "WER": 0.294,
+   "latency_median_s": 1.17,
+   "latency_p90_s": 1.8,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.152,
+   "words": 98,
+   "text": "Guten Morgen. Heute möchte ich ich Ihnen drei Dinge zeigen. Erstens. Wie das wie das System zuhört. Zweitens. Wie ist übersetzt? Und drittens. Warum die die Pausen wichtig sind. Wenn ich Wenn ich aufhöre zu sprechen, Sollte die die Stimme auch aufhören. Und wenn ich wenn ich eine Pause mache. Sollten Sie eine Pause Das Das Treffen beginnt am Am 14. März um um neun 45 Uhr in Raum 2.17 Herr Herr Novak aus Bratislava präsentiert die Ergebnisse von drei 1250 Das Das Latenziel liegt bei Bei 800 Millisekunden Und die Die Fehlerrate muss unter 10% bleiben. Yeah."
+  },
+  "de_paced|turbo|whole": {
+   "WER": 0.032,
+   "latency_median_s": 20.07,
+   "latency_p90_s": 33.86,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.028,
+   "words": 93,
+   "text": "Guten Morgen und willkommen zu dieser live Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach ein bis zwei Sekunden Deutsch oder Slowakisch. Das Stimm hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, dann übersetzt und schließlich wieder gesprochen. Alles läuft auf diesem Computer, ohne Klutdienst. Die Verzögerung ist die Zeit zwischen meinen Worten und der Stimme, die Sie hören. Unser Ziel ist eine Verzögerung, die kurz genug für ein natürliches Gespräch ist. Ein ruhiger Raum ist wichtiger als ein teures Mikrofon."
+  },
+  "de_paced|turbo|pause": {
+   "WER": 0.053,
+   "latency_median_s": 2.57,
+   "latency_p90_s": 4.01,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.076,
+   "words": 93,
+   "text": "Guten Morgen und willkommen zu dieser live Vorführung der Sprachübersetzung. Ich spreche Englisch und sie hören nach 1 -2 Sekunden Deutsch oder Slowakisch. Das Stimm hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, dann übersetzt und schließlich wieder gesprochen. Alles läuft auf diesem Computer ohne Clued -Dienst. Die Verzögerung ist die Zeit zwischen meinen Worten und der Stimme, die Sie hören. Unser Ziel ist eine Verzögerung, die kurz genug für ein natürliches Gespräch ist. Ein ruhiger Raum ist wichtiger als ein teures Mikrofon."
+  },
+  "de_paced|turbo|clause": {
+   "WER": 0.074,
+   "latency_median_s": 2.44,
+   "latency_p90_s": 3.83,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.086,
+   "words": 94,
+   "text": "Guten Morgen und willkommen zu dieser live Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach 1 -2 Sekunden Deutsch oder Slowake. Reküche. Das Stimm hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, dann übersetzt und schließlich wieder gesprochen. Alles läuft auf diesem Computer ohne Clued -Dienst. Die Verzögerung ist die Zeit zwischen meinen Worten und der Stimme, die Sie hören. Unser Ziel ist eine Verzögerung, die kurz genug für ein natürliches Gespräch ist. Ein ruhiger Raum ist wichtiger als ein teures Mikrofon."
+  },
+  "de_paced|turbo|chunk-2.0": {
+   "WER": 0.16,
+   "latency_median_s": 1.27,
+   "latency_p90_s": 1.98,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.172,
+   "words": 95,
+   "text": "Guten Morgen und willkommen zu dieser Leitungszeit. Vorführung der Sprachübersetzung. Ich spreche Englisch. und Sie hören nach 1 -2 Sekunden Deutsch oder Slowakisch. Das Stimm hört über das Mikrofon. zu und entscheidet, wann Einsatz zu enden ist. ist. Zuerst werden die Wörter erkannt, dann übersetzt und schlug. wieder gesprochen. Alles läuft auf diesem Computer. ohne Cloutdienst. Die Verzögerung ist die Zeit zwischen meinen Worten und der Stimme, die Sie hören. Unser Ziel ist eine Verzögerung. die kurz genug für ein natürliches Gespräch ist. Ein ruhiger Raum ist ist wichtiger als ein teures Mi"
+  },
+  "de_paced|turbo|agree-1.0": {
+   "WER": 0.043,
+   "latency_median_s": 2.22,
+   "latency_p90_s": 3.18,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.357,
+   "words": 93,
+   "text": "Guten Morgen und Willkommen zu dieser Live -Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach ein bis zwei Sekunden Deutsch oder Das Tim hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, dann übersetzt und schließlich wieder gesprochen. Alles läuft auf diesen Computer ohne Clued -Dienst. Die Verzögerung ist die Zeit zwischen meinen Worten und der Stimme, die Sie hören. Unser Ziel ist eine Verzögerung, die kurz genug für ein natürliches Gespräch ist. Ein ruhiger Raum ist wichtiger als ein teures Mikrofon."
+  },
+  "de_paced|turbo|agree-0.5": {
+   "WER": 0.16,
+   "latency_median_s": 1.32,
+   "latency_p90_s": 1.94,
+   "max_wait_for_engine_s": 0.64,
+   "compute_RTF": 0.698,
+   "words": 98,
+   "text": "Guten Morgen und willkommen zu dieseleihe Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach ein bis zwei Sekunden Deutsch oder Slowakisch. Das Tim hört über das Mikrofon zu und entscheidet, wann Einsatz zu ist Zuerst werden die Wörter erkannt. dann übersetzt und schließlich wieder gesprochen. Alles läuft auf diesem Computer. ohne Clueddienst. Die Die Verzögerung ist die Zeit zwischen meinen Worten und der Stimme, die Sie hören. Unser Ziel ist eine Verzögerung, die kurz genug für ein natürliches Gespräch ist. Ein ruhiger Dieser Raum ist wichtiger als ein teures Mikrofon."
+  },
+  "de_paced|parakeet|whole": {
+   "WER": 0.032,
+   "latency_median_s": 19.5,
+   "latency_p90_s": 32.72,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.012,
+   "words": 93,
+   "text": "Guten Morgen und willkommen zu dieser live Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach ein bis zwei Sekunden Deutsch oder Slowakisch. Das System hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, wann übersetzt und schließlich wieder gesprochen. Alles läuft auf diesem Computer ohne Clutdienst. Die Verzögerung ist die Zeit zwischen meinen Worten und der Stimme, die Sie hören. Unser Ziel ist eine Verzögerung, die kurz genug für ein natürliches Gespräch ist. Ein ruhiger Raum ist wichtiger als ein teures Mikrofon."
+  },
+  "de_paced|parakeet|pause": {
+   "WER": 0.021,
+   "latency_median_s": 2.35,
+   "latency_p90_s": 3.81,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.021,
+   "words": 93,
+   "text": "Guten Morgen und willkommen zu dieser live Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach ein bis zwei Sekunden Deutsch oder Slowakisch. Das Stimm hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, dann übersetzt und schließlich wieder gesprochen. Alles läuft auf diesem Computer ohne Clut-Dienst. Die Verzögerung ist die Zeit zwischen meinen Worten und der Stimme, die Sie hören. Unser Ziel ist eine Verzögerung, die kurz genug für ein natürliches Gespräch ist. Ein ruhiger Raum ist wichtiger als ein teures Mikrofon."
+  },
+  "de_paced|parakeet|clause": {
+   "WER": 0.043,
+   "latency_median_s": 2.21,
+   "latency_p90_s": 3.65,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.022,
+   "words": 94,
+   "text": "Guten Morgen und willkommen zu dieser live Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach ein bis zwei Sekunden Deutsch oder Slowak. Wackish. Das Stimme hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, dann übersetzt und schließlich wieder gesprochen. Alles läuft auf diesem Computer ohne Clut-Dienst. Die Verzögerung ist die Zeit zwischen meinen Worten und der Stimme, die Sie hören. Unser Ziel ist eine Verzögerung, die kurz genug für ein natürliches Gespräch ist. Ein ruhiger Raum ist wichtiger als ein teures Mikro"
+  },
+  "de_paced|parakeet|chunk-2.0": {
+   "WER": 0.149,
+   "latency_median_s": 1.04,
+   "latency_p90_s": 1.72,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.02,
+   "words": 86,
+   "text": "Guten Morgen und willkommen zu dieser Leitung. Selbe Vorführung der Sprachübersetzung Ich spreche Englisch. Und Sie hören nach ein bis zwei Sekunden. Deutsch oder Slowakisch. Das Stimm hört über das Mikrofon. Und entscheidet, wann ein Satz zu ändern. Zuerst werde schließlich wieder gesprochen. Alles läuft auf diesem Computer. Ohne Clut-Dienst. Die Verzögerung ist die Zeit zwischen meinen Worten. und der Stimme, die Sie hören. Unser Ziel ist eine Verzögerung die kurz genug für ein natürliches Gespräch ist. Ein ruhiger Raum ist wichtiger als ein teures Mikrofon."
+  },
+  "de_paced|parakeet|agree-1.0": {
+   "WER": 0.138,
+   "latency_median_s": 2.11,
+   "latency_p90_s": 4.94,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.087,
+   "words": 100,
+   "text": "Guten Morgen und Und willkommen zu dieser live Vorführung der Sprachübersetzung. Ich spreche Englisch und Sie hören nach Nach Bis zwei Sekunden Deutsch oder Slowakisch. Das Das Das Das System hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende ist. Zuerst werden die Wörter erkannt, Wann übersetzt und schließlich wieder gesprochen. Alles läuft auf auf diesen Computer ohne Clut-Dienst. Die Verzögerung ist die Die Zeit zwischen meinen Worten und der Stimme, die Sie Unser Ziel ist ist eine Verzögerung, die kurz genug für Ein natürliches Gespräch ist. Ein ruhiger Raum ist wichtiger als"
+  },
+  "de_paced|parakeet|agree-0.5": {
+   "WER": 0.181,
+   "latency_median_s": 1.19,
+   "latency_p90_s": 2.0,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.152,
+   "words": 104,
+   "text": "Guten Morgen Guten Morgen und willkommen zu dieser live Vorführung der der Sprachübersetzung Ich spreche Englisch und Sie hören nach und nach ein bis zwei Sekunden Deutsch oder Das Das Stimm hört über das Mikrofon zu und entscheidet, wann ein Satz zu Ende Zuerst Zuerst werden die Wörter erkannt. Wann übersetzt und schließlich wieder gesprochen. Alles Alles läuft auf diesem Computer. Ohne Clutdienst. Die Verzögerung Gerum ist die Zeit zwischen Meinen Worten und der Stimme, die Sie hören. Unser Ziel ist Ziel ist eine Verzögerung, die kurz genug für ein natürliches Gespräch ist. Ein Ein ruhiger R"
+  },
+  "en_continuous|turbo|whole": {
+   "WER": 0.052,
+   "latency_median_s": 20.74,
+   "latency_p90_s": 35.18,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.024,
+   "words": 96,
+   "text": "Good morning, and welcome to this live demonstration of speech translation. I am speaking English, and you will hear German or Slovak within a second or two. The system listens to the microphone and the size where phrase has ended. First the words are recognized, then they are translated, then they are spoken again. Everything runs on this computer without a cloud service. The delay is the time between my words and the voice you hear. Our goal is a delay short enough for a natural conversation. A quiet room matters more than an expensive microphone."
+  },
+  "en_continuous|turbo|pause": {
+   "WER": 0.052,
+   "latency_median_s": 2.66,
+   "latency_p90_s": 4.24,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.086,
+   "words": 96,
+   "text": "Good morning. and welcome to this live demonstration of speech translation i am speaking english and you will hear german or slovak within a second or two The system listens to the microphone and the sighs where phrase has ended. First the words are recognized, then they are translated. Then they are spoken again. Everything runs on this computer without a cloud service. The delay is the time between my words and the voice you hear. Our goal is a delay short enough for a natural conversation. A quiet room matters more than an expensive microphone."
+  },
+  "en_continuous|turbo|clause": {
+   "WER": 0.062,
+   "latency_median_s": 2.32,
+   "latency_p90_s": 3.87,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.103,
+   "words": 97,
+   "text": "Good morning. and welcome to this live demonstration of speech translation I am speaking English. and you will hear german or slovak within a second or two The system listens to the microphone and the size where phrase has end ended. First the words are recognized, then they are translated. Then they are spoken again. Everything runs on this computer without a cloud service. The delay is the time between my words and the voice you hear. Our goal is a delay short enough for a natural conversation. A quiet room matters more than an expensive microphone."
+  },
+  "en_continuous|turbo|chunk-2.0": {
+   "WER": 0.125,
+   "latency_median_s": 1.43,
+   "latency_p90_s": 1.98,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.169,
+   "words": 99,
+   "text": "Good morning, and welcome. Welcome to this live demonstration of speech translation. I am speaking English, and you will hear German or Slovak with an A. second or two. The system and listens to the microphone and the size where phrase has ended. First, the words are recognized. then they are translated. Then they are spoken again. Everything runs on this computer. without a cloud service. Delay is the time between my words. and the voice you hear are goal is a delay short enough. for a natural conversation. A quiet room matters. more than an expensive microphone. phone."
+  },
+  "en_continuous|turbo|agree-1.0": {
+   "WER": 0.083,
+   "latency_median_s": 2.35,
+   "latency_p90_s": 2.99,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.347,
+   "words": 98,
+   "text": "Good morning, and welcome to this live demonstration of speech translation. I am speaking English, and you will hear German or Slovrak within a second or two. The system listens to the microphone and the size where phrase has ended. First the words are recognized, then they are translated. it. Then they are spoken again. Everything runs on this computer without a cloud service. The delay is the time between my words and the voice you hear. Our goal is a delay short enough for a natural conversation, A quiet room matters more than an expensive microphone. phone."
+  },
+  "en_continuous|turbo|agree-0.5": {
+   "WER": 0.125,
+   "latency_median_s": 1.25,
+   "latency_p90_s": 1.66,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.664,
+   "words": 101,
+   "text": "Good Good morning, and welcome Welcome to this live demonstration of speech translation. I am speaking English and you will hear German or Slovak within a second or two. The system listens to the microphone and the size where phrase has ended. First the words are recognized eyes, then they are translated, then they are spoken again. Everything runs on this computer. without a cloud service. The delay is the time between my words and the voice you here. Our goal is They delay short enough for a natural conversation. A quiet But room matters more than an expensive microphone. phone."
+  },
+  "en_continuous|parakeet|whole": {
+   "WER": 0.042,
+   "latency_median_s": 19.51,
+   "latency_p90_s": 34.45,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.011,
+   "words": 95,
+   "text": "Good morning, and welcome to this live demonstration of speech translation. I am speaking English, and you will hear German or Slovak within a second or two. The system listens to the microphone and decides where phrase has ended. First the words are recognized, then they are translated. Then they are spoken again. Everything runs on this computer without a cloud service. The delay is the time between my words and the voice you hear. Our goal is a delay short enough for a natural conversation. A quiet room matters more than an expensive microphone."
+  },
+  "en_continuous|parakeet|pause": {
+   "WER": 0.052,
+   "latency_median_s": 2.36,
+   "latency_p90_s": 4.06,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.022,
+   "words": 96,
+   "text": "Good morning, said and welcome to this live demonstration of speech translation. I am speaking English, and you will hear German or Slovak within a second or two. The system listens to the microphone and decides where phrase has ended. First the words are recognized, then they are translated. Then they are spoken again, Everything runs on this computer, without a cloud service. The delay is the time between my words and the voice you hear. Our goal is a delay short enough for a natural conversation. A quiet room matters more than an expensive microphone."
+  },
+  "en_continuous|parakeet|clause": {
+   "WER": 0.062,
+   "latency_median_s": 2.01,
+   "latency_p90_s": 3.64,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.028,
+   "words": 97,
+   "text": "Good morning, said and welcome to this live demonstration of speech translation. I am speaking English, and you will hear German or Slovak within a second or two. The system listens to the microphone and decides where phrase has ended. Ended. First the words are recognized, then they are translated. Then they are spoken again, Everything runs on this computer, without a cloud service. The delay is the time between my words and the voice you hear. Our goal is a delay short enough for a natural conversation. A quiet room matters more than an expensive microphone."
+  },
+  "en_continuous|parakeet|chunk-2.0": {
+   "WER": 0.323,
+   "latency_median_s": 1.03,
+   "latency_p90_s": 1.64,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.02,
+   "words": 90,
+   "text": "Good morning, and welcome to the Welcome to this live demonstration of Speech translation I am. In speaking English, and you were not A second or two, the system Sighs where phrase has ended. First the words are recognized by the then they are translated. Then they are spoken again. Everything runs on this computer, said Without a cloud service, the deep Delay is the time between my words. Goal is a delay short enough for For a natural conversation. A quiet room matters More than an expensive microphone. Phone"
+  },
+  "en_continuous|parakeet|agree-1.0": {
+   "WER": 0.094,
+   "latency_median_s": 2.77,
+   "latency_p90_s": 5.63,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.09,
+   "words": 92,
+   "text": "Good morning, and welcome to this live demonstration of speech translation. I am speaking English, And you will hear German or Slovak within a second or two. The system listens to the microphone and the sighs where phrase has ended. First the words are recognized, then they are translated, Then they are spoken again. Everything runs on this computer The delay is the time between my words and the voice you hear. Our goal is a delay short enough for a natural conversation. A quiet room matters more than an expensive microphone."
+  },
+  "en_continuous|parakeet|agree-0.5": {
+   "WER": 0.188,
+   "latency_median_s": 2.15,
+   "latency_p90_s": 5.06,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.171,
+   "words": 109,
+   "text": "Good morning, Learning, and welcome to this live demonstration Demonstration of speech translation. I am speaking English, and you will hear German or Slovak within a second or two. The system The system listens to the microphone and and The size where phrase has ended. First the The words are recognized, then they are translated. Then they are spoken again. Everything runs on on this computer without a cloud service. The delay is the time between my words and the voice you hear. Our goal is soul is a delay short enough for a natural conversation. A quiet Quiet room matters more than an than a"
+  },
+  "en_long|turbo|whole": {
+   "WER": 0.129,
+   "latency_median_s": 19.71,
+   "latency_p90_s": 38.6,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.023,
+   "words": 89,
+   "text": "Good morning. Today I want to show you three things. First, how the system listens. Second, how it translates. And third, why the pauses matter. When I stop speaking, the voice should stop too. And when I pause, you should hear a pause. The meeting starts at 9 .45 on the 14th of March, in room 2 .17. mr navarck from brattisliwur will present the results of three to hint fifteen measurements the latency target is at hundred milliseconds and the error rate must stay below ten per cent"
+  },
+  "en_long|turbo|pause": {
+   "WER": 0.129,
+   "latency_median_s": 2.02,
+   "latency_p90_s": 4.69,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.125,
+   "words": 88,
+   "text": "Good morning. Today I want to show you three things. First, How the system listens. Second. how it translates. and third Why the Palses Matter? When I stopped speaking, The voice should stop too. And when I pause... You should hear a pause. The meeting starts at 9 .45 on the 14th of March, in Room 2 .17. Mr. Navarque from Bratislava will present the results of three A2Hint 15 measurements. The latency target is at 100 milliseconds. and the error rate must stay below ten per cent"
+  },
+  "en_long|turbo|clause": {
+   "WER": 0.141,
+   "latency_median_s": 1.73,
+   "latency_p90_s": 3.29,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.14,
+   "words": 89,
+   "text": "Good morning. Today I want to show you three things. First, How the system listens. Second. how it translates. and third Why the Palses Matter? When I stopped speaking, The voice should stop too. And when I pause... You should hear a pause. The meeting starts at 9 .45 on the 14th of March. in room 2 .17. Mr. Novark from Bratislava will present the results of three... A2 hint 15 measurements. The latency target is at 100 milliseconds. and the error rate must stay below ten per cent"
+  },
+  "en_long|turbo|chunk-2.0": {
+   "WER": 0.294,
+   "latency_median_s": 1.1,
+   "latency_p90_s": 2.02,
+   "max_wait_for_engine_s": 0.15,
+   "compute_RTF": 0.172,
+   "words": 88,
+   "text": "Good morning. Today I want to show you... things. First... how the system listens. Second, how it translates. 3. Why the pause is mad. When I stopped speaking to you, The voice should stop. And when I pause, you should hear a paw The meeting starts at 9 45 on the 14th of March in room 2 .1. One Seven. Mister. Novark from Bratislava will... the results of 3A2Hint. 15 measurements. The late latency target is attentured millis seconds, and the error rate must say below 10%. ."
+  },
+  "en_long|turbo|agree-1.0": {
+   "WER": 0.165,
+   "latency_median_s": 2.86,
+   "latency_p90_s": 4.6,
+   "max_wait_for_engine_s": 0.14,
+   "compute_RTF": 0.354,
+   "words": 87,
+   "text": "Good morning. Today I want to show you three things. First, How the system listens. Second, how it translates. And third, Why the pause his matter. When I stopped speaking, the voice should stop too. And when I pause, you should hear a pause. The meeting starts at 945 on the 14th of march in room 2 .17. Mr. Navark from Bratislava will present the results of three eight to The latency target is at 100 milliseconds, and the error rate must say below 10%. are present."
+  },
+  "en_long|turbo|agree-0.5": {
+   "WER": 0.153,
+   "latency_median_s": 1.3,
+   "latency_p90_s": 2.01,
+   "max_wait_for_engine_s": 0.14,
+   "compute_RTF": 0.673,
+   "words": 91,
+   "text": "Good morning. Today I want to show you three things First... How the System listens. Second, How it translates. And And third. Why the pauses matter. When I stopped speaking, The voice This should stop too. And when I pause. you should hear a pause. The meeting starts at 9 45 on the 14th of March in room 2 .1. 7. Mr. Navar from Bratislava will present the results Lots of 3A2Hint 50 measurements. The latency see target is at 100 milliseconds, and the error rate must Stay below 10%. sent."
+  },
+  "en_long|parakeet|whole": {
+   "WER": 0.235,
+   "latency_median_s": 18.72,
+   "latency_p90_s": 37.22,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.011,
+   "words": 93,
+   "text": "Good morning. Today I want to show you three things. First, how the system listens. Second, how it translates. And third, why the pauses matter. When I stop speaking, the voice should stop too. And when I pause, you should hear a pause. The meeting starts at nine forty five on the fourteenth of March, in room two point one seven. Mr Navark from Bratislava will present the results of three A two hint fifteen measurements. The latency target is at hundred milliseconds, and the error rate must say below ten per cent."
+  },
+  "en_long|parakeet|pause": {
+   "WER": 0.294,
+   "latency_median_s": 1.77,
+   "latency_p90_s": 4.47,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.03,
+   "words": 96,
+   "text": "Good morning. Uh Today I want to show you three things. First, How the system listens Second, How it translates And third, the Why the pauses matter? When I stopped speaking, The voice should stop too. And when I pause, I You should hear a pause. The meeting starts at nine forty five on the fourteenth of march, in room two point one seven. mister Navark from Bratislava will present the results of three A two hint fifteen measurements. The latency target is at hundred milliseconds. and the error rate must say below ten per cent."
+  },
+  "en_long|parakeet|clause": {
+   "WER": 0.294,
+   "latency_median_s": 1.51,
+   "latency_p90_s": 2.99,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.033,
+   "words": 96,
+   "text": "Good morning. Uh Today I want to show you three things. First, How the system listens Second, How it translates And third, the Why the pauses matter? When I stopped speaking, The voice should stop too. And when I pause, I You should hear a pause. The meeting starts at nine forty five on the fourteenth of march. in room two point one seven. mister Navark from Bratislava will present the results of three. A two hint, fifteen measurements. The latency target is at hundred milliseconds. and the error rate must say below ten per cent."
+  },
+  "en_long|parakeet|chunk-2.0": {
+   "WER": 0.541,
+   "latency_median_s": 0.91,
+   "latency_p90_s": 1.63,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.02,
+   "words": 80,
+   "text": "Good morning. Today I want to show you f Three things. How the system listens. Second. How it translates. third. Why the pause is matter? Mm. The voice should stop. And when I pause You should hear a pause. The meeting starts in the first time. at nine forty five on the fourteenth of the first. Of March in Room two point one. one seven mister. Navark from Bratislava will present. fifteen measurements. The latent Say below ten percent. Yeah."
+  },
+  "en_long|parakeet|agree-1.0": {
+   "WER": 0.271,
+   "latency_median_s": 2.57,
+   "latency_p90_s": 4.32,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.087,
+   "words": 97,
+   "text": "Good morning. Uh today I want to To show you three things. First, How the system listens. Second. How it translates. And third, Why the pauses matter? When I I stopped speaking, the voice should stop too, And when I pause, you You should hear a pause. The meeting starts at 9.45 five on the fourteenth of March in room two point one seven Mr. Navark from Bratislava will present the results of three A2 Hint 15 measurements. The latency See target is at hundred milliseconds, and and the error rate must say below ten ten percent."
+  },
+  "en_long|parakeet|agree-0.5": {
+   "WER": 0.447,
+   "latency_median_s": 1.31,
+   "latency_p90_s": 3.29,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.157,
+   "words": 104,
+   "text": "Good morning, Today I want to to show you three things. First, How the system System listens. Second. How it translates. And And third, Why the pauses matter? When I stop I stopped speaking. The voice Voice should stop too. And when I When I pause, you should hear The meeting starts at nine forty forty five on the fourteenth of When I was a very good thing, I mister Navark from Bratislava will present the results of three. Fifteen measurements. The The latency target is It is at hundred milliseconds, and And the error rate must It must say below ten percent. Yeah."
+  },
+  "en_paced|turbo|whole": {
+   "WER": 0.01,
+   "latency_median_s": 24.07,
+   "latency_p90_s": 41.41,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.021,
+   "words": 96,
+   "text": "Good morning, and welcome to this live demonstration of speech translation. I am speaking English, and you will hear German or Slovak within a second or two. The system listens through the microphone and decides when a phrase has ended. First the words are recognized. Then they are translated. Then they are spoken again. Everything runs on this computer, without a cloud service. The delay is the time between my words and the voice you hear. Our goal is a delay short enough for a natural conversation. A quiet room matters more than an expensive microphone."
+  },
+  "en_paced|turbo|pause": {
+   "WER": 0.042,
+   "latency_median_s": 2.23,
+   "latency_p90_s": 4.25,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.09,
+   "words": 96,
+   "text": "Good morning, and welcome to this live demonstration of speech translation. I am speaking English. and you will hear german or slovak within a second or two The system listens through the microphone and decides when a phrase has ended. First, the words are recognized. then they are translated. and they are spoken again. Everything runs on this computer. Without a cloud service, The delay is the time between my words and the voice you hear. Our goal is to lay short enough for a natural conversation. A quiet room matters more than an expensive microphone."
+  },
+  "en_paced|turbo|clause": {
+   "WER": 0.052,
+   "latency_median_s": 2.06,
+   "latency_p90_s": 4.0,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.098,
+   "words": 98,
+   "text": "Good morning, and welcome to this live demonstration of speech trans - Translation. I am speaking English. and you will hear german or slovak within a second or two The system listens through the microphone and decides when a phrase has ended. First, the words are recognized. then they are translated. and they are spoken again. Everything runs on this computer. Without a cloud service, The delay is the time between my words and the voice you hear. Our goal is to lay short enough for a natural conversation. A quiet room matters more than an expensive microphone."
+  },
+  "en_paced|turbo|chunk-2.0": {
+   "WER": 0.219,
+   "latency_median_s": 1.23,
+   "latency_p90_s": 2.02,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.171,
+   "words": 101,
+   "text": "Good morning, and welcome to this evening. live demonstration of speech trans Translation. I. speaking English you will hear German or Slovak. within a second or two. The system listens to the... microphone and decides when afraid has ended. First the words are recognized. Then they are translated. And they are spoken again. Everything runs on... this computer. Without a cloud screen, service. Today is the time between my words and In the voice you hear. Our goal is to lay short in enough for a natural conversa - A quiet one. Room matters more than an expense. microphone Thank you."
+  },
+  "en_paced|turbo|agree-1.0": {
+   "WER": 0.073,
+   "latency_median_s": 2.72,
+   "latency_p90_s": 4.16,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.351,
+   "words": 99,
+   "text": "Good morning, and welcome to this live demonstration of speech translation. I am speaking English. and you will hear German or Slovik within a second or two. The The system listens through the microphone and decides when a phrase has ended. First the words are recognized, then they are translated, and they are spoken again. Everything runs on this computer, without a cloud service. The delay is the time between between my words and the voice you hear. Our goal is They delay short enough for a natural conversation. A quiet room matters more than an An expensive microphone."
+  },
+  "en_paced|turbo|agree-0.5": {
+   "WER": 0.135,
+   "latency_median_s": 1.27,
+   "latency_p90_s": 1.65,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.654,
+   "words": 103,
+   "text": "Good morning. and welcome to this live demonstration of speech translation. I I am speaking English. English, and you will hear German or Slovik within a second or two. The system listens to the microphone and the size when a phrase has ended. First, the words are recognized. Then they are translated, and they are spoken again. Everything runs on this computer. without a cloud service the delay Today is the time between my words and the voice you hear. Our call is a delay short enough for a natural conversation. conversation. A quiet room matters more than an expensive microphone. phone. you"
+  },
+  "en_paced|parakeet|whole": {
+   "WER": 0.021,
+   "latency_median_s": 23.41,
+   "latency_p90_s": 40.37,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.011,
+   "words": 96,
+   "text": "Good morning and welcome to this live demonstration of speech translation. I am speaking English, and you will hear German or Slovak within a second or two. The system listens through the microphone and decides when a phrase has ended. First the words are recognized, then they are translated, and they are spoken again. Everything runs on this computer, without a cloud service. The delay is the time between my words and the voice you hear. Our goal is a delay short enough for a natural conversation. A quiet room matters more than an expensive microphone."
+  },
+  "en_paced|parakeet|pause": {
+   "WER": 0.042,
+   "latency_median_s": 2.05,
+   "latency_p90_s": 4.06,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.022,
+   "words": 97,
+   "text": "Good morning, and welcome to this live demonstration of speech translation. I am speaking English. and you will hear German or Slovak within a second or two. The system listens to the microphone and decides when a phrase has ended. first the words are recognized, Then they are translated. And they are spoken again. Everything runs on this computer. Without a cloud service, the The delay is the time between my words and the voice you hear. Our goal is a delay short enough for a natural conversation. A quiet room matters more than an expensive microphone."
+  },
+  "en_paced|parakeet|clause": {
+   "WER": 0.052,
+   "latency_median_s": 1.84,
+   "latency_p90_s": 3.82,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.023,
+   "words": 98,
+   "text": "Good morning, and welcome to this live demonstration of speech transformation. Translation I am speaking English. and you will hear German or Slovak within a second or two. The system listens to the microphone and decides when a phrase has ended. first the words are recognized, Then they are translated. And they are spoken again. Everything runs on this computer. Without a cloud service, the The delay is the time between my words and the voice you hear. Our goal is a delay short enough for a natural conversation. A quiet room matters more than an expensive microphone."
+  },
+  "en_paced|parakeet|chunk-2.0": {
+   "WER": 0.323,
+   "latency_median_s": 0.99,
+   "latency_p90_s": 1.64,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.019,
+   "words": 96,
+   "text": "Good morning, and welcome to this event. Live demonstration of speech transition. Translation. In speaking English it is and you will hear German or Slovak. Within a second or two. The system listens to the same. Microphone and the size when afraid of the has ended. First the words are recognized, and Then they are translated, and they are spoken again. Everything runs on This computer, without a cloud spectrum. Service the voice you hear. Our goal is a delay shortened to the Enough for a natural conversation. A quiet Room matters more than an extension."
+  },
+  "en_paced|parakeet|agree-1.0": {
+   "WER": 0.188,
+   "latency_median_s": 2.29,
+   "latency_p90_s": 3.75,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.089,
+   "words": 91,
+   "text": "Good morning, And welcome to this live demonstration I am speaking English. And you will hear German or Slovak within a second or two. The system listens to the the microphone and the size when The phrase has ended. First the words are recognized, Then they are translated. And they are spoken again. Everything runs on The delay is is the time between my words and the voice you hear. Our Our goal is a delay short enough for a natural Conversation. A quiet room matters more than an expensive microphone."
+  },
+  "en_paced|parakeet|agree-0.5": {
+   "WER": 0.271,
+   "latency_median_s": 1.36,
+   "latency_p90_s": 3.05,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.157,
+   "words": 119,
+   "text": "Good morning. and welcome to this live demonstration of speech translation. I I am speaking English, And you will hear will hear German or Slovak within a second or two. The system The system listens to the microphone Microphone and decides when a phrase has ended. First the words are words are recognized, then they are translated. And And they are spoken again. Everything Everything runs on this computer. Without Without a cloud service. The delay is Today is the time between my words and the voice you hear. Our goal is a A delay A short enough for a natural Natural conversation. Thank you. A"
+  },
+  "sk_continuous|turbo|whole": {
+   "WER": 0.103,
+   "latency_median_s": 18.02,
+   "latency_p90_s": 29.63,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.039,
+   "words": 78,
+   "text": "Dobré ráno a vítajte na tejto živej ukážke prekladu reči. Hovorím po anglicky a o sekundu, či dve budete počuť nemčinu alebo slovenčinu. Systém počúva cez mikrofón a rozhoduje, kedy sa veta skončilo. Najprv sa slova rozpoznajú, potom sa proložia a nakoniec znova vyslovia. Všetko beží na tomto počítači bez slodovej služby. Oneskorenie je čas medzi mojimi slovami a hlasom, ktorý počujete. Našim cížerom je oneskorenie dosť krátke na prírodzený rozhovor. Tichá miestnosť je dôležitejšia ako drahý mikrofón."
+  },
+  "sk_continuous|turbo|pause": {
+   "WER": 0.167,
+   "latency_median_s": 5.28,
+   "latency_p90_s": 12.76,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.057,
+   "words": 77,
+   "text": "Dobré ráno a vítajte na tejto živej ukážke prekladu reči. Hovorím po anglicky a o sekundu, či dve budete počuť Nemčinu alebo Slovenčinu. System počúva cez mikrofón a rozhoduje, kedy sa veta skončilo. Najprv sa slova rozpoznajú, potom sa proložia a nakoniec znova vyslovia. Všetko beží na tomto počítači bez slodovej služby. Oneskorenie je čas medzi mojimi slovami a hlasom, ktorý počujete. Našim cílom je oneskorenie dosť krátke na prírodzené... Tiché miestnosti je dôležitejšie ako drahý mikrofón."
+  },
+  "sk_continuous|turbo|clause": {
+   "WER": 0.218,
+   "latency_median_s": 2.59,
+   "latency_p90_s": 3.75,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.107,
+   "words": 82,
+   "text": "Dobré ráno a vítajte na tejto živej ukážke prekladu reči. Hovorím po anglicky a o sekundu, či dve budete počúť Nemčinu alebo Slovenčinu. Systém počúva cez mikrofón a rozhoduje, kedy sa veta skončilo. Najprv sa slova rozpoznajú, potom sa proložia a nakoniec znova vyslovo. volia. Všetko beží na tomto počítači bez slúdové služby. Oneskore nie je čas medzi mojimi slovami a hlasom, ktorý počujete. Našim cílem je o neskorení dosť krátke na prírodzený rozhovor. Tichá mý jasnost je dôležitejšia ako drahý mikrofón."
+  },
+  "sk_continuous|turbo|chunk-2.0": {
+   "WER": 0.321,
+   "latency_median_s": 1.21,
+   "latency_p90_s": 1.97,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.179,
+   "words": 81,
+   "text": "Dobré ráno a vítajte na tejto živým úplnímu. ukážke prekladu reči. po anglicky a o sekundu učiť. Vy budete... počuť Nemčinu alebo Slovenčinu. System počúva cez mikrofon a rozhoda. kedy sa veta skončilo. Najprv sa slova rozpoznajú, potom, Potom sa proložia a nakoniec znova vysložia. Všetko beží na tomto počítaní. začiť bez sludové služby. Oni skorajúť čas medzi mojimi slovami. a hlasom, ktorý počujete. Našim cílom je o neskorení dosť... krátke na prírodzený rozhovor. Tichá miestnosť je dôležitejšia ako... drahým mikrofón."
+  },
+  "sk_continuous|turbo|agree-1.0": {
+   "WER": 0.192,
+   "latency_median_s": 3.01,
+   "latency_p90_s": 5.67,
+   "max_wait_for_engine_s": 0.14,
+   "compute_RTF": 0.407,
+   "words": 79,
+   "text": "Dobré ráno a vítajte na tejto živie ukážke prekladu reči. Hovorím po anglicky a o sekundu, či ved budete počuť Nemčinu alebo Slovenčinu. System počúva cez mikrofon a rozhoduje, kedy sa veta skončilo. Najprv sa slova rozpoznajú, potom sa proložia a A nakoniec znova vyslovia. Všetko beží na tomto počítači bez slúdovej slúžby. Oneskorenie je čas medzi mojimi slovami a hlasom, ktorý počujete. Našim cíľom je oneskorenie dosť Krátke na prírodzený rozhovor. Tichá miestnosť je dôležitejšia ako drahým mikrofón."
+  },
+  "sk_continuous|turbo|agree-0.5": {
+   "WER": 0.359,
+   "latency_median_s": 1.77,
+   "latency_p90_s": 3.14,
+   "max_wait_for_engine_s": 0.08,
+   "compute_RTF": 0.727,
+   "words": 79,
+   "text": "Dobre a vítajte na týto živie ukážke prekladu reči. Hovorím po anglicky a o sekundu či dve budete počuť Nemčinu alebo slovenčím. System počúvať cez mikrofon a rozhoduje, kedy sa veta skončilo. Najprv sa slova rozpoznajú, potom sa proložia a nakoniec znova vyslovia. Všetko beží na tento počítači bez slúdovej slúžby. Oneskore nie je čas medzi mojimi slovami a hlasom, ktorý počujete. V našim cíľom je o neskorení dosť krátke na prírodzený Tiché miestnosti je dôležitejšie ako drahým mikrofón."
+  },
+  "sk_continuous|kinit|whole": {
+   "WER": 0.0,
+   "latency_median_s": 18.26,
+   "latency_p90_s": 29.86,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.047,
+   "words": 78,
+   "text": "Dobré ráno a vitajte na tejto živej ukážke prekladu reči. Hovorím po anglicky a o sekundu, či dve budete počuť nemčinu alebo slovenčinu. Systém počúva cez mikrofón a rozhoduje, kedy sa veta skončila. Najprv sa slová rozpoznajú, potom sa preložia a nakoniec znova vyslovia. Všetko beží na tomto počítači bez cloudovej služby. Oneskorenie je čas medzi mojimi slovami a hlasom, ktorý počujete. Naším cieľom je oneskorenie dosť krátke na prirodzený rozhovor. Tichá miestnosť je dôležitejšia ako drahý mikrofón"
+  },
+  "sk_continuous|kinit|pause": {
+   "WER": 0.064,
+   "latency_median_s": 5.11,
+   "latency_p90_s": 12.95,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.096,
+   "words": 79,
+   "text": "dobré ráno a vitajte na tejto živej ukážke prekladu reči hovorím po anglicky a o sekundu či dve budete počuť nemčinu alebo slovenčinu systém počúva cez mikrofón a rozhoduje kedy sa veta skončila Najprv sa slová rozpoznajú, potom sa preložia a nakoniec znova vyslovia. Všetko beží na tomto počítači bez cloudovej služby. Oneskorenie je čas medzi mojimi slovami a hlasom, ktorý počujete. Naším cieľom je oneskorenie dosť krátke na prirodzenú lný rozhovor. Tiché miestnosti je dôležitejšie ako drahý mikrofón."
+  },
+  "sk_continuous|kinit|clause": {
+   "WER": 0.077,
+   "latency_median_s": 2.77,
+   "latency_p90_s": 4.02,
+   "max_wait_for_engine_s": 0.28,
+   "compute_RTF": 0.194,
+   "words": 78,
+   "text": "dobré ráno a vitajte na tejto živej ukážke prekladu reči hovorím po anglicky a o sekundu čidve budete počuť nemčinu alebo slovenčinu Systém počúva cez mikrofón a rozhoduje kedy sa veta skončila. najprv sa slová rozpoznajú potom sa preložia a nakoniec znova vyslovia Silvia všetko beží na tomto počítači bez cloudovej služby oneskorenie je čas medzi mojimi slovami a hlasom ktorý počujete naším cieľom je oneskorenie dosť krátke na prirodzený rozhovor tiché miestnosti je dôležitejšie ako drahý mikrofón"
+  },
+  "sk_continuous|kinit|chunk-2.0": {
+   "WER": 0.218,
+   "latency_median_s": 1.62,
+   "latency_p90_s": 2.39,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.333,
+   "words": 82,
+   "text": "dobré ráno a vitajte na tejto živej ukážke prekladu reči. Hovorím po anglicky a o sekundu čidve budete je počet nemčinu alebo slovenčinu systém počúva cez mikrofón a ohoduje, kedy sa veta skončilo. Najprv sa slová rozpoznajú, Potom sa preložia a nakoniec znova vysložia. boja. Všetko beží na tomto počíta. čítači bez cloudovej služby. oniskorenie je čas medzi mojimi slovami mi a hlasom, ktorý počujete. naším cieľom je oneskorenie do v krátke na prirodzený rozhovor tiché miestnosti je dôležitejšie ako drahý mikrofón"
+  },
+  "sk_continuous|kinit|agree-1.0": {
+   "WER": 0.167,
+   "latency_median_s": 2.78,
+   "latency_p90_s": 3.73,
+   "max_wait_for_engine_s": 0.43,
+   "compute_RTF": 0.7,
+   "words": 81,
+   "text": "dobré ráno a vitajte na tejto živej ukážke prekladu reči. Hovorím po longlicky a o sekundu čidve budete počuť nemčinu alebo slovenčín systém počúva cez mikrofón a rozhoduje kedy sa a veta skončilo. Najprv sa slová rozpoznajú, potom sa preložia a a nakoniec znova vyslovia. Všetko beží na tomto počítači bez sloudovej služby. oneskorenie je čas medzi mojimi slovami a hlasom ktorý počujete. Naším cieľom je oneskorenie dosť krátke na na prirodzený rozhovor. Tiché miestnosti je dôležitejšie ako ako drahý mikrofón."
+  },
+  "sk_continuous|kinit|agree-0.5": {
+   "WER": 0.218,
+   "latency_median_s": 6.35,
+   "latency_p90_s": 11.73,
+   "max_wait_for_engine_s": 10.14,
+   "compute_RTF": 1.349,
+   "words": 84,
+   "text": "dobré ráno a vitajte na na tejto živej ukážke te prekladu reči. Hovorím po anglicky a o sekundu, čidve budete počuť nemčinu alebo slovenčinu? systém počúvať cez mikrofón a rozhoduje, kedy sa veta skončilo. Najprv Tu sa slová rozpoznajú, potom sa sa preložia a nakoniec znova zavýslovia. Všetko beží na tomto počítači bez cloudovej služby. Oneskorenie je čas medzi mojimi a hlasom, ktorý počujete. naším cieľom je je oneskorenie dosť krátke aj na prirodzený rozhovor. tiché miestnosti je je dôležitejšie ako ako drahý mikrofón."
+  },
+  "sk_continuous|parakeet|whole": {
+   "WER": 0.077,
+   "latency_median_s": 17.24,
+   "latency_p90_s": 28.78,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.013,
+   "words": 78,
+   "text": "Dobré ráno a vítajte na tejto živej ukážke prekladu reči. Hovorím po anglicky a o sekundu či dve budete počuť nemčinu alebo slovenčinu. Systém počúva cez mikrofón a rozhoduje, kedy sa veta skončilo. Najprv sa slová rozpoznajú, potom sa preložia a nakoniec znova vyslovia. Všetko beží na tomto počítači bez súdovej služby. Onskorenie je čas medzi mojimi slovami a hlasom, ktorý počujete. Naším cieľom je oneskorenie dosť krátke na prirodzený rozh. Ticha miestnosť je dôležitejšia ako drahý mikrofón."
+  },
+  "sk_continuous|parakeet|pause": {
+   "WER": 0.128,
+   "latency_median_s": 4.63,
+   "latency_p90_s": 12.43,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.016,
+   "words": 76,
+   "text": "Dobré ráno a vítajte na tejto živej ukážke prekladu reči. Hovorím po-anglicky a o sekundu, či dve budete počuť nemčinu alebo slovenčinu. Systém počúva cez mikrofon a rozhoduje, kedy sa veta skončilo. Najprv sa slová rozpoznajú, potom sa položia a nakoniec znova vyslovia. Všetko beží na tomto počítači bez súľovej služby. Onskorenie je čas medzi mojimi slovami a hlasom, ktorý počujete. Naším cieľom je oneskorenie dosť krátke na prírodzene. Ticha miestnosti je dôležitejšia ako drahý mikrofón."
+  },
+  "sk_continuous|parakeet|clause": {
+   "WER": 0.167,
+   "latency_median_s": 2.36,
+   "latency_p90_s": 3.59,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.027,
+   "words": 83,
+   "text": "Dobré ráno a vítajte na tejto živej ukážke prekladu reči. Hovorím po anglicky a o sekundu, či dve budete počuť nemčinu alebo slovenčinu. Cystén počúva cez mikrofón a rozhoduje, kedy sa veta skončilo. Najprv sa slová rozpoznajú, potom sa preložia a nakoniec znova vysloven. So yeah. Všetko beží na tomto počítači bez súdovej služby. O neskôr nie je čas medzi mojimi slovami a hlasom, ktorý počujete. Naším cieľom je o neskorenie dosť krátke na prirodzený rozhovor. Tichá miestnosti je dôležitejšia ako drahý mikrofón."
+  },
+  "sk_continuous|parakeet|chunk-2.0": {
+   "WER": 0.282,
+   "latency_median_s": 0.99,
+   "latency_p90_s": 1.64,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.022,
+   "words": 80,
+   "text": "Dobré ráno a vítajte na tejto živej u kažke prekladu reči. Hovín po anglicky a o sekonú či dve budete. počuť nemčinu alebo slovenčinu. Systém počúva cez mikrofon a rozhodný. kedy sa veta skončilo. Najprv sa slová rozpoznajú, potom, Sa preložia a nakoniec znova výskú. Všetko beží na tomto počíku. bez sludovej služby. Oni skoro nie je čas medzi mojimi myslovami. hlasom, ktorý počujete. Naším cieľom je oneskorenie dost krátke na prírodzený rozhovor. Tichá miestnosti je dôležitej, ako. Draging microphone."
+  },
+  "sk_continuous|parakeet|agree-1.0": {
+   "WER": 0.103,
+   "latency_median_s": 3.22,
+   "latency_p90_s": 5.23,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.104,
+   "words": 78,
+   "text": "Dobré ráno a A vítajte na tejto živej ukážke prekladu Hovorím po anglicky a o sekundu, či dve budete počuť Nemčinu alebo slovenčinu. Systém počúva cez Mikrofon a rozhoduje, kedy sa veta skončilo. Najprv sa Slova rozpoznajú, potom sa preložia a nakoniec znova vyslovia. Všetko beží na tomto počítači bez slodovej služby. Oneskorenie je čas medzi mojimi slovami a hlasom, ktorý počujete. Naším cieľom je oneskorenie dosť krátke na Prirodzený rozhovor. Tichá miestnosti je dôležitejšia ako drahý mikrofón."
+  },
+  "sk_continuous|parakeet|agree-0.5": {
+   "WER": 0.321,
+   "latency_median_s": 1.53,
+   "latency_p90_s": 2.61,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.167,
+   "words": 82,
+   "text": "Dobré ráno a vítajte na na Tieto živie ukážké prekladú reči. Hovorím po anglicky a o o sekundu či dve budete počuť nemčinu alebo Systém počúva Cez mikrofon a rozhoduj, Kedy sa veta skončilo. Najprv Sa Slova rozpoznajú, potom sa preložia a a nakoniec znova Všetko beží na tomto Be slodovej služby. Onskore nie je čas medzi mojimi slovami a hlasom, ktorý počujete. Naším cieľom je O neskorení je dosť krátke na Prirodzený rozhovor. Tichá miestnosti je dôležitejšia ako Ako drahý mikrofon."
+  },
+  "sk_long|turbo|whole": {
+   "WER": 0.189,
+   "latency_median_s": 18.38,
+   "latency_p90_s": 34.16,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.03,
+   "words": 73,
+   "text": "Dobre ráno. Dnes vám chcem ukázať tri veci. Tu prvé, ako systém počúva. Po druhé, ako preklada. A po tretie, prečo záleží na prestavkách. Keď prestanem hovoriť, hlas by mal prestať tiež. A keď spravím pauzu, mali by ste počúť pauzu. Sretnutí sa začína o 9 .45 .14. v miestnosti 2 .17. Pán Novák z Bratislavy predstaví výsledky k 250 meraní. Cíľové oneskorenie je 800 milisekund a chybovosť musí zostať po 10 %."
+  },
+  "sk_long|turbo|pause": {
+   "WER": 0.257,
+   "latency_median_s": 1.79,
+   "latency_p90_s": 4.46,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.141,
+   "words": 72,
+   "text": "Dobre rano! Dnes vám chcem ukázať prie veci. tu prvný. Ako systém počúva? Po druhé. ako preklada. A po tretie. Prečo záleží na prestavkach? Keď prestanem hovoriť. Hlas by mal prestať tiež. A teď spravím pauzu. Mali by ste počuť pauzu? Sretnutí sa začína o 9 .45 .14. v miestnosti 2 .17. Pán Novák z Bratislavy predstaví výsledky v 250 meraní. Cíľové oneskorinie je 800 ms a chybovost musí zostať po 10%."
+  },
+  "sk_long|turbo|clause": {
+   "WER": 0.257,
+   "latency_median_s": 1.54,
+   "latency_p90_s": 3.46,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.159,
+   "words": 74,
+   "text": "Dobre rano! Dnes vám chcem ukázať prie veci. tu prvný. Ako systém počúva? Po druhé. ako preklada. A po tretie. Prečo záleží na prestavkach? Keď prestanem hovoriť. Hlas by mal prestať tiež. A teď spravím pauzu. Mali by ste počuť pauzu? Sretnutí sa začína o 9 .45 .14. v miestnosti Dúry. 2 ,17. Pán Novák z Bratislavy predstaví výsledky v 250 meraní. Cíľové oneskorenie je 800 ms a chybovost musí zostať podíle. po 10%."
+  },
+  "sk_long|turbo|chunk-2.0": {
+   "WER": 0.419,
+   "latency_median_s": 0.96,
+   "latency_p90_s": 1.75,
+   "max_wait_for_engine_s": 0.08,
+   "compute_RTF": 0.178,
+   "words": 72,
+   "text": "Dobre ráno. Dnes vám chcem... ukázat pri veci. ako systém počúva. Po druhé, akum. A po tretí, prečo záleží na prestožení. Keď prestanem hovoriť, Hlas by mal prestať tým. A teď spravím pauzu. Mali by ste počuť pauzu? Srednky sa začína od... 9 .4514. v miestnosti 2 ,17. Pán Novák z Bratislavy, predsúcať. staví výsledky v tých 250 nám. Cíľové onyskorinie 800 milisekund a chybovo musí zostať po 10%. Ďakujem za pozornosť."
+  },
+  "sk_long|turbo|agree-1.0": {
+   "WER": 0.27,
+   "latency_median_s": 2.32,
+   "latency_p90_s": 4.54,
+   "max_wait_for_engine_s": 0.1,
+   "compute_RTF": 0.371,
+   "words": 70,
+   "text": "Dobre Ano, dnes vám chcem ukázať 3 veci. Po prvé, ako systém počúva. Po druhé, ako A po 3. Prečo záleží na prestavkách. Keď prestanem hovoriť. Hlas by mal prestať A teď spravím pauzu. Mali by ste počuť pauzu. Zretnutí sa začína od 9 .45 .14. v miestnosti 2 ,17. Pán Novák z Bratislavy predstaví výsledky v 250 m. Cíľové oneskorinie je 800 a chybovosť musí zostať po 10%. Zdravíte."
+  },
+  "sk_long|turbo|agree-0.5": {
+   "WER": 0.365,
+   "latency_median_s": 1.62,
+   "latency_p90_s": 3.1,
+   "max_wait_for_engine_s": 0.07,
+   "compute_RTF": 0.691,
+   "words": 76,
+   "text": "Dobre Ano, dnes vám chcem ukázať privéť. Tu prvé, ako systém počúva. Po druhé, ako preklada A po 3. Prečo záleží na prestalka. Keď prestanem hovoriť. Hlas by mal prestať A Aj keď spravím pauzu. Mali by ste počuť pauzu? Zretnutí sa začína od 9 .45 .14. jeho Márca v miestnosti 2 ,17. Pán Novák z Bratislavy predstaví výsledky, i 250 10. Ne. Cíľové onyskorinie 800 to milosekund a chybovo musí zostať po 10%. z námi."
+  },
+  "sk_long|kinit|whole": {
+   "WER": 0.108,
+   "latency_median_s": 18.56,
+   "latency_p90_s": 34.24,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.038,
+   "words": 75,
+   "text": "Dobré ráno, dnes vám chcem ukázať tri veci. Po prvé, ako systém počúva? Po druhé, ako prekladá? A po tretie, prečo záleží na prestávkach, keď prestanem hovoriť? Hlas by mal prestať tiež. A keď spravím pauzu, mali by ste počuť pauzu. Stretnutie sa začína o 9 .45 hod. 14. marca v miestnosti 2 .17 hod. Pán z Bratislavy predstaví výsledky 350 150 menov. Cieľové oneskorenie je 800 milisekúnd a chybovosť musí zostať pod 10 percent."
+  },
+  "sk_long|kinit|pause": {
+   "WER": 0.189,
+   "latency_median_s": 2.11,
+   "latency_p90_s": 4.77,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.266,
+   "words": 72,
+   "text": "Dobré ráno! dnes vám chcem ukázať tri veci upľný ako systém počúva po druhé ako prekladáme a potretie Prečo záleží na prestávkach? keď prestanem hovoriť hlas by mal prestať tiež Efix provín pauzu mali by ste počuť pauzu stretnutie sa začína o 9 .45 hod. 14. marca v miestnosti 2 .17 pán novák z bratislavy predstaví výsledky pri 250 mld cieľové oneskorenie je 800 míľs a chybovosť musí zostať pod 10 percent"
+  },
+  "sk_long|kinit|clause": {
+   "WER": 0.216,
+   "latency_median_s": 1.8,
+   "latency_p90_s": 3.75,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.3,
+   "words": 72,
+   "text": "Dobré ráno! dnes vám chcem ukázať tri veci upľný ako systém počúva po druhé ako prekladáme a potretie Prečo záleží na prestávkach? keď prestanem hovoriť hlas by mal prestať tiež Efix provín pauzu mali by ste počuť pauzu stretnutie sa začína o 9 .45 hod. 14. marca v miestnosti 17 pán novák z bratislavy predstaví výsledky pri 250 mld cieľové oneskorenie je 800 míľs a chybovosť musí zostať pod pod 10 percent."
+  },
+  "sk_long|kinit|chunk-2.0": {
+   "WER": 0.27,
+   "latency_median_s": 1.41,
+   "latency_p90_s": 2.35,
+   "max_wait_for_engine_s": 0.39,
+   "compute_RTF": 0.344,
+   "words": 76,
+   "text": "Dobré ráno, dnes vám chcem ukázať tri veci. stupň vieme ako systém počúva? po druhé ako prekladá. A po tretí prečo záleží na prestoji vystávkach. Keď prestanem hovoriť, hlas by mal prestať tiež. Edit s prvým palzom. Mali by ste počuť pauzu. stretnutie sa začína o 14. marca v miestnosti 2 .17 pán novák z bratislavy pred ústavy výsledky pri 250 50 cieľové oneskorenie nie je 800 míus sekúnd a chybovosť musí zostať pod 10 percent"
+  },
+  "sk_long|kinit|agree-1.0": {
+   "WER": 0.135,
+   "latency_median_s": 3.13,
+   "latency_p90_s": 4.61,
+   "max_wait_for_engine_s": 0.42,
+   "compute_RTF": 0.707,
+   "words": 78,
+   "text": "Dobré ráno, dnes vám chcem ukázať tri veci po prvé ako systém počúva? po druhé ako ho prekladá. A po tretie. Prečo u záleží na prestávkach. Keď prestanem hovoriť, hlas by mal ho prestať tiež. A keď spravím pauzu, mali by ste počuť pauzu stretnutie sa začína o 9 .45 15 14. marca v miestnosti 2 17. 11. pán novák z Bratislavy predstaví výsledky 250 mení. cieľové oneskorenie je 800 o a chybovosť musí zostať pod 10 percent."
+  },
+  "sk_long|kinit|agree-0.5": {
+   "WER": 0.216,
+   "latency_median_s": 6.7,
+   "latency_p90_s": 11.6,
+   "max_wait_for_engine_s": 9.55,
+   "compute_RTF": 1.277,
+   "words": 78,
+   "text": "Dobré dnes vám chcem ukázať tri veci po prvé ako systém počúva? po druhé ako to prekladá. A po po tretie. Prečo záleží na prestávkach. h. Keď prestanem hovoriť. hlas by mal a prestať tiež. Edit spravím pauzu. Mali by ste počuť pauzu stretnutie sa sa začína o 9 .45 14. marca v miestnosti 2 17. 11. pán novák z Bratislavy predstaví výsledky 250 cieľové oneskorenie je je 800 o milosekúnd a chybovosť musí zostať pod 10 percent."
+  },
+  "sk_long|parakeet|whole": {
+   "WER": 0.297,
+   "latency_median_s": 17.87,
+   "latency_p90_s": 33.52,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.012,
+   "words": 67,
+   "text": "Dobré ráno. Dnes vám chcem ukazať tri veci. Poprvé, ako systém počúva, podruhé, ako prekladá. A podtretie, prečo záleží na prestavkách, keď prestanem hovoriť. Hlas by mal prestať tiež, a keď spravím pauzu. Mali by ste počuť pauzu. Stretnutie sa začína od 94 14. marca v miestnosti dva búka 17. Pán novák Bratislavy predstaví výsledky 350 merami. Cieľové oneskorenie je 800 msekúnt a chybovosť musí zostať 10%."
+  },
+  "sk_long|parakeet|pause": {
+   "WER": 0.297,
+   "latency_median_s": 1.54,
+   "latency_p90_s": 4.15,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.033,
+   "words": 73,
+   "text": "Dobrý ráno. Dnes vám chcem ukazať priveti. Toply. Ako systém počúva? Po drugé. Ako preklady, А по третє Prečo záleží na predstavkách? Keď prestaním hovíť. Hlas by mal prestať tiež. A teď sprawimy pauzu. Mali by ste počuť pauzu? Stretnutie sa začína od 9 45 14. marca v miestnosti 2 bodka 17. Pán Novák z Bratislavy predstaví výsledky tých 250 merní. Cieľové oneskorenie je 800 milisekúnd a chybovosť musí zostať pod 10 percent."
+  },
+  "sk_long|parakeet|clause": {
+   "WER": 0.392,
+   "latency_median_s": 1.28,
+   "latency_p90_s": 3.15,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.037,
+   "words": 75,
+   "text": "Dobrý ráno. Dnes vám chcem ukazať priveti. Toply. Ako systém počúva? Po drugé. Ako preklady, А по третє Prečo záleží na predstavkách? Keď prestaním hovíť. Hlas by mal prestať tiež. A teď sprawimy pauzu. Mali by ste počuť pauzu? Sretnutie sa začína od 9 45 14. marca v miestnosti. 2 budka, 17. Pán Novák z Bratislavy predstaví výsledky tých 250 merní. Cílové oneskorenie je 800 milisekúnt a chybovosť musí zostať podelom. For dizzy per cent."
+  },
+  "sk_long|parakeet|chunk-2.0": {
+   "WER": 0.5,
+   "latency_median_s": 0.76,
+   "latency_p90_s": 1.48,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.021,
+   "words": 69,
+   "text": "Dobrý ráno. Dnes vám chce. Указа приветстви. То през. Ako systém počúva. Po drugie. ako preklada. A po tretí. Prečo záleží na peste? Keď prestaním hovorí, Hlas by mal prestať. A teď spravím pauzu. Mali by ste počuť pauzu? Средний кіся začíна опозиція. 45.14. narca. v miestnosti 2 budka 17. Pán nováx Bratislavy predstavný. staví výsledky 250 Mén. Cílové oniskorín. 800 milisekund a chybovost. musí zostať po 10%. Yeah."
+  },
+  "sk_long|parakeet|agree-1.0": {
+   "WER": 0.324,
+   "latency_median_s": 2.74,
+   "latency_p90_s": 5.15,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.1,
+   "words": 72,
+   "text": "Dobrý ráno. Dnes vám chcem ukazať Tri veci. Poprvé, ako systém počúva. Podruhé, Ako Ako prekladá. A podtretie, prečo záleží na Prestavkách. Keď prestan hovoriť, hlas by mal prestať A keď spravím pauzu, Mali by ste počuť pauzu. Stretnutie sa začína od 9 45 14. marca v miestnosti dva bábka 17. Pán novák z Bratislavy predstaví výsledky 350 meravní. Cílové oneskorenie je 800 misek a chybovosť musí musí zostať po 10%. Yeah."
+  },
+  "sk_long|parakeet|agree-0.5": {
+   "WER": 0.392,
+   "latency_median_s": 1.7,
+   "latency_p90_s": 3.63,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.172,
+   "words": 71,
+   "text": "Dobrý ráno. Nie Dnes vám chcem ukazať Poprvé, ako Ako systém Podruh, ako prekladá a A A po tretie, prečo záleží na predstavkách. Keď prestaním hovoriť. Hlas by mal Prestať tiež. A keď spravím pauzu. Mali by ste počuť pauzu. Stretnutie sa začína od 9 45 14. marca v miestnosti dva budka: 17. Pán Pán Novák z Bratislavy predstaví výsledky 250 That Cílové oneskorení 800 A chybovost musí zostať po 10%."
+  },
+  "sk_paced|turbo|whole": {
+   "WER": 0.179,
+   "latency_median_s": 20.8,
+   "latency_p90_s": 34.62,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.033,
+   "words": 79,
+   "text": "Dobré ráno a výtajte na tieto živej ukážke prekladu reči. Hovorím po anglicky a o sekundu, či dve budete počúť nemčinu alebo slovemčinu. Systém počúva cez mikrochón a rozhoduje, kedy sa veta skončila. Najprv sa slova rozpoznajú, potom sa proložia a nakoniec znova vyslovia. Všetko beží na tomto počítači bez slodovej služby. Oneskorenie je čas medzi mojimi slovami a hlasom, ktorý počujete. Našim cíľom je o neskorenie dosť krátke na prírodzený rozhovor. Tichá miestnosť je dôležitejšie ako drahý mikrofón."
+  },
+  "sk_paced|turbo|pause": {
+   "WER": 0.269,
+   "latency_median_s": 2.75,
+   "latency_p90_s": 4.04,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.083,
+   "words": 80,
+   "text": "Dobré ráno a vítajte na tieto živej ukážke prekladu rečí. Hovorím po anglicky a o sekundu či dve budete počúť Nemčinu alebo Slovenčinu. System počúva cez mikrofon a rozhoduj, kedy sa veté skončilo. Najprv sa slova rozpoznajú, potom sa proložia a nakoniec znova vyslovia. Všetko beží na tomto počítači bez slúdové služby. Oneskôr nie je čas medzi mojimi slovami a hlasom, ktorý počujete. Našim cíľom je o neskorenie dosť krátke na prírodzený rozhov. Tichá miestnosť je dôležitejšie ako drahý mikrofón."
+  },
+  "sk_paced|turbo|clause": {
+   "WER": 0.269,
+   "latency_median_s": 2.59,
+   "latency_p90_s": 3.77,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.084,
+   "words": 80,
+   "text": "Dobré ráno a vítajte na tieto živej ukážke prekladu rečí. Hovorím po anglicky a o sekundu či dve budete počúť Nemčinu alebo Slovenčinu. System počúva cez mikrofon a rozhoduj, kedy sa veté skončilo. Najprv sa slova rozpoznajú, potom sa proložia a nakoniec znova vyslovia. Všetko beží na tomto počítači bez slúdové služby. Oneskôr nie je čas medzi mojimi slovami a hlasom, ktorý počujete. Našim cíľom je o neskorenie dosť krátke na prírodzený rozhov. Tichá miestnosť je dôležitejšie ako drahý mikrofón."
+  },
+  "sk_paced|turbo|chunk-2.0": {
+   "WER": 0.667,
+   "latency_median_s": 1.15,
+   "latency_p90_s": 2.06,
+   "max_wait_for_engine_s": 0.06,
+   "compute_RTF": 0.182,
+   "words": 87,
+   "text": "Dobré ráno a vítajte na tieto živej úplnosti. ukažke prekladureči. Hvorím po angolické a o sekundu... či dve budete počuť Nemčinu alebo Slováča. výsledný činný. Sistým počutým. sa z mikrofon a rozhoduj, kedy... sa vete skončilo. Najprve sa slova rozpoznejú, potom... Potom sa proložia a nakoniec znova vyslovia. Všetko beží na to, že... to počítači ve slodovej služby. oni skorají čas mediumaj misolami, ahlasom. ktorý počujete. Našim cílem je o neskorenie dostkávanie. Čeť ke napríroče níro soba. Tiché mňastnosti je dôležitejšie, ako drahý mikrofon. Ďakujem za pozornosť."
+  },
+  "sk_paced|turbo|agree-1.0": {
+   "WER": 0.321,
+   "latency_median_s": 3.06,
+   "latency_p90_s": 5.01,
+   "max_wait_for_engine_s": 0.1,
+   "compute_RTF": 0.393,
+   "words": 82,
+   "text": "Dobré ráno a vítajte na tieto živej ukážke prekladu reči. Hovorím po anglicky a o sekundu či dve budete počuť Nemčinu alebo Slovenčínu. System počúvať sa z mikrofonu a rozhoduj, kedy sa vete skončilo. Najprv sa slova rozpoznajú, potom sa preložia a nakoniec znova vyslovia. Všetko beží na na tomto počítači bez slúdovej služby. Oneskôr nie je čas medzi mojimi slovami a hlasom, ktorý počujete. Našim si ďalíme o neskorenie dosť krátke na prírodzený rozhov. Tichá miestnosť je dôležitejšie ako drahý mikrofon."
+  },
+  "sk_paced|turbo|agree-0.5": {
+   "WER": 0.449,
+   "latency_median_s": 1.68,
+   "latency_p90_s": 2.71,
+   "max_wait_for_engine_s": 0.05,
+   "compute_RTF": 0.707,
+   "words": 86,
+   "text": "Dobre a A vítajte na tieto živej ukážke prekladu reči. Hovorím po anglicky a o sekundu či dve budete počuť Nemčinu alebo Slovenčinu. System počúva cez mikrofon a Rozhoduj, kedy sa veté skončilo. Nei Eprve sa slova rozpoznajú, potom sa proložia a nakoniec znova vyslovila. Všetko beží na tomto počítači ve sludo ve slujbe. A nie skôr nie je čas medzi mojimi slovami a hlasom, ktorý počíke. Naším si javíme o neskorenie dosť krátke na prírodzený rozhov. V tiché jasnosti je dôležitejšie ako drahý mikrofon. Ďakujem."
+  },
+  "sk_paced|kinit|whole": {
+   "WER": 0.051,
+   "latency_median_s": 20.97,
+   "latency_p90_s": 34.9,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.04,
+   "words": 78,
+   "text": "Dobré ráno a vitajte na tejto živej ukážke prekladu reči. Hovorím ponglicky a o sekundu, či dve budete počuť nemčinu alebo slovenčinu. Systém počúva cez mikrofón a rozhoduje, kedy sa veta skončila. Najprv sa slová rozpoznajú, potom sa preložia a nakoniec znova vyslovia. Všetko beží na tomto počítači bez cloudovej služby. Oneskorenie je čas medzi mojimi slovami a hlasom, ktorý počujete. Naším cieľom je oneskorenie dosť v skratke na prirodzený rozhovor. Tichá miestnosť je dôležitejšia ako drahý mikrofón."
+  },
+  "sk_paced|kinit|pause": {
+   "WER": 0.064,
+   "latency_median_s": 3.01,
+   "latency_p90_s": 4.31,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.149,
+   "words": 79,
+   "text": "dobré ráno a vitajte na tejto živej ukážke prekladu reči hovorím po anglicky a o sekundu či dve budete počuť nemčinu alebo slovenčinu systém počúva cez mikrofón a rozhoduje kedy sa veta skončila najprv sa slová rozpoznajú potom sa preložia a nakoniec znova vyslovia všetko beží na tomto počítači bez cloudovej služby oneskore nie je čas medzi mojimi slovami a hlasom ktorý počujete naším cieľom je oneskorenie dosť krátke na prirodzený rozhovor tiché miestnosti je dôležitejšie ako drahý mikrofón"
+  },
+  "sk_paced|kinit|clause": {
+   "WER": 0.064,
+   "latency_median_s": 2.84,
+   "latency_p90_s": 4.06,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.15,
+   "words": 79,
+   "text": "dobré ráno a vitajte na tejto živej ukážke prekladu reči hovorím po anglicky a o sekundu či dve budete počuť nemčinu alebo slovenčinu systém počúva cez mikrofón a rozhoduje kedy sa veta skončila najprv sa slová rozpoznajú potom sa preložia a nakoniec znova vyslovia všetko beží na tomto počítači bez cloudovej služby oneskore nie je čas medzi mojimi slovami a hlasom ktorý počujete naším cieľom je oneskorenie dosť krátke na prirodzený rozhovor tiché miestnosti je dôležitejšie ako drahý mikrofón"
+  },
+  "sk_paced|kinit|chunk-2.0": {
+   "WER": 0.282,
+   "latency_median_s": 1.6,
+   "latency_p90_s": 2.42,
+   "max_wait_for_engine_s": 0.37,
+   "compute_RTF": 0.331,
+   "words": 85,
+   "text": "dobré ráno a vitajte na tejto živej ku ukážke prekladu reči. hovorím ponglicky a oseku či dve budete počuť nemčinu alebo slovo lvenčín systém počtu čúva cez mikrofón a rozhoduje, kedy vpise veta skončila. najprv sa slová rozpoznajú potom Potom sa preložia a nakoniec znova vyslovi. všetko beží na to tomto počítači bez cloudovej služby. užby. Ono skorej nie je čas medzi mojimi slovami a hlasom. ktorý počujete naším cieľom je oneskorenie dosť atke na prirodzený rozhovor tiché miestnosti je dôležitejšie šie ako drahý mikrofón"
+  },
+  "sk_paced|kinit|agree-1.0": {
+   "WER": 0.167,
+   "latency_median_s": 3.06,
+   "latency_p90_s": 5.45,
+   "max_wait_for_engine_s": 0.37,
+   "compute_RTF": 0.689,
+   "words": 77,
+   "text": "dobré ráno a čítajte na tejto živej ukážke prekladu reči hovorím pongolický a o sekundu či dve budete počuť nemčinu alebo slovenčinu. Systém počúva cez mikrofón a rozhoduje kedy veta skončila. najprv sa slová rozpoznajú potom sa preložia a nakoniec znova vyslovia. Všetko beží na tomto počítači bez služby. o oneskore nie je čas medzi mojimi slovami a hlasom ktorý počujete naším cieľom je je oneskorenie dosť krátke na prirodzený tiché miestnosti je dôležitejšie ako drahý mikrofón"
+  },
+  "sk_paced|kinit|agree-0.5": {
+   "WER": 0.192,
+   "latency_median_s": 6.77,
+   "latency_p90_s": 9.77,
+   "max_wait_for_engine_s": 9.32,
+   "compute_RTF": 1.26,
+   "words": 83,
+   "text": "dobré ráno a vitajte na na tejto živej ukážke prekladu reči hovorím ponguitský a a o sekundu, či dve budete počuť nemčinu alebo slovenčinu systém počúva cez mikrofón a rozhoduje, kedy veta sa skončilo. Najprv sa slová rozpoznajú, potom sa sa preložia a nakoniec znova vyslovia. všetko beží na tomto do počítači bez sloudovej služby oneskorenie je čas medzi s mojimi slovami a a hlasom, ktorý počieť naším cieľom je oneskorenie dosť krátke na prirodzený rozhovor tiché miestnosti je dôležitejšie ako drahý mikrofón"
+  },
+  "sk_paced|parakeet|whole": {
+   "WER": 0.128,
+   "latency_median_s": 20.27,
+   "latency_p90_s": 33.83,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.012,
+   "words": 78,
+   "text": "Dobré ráno a vytajte na tejto živej ukážke prekladú reči. Hovorím po anglicky a o sekunnú či dvé budete počuť nemčinu alebo slovenčinu. Systém počúva cez mikrofón a rozhoduje, kedy sa veta skončila. Najprv sa slová rozpoznajú, potom sa preložia a nakoniec znova vyslovia. Všetko beží na tomto počítači bez slodovej služby. Oneskorenie je čas medzi malými slovami a hlasom, ktorý počujete. Naším cieľom je oneskorenie dosť krátke na prírodzený rozhovor. Ticha miestnosti je dôležitejší ako drahý mikrofón."
+  },
+  "sk_paced|parakeet|pause": {
+   "WER": 0.141,
+   "latency_median_s": 2.46,
+   "latency_p90_s": 3.88,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.021,
+   "words": 79,
+   "text": "Dobré ráno, abytajte na tejto živej ukážke prekladu reči. Hovorím po anglicky a o sekunú, či dve budete počuť nemčinu alebo slovenčinu. Systém počúva cez mikrofón a rozhoduje, kedy sa veta skončilo. Najprv sa slova rozpoznajú, potom sa preložia a nakoniec znova vyslovia. Všetko beží na tomto počítači bez slodovej služby. O neskore nie je čas medzi mojimi slovami a hlasom, ktorý počiete. Naším cieľom je oneskorenie dosť krátke na prirodzený rozhovor. Ticha miestnosť je dôležitejšia ako drahý mikrofón."
+  },
+  "sk_paced|parakeet|clause": {
+   "WER": 0.141,
+   "latency_median_s": 2.28,
+   "latency_p90_s": 3.72,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.022,
+   "words": 79,
+   "text": "Dobré ráno, abytajte na tejto živej ukážke prekladu reči. Hovorím po anglicky a o sekunnu, či dve budete počuť nemčinu alebo slovenčinu. Systém počúva cez mikrofón a rozhoduje, kedy sa veta skončilo. Najprv sa slova rozpoznajú, potom sa preložia a nakoniec znova vyslovia. Všetko beží na tomto počítači bez slodovej služby. O neskore nie je čas medzi mojimi slovami a hlasom, ktorý počiete. Naším cieľom je oneskorenie dosť krátke na prirodzený rozhovor. Ticha miestnosť je dôležitejšia ako drahý mikrofón."
+  },
+  "sk_paced|parakeet|chunk-2.0": {
+   "WER": 0.41,
+   "latency_median_s": 0.89,
+   "latency_p90_s": 1.72,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.021,
+   "words": 75,
+   "text": "Dobré ráno, abytajte na tejto živej. У кашка приклад у речі. Hovorím po anglicky a o sekundú či dve budete počuť nemčinu alebo... System poor. Cez mikrofon a rozhoduje, keď. se veta skončilo. Najprv sa slova rozpoznajú, potom, Sa preložia a nakoniec znova vysloven. Všetko beží na to. Be slodovej súžnosti. Čas medzi mojimi slovami a hlasom. ktorý počujete. Naším cílem je oneskorení dostke. na prírodzený rozhova. Tichá miestnosť je dôležitejšia. Ako drahý mikrofon. Yeah."
+  },
+  "sk_paced|parakeet|agree-1.0": {
+   "WER": 0.346,
+   "latency_median_s": 3.03,
+   "latency_p90_s": 5.47,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.098,
+   "words": 79,
+   "text": "Dobré ráno, A vytajte na tejto živej ukážke prekladú reči. Hovorím po anglicky a A o či 2 budete počuť nemčinu alebo slovenčinu. Systém Staúva cez mikrofón a rozhoduje, kedy sa Najprón sa slova rozpoznajú, potom sa prôžia a nakoniec znova vyslovia. Všetko beží na na tomto počítači bez bez súdovej služby. Oneskôr nie je čas medzi mojimi slovami a hlasom, Našším cieľom je O neskorenie je dosť krátke na prírodzený rozhovor. Ticha miestnosť je dôležitejšia jako dreh microfon."
+  },
+  "sk_paced|parakeet|agree-0.5": {
+   "WER": 0.474,
+   "latency_median_s": 1.62,
+   "latency_p90_s": 2.42,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.19,
+   "words": 84,
+   "text": "Dobré ráno, No a vytajte na tejto živej ukážke Приклад у речі. Hovorím po anglicky a a a o sekonú, či dve budete počuť Systém počúva cez mikrofon Kedy se veta skončilo. Najprv sa slova rozpoznajú, Potom sa Sa preložia a nakoniec Všetko beží na tomto počítači bez bez bez slúdovej služby. Oni O neskore nie je čas medzi Mojimi slovami a hlasom, ktorý počujete. Naším Naším cílem je O neskorenie je dosť krátke na Prirodzený rozhovor. Ticha miestnosti tie dôležitejší ako drahý mikrofon."
+  },
+  "fleurs_sk|turbo|whole": {
+   "WER": 0.097,
+   "latency_median_s": 101.27,
+   "latency_p90_s": 150.14,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.023,
+   "words": 248,
+   "text": "Madagaskar je zďaleka tým najväčším a je sám o sebe kontinentom, keď ide o divokú prírodu. Jedna z najbežnejších metód, ktorá sa používa na ilustráciu dôležitosti socializácie, čerpá z niekoľkých nešťastných prípadov detí, ktoré boli zanedbávané, nešťastné alebo úmyselne týrané a pri dospievaní neboli socializované dospelými. Prerušenie spánku je proces, ktorý spočíva v zámernom prebudení sa počas zvyčajnej doby spánku a následnom zaspaní krátko na to 10 až 60 minút. Teórie sa zameriavajú na to, čo v ľudach motivuje túžbu robiť určité veci a čo v nich zprostredí ich úti určité veci robiť alebo"
+  },
+  "fleurs_sk|turbo|pause": {
+   "WER": 0.226,
+   "latency_median_s": 2.93,
+   "latency_p90_s": 7.72,
+   "max_wait_for_engine_s": 0.12,
+   "compute_RTF": 0.056,
+   "words": 226,
+   "text": "Madagaskar je zďaleka tým najväčším a je sám o sebe kontinentom, keď ide o divokú prírodu. Jedna z najbežnejších metód, ktorá sa používa na ilustráciu dôležitosti socializácie, čerpá z niekoľkých nešťastných prípadov detí, ktoré boli zanedbávané, nešťastné alebo úmyselne týrané a pri dospievaní neboli socializované dospievané. spely imi. Prerušenie spánku je proces, ktorý spočíva v zámernom prebudení sa počas zvyčajnej doby spánku, a následnom zaspaní krátko na to 10 -60 minút. Teórie sa zameriavajú na to, čo v ľudach motivuje túžbu robiť určité veci, a čo v nich sprostredí ich unutí určité ve"
+  },
+  "fleurs_sk|turbo|clause": {
+   "WER": 0.335,
+   "latency_median_s": 1.77,
+   "latency_p90_s": 3.66,
+   "max_wait_for_engine_s": 0.06,
+   "compute_RTF": 0.089,
+   "words": 233,
+   "text": "Madagaskar je zďaleka tým najväčším a je sám o sebe Tebe kontinentom. keď ide o divokú prírodu. Jedna z najbežnejších metód, ktorá sa používa na ilustráciu dôležitosti, Ďakujem za pozornosť. ktoré boli zanedbávané, nešťastné alebo úmyselne týrané. a pri dospievaní neboli socializované dospelými. Prerušenie spánku je proces, ktorý spočíva v zámernom prebudení sa počas zvyšenia. z zvyčajnej doby spánku. a následnom zaspaní krátko na to. 10 až 60 minút. Teórie sa zameriavajú na to, čo v ľudach motivuje túžbu robiť určité. Čité veci. a čo v nich sprostredí ich unutí určité veci robiť alebo nerobiť"
+  },
+  "fleurs_sk|turbo|chunk-2.0": {
+   "WER": 0.496,
+   "latency_median_s": 1.06,
+   "latency_p90_s": 1.91,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.171,
+   "words": 281,
+   "text": "Madagasc... je z ďaleká tým najväčší a je sám o sebe kontinuálny. Keď ide o divokú prírodu. Jedna z najbežniejších myslí. metód, ktorá sa používa na ilustrácii. Dôležitosti socializácie. čerpá z niekoľkých nešťastných prízeb. ktoré boli zanedbávaní. nešťastné alebo úmnešné. Ďakujem za pozornosť. Ďakujem za pozornosť. Emi. Prerušenie spankuje proces. ktorý spočíva v zámernom prebudení. sa počas zvyčajnej doby spánku. a následnom zaspaní krátko na... 10 -60 minút. Ďakujem za pozornosť. Teóri, saz emery Čo v ľudoch motivuje tú už budú robiť určité veci. v nich z prostredí i úči. určité veci robiť"
+  },
+  "fleurs_sk|turbo|agree-1.0": {
+   "WER": 0.149,
+   "latency_median_s": 2.59,
+   "latency_p90_s": 4.41,
+   "max_wait_for_engine_s": 0.17,
+   "compute_RTF": 0.36,
+   "words": 256,
+   "text": "Madagaskar je zďaleka tým najväčším a je sám o sebe kontinentom, keď ide o divokú prírodu. Jedna z Z najbežnejších metód, ktorá sa používa na ilustráciu dôležitosti socializácie čerpá z niekoľkých nešťastných prípadov detí, ktoré boli zanedbávané, nešťastné alebo úmyselne týrané a pri dospievani neboli socializované Prerušenie spánku je proces, ktorý spočíva v zámernom prebudení sa počas zvyčajnej doby spánku a následnom zaspaní krátko na 10 -60 minút. Teórie sa zameriavajú na to, čo Čo v ľudách motivuje túžbu robiť určité veci a čo v nich z prostredí ich unúti určité veci robiť alebo nerobiť."
+  },
+  "fleurs_sk|turbo|agree-0.5": {
+   "WER": 0.335,
+   "latency_median_s": 1.42,
+   "latency_p90_s": 2.33,
+   "max_wait_for_engine_s": 0.09,
+   "compute_RTF": 0.68,
+   "words": 283,
+   "text": "Madagaskar je zďaleká tým najväčším a je sám o sebe kontinentom. Keď ide o divokú prírodu. Zdravíte. Jedna z najbežnejších metód, ktorá sa používa na ilustráciu dôležitosti socializácie. čerpá z niekoľkých nešťastných prípadov detí, ktoré boli zanedbávané, nešťastné alebo úmyselne týrané a pri dospievani neboli socializované nedospelými. Zvukaj. Prerušenie spánkuje proces, ktorý spočíva v zámernom prebudení sa počas z zvyčajnej doby spánku a následnom za spaní krátko na 10 -60 minut Zdravíte. Zdravíte. Teorías, sa zameriavajú na to, čo v Ľudách motivuje túž bude byť určité veci a čo v nich z p"
+  },
+  "fleurs_sk|kinit|whole": {
+   "WER": 0.085,
+   "latency_median_s": 101.42,
+   "latency_p90_s": 149.96,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.024,
+   "words": 252,
+   "text": "madagaskar je zďaleka tým najväčším a je sám o sebe kontinentom keď ide o divokú prírodu jedna z najbežnejších metód ktorá sa používa na ilustráciu dôležitosti socializácie čerpá z niekoľkých nešťastných prípadov detí ktoré boli zanedbávané nešťastné alebo úmyselne týrané a pri dospievaní neboli socializované dospelými prerušenie spánku je je proces ktorý spočíva v zámernom prebudení sa počas zvyčajnej doby spánku a následnom zaspaní krátko na to 10 až 60 minút teórie sa zameriavajú na to čo v ľuďoch motivuje túžbu robiť určité veci a čo v nich sprostredí ich núti určité veci robiť alebo nerob"
+  },
+  "fleurs_sk|kinit|pause": {
+   "WER": 0.19,
+   "latency_median_s": 3.3,
+   "latency_p90_s": 8.04,
+   "max_wait_for_engine_s": 0.39,
+   "compute_RTF": 0.1,
+   "words": 223,
+   "text": "madagaskar je zďaleka tým najväčším a je sám o sebe kontinentom keď ide o divokú prírodu jedna z najbežnejších metód ktorá sa používa na ilustráciu dôležitosti socializácie čerpá z niekoľkých nešťastných prípadov detí ktoré boli zanedbávané nešťastné alebo úmyselne týrané a pri dospievaní neboli socializované dospe ospelými prerušenie spánku je proces ktorý spočíva v zámernom prebudení sa počas zvyčajnej doby spánku a následnom zaspaní krátko nato 10 až 60 minút teórie sa zameriavajú na to čo v ľuďoch motivuje túžbu robiť určité veci a čo v nich sprostredne ich núti určité veci robiť alebo ner"
+  },
+  "fleurs_sk|kinit|clause": {
+   "WER": 0.258,
+   "latency_median_s": 2.2,
+   "latency_p90_s": 4.12,
+   "max_wait_for_engine_s": 0.37,
+   "compute_RTF": 0.158,
+   "words": 230,
+   "text": "madagaskar je zďaleka tým najväčším a je sám osebe webe kontinentom keď ide o živokú prírodu jedna z najbežnejších metód ktorá sa používa na ilustráciu dôležitosti užitosti socializácie čerpá z niekoľkých nešťastných prípadov detí ktoré boli zanedbávané nešťastné alebo úmyselne týrané rané a pri dospievaní neboli socializované dospelými prerušenie spánku je proces ktorý spočíva v zámernom prebudení sa počas zo zvyčajnej doby spánku a následnom zaspaní krátko nato 10 až 60 minút teórie sa zameriavajú na to čo v ľuďoch motivuje túžbu robiť určité veci a čo v nich sprostredne ich núti určité veci"
+  },
+  "fleurs_sk|kinit|chunk-2.0": {
+   "WER": 0.278,
+   "latency_median_s": 1.51,
+   "latency_p90_s": 2.4,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.299,
+   "words": 276,
+   "text": "Madagas je zďaleka tým najväčší a je sám o sebe kontinu. keď ide o divokú prírodu jedna z najbežnejších metód ktorá sa používa na ilustráciu dôležitosti socializácie čerpá z niekoľkých nešťastných prípad prípadov detí ktoré boli zanedbávané nene, nešťastné alebo úmyselne týrané a pri dospelých ívaní neboli socializované dospelí prerušenie spánku je proces ktorý spočíva v zámernom prebude dní sa počas zvyčajnej doby spánku a následnom zaspaní krátko na a to 10 až 60 minút teórie sa zameria diavajú na to čo v ľuďoch motivuje tú užbu robiť v určitej veci a čo v nich z prostredí ich núti určité ve"
+  },
+  "fleurs_sk|kinit|agree-1.0": {
+   "WER": 0.169,
+   "latency_median_s": 2.98,
+   "latency_p90_s": 4.7,
+   "max_wait_for_engine_s": 1.5,
+   "compute_RTF": 0.633,
+   "words": 273,
+   "text": "madagaskar je zďaleka za tým najväčším a je sám om o sebe kontinentom keď ide o divokú prírodu jedna z najbežnejších ich metód ktorá sa používa na ilustráciu do dôležitosti socializácie čerpá z niekoľkých nešťastných z prípadov detí ktoré boli zanedbávané nešťastné alebo úmyselne týrané a pri dospievaní neboli socializované nedospelými. prerušenie spánku je je proces ktorý spočíva v zámernom nou prebudení sa počas zvyčajnej doby spánku a následnom ho ho zaspaní krátko nato 10 až 60 minút teórie sa sa zameriavajú na to čo v ľuďoch motivuje túžbu robiť už určité veci a čo v nich sprostredí ich n"
+  },
+  "fleurs_sk|kinit|agree-0.5": {
+   "WER": 0.214,
+   "latency_median_s": 13.95,
+   "latency_p90_s": 20.82,
+   "max_wait_for_engine_s": 21.73,
+   "compute_RTF": 1.129,
+   "words": 278,
+   "text": "Madagaskar je zďaleka za tým najväčším a je sám o sebe je kontinentom keď ide o divokú prírodu jedna z z najbežnejších metód ktorá sa používa na ilustráciu do dôležitosti socializácie čerpá z niekoľkých ich nešťastných prípadov detí ktoré boli zanedbávané nešťastné alebo úmyselne týrané a pri pri dospievaní neboli isocializované nedospelými. prerušenie v spánku je proces ktorý spočíva v zámernom prebudení sa počas zo zvyčajnej doby spánku a následnom zaspaní krátko nato 10 až 60 minút teórie tie sa zameriavajú na to čo v ľudách motivuje túžbu robiť v určitej veci a čo v nich ich sprostredí ich"
+  },
+  "fleurs_sk|parakeet|whole": {
+   "WER": 0.198,
+   "latency_median_s": 100.26,
+   "latency_p90_s": 149.83,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.014,
+   "words": 232,
+   "text": "Madagaskar je zďeká tým najväčším a je sám o sebe kontinentom, keď ide o divokú prírodu. Jedna z najbežnejších metód, ktorá sa používa na ilustráciu dôležitosti socializácie čerpá z niekoľkých nešťastných prípadov detí, ktoré boli zanedbávané, nešťastné alebo úmyselne tírané a pri dospívaní neboli socializované dospelými. Preušenie spánku je proces, ktorý spočíva v zámernom prebudení sa počas zvyčajnej doby spánku a následnom zaspadní krátko na to 10 až 60 minút. Teórie sa zameriavajú na to, čo v ľudach motivuje tužbu robiť určité veci a čo v nich prostrední ich určité veci robiť alebo nerobiť"
+  },
+  "fleurs_sk|parakeet|pause": {
+   "WER": 0.226,
+   "latency_median_s": 2.74,
+   "latency_p90_s": 7.47,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.014,
+   "words": 221,
+   "text": "Madagaskar je zdaľeka tým najväčším a je sám o sebe kontinentom, keď ide o divokú prírodu. Jedna z najbežnejších metód, ktorá sa používa na ilustráciu dôležitosti socializácie, čerpá z niekoľkých nešťastných prípadov detí, ktoré boli zanedbávané, nešťastné alebo úmyselne týrané a pri dospievaní neboli socializované dospečných. Believe me. Prerušenie spánku je proces, ktorý spočíva v zámernom prebudení sa počas zvyčajnej doby spánku. a následnom zaspanie krátko nato 10 až 60 minút. Teórie sa zameriavajú na to, čo v ľudach motivuje túžbu robiť určité veci, a čo v nich sprostrední ich útí určité "
+  },
+  "fleurs_sk|parakeet|clause": {
+   "WER": 0.347,
+   "latency_median_s": 1.59,
+   "latency_p90_s": 3.47,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.019,
+   "words": 227,
+   "text": "Madagaskar je zďeka tým najväčším a je sám o sebe. se bekontinentom. Keď ide o divokú prírodu, Jedna z najbežnejších metód, ktorá sa používa na ilustráciu dôležitosť. Čerpa z niekoľkých nešťastných prípadov detí. ktoré boli zanedbávané, nešťastné alebo úmyselne týrané. a pri dospievaní neboli socializované dospelými. Prerušenie spánku je proces, ktorý spočíva v zámernom prebudení sa počas zvylovania. ze zvyčajnej doby spánku A následom zaspaní krátko na to. desať až šesťdesiat minut. Teórie sa zameriavajú na to, čo v ľudach motivuje túžbu robiť určité. a čo v nich sprostrední ich útí určité ve"
+  },
+  "fleurs_sk|parakeet|chunk-2.0": {
+   "WER": 0.46,
+   "latency_median_s": 0.76,
+   "latency_p90_s": 1.56,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.018,
+   "words": 234,
+   "text": "Madagascar. Kar je z ďaleka tým najväčší. A je sám o sebe kontinuč. Keď ide o divoko Prirodu. Jedna z najbežnejších. Metód, ktorá sa používa na ilustraci. Dôležitosti socializácie. Čerpa z niekoľkých nešťastných príšťov. Padov dětí, které byly zanedbávaní. Nešťastné alebo umělz. Myslelne tírané a pri dospiaché. Neboli socializované dospelých. Prerušenie spánku je proc. Který spočíva v zámernom prebudení. sa počas zvyčajnej doby spánku A následnom zaspaní krátko navíš. na to desať až šesťdesiat minút. Teorías as americanas. určité veci robiť alebo nerobiť. Nie je to však iba o experimentál. A e"
+  },
+  "fleurs_sk|parakeet|agree-1.0": {
+   "WER": 0.198,
+   "latency_median_s": 2.72,
+   "latency_p90_s": 5.54,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.09,
+   "words": 256,
+   "text": "Madagaskar je S ďaleka tým najväčším a je sám o sebe kontinentom, keď ide o divokú prírodu. Jedna z najbežnejších Metód, ktorá sa používa na Na ilustráciu V dôležitosti socializácie Čerpa z niekoľkých nešťastných prípadov detí, ktoré boli zanedbávané, nešťastné alebo úmyselne týrané a A pri dospievaní neboli Socializované Prerušenie spánku je proces, ktorý spočíva v zámernom prebudení sa počas zvyčajnej doby spánku a následnom zaspanie krátko na to 10 až 60 minút. Teórie sa zameriavajú na to, čo v ľuďoch Mativo je Tu užbu robiť určité veci a čo v nich sprostrední ich ich Učé veci robiť alebo n"
+  },
+  "fleurs_sk|parakeet|agree-0.5": {
+   "WER": 0.286,
+   "latency_median_s": 1.54,
+   "latency_p90_s": 3.95,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.16,
+   "words": 262,
+   "text": "Madagaskar Kar je tým najväčším a je sám Sám o sebe kontinentom. Keď ide o divokú Prirodu. Jedna z Z najbežnejších metód, Která sa používa na ilustráciu V dôležitosti socializácie Čerpa z niekoľkých nešťastných prípadov Dětí, které byly Zanedbávané, nešťastné alebo úmyselne týrané a pri dospievaní neboli socializované dospelými. Prerušenie Spánku je proces, ktorý ktorý spočíva v zámernom prebudení sa počas zvyčajnej doby Spánku a následnom za Zaspaní krátko na na to desať až šesťdesiat minút. Uh Teórie sa zameriavajú na to, čo v V Ľudah Motivuje túžbu robiť určité veci a čo v nich sprostrední "
+  },
+  "fleurs_de|turbo|whole": {
+   "WER": 0.035,
+   "latency_median_s": 127.18,
+   "latency_p90_s": 196.46,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.021,
+   "words": 345,
+   "text": "Für die besten Aussichten auf Hongkong sollten sie die Insel verlassen und zum gegenüberliegenden Ufer von Kowloon fahren. Er griff auch alles an, was ins Wasser kam. Selbst ein großer Dinosaurier wie der T -Rex war ihm nicht gewachsen. Wenn Sie den Film Das Vermächtnis der Tempelritter gesehen haben, denken Sie vielleicht, dass auf der Rückseite der Unabhängigkeitserklärung eine Schatzkarte gezeichnet wurde. Es leben noch viele Männer und Frauen, die ihre Zeit hier überlebt haben und viele weitere Mitangehörigen, die dort ermordet wurden oder sich zu Tode arbeiteten, Juden und Nichtjuden glei"
+  },
+  "fleurs_de|turbo|pause": {
+   "WER": 0.089,
+   "latency_median_s": 3.01,
+   "latency_p90_s": 6.99,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.067,
+   "words": 360,
+   "text": "Für die besten Aussichten auf Hongkong. sollten sie die Insel verlassen und zum gegenüberliegenden Ufer von Kowloon fahren. ergriff auch alles an was ins Wasser kam Selbst ein großer Dinosaurier wie der T -Rex war ihm nicht gewachsen. Wenn Sie den Film Das Vermächtnis der Tempelritter gesehen haben, Denken Sie vielleicht, dass auf der Rückseite der Unabhängigkeitserklärung eine Schatzkarte gezeichnet wurde. Es leben noch viele Männer und Frauen, die ihre Zeit hier überlebt haben und viele weitere Mitangehörigen, die dort ermordet wurden oder sich zu Tode arbeiteten, Juden und Nichtjuden gleich"
+  },
+  "fleurs_de|turbo|clause": {
+   "WER": 0.121,
+   "latency_median_s": 1.91,
+   "latency_p90_s": 3.77,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.097,
+   "words": 370,
+   "text": "Für die besten Aussichten auf Hongkong. sollten sie die Insel verlassen und zum gegenüberliegenden Urlaub. Ufer. von Kovlun fahren ergriff auch alles an was ins Wasser kam Selbst ein großer Dinosaurier wie der T -Rex war ihm nicht gewachsen. Wenn Sie den Film das Vermächtnis der Tempel Tempelritter gesehen haben. Denken Sie vielleicht, dass auf der Rückseite der Unabhängigkeitserklärung eine Schrift Schatzkarte gezeichnet wurde. Es leben noch viele Männer und Frauen, die ihre Zeit hier überlebt haben und viele weitere mit... Angehörigen, die dort ermordet wurden. oder sich zu Tode arbeiteten J"
+  },
+  "fleurs_de|turbo|chunk-2.0": {
+   "WER": 0.334,
+   "latency_median_s": 1.16,
+   "latency_p90_s": 2.04,
+   "max_wait_for_engine_s": 0.26,
+   "compute_RTF": 0.166,
+   "words": 414,
+   "text": "Und jetzt kommt die Karte. für die besten Aussichten Auf Hongkong sollten Sie die... verlassen und zum gegen überliegenden Ufer. von Kowloon fahren. Vielen Dank. Vielen Dank. Untertitelung des ZDF, 2020 Er griff auch alles an, was ins Wasser kam. ein großer Dinosaurier wie der T -Rex. Es war ihm nicht gewachsen. Vielen Dank. Wen Sie den Film Das Vermächtnis der Temp... Tempelritter gesehen haben. Denken Sie vielleicht, dass auf der Rückseite der Unabhängigkeitserklärung eine Schatzkarte gezeichnet wurde. Es leben noch viele Menschen. Männer und Frauen, die ihre Zeit hier überleben. haben und v"
+  },
+  "fleurs_de|turbo|agree-1.0": {
+   "WER": 0.104,
+   "latency_median_s": 2.36,
+   "latency_p90_s": 3.26,
+   "max_wait_for_engine_s": 0.26,
+   "compute_RTF": 0.34,
+   "words": 359,
+   "text": "Für die besten Aussichten auf Hongkong, sollten sie die Insel verlassen und zum gegenüberliegenden Ufer von Kowlun fahren. Amen. Er griff auch alles an, was ins Wasser kam. Selbst ein großer Dinosaurier wie der T -Rex war ihm nicht gewachsen. Das war's. Wählen Sie den Film Das Vermächtnis der Tempelritter gesehen haben. Denken Sie vielleicht, dass auf der Rückseite der Unabhängigkeitserklärung einer Schatzkarte gezeichnet wurde. Es leben noch viele Männer und Frauen, die ihre Zeit hier überlebt haben und viele weitere mit Angehörigen, die dort ermordet wurden oder sich zu Tode arbeiteten Juden"
+  },
+  "fleurs_de|turbo|agree-0.5": {
+   "WER": 0.262,
+   "latency_median_s": 1.34,
+   "latency_p90_s": 2.13,
+   "max_wait_for_engine_s": 0.26,
+   "compute_RTF": 0.657,
+   "words": 403,
+   "text": "für die besten Aussichten auf Hongkong. sollten Sie die Insel verlassen und zum gegenüberliegenden Ufer. von Kowloon fahren. Amen. Amen. Vielen Dank. Vielen Dank. Vielen Dank. Er griff auch alles an, was ins Wasser kam. Selbst ein großer Dinosaurier wieder T -Rex war ihm nicht gewachsen. Musik Vielen Dank. Sehen Sie den Film Das Vermächtnis der Tempelritter gesehen haben. Denken Sie vielleicht das auf der Rückseite der Unabhängigkeitserklärung eine Schatzkarte die Zeichnet wurde. Es leben noch viele Männer und Frauen, die ihre Zeit, die überlebt haben und viele weitere mit Angehörigen, die dor"
+  },
+  "fleurs_de|parakeet|whole": {
+   "WER": 0.037,
+   "latency_median_s": 124.92,
+   "latency_p90_s": 195.02,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.015,
+   "words": 345,
+   "text": "Für die besten Aussichten auf Hongkong sollten sie die Insel verlassen und zum gegenüberliegenden Ufer von Kowloon fahren. Er griff auch alles an, was ins Wasser kam. Selbst ein großer Dinosaurier wie der T-Rex war ihm nicht gewachsen. Wenn Sie den Film Das Vermächtnis der Tempelritter gesehen haben, denken Sie vielleicht, dass auf der Rückseite der Unabhängigkeitserklärung eine Schatzkarte gezeichnet wurde. Es leben noch viele Männer und Frauen, die ihre Zeit hier überlebt haben und viele weitere mit Angehörigen, die dort ermordet wurden oder sich zu Tode arbeiteten, Juden und Nichtjuden glei"
+  },
+  "fleurs_de|parakeet|pause": {
+   "WER": 0.072,
+   "latency_median_s": 2.83,
+   "latency_p90_s": 6.69,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.019,
+   "words": 349,
+   "text": "Für die besten Aussichten auf Hong Kong. sollten sie die Insel verlassen und zum gegenüberliegenden Ufer Fon Kovloon Faren. Er griff auch alles an, was ins Wasser kam. Selbst ein großer Dinosaurier wie der T Rex war ihm nicht gewachsen. Wenn Sie den Film Das Vermächtnis der Tempelritter gesehen haben. Denken Sie vielleicht, dass auf der Rückseite der Unabhängigkeitserklärung eine Schatzkarte gezeichnet wurde. Es leben noch viele Männer und Frauen, die ihre Zeit hier überlebt haben und viele weitere mit Angehörigen, die dort ermordet wurden oder sich zu Tode arbeiteten Juden und Nichtjuden glei"
+  },
+  "fleurs_de|parakeet|clause": {
+   "WER": 0.13,
+   "latency_median_s": 1.82,
+   "latency_p90_s": 3.56,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.026,
+   "words": 358,
+   "text": "Für die besten Aussichten auf Hong Kong. sollten sie die Insel verlassen und zum gegenüberliegenden Ufa. Fun Kovloon. Farin. Er griff auch alles an, was ins Wasser kam. Selbst ein großer Dinosaurier wie der T Rex war ihm nicht gewachsen. Wählen Sie den Film Das Vermächtnis der Tent. Temperature gesehen haben. Denken Sie vielleicht, dass auf der Rückseite der Unabhängigkeitserklärung eine Schadung ist. Schatzkarte gezeichnet wurde. Es leben noch viele Männer und Frauen, die ihre Zeit hier überlebt haben, und viele weitere mit. mit Angehörigen, die dort ermordet wurden. oder sich zu Tode arbeite"
+  },
+  "fleurs_de|parakeet|chunk-2.0": {
+   "WER": 0.34,
+   "latency_median_s": 0.92,
+   "latency_p90_s": 1.64,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.018,
+   "words": 337,
+   "text": "Für die besten Aussichten. Of Hong Kong. Insel verlassen. überliegenden Ufer Fonkovun Farin. Er griff auch alles an. was ins Wasser kam. Ein großer Dinosaurier wie der T Rex. Es war ihm nicht gewachsen. Wen Sie? Din film Das Vermächtnis der Temp. Betretter gesehen haben. Denken Sie vielleicht das auf der Rückseite. der Unabhängigkeitserklärung Schatzkarte gezeichnet wurde. Es leben noch vier. Viele Männer und Frauen, die ihre Zeit hier. die dort ermordet wurden oder sich zu tun. Tode arbeiteten Juden und Nichts. gleichermaßen. Die Höhle befindet sich. Findet sich auf der Spitze eines der Berge"
+  },
+  "fleurs_de|parakeet|agree-1.0": {
+   "WER": 0.138,
+   "latency_median_s": 2.26,
+   "latency_p90_s": 3.87,
+   "max_wait_for_engine_s": 0.03,
+   "compute_RTF": 0.095,
+   "words": 372,
+   "text": "Für die Die besten Aussichten auf Hongkong sollten sie die Insel verlassen und zum gegenüberliegenden Ufer von Kovloon Fahren. Er griff auch alles an, was ins Ins Wasser kam. Selbst ein großer Dinosaurier wie der T-Rex War ihm nicht gewachsen. Wenn sie den Film Das Das Vermächtnis der Tempelritter gesehen Denken Sie vielleicht, Ich dass auf der Rückseite der Unabhängigkeitserklärung eine Schatzkarte Es leben noch Es gibt noch viele Männer und Frauen, die ihre Zeit hier überlebt haben, und viele Weitere mit Angehörigen, die dort ermordet wurden Oder sich zu Tode arbeiteten, Juden und Nicht Jude"
+  },
+  "fleurs_de|parakeet|agree-0.5": {
+   "WER": 0.207,
+   "latency_median_s": 1.41,
+   "latency_p90_s": 2.63,
+   "max_wait_for_engine_s": 0.02,
+   "compute_RTF": 0.157,
+   "words": 386,
+   "text": "Für die Die besten Aussichten Of Hong Kong Sollten sie die Insel verlassen und zum zum gegenüberliegenden Ufer. Fun Kovloon fahren. Er griff auch alles Alles an, was ins Wasser kam. Selbst ein großer Grosser Dinosaurier wie der T-Rex war ihm nicht gewachsen. Wenn Sie den Film Das Das Vermächtnis der Tempelritter gesehen haben, Denken Sie vielleicht, Dass auf der Rückseite der Unabhängigkeitserklärung eine Eine Schatzkarte gezeichnet wurde. Es leben noch noch viele Männer und Frauen, die die ihre Zeit hier überlebt haben und viele weitere mit Angehörigen, Die dort ermordet wurden oder sich zu z"
+  },
+  "fleurs_en|turbo|whole": {
+   "WER": 0.085,
+   "latency_median_s": 62.27,
+   "latency_p90_s": 120.88,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.021,
+   "words": 314,
+   "text": "However, due to the slow communication channels, styles in the West could lag behind by 25 -30 years. All nouns alongside the world say for you always begin with a capital letter, even in the middle of a sentence. To the north and within easy reach is the romantic and fascinating town of Sintra and which was made famous. to foreigners after a glowing account of its splendor is recorded by Lord Byron. The cabbage juice changes color depending on how acidic, basic, alkaline the chemical is. Many people don't think about them as dinosaurs because they have feathers and control. The hospital has f"
+  },
+  "fleurs_en|turbo|pause": {
+   "WER": 0.753,
+   "latency_median_s": 2.95,
+   "latency_p90_s": 7.42,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.035,
+   "words": 87,
+   "text": "However, due to the slow communication Miles in the... 30 years. All nouns alongside the words say for you always begin with a capital letter, even in the middle of a sentence. The hospital has followed protocol for infection control, including separating the patient from others to prevent possible infection. of others. the northern Mariana's The aspect ratio of this format dividing by 12 to obtain the simplest whole number ratio. is therefore said to be free to two. the night The city is also... climb that"
+  },
+  "fleurs_en|turbo|clause": {
+   "WER": 0.772,
+   "latency_median_s": 1.91,
+   "latency_p90_s": 3.6,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.042,
+   "words": 85,
+   "text": "However, due to the slow communication 30 years. All nouns alongside the world say for you always be begin with a capital letter even in the middle of a sentence. you The hospital has filed protocol for infection control. including separating the patient from others to prevent possible possible infection. of others. the northern Mariana's The aspect ratio of this format dividing by 12 to obtain the simplest whole number ratio. is therefore said to be free to two. the night The city is also..."
+  },
+  "fleurs_en|turbo|chunk-2.0": {
+   "WER": 0.155,
+   "latency_median_s": 1.15,
+   "latency_p90_s": 1.95,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.166,
+   "words": 326,
+   "text": "However... due to the slow communication channels. Styles in the West could... lag behind by 25. to 30 years. All now. alongside the world say for you always begin with a of the letter even in the middle of sentence. To the north and within easy reach is a romantic and fascinating town. of Cintra and which was made famous to foreigners after a glowing account of the splendors recorded by Lord Byron. The cabbage juice changes color depending on the color. on how acidic, basic, alkaline... the chemical is. Many people don't think about them as dinosaurs. because they have feathers and can fly. T"
+  },
+  "fleurs_en|turbo|agree-1.0": {
+   "WER": 0.101,
+   "latency_median_s": 2.37,
+   "latency_p90_s": 3.16,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.334,
+   "words": 320,
+   "text": "However, due to the slow communication channels Styles in the West could lag behind by 25 to 30 years. All nouns alongside the world say for you always begin with a capital letter, even in the middle of sentence To the north and within easy reach is a romantic and fascinating town of and which was made famous to foreigners after a glowing account of the Splendorous recorded by Lord Byron. The cabbage juice changes color depending on how acidic, basic, alkaline the chemical is. Many people don't think about them as dinosaurs because they have feathers and can fly. The The hospital has followed "
+  },
+  "fleurs_en|turbo|agree-0.5": {
+   "WER": 0.136,
+   "latency_median_s": 1.35,
+   "latency_p90_s": 1.92,
+   "max_wait_for_engine_s": 0.64,
+   "compute_RTF": 0.658,
+   "words": 320,
+   "text": ". However, due to the slow communication channels styles in the West could lag behind by 25 to 30 years. Here we go. All nouns alongside the world say for you always begin with a capital letter, even in the middle of sentence Thanks. To the north and within easy reach is a romantic and fascinating town of Sintra and which was made famous to foreigners after a glowing account of The Splendorous recorded by Lord Byron. the Cabbage juice changes color depending on how basic alkaline the chemical is. Many people don't about them as dinosaurs because they have feathers and can fly. The The hospital"
+  },
+  "fleurs_en|parakeet|whole": {
+   "WER": 0.671,
+   "latency_median_s": 98.11,
+   "latency_p90_s": 130.67,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.012,
+   "words": 109,
+   "text": "However, due to the slow communication channels, styles in the West could lag behind by 25 to 30 years. All nouns alongside the world say for you always begin with a capital letter, even in the middle of a sentence. The cabbage juice changes color depending on how acidic, basic alkaline the chemical is. Many people don't think about them as dinosaurs because they have feathers and can fly. Twentieth century research has shown that there are two pools of genetic variation hidden and expressed the aspect ratio of this format, dividing by 12 to obtain the simplest whole number ratio, is therefore"
+  },
+  "fleurs_en|parakeet|pause": {
+   "WER": 0.759,
+   "latency_median_s": 2.75,
+   "latency_p90_s": 7.23,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.008,
+   "words": 85,
+   "text": "However, Due to the slow communication Thirty years. All nouns alongside the word say for you always begin with a capital letter even in the middle of a sentence. The hospital has followed protocol for infection control, including separating the patient from others to prevent possible infection of others. The northern Mariana's The aspect ratio of this format, dividing by twelve to obtain the simplest whole number ratio, is therefore said to be free to two. Is a knife? The city is also Climb that"
+  },
+  "fleurs_en|parakeet|clause": {
+   "WER": 0.772,
+   "latency_median_s": 1.55,
+   "latency_p90_s": 3.44,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.009,
+   "words": 85,
+   "text": "However, Due to the slow communication Thirty years. All nouns alongside the world say for you always be begin with a capital letter even in the middle of a sentence. Yeah. The hospital has followed protocol for infection control. Including separating the patient from others to prevent possible Yeah. of others. The northern Mariana's The aspect ratio of this format Dividing by twelve to obtain the simplest whole number ratio. is therefore said to be free to two. Is a knife? The city is also"
+  },
+  "fleurs_en|parakeet|chunk-2.0": {
+   "WER": 0.57,
+   "latency_median_s": 0.84,
+   "latency_p90_s": 1.64,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.018,
+   "words": 193,
+   "text": "However, I think that's a good thing. Due to the slow communication channels. Styles in the West could be a little bit more than a little bit. Lag behind by twenty five. All now. To the north and within easy reach. Lord Byron. The cabbage juice changes color depending on the case. Many people don't think about them as dinosaurs. Because they have feathers and can fly. The highest. Possible has followed protocol for infection. To prevent possible infection. of others. The northern No damages reported in the nation. Twenty four. genetic variation hidden and expressed. The aspect ratio of this fo"
+  },
+  "fleurs_en|parakeet|agree-1.0": {
+   "WER": 0.133,
+   "latency_median_s": 3.05,
+   "latency_p90_s": 6.44,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.093,
+   "words": 330,
+   "text": "However, Due to the slow communication channels, styles in the West could could lag behind by twenty five All All nouns alongside the world say for you always Begin with a capital letter, even in the middle of The sentence. To the north and within easy reach is the romantic and fascinating town of Sintra, and which was made famous to foreigners after After a glowing account of its It's splinterus recorded by Lord Byron. The cabbage juice changes color depending on how acidic, basic, alkaline the Chemical is many people don't think about them as dinosaurs Because they have feathers and can fly."
+  },
+  "fleurs_en|parakeet|agree-0.5": {
+   "WER": 0.206,
+   "latency_median_s": 2.14,
+   "latency_p90_s": 4.67,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.17,
+   "words": 320,
+   "text": "However, Due to the slow communication channels, Styles in the West could Could lag behind All nouns Sounds alongside the world say for you always begin with a capital letter To the north and within easy reach is the romantic And fascinating town of Sintra, and which was made famous to foreigners after a glowing account Account of its splendors recorded by Lord Byron. The The cabbage juice changes color Its color depending on how acidic, basic alkaline the chemical is. Many people don't think about them as dinosaurs because they have feathers and can fly. The The hospital has followed Protocol"
+  }
+ },
+ "log": [
+  {
+   "t": 375.6,
+   "m": "pip",
+   "rc": 0
+  },
+  {
+   "t": 415.1,
+   "m": "streams",
+   "cs_continuous": 46.5,
+   "cs_long": 49.0,
+   "cs_paced": 52.1,
+   "de_continuous": 32.1,
+   "de_long": 39.8,
+   "de_paced": 36.9,
+   "en_continuous": 38.9,
+   "en_long": 42.2,
+   "en_paced": 44.5,
+   "sk_continuous": 31.3,
+   "sk_long": 36.2,
+   "sk_paced": 36.3,
+   "fleurs_sk": 161.2,
+   "fleurs_de": 218.1,
+   "fleurs_en": 134.9
+  },
+  {
+   "t": 485.0,
+   "m": "convert_kinit",
+   "rc": 0,
+   "tail": "ing weights:  68%|██████▊   | 398/587 [00:00<00:00, 886.73it/s]\nLoading weights:  83%|████████▎ | 487/587 [00:00<00:00, 873.17it/s]\nLoading weights: 100%|██████████| 587/587 [00:00<00:00, 915.02it/s]\n"
+  },
+  {
+   "t": 514.2,
+   "m": "engines",
+   "names": [
+    "turbo",
+    "kinit",
+    "parakeet"
+   ]
+  },
+  {
+   "t": 515.3,
+   "m": "cell",
+   "cell": "cs_continuous|turbo|whole",
+   "WER": 0.063,
+   "latency_median_s": 25.63,
+   "latency_p90_s": 43.46,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.024,
+   "words": 79
+  },
+  {
+   "t": 517.8,
+   "m": "cell",
+   "cell": "cs_continuous|turbo|pause",
+   "WER": 0.089,
+   "latency_median_s": 3.71,
+   "latency_p90_s": 11.19,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.053,
+   "words": 81
+  },
+  {
+   "t": 522.5,
+   "m": "cell",
+   "cell": "cs_continuous|turbo|clause",
+   "WER": 0.215,
+   "latency_median_s": 2.01,
+   "latency_p90_s": 3.83,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.102,
+   "words": 91
+  },
+  {
+   "t": 530.4,
+   "m": "cell",
+   "cell": "cs_continuous|turbo|chunk-2.0",
+   "WER": 0.696,
+   "latency_median_s": 1.07,
+   "latency_p90_s": 1.8,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.17,
+   "words": 116
+  },
+  {
+   "t": 545.6,
+   "m": "cell",
+   "cell": "cs_continuous|turbo|agree-1.0",
+   "WER": 0.063,
+   "latency_median_s": 2.26,
+   "latency_p90_s": 3.09,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.325,
+   "words": 80
+  },
+  {
+   "t": 575.5,
+   "m": "cell",
+   "cell": "cs_continuous|turbo|agree-0.5",
+   "WER": 0.114,
+   "latency_median_s": 1.28,
+   "latency_p90_s": 1.69,
+   "max_wait_for_engine_s": 0.59,
+   "compute_RTF": 0.643,
+   "words": 78
+  },
+  {
+   "t": 576.5,
+   "m": "cell",
+   "cell": "cs_long|turbo|whole",
+   "WER": 0.083,
+   "latency_median_s": 26.02,
+   "latency_p90_s": 45.54,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.022,
+   "words": 70
+  },
+  {
+   "t": 581.4,
+   "m": "cell",
+   "cell": "cs_long|turbo|pause",
+   "WER": 0.083,
+   "latency_median_s": 2.17,
+   "latency_p90_s": 6.01,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.099,
+   "words": 72
+  },
+  {
+   "t": 587.2,
+   "m": "cell",
+   "cell": "cs_long|turbo|clause",
+   "WER": 0.139,
+   "latency_median_s": 1.63,
+   "latency_p90_s": 3.19,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.118,
+   "words": 73
+  },
+  {
+   "t": 595.2,
+   "m": "cell",
+   "cell": "cs_long|turbo|chunk-2.0",
+   "WER": 0.333,
+   "latency_median_s": 0.78,
+   "latency_p90_s": 1.77,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.164,
+   "words": 78
+  },
+  {
+   "t": 612.4,
+   "m": "cell",
+   "cell": "cs_long|turbo|agree-1.0",
+   "WER": 0.181,
+   "latency_median_s": 2.46,
+   "latency_p90_s": 3.9,
+   "max_wait_for_engine_s": 0.33,
+   "compute_RTF": 0.351,
+   "words": 71
+  },
+  {
+   "t": 645.9,
+   "m": "cell",
+   "cell": "cs_long|turbo|agree-0.5",
+   "WER": 0.208,
+   "latency_median_s": 1.33,
+   "latency_p90_s": 2.19,
+   "max_wait_for_engine_s": 0.31,
+   "compute_RTF": 0.682,
+   "words": 75
+  },
+  {
+   "t": 647.2,
+   "m": "cell",
+   "cell": "cs_paced|turbo|whole",
+   "WER": 0.076,
+   "latency_median_s": 29.3,
+   "latency_p90_s": 49.14,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.024,
+   "words": 79
+  },
+  {
+   "t": 650.3,
+   "m": "cell",
+   "cell": "cs_paced|turbo|pause",
+   "WER": 0.089,
+   "latency_median_s": 3.54,
+   "latency_p90_s": 5.85,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.06,
+   "words": 78
+  },
+  {
+   "t": 656.4,
+   "m": "cell",
+   "cell": "cs_paced|turbo|clause",
+   "WER": 0.19,
+   "latency_median_s": 1.79,
+   "latency_p90_s": 3.76,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.116,
+   "words": 86
+  },
+  {
+   "t": 665.5,
+   "m": "cell",
+   "cell": "cs_paced|turbo|chunk-2.0",
+   "WER": 0.278,
+   "latency_median_s": 1.06,
+   "latency_p90_s": 1.9,
+   "max_wait_for_engine_s": 0.26,
+   "compute_RTF": 0.176,
+   "words": 83
+  },
+  {
+   "t": 685.0,
+   "m": "cell",
+   "cell": "cs_paced|turbo|agree-1.0",
+   "WER": 0.127,
+   "latency_median_s": 2.19,
+   "latency_p90_s": 3.17,
+   "max_wait_for_engine_s": 0.26,
+   "compute_RTF": 0.373,
+   "words": 79
+  },
+  {
+   "t": 721.2,
+   "m": "cell",
+   "cell": "cs_paced|turbo|agree-0.5",
+   "WER": 0.177,
+   "latency_median_s": 1.16,
+   "latency_p90_s": 1.79,
+   "max_wait_for_engine_s": 0.67,
+   "compute_RTF": 0.696,
+   "words": 82
+  },
+  {
+   "t": 722.2,
+   "m": "cell",
+   "cell": "de_continuous|turbo|whole",
+   "WER": 0.021,
+   "latency_median_s": 17.01,
+   "latency_p90_s": 29.05,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.032,
+   "words": 93
+  },
+  {
+   "t": 724.2,
+   "m": "cell",
+   "cell": "de_continuous|turbo|pause",
+   "WER": 0.021,
+   "latency_median_s": 3.62,
+   "latency_p90_s": 12.86,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.06,
+   "words": 93
+  },
+  {
+   "t": 727.4,
+   "m": "cell",
+   "cell": "de_continuous|turbo|clause",
+   "WER": 0.032,
+   "latency_median_s": 2.48,
+   "latency_p90_s": 3.96,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.099,
+   "words": 95
+  },
+  {
+   "t": 733.1,
+   "m": "cell",
+   "cell": "de_continuous|turbo|chunk-2.0",
+   "WER": 0.138,
+   "latency_median_s": 1.2,
+   "latency_p90_s": 2.05,
+   "max_wait_for_engine_s": 0.2,
+   "compute_RTF": 0.179,
+   "words": 102
+  },
+  {
+   "t": 744.8,
+   "m": "cell",
+   "cell": "de_continuous|turbo|agree-1.0",
+   "WER": 0.032,
+   "latency_median_s": 2.24,
+   "latency_p90_s": 3.09,
+   "max_wait_for_engine_s": 0.21,
+   "compute_RTF": 0.364,
+   "words": 91
+  },
+  {
+   "t": 766.3,
+   "m": "cell",
+   "cell": "de_continuous|turbo|agree-0.5",
+   "WER": 0.064,
+   "latency_median_s": 1.24,
+   "latency_p90_s": 1.69,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.667,
+   "words": 95
+  },
+  {
+   "t": 766.7,
+   "m": "cell",
+   "cell": "de_continuous|parakeet|whole",
+   "WER": 0.032,
+   "latency_median_s": 16.46,
+   "latency_p90_s": 28.17,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.013,
+   "words": 93
+  },
+  {
+   "t": 767.3,
+   "m": "cell",
+   "cell": "de_continuous|parakeet|pause",
+   "WER": 0.032,
+   "latency_median_s": 3.45,
+   "latency_p90_s": 12.63,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.018,
+   "words": 92
+  },
+  {
+   "t": 768.1,
+   "m": "cell",
+   "cell": "de_continuous|parakeet|clause",
+   "WER": 0.043,
+   "latency_median_s": 2.27,
+   "latency_p90_s": 3.75,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.024,
+   "words": 93
+  },
+  {
+   "t": 768.8,
+   "m": "cell",
+   "cell": "de_continuous|parakeet|chunk-2.0",
+   "WER": 0.096,
+   "latency_median_s": 1.0,
+   "latency_p90_s": 1.64,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.022,
+   "words": 98
+  },
+  {
+   "t": 771.8,
+   "m": "cell",
+   "cell": "de_continuous|parakeet|agree-1.0",
+   "WER": 0.106,
+   "latency_median_s": 2.01,
+   "latency_p90_s": 3.05,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.093,
+   "words": 90
+  },
+  {
+   "t": 776.9,
+   "m": "cell",
+   "cell": "de_continuous|parakeet|agree-0.5",
+   "WER": 0.223,
+   "latency_median_s": 1.26,
+   "latency_p90_s": 2.03,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.159,
+   "words": 96
+  },
+  {
+   "t": 777.9,
+   "m": "cell",
+   "cell": "de_long|turbo|whole",
+   "WER": 0.047,
+   "latency_median_s": 20.69,
+   "latency_p90_s": 37.14,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.025,
+   "words": 85
+  },
+  {
+   "t": 782.9,
+   "m": "cell",
+   "cell": "de_long|turbo|pause",
+   "WER": 0.071,
+   "latency_median_s": 1.83,
+   "latency_p90_s": 5.15,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.125,
+   "words": 85
+  },
+  {
+   "t": 788.8,
+   "m": "cell",
+   "cell": "de_long|turbo|clause",
+   "WER": 0.118,
+   "latency_median_s": 1.53,
+   "latency_p90_s": 3.58,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.15,
+   "words": 89
+  },
+  {
+   "t": 795.5,
+   "m": "cell",
+   "cell": "de_long|turbo|chunk-2.0",
+   "WER": 0.2,
+   "latency_median_s": 1.31,
+   "latency_p90_s": 2.08,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.167,
+   "words": 84
+  },
+  {
+   "t": 809.5,
+   "m": "cell",
+   "cell": "de_long|turbo|agree-1.0",
+   "WER": 0.094,
+   "latency_median_s": 2.2,
+   "latency_p90_s": 3.02,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.352,
+   "words": 84
+  },
+  {
+   "t": 836.0,
+   "m": "cell",
+   "cell": "de_long|turbo|agree-0.5",
+   "WER": 0.141,
+   "latency_median_s": 1.21,
+   "latency_p90_s": 1.78,
+   "max_wait_for_engine_s": 0.05,
+   "compute_RTF": 0.667,
+   "words": 87
+  },
+  {
+   "t": 836.5,
+   "m": "cell",
+   "cell": "de_long|parakeet|whole",
+   "WER": 0.129,
+   "latency_median_s": 20.14,
+   "latency_p90_s": 36.2,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.011,
+   "words": 85
+  },
+  {
+   "t": 837.9,
+   "m": "cell",
+   "cell": "de_long|parakeet|pause",
+   "WER": 0.188,
+   "latency_median_s": 1.65,
+   "latency_p90_s": 4.84,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.036,
+   "words": 87
+  },
+  {
+   "t": 839.6,
+   "m": "cell",
+   "cell": "de_long|parakeet|clause",
+   "WER": 0.165,
+   "latency_median_s": 1.36,
+   "latency_p90_s": 3.34,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.042,
+   "words": 91
+  },
+  {
+   "t": 840.4,
+   "m": "cell",
+   "cell": "de_long|parakeet|chunk-2.0",
+   "WER": 0.388,
+   "latency_median_s": 0.82,
+   "latency_p90_s": 1.64,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.021,
+   "words": 88
+  },
+  {
+   "t": 843.9,
+   "m": "cell",
+   "cell": "de_long|parakeet|agree-1.0",
+   "WER": 0.224,
+   "latency_median_s": 2.0,
+   "latency_p90_s": 2.99,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.086,
+   "words": 91
+  },
+  {
+   "t": 849.9,
+   "m": "cell",
+   "cell": "de_long|parakeet|agree-0.5",
+   "WER": 0.294,
+   "latency_median_s": 1.17,
+   "latency_p90_s": 1.8,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.152,
+   "words": 98
+  },
+  {
+   "t": 850.9,
+   "m": "cell",
+   "cell": "de_paced|turbo|whole",
+   "WER": 0.032,
+   "latency_median_s": 20.07,
+   "latency_p90_s": 33.86,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.028,
+   "words": 93
+  },
+  {
+   "t": 853.8,
+   "m": "cell",
+   "cell": "de_paced|turbo|pause",
+   "WER": 0.053,
+   "latency_median_s": 2.57,
+   "latency_p90_s": 4.01,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.076,
+   "words": 93
+  },
+  {
+   "t": 856.9,
+   "m": "cell",
+   "cell": "de_paced|turbo|clause",
+   "WER": 0.074,
+   "latency_median_s": 2.44,
+   "latency_p90_s": 3.83,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.086,
+   "words": 94
+  },
+  {
+   "t": 863.3,
+   "m": "cell",
+   "cell": "de_paced|turbo|chunk-2.0",
+   "WER": 0.16,
+   "latency_median_s": 1.27,
+   "latency_p90_s": 1.98,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.172,
+   "words": 95
+  },
+  {
+   "t": 876.5,
+   "m": "cell",
+   "cell": "de_paced|turbo|agree-1.0",
+   "WER": 0.043,
+   "latency_median_s": 2.22,
+   "latency_p90_s": 3.18,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.357,
+   "words": 93
+  },
+  {
+   "t": 902.2,
+   "m": "cell",
+   "cell": "de_paced|turbo|agree-0.5",
+   "WER": 0.16,
+   "latency_median_s": 1.32,
+   "latency_p90_s": 1.94,
+   "max_wait_for_engine_s": 0.64,
+   "compute_RTF": 0.698,
+   "words": 98
+  },
+  {
+   "t": 902.7,
+   "m": "cell",
+   "cell": "de_paced|parakeet|whole",
+   "WER": 0.032,
+   "latency_median_s": 19.5,
+   "latency_p90_s": 32.72,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.012,
+   "words": 93
+  },
+  {
+   "t": 903.4,
+   "m": "cell",
+   "cell": "de_paced|parakeet|pause",
+   "WER": 0.021,
+   "latency_median_s": 2.35,
+   "latency_p90_s": 3.81,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.021,
+   "words": 93
+  },
+  {
+   "t": 904.3,
+   "m": "cell",
+   "cell": "de_paced|parakeet|clause",
+   "WER": 0.043,
+   "latency_median_s": 2.21,
+   "latency_p90_s": 3.65,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.022,
+   "words": 94
+  },
+  {
+   "t": 905.0,
+   "m": "cell",
+   "cell": "de_paced|parakeet|chunk-2.0",
+   "WER": 0.149,
+   "latency_median_s": 1.04,
+   "latency_p90_s": 1.72,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.02,
+   "words": 86
+  },
+  {
+   "t": 908.2,
+   "m": "cell",
+   "cell": "de_paced|parakeet|agree-1.0",
+   "WER": 0.138,
+   "latency_median_s": 2.11,
+   "latency_p90_s": 4.94,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.087,
+   "words": 100
+  },
+  {
+   "t": 913.8,
+   "m": "cell",
+   "cell": "de_paced|parakeet|agree-0.5",
+   "WER": 0.181,
+   "latency_median_s": 1.19,
+   "latency_p90_s": 2.0,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.152,
+   "words": 104
+  },
+  {
+   "t": 914.8,
+   "m": "cell",
+   "cell": "en_continuous|turbo|whole",
+   "WER": 0.052,
+   "latency_median_s": 20.74,
+   "latency_p90_s": 35.18,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.024,
+   "words": 96
+  },
+  {
+   "t": 918.1,
+   "m": "cell",
+   "cell": "en_continuous|turbo|pause",
+   "WER": 0.052,
+   "latency_median_s": 2.66,
+   "latency_p90_s": 4.24,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.086,
+   "words": 96
+  },
+  {
+   "t": 922.2,
+   "m": "cell",
+   "cell": "en_continuous|turbo|clause",
+   "WER": 0.062,
+   "latency_median_s": 2.32,
+   "latency_p90_s": 3.87,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.103,
+   "words": 97
+  },
+  {
+   "t": 928.7,
+   "m": "cell",
+   "cell": "en_continuous|turbo|chunk-2.0",
+   "WER": 0.125,
+   "latency_median_s": 1.43,
+   "latency_p90_s": 1.98,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.169,
+   "words": 99
+  },
+  {
+   "t": 942.2,
+   "m": "cell",
+   "cell": "en_continuous|turbo|agree-1.0",
+   "WER": 0.083,
+   "latency_median_s": 2.35,
+   "latency_p90_s": 2.99,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.347,
+   "words": 98
+  },
+  {
+   "t": 968.0,
+   "m": "cell",
+   "cell": "en_continuous|turbo|agree-0.5",
+   "WER": 0.125,
+   "latency_median_s": 1.25,
+   "latency_p90_s": 1.66,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.664,
+   "words": 101
+  },
+  {
+   "t": 968.4,
+   "m": "cell",
+   "cell": "en_continuous|parakeet|whole",
+   "WER": 0.042,
+   "latency_median_s": 19.51,
+   "latency_p90_s": 34.45,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.011,
+   "words": 95
+  },
+  {
+   "t": 969.3,
+   "m": "cell",
+   "cell": "en_continuous|parakeet|pause",
+   "WER": 0.052,
+   "latency_median_s": 2.36,
+   "latency_p90_s": 4.06,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.022,
+   "words": 96
+  },
+  {
+   "t": 970.4,
+   "m": "cell",
+   "cell": "en_continuous|parakeet|clause",
+   "WER": 0.062,
+   "latency_median_s": 2.01,
+   "latency_p90_s": 3.64,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.028,
+   "words": 97
+  },
+  {
+   "t": 971.2,
+   "m": "cell",
+   "cell": "en_continuous|parakeet|chunk-2.0",
+   "WER": 0.323,
+   "latency_median_s": 1.03,
+   "latency_p90_s": 1.64,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.02,
+   "words": 90
+  },
+  {
+   "t": 974.7,
+   "m": "cell",
+   "cell": "en_continuous|parakeet|agree-1.0",
+   "WER": 0.094,
+   "latency_median_s": 2.77,
+   "latency_p90_s": 5.63,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.09,
+   "words": 92
+  },
+  {
+   "t": 981.3,
+   "m": "cell",
+   "cell": "en_continuous|parakeet|agree-0.5",
+   "WER": 0.188,
+   "latency_median_s": 2.15,
+   "latency_p90_s": 5.06,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.171,
+   "words": 109
+  },
+  {
+   "t": 982.3,
+   "m": "cell",
+   "cell": "en_long|turbo|whole",
+   "WER": 0.129,
+   "latency_median_s": 19.71,
+   "latency_p90_s": 38.6,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.023,
+   "words": 89
+  },
+  {
+   "t": 987.5,
+   "m": "cell",
+   "cell": "en_long|turbo|pause",
+   "WER": 0.129,
+   "latency_median_s": 2.02,
+   "latency_p90_s": 4.69,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.125,
+   "words": 88
+  },
+  {
+   "t": 993.5,
+   "m": "cell",
+   "cell": "en_long|turbo|clause",
+   "WER": 0.141,
+   "latency_median_s": 1.73,
+   "latency_p90_s": 3.29,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.14,
+   "words": 89
+  },
+  {
+   "t": 1000.7,
+   "m": "cell",
+   "cell": "en_long|turbo|chunk-2.0",
+   "WER": 0.294,
+   "latency_median_s": 1.1,
+   "latency_p90_s": 2.02,
+   "max_wait_for_engine_s": 0.15,
+   "compute_RTF": 0.172,
+   "words": 88
+  },
+  {
+   "t": 1015.6,
+   "m": "cell",
+   "cell": "en_long|turbo|agree-1.0",
+   "WER": 0.165,
+   "latency_median_s": 2.86,
+   "latency_p90_s": 4.6,
+   "max_wait_for_engine_s": 0.14,
+   "compute_RTF": 0.354,
+   "words": 87
+  },
+  {
+   "t": 1044.0,
+   "m": "cell",
+   "cell": "en_long|turbo|agree-0.5",
+   "WER": 0.153,
+   "latency_median_s": 1.3,
+   "latency_p90_s": 2.01,
+   "max_wait_for_engine_s": 0.14,
+   "compute_RTF": 0.673,
+   "words": 91
+  },
+  {
+   "t": 1044.5,
+   "m": "cell",
+   "cell": "en_long|parakeet|whole",
+   "WER": 0.235,
+   "latency_median_s": 18.72,
+   "latency_p90_s": 37.22,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.011,
+   "words": 93
+  },
+  {
+   "t": 1045.8,
+   "m": "cell",
+   "cell": "en_long|parakeet|pause",
+   "WER": 0.294,
+   "latency_median_s": 1.77,
+   "latency_p90_s": 4.47,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.03,
+   "words": 96
+  },
+  {
+   "t": 1047.2,
+   "m": "cell",
+   "cell": "en_long|parakeet|clause",
+   "WER": 0.294,
+   "latency_median_s": 1.51,
+   "latency_p90_s": 2.99,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.033,
+   "words": 96
+  },
+  {
+   "t": 1048.0,
+   "m": "cell",
+   "cell": "en_long|parakeet|chunk-2.0",
+   "WER": 0.541,
+   "latency_median_s": 0.91,
+   "latency_p90_s": 1.63,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.02,
+   "words": 80
+  },
+  {
+   "t": 1051.7,
+   "m": "cell",
+   "cell": "en_long|parakeet|agree-1.0",
+   "WER": 0.271,
+   "latency_median_s": 2.57,
+   "latency_p90_s": 4.32,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.087,
+   "words": 97
+  },
+  {
+   "t": 1058.3,
+   "m": "cell",
+   "cell": "en_long|parakeet|agree-0.5",
+   "WER": 0.447,
+   "latency_median_s": 1.31,
+   "latency_p90_s": 3.29,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.157,
+   "words": 104
+  },
+  {
+   "t": 1059.3,
+   "m": "cell",
+   "cell": "en_paced|turbo|whole",
+   "WER": 0.01,
+   "latency_median_s": 24.07,
+   "latency_p90_s": 41.41,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.021,
+   "words": 96
+  },
+  {
+   "t": 1063.3,
+   "m": "cell",
+   "cell": "en_paced|turbo|pause",
+   "WER": 0.042,
+   "latency_median_s": 2.23,
+   "latency_p90_s": 4.25,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.09,
+   "words": 96
+  },
+  {
+   "t": 1067.6,
+   "m": "cell",
+   "cell": "en_paced|turbo|clause",
+   "WER": 0.052,
+   "latency_median_s": 2.06,
+   "latency_p90_s": 4.0,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.098,
+   "words": 98
+  },
+  {
+   "t": 1075.2,
+   "m": "cell",
+   "cell": "en_paced|turbo|chunk-2.0",
+   "WER": 0.219,
+   "latency_median_s": 1.23,
+   "latency_p90_s": 2.02,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.171,
+   "words": 101
+  },
+  {
+   "t": 1090.9,
+   "m": "cell",
+   "cell": "en_paced|turbo|agree-1.0",
+   "WER": 0.073,
+   "latency_median_s": 2.72,
+   "latency_p90_s": 4.16,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.351,
+   "words": 99
+  },
+  {
+   "t": 1120.0,
+   "m": "cell",
+   "cell": "en_paced|turbo|agree-0.5",
+   "WER": 0.135,
+   "latency_median_s": 1.27,
+   "latency_p90_s": 1.65,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.654,
+   "words": 103
+  },
+  {
+   "t": 1120.4,
+   "m": "cell",
+   "cell": "en_paced|parakeet|whole",
+   "WER": 0.021,
+   "latency_median_s": 23.41,
+   "latency_p90_s": 40.37,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.011,
+   "words": 96
+  },
+  {
+   "t": 1121.4,
+   "m": "cell",
+   "cell": "en_paced|parakeet|pause",
+   "WER": 0.042,
+   "latency_median_s": 2.05,
+   "latency_p90_s": 4.06,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.022,
+   "words": 97
+  },
+  {
+   "t": 1122.5,
+   "m": "cell",
+   "cell": "en_paced|parakeet|clause",
+   "WER": 0.052,
+   "latency_median_s": 1.84,
+   "latency_p90_s": 3.82,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.023,
+   "words": 98
+  },
+  {
+   "t": 1123.3,
+   "m": "cell",
+   "cell": "en_paced|parakeet|chunk-2.0",
+   "WER": 0.323,
+   "latency_median_s": 0.99,
+   "latency_p90_s": 1.64,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.019,
+   "words": 96
+  },
+  {
+   "t": 1127.3,
+   "m": "cell",
+   "cell": "en_paced|parakeet|agree-1.0",
+   "WER": 0.188,
+   "latency_median_s": 2.29,
+   "latency_p90_s": 3.75,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.089,
+   "words": 91
+  },
+  {
+   "t": 1134.3,
+   "m": "cell",
+   "cell": "en_paced|parakeet|agree-0.5",
+   "WER": 0.271,
+   "latency_median_s": 1.36,
+   "latency_p90_s": 3.05,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.157,
+   "words": 119
+  },
+  {
+   "t": 1135.5,
+   "m": "cell",
+   "cell": "sk_continuous|turbo|whole",
+   "WER": 0.103,
+   "latency_median_s": 18.02,
+   "latency_p90_s": 29.63,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.039,
+   "words": 78
+  },
+  {
+   "t": 1137.3,
+   "m": "cell",
+   "cell": "sk_continuous|turbo|pause",
+   "WER": 0.167,
+   "latency_median_s": 5.28,
+   "latency_p90_s": 12.76,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.057,
+   "words": 77
+  },
+  {
+   "t": 1140.6,
+   "m": "cell",
+   "cell": "sk_continuous|turbo|clause",
+   "WER": 0.218,
+   "latency_median_s": 2.59,
+   "latency_p90_s": 3.75,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.107,
+   "words": 82
+  },
+  {
+   "t": 1146.2,
+   "m": "cell",
+   "cell": "sk_continuous|turbo|chunk-2.0",
+   "WER": 0.321,
+   "latency_median_s": 1.21,
+   "latency_p90_s": 1.97,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.179,
+   "words": 81
+  },
+  {
+   "t": 1159.0,
+   "m": "cell",
+   "cell": "sk_continuous|turbo|agree-1.0",
+   "WER": 0.192,
+   "latency_median_s": 3.01,
+   "latency_p90_s": 5.67,
+   "max_wait_for_engine_s": 0.14,
+   "compute_RTF": 0.407,
+   "words": 79
+  },
+  {
+   "t": 1181.7,
+   "m": "cell",
+   "cell": "sk_continuous|turbo|agree-0.5",
+   "WER": 0.359,
+   "latency_median_s": 1.77,
+   "latency_p90_s": 3.14,
+   "max_wait_for_engine_s": 0.08,
+   "compute_RTF": 0.727,
+   "words": 79
+  },
+  {
+   "t": 1183.2,
+   "m": "cell",
+   "cell": "sk_continuous|kinit|whole",
+   "WER": 0.0,
+   "latency_median_s": 18.26,
+   "latency_p90_s": 29.86,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.047,
+   "words": 78
+  },
+  {
+   "t": 1186.2,
+   "m": "cell",
+   "cell": "sk_continuous|kinit|pause",
+   "WER": 0.064,
+   "latency_median_s": 5.11,
+   "latency_p90_s": 12.95,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.096,
+   "words": 79
+  },
+  {
+   "t": 1192.2,
+   "m": "cell",
+   "cell": "sk_continuous|kinit|clause",
+   "WER": 0.077,
+   "latency_median_s": 2.77,
+   "latency_p90_s": 4.02,
+   "max_wait_for_engine_s": 0.28,
+   "compute_RTF": 0.194,
+   "words": 78
+  },
+  {
+   "t": 1202.6,
+   "m": "cell",
+   "cell": "sk_continuous|kinit|chunk-2.0",
+   "WER": 0.218,
+   "latency_median_s": 1.62,
+   "latency_p90_s": 2.39,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.333,
+   "words": 82
+  },
+  {
+   "t": 1224.5,
+   "m": "cell",
+   "cell": "sk_continuous|kinit|agree-1.0",
+   "WER": 0.167,
+   "latency_median_s": 2.78,
+   "latency_p90_s": 3.73,
+   "max_wait_for_engine_s": 0.43,
+   "compute_RTF": 0.7,
+   "words": 81
+  },
+  {
+   "t": 1266.7,
+   "m": "cell",
+   "cell": "sk_continuous|kinit|agree-0.5",
+   "WER": 0.218,
+   "latency_median_s": 6.35,
+   "latency_p90_s": 11.73,
+   "max_wait_for_engine_s": 10.14,
+   "compute_RTF": 1.349,
+   "words": 84
+  },
+  {
+   "t": 1267.1,
+   "m": "cell",
+   "cell": "sk_continuous|parakeet|whole",
+   "WER": 0.077,
+   "latency_median_s": 17.24,
+   "latency_p90_s": 28.78,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.013,
+   "words": 78
+  },
+  {
+   "t": 1267.6,
+   "m": "cell",
+   "cell": "sk_continuous|parakeet|pause",
+   "WER": 0.128,
+   "latency_median_s": 4.63,
+   "latency_p90_s": 12.43,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.016,
+   "words": 76
+  },
+  {
+   "t": 1268.5,
+   "m": "cell",
+   "cell": "sk_continuous|parakeet|clause",
+   "WER": 0.167,
+   "latency_median_s": 2.36,
+   "latency_p90_s": 3.59,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.027,
+   "words": 83
+  },
+  {
+   "t": 1269.2,
+   "m": "cell",
+   "cell": "sk_continuous|parakeet|chunk-2.0",
+   "WER": 0.282,
+   "latency_median_s": 0.99,
+   "latency_p90_s": 1.64,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.022,
+   "words": 80
+  },
+  {
+   "t": 1272.4,
+   "m": "cell",
+   "cell": "sk_continuous|parakeet|agree-1.0",
+   "WER": 0.103,
+   "latency_median_s": 3.22,
+   "latency_p90_s": 5.23,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.104,
+   "words": 78
+  },
+  {
+   "t": 1277.7,
+   "m": "cell",
+   "cell": "sk_continuous|parakeet|agree-0.5",
+   "WER": 0.321,
+   "latency_median_s": 1.53,
+   "latency_p90_s": 2.61,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.167,
+   "words": 82
+  },
+  {
+   "t": 1278.8,
+   "m": "cell",
+   "cell": "sk_long|turbo|whole",
+   "WER": 0.189,
+   "latency_median_s": 18.38,
+   "latency_p90_s": 34.16,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.03,
+   "words": 73
+  },
+  {
+   "t": 1283.9,
+   "m": "cell",
+   "cell": "sk_long|turbo|pause",
+   "WER": 0.257,
+   "latency_median_s": 1.79,
+   "latency_p90_s": 4.46,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.141,
+   "words": 72
+  },
+  {
+   "t": 1289.6,
+   "m": "cell",
+   "cell": "sk_long|turbo|clause",
+   "WER": 0.257,
+   "latency_median_s": 1.54,
+   "latency_p90_s": 3.46,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.159,
+   "words": 74
+  },
+  {
+   "t": 1296.1,
+   "m": "cell",
+   "cell": "sk_long|turbo|chunk-2.0",
+   "WER": 0.419,
+   "latency_median_s": 0.96,
+   "latency_p90_s": 1.75,
+   "max_wait_for_engine_s": 0.08,
+   "compute_RTF": 0.178,
+   "words": 72
+  },
+  {
+   "t": 1309.5,
+   "m": "cell",
+   "cell": "sk_long|turbo|agree-1.0",
+   "WER": 0.27,
+   "latency_median_s": 2.32,
+   "latency_p90_s": 4.54,
+   "max_wait_for_engine_s": 0.1,
+   "compute_RTF": 0.371,
+   "words": 70
+  },
+  {
+   "t": 1334.6,
+   "m": "cell",
+   "cell": "sk_long|turbo|agree-0.5",
+   "WER": 0.365,
+   "latency_median_s": 1.62,
+   "latency_p90_s": 3.1,
+   "max_wait_for_engine_s": 0.07,
+   "compute_RTF": 0.691,
+   "words": 76
+  },
+  {
+   "t": 1336.0,
+   "m": "cell",
+   "cell": "sk_long|kinit|whole",
+   "WER": 0.108,
+   "latency_median_s": 18.56,
+   "latency_p90_s": 34.24,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.038,
+   "words": 75
+  },
+  {
+   "t": 1345.6,
+   "m": "cell",
+   "cell": "sk_long|kinit|pause",
+   "WER": 0.189,
+   "latency_median_s": 2.11,
+   "latency_p90_s": 4.77,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.266,
+   "words": 72
+  },
+  {
+   "t": 1356.5,
+   "m": "cell",
+   "cell": "sk_long|kinit|clause",
+   "WER": 0.216,
+   "latency_median_s": 1.8,
+   "latency_p90_s": 3.75,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.3,
+   "words": 72
+  },
+  {
+   "t": 1369.0,
+   "m": "cell",
+   "cell": "sk_long|kinit|chunk-2.0",
+   "WER": 0.27,
+   "latency_median_s": 1.41,
+   "latency_p90_s": 2.35,
+   "max_wait_for_engine_s": 0.39,
+   "compute_RTF": 0.344,
+   "words": 76
+  },
+  {
+   "t": 1394.6,
+   "m": "cell",
+   "cell": "sk_long|kinit|agree-1.0",
+   "WER": 0.135,
+   "latency_median_s": 3.13,
+   "latency_p90_s": 4.61,
+   "max_wait_for_engine_s": 0.42,
+   "compute_RTF": 0.707,
+   "words": 78
+  },
+  {
+   "t": 1440.9,
+   "m": "cell",
+   "cell": "sk_long|kinit|agree-0.5",
+   "WER": 0.216,
+   "latency_median_s": 6.7,
+   "latency_p90_s": 11.6,
+   "max_wait_for_engine_s": 9.55,
+   "compute_RTF": 1.277,
+   "words": 78
+  },
+  {
+   "t": 1441.3,
+   "m": "cell",
+   "cell": "sk_long|parakeet|whole",
+   "WER": 0.297,
+   "latency_median_s": 17.87,
+   "latency_p90_s": 33.52,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.012,
+   "words": 67
+  },
+  {
+   "t": 1442.5,
+   "m": "cell",
+   "cell": "sk_long|parakeet|pause",
+   "WER": 0.297,
+   "latency_median_s": 1.54,
+   "latency_p90_s": 4.15,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.033,
+   "words": 73
+  },
+  {
+   "t": 1443.9,
+   "m": "cell",
+   "cell": "sk_long|parakeet|clause",
+   "WER": 0.392,
+   "latency_median_s": 1.28,
+   "latency_p90_s": 3.15,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.037,
+   "words": 75
+  },
+  {
+   "t": 1444.7,
+   "m": "cell",
+   "cell": "sk_long|parakeet|chunk-2.0",
+   "WER": 0.5,
+   "latency_median_s": 0.76,
+   "latency_p90_s": 1.48,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.021,
+   "words": 69
+  },
+  {
+   "t": 1448.3,
+   "m": "cell",
+   "cell": "sk_long|parakeet|agree-1.0",
+   "WER": 0.324,
+   "latency_median_s": 2.74,
+   "latency_p90_s": 5.15,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.1,
+   "words": 72
+  },
+  {
+   "t": 1454.5,
+   "m": "cell",
+   "cell": "sk_long|parakeet|agree-0.5",
+   "WER": 0.392,
+   "latency_median_s": 1.7,
+   "latency_p90_s": 3.63,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.172,
+   "words": 71
+  },
+  {
+   "t": 1455.7,
+   "m": "cell",
+   "cell": "sk_paced|turbo|whole",
+   "WER": 0.179,
+   "latency_median_s": 20.8,
+   "latency_p90_s": 34.62,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.033,
+   "words": 79
+  },
+  {
+   "t": 1458.8,
+   "m": "cell",
+   "cell": "sk_paced|turbo|pause",
+   "WER": 0.269,
+   "latency_median_s": 2.75,
+   "latency_p90_s": 4.04,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.083,
+   "words": 80
+  },
+  {
+   "t": 1461.8,
+   "m": "cell",
+   "cell": "sk_paced|turbo|clause",
+   "WER": 0.269,
+   "latency_median_s": 2.59,
+   "latency_p90_s": 3.77,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.084,
+   "words": 80
+  },
+  {
+   "t": 1468.4,
+   "m": "cell",
+   "cell": "sk_paced|turbo|chunk-2.0",
+   "WER": 0.667,
+   "latency_median_s": 1.15,
+   "latency_p90_s": 2.06,
+   "max_wait_for_engine_s": 0.06,
+   "compute_RTF": 0.182,
+   "words": 87
+  },
+  {
+   "t": 1482.7,
+   "m": "cell",
+   "cell": "sk_paced|turbo|agree-1.0",
+   "WER": 0.321,
+   "latency_median_s": 3.06,
+   "latency_p90_s": 5.01,
+   "max_wait_for_engine_s": 0.1,
+   "compute_RTF": 0.393,
+   "words": 82
+  },
+  {
+   "t": 1508.4,
+   "m": "cell",
+   "cell": "sk_paced|turbo|agree-0.5",
+   "WER": 0.449,
+   "latency_median_s": 1.68,
+   "latency_p90_s": 2.71,
+   "max_wait_for_engine_s": 0.05,
+   "compute_RTF": 0.707,
+   "words": 86
+  },
+  {
+   "t": 1509.8,
+   "m": "cell",
+   "cell": "sk_paced|kinit|whole",
+   "WER": 0.051,
+   "latency_median_s": 20.97,
+   "latency_p90_s": 34.9,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.04,
+   "words": 78
+  },
+  {
+   "t": 1515.3,
+   "m": "cell",
+   "cell": "sk_paced|kinit|pause",
+   "WER": 0.064,
+   "latency_median_s": 3.01,
+   "latency_p90_s": 4.31,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.149,
+   "words": 79
+  },
+  {
+   "t": 1520.7,
+   "m": "cell",
+   "cell": "sk_paced|kinit|clause",
+   "WER": 0.064,
+   "latency_median_s": 2.84,
+   "latency_p90_s": 4.06,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.15,
+   "words": 79
+  },
+  {
+   "t": 1532.7,
+   "m": "cell",
+   "cell": "sk_paced|kinit|chunk-2.0",
+   "WER": 0.282,
+   "latency_median_s": 1.6,
+   "latency_p90_s": 2.42,
+   "max_wait_for_engine_s": 0.37,
+   "compute_RTF": 0.331,
+   "words": 85
+  },
+  {
+   "t": 1557.7,
+   "m": "cell",
+   "cell": "sk_paced|kinit|agree-1.0",
+   "WER": 0.167,
+   "latency_median_s": 3.06,
+   "latency_p90_s": 5.45,
+   "max_wait_for_engine_s": 0.37,
+   "compute_RTF": 0.689,
+   "words": 77
+  },
+  {
+   "t": 1603.4,
+   "m": "cell",
+   "cell": "sk_paced|kinit|agree-0.5",
+   "WER": 0.192,
+   "latency_median_s": 6.77,
+   "latency_p90_s": 9.77,
+   "max_wait_for_engine_s": 9.32,
+   "compute_RTF": 1.26,
+   "words": 83
+  },
+  {
+   "t": 1603.9,
+   "m": "cell",
+   "cell": "sk_paced|parakeet|whole",
+   "WER": 0.128,
+   "latency_median_s": 20.27,
+   "latency_p90_s": 33.83,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.012,
+   "words": 78
+  },
+  {
+   "t": 1604.6,
+   "m": "cell",
+   "cell": "sk_paced|parakeet|pause",
+   "WER": 0.141,
+   "latency_median_s": 2.46,
+   "latency_p90_s": 3.88,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.021,
+   "words": 79
+  },
+  {
+   "t": 1605.4,
+   "m": "cell",
+   "cell": "sk_paced|parakeet|clause",
+   "WER": 0.141,
+   "latency_median_s": 2.28,
+   "latency_p90_s": 3.72,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.022,
+   "words": 79
+  },
+  {
+   "t": 1606.2,
+   "m": "cell",
+   "cell": "sk_paced|parakeet|chunk-2.0",
+   "WER": 0.41,
+   "latency_median_s": 0.89,
+   "latency_p90_s": 1.72,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.021,
+   "words": 75
+  },
+  {
+   "t": 1609.8,
+   "m": "cell",
+   "cell": "sk_paced|parakeet|agree-1.0",
+   "WER": 0.346,
+   "latency_median_s": 3.03,
+   "latency_p90_s": 5.47,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.098,
+   "words": 79
+  },
+  {
+   "t": 1616.7,
+   "m": "cell",
+   "cell": "sk_paced|parakeet|agree-0.5",
+   "WER": 0.474,
+   "latency_median_s": 1.62,
+   "latency_p90_s": 2.42,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.19,
+   "words": 84
+  },
+  {
+   "t": 1620.4,
+   "m": "cell",
+   "cell": "fleurs_sk|turbo|whole",
+   "WER": 0.097,
+   "latency_median_s": 101.27,
+   "latency_p90_s": 150.14,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.023,
+   "words": 248
+  },
+  {
+   "t": 1629.5,
+   "m": "cell",
+   "cell": "fleurs_sk|turbo|pause",
+   "WER": 0.226,
+   "latency_median_s": 2.93,
+   "latency_p90_s": 7.72,
+   "max_wait_for_engine_s": 0.12,
+   "compute_RTF": 0.056,
+   "words": 226
+  },
+  {
+   "t": 1643.9,
+   "m": "cell",
+   "cell": "fleurs_sk|turbo|clause",
+   "WER": 0.335,
+   "latency_median_s": 1.77,
+   "latency_p90_s": 3.66,
+   "max_wait_for_engine_s": 0.06,
+   "compute_RTF": 0.089,
+   "words": 233
+  },
+  {
+   "t": 1671.6,
+   "m": "cell",
+   "cell": "fleurs_sk|turbo|chunk-2.0",
+   "WER": 0.496,
+   "latency_median_s": 1.06,
+   "latency_p90_s": 1.91,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.171,
+   "words": 281
+  },
+  {
+   "t": 1729.7,
+   "m": "cell",
+   "cell": "fleurs_sk|turbo|agree-1.0",
+   "WER": 0.149,
+   "latency_median_s": 2.59,
+   "latency_p90_s": 4.41,
+   "max_wait_for_engine_s": 0.17,
+   "compute_RTF": 0.36,
+   "words": 256
+  },
+  {
+   "t": 1839.3,
+   "m": "cell",
+   "cell": "fleurs_sk|turbo|agree-0.5",
+   "WER": 0.335,
+   "latency_median_s": 1.42,
+   "latency_p90_s": 2.33,
+   "max_wait_for_engine_s": 0.09,
+   "compute_RTF": 0.68,
+   "words": 283
+  },
+  {
+   "t": 1843.2,
+   "m": "cell",
+   "cell": "fleurs_sk|kinit|whole",
+   "WER": 0.085,
+   "latency_median_s": 101.42,
+   "latency_p90_s": 149.96,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.024,
+   "words": 252
+  },
+  {
+   "t": 1859.3,
+   "m": "cell",
+   "cell": "fleurs_sk|kinit|pause",
+   "WER": 0.19,
+   "latency_median_s": 3.3,
+   "latency_p90_s": 8.04,
+   "max_wait_for_engine_s": 0.39,
+   "compute_RTF": 0.1,
+   "words": 223
+  },
+  {
+   "t": 1884.8,
+   "m": "cell",
+   "cell": "fleurs_sk|kinit|clause",
+   "WER": 0.258,
+   "latency_median_s": 2.2,
+   "latency_p90_s": 4.12,
+   "max_wait_for_engine_s": 0.37,
+   "compute_RTF": 0.158,
+   "words": 230
+  },
+  {
+   "t": 1933.0,
+   "m": "cell",
+   "cell": "fleurs_sk|kinit|chunk-2.0",
+   "WER": 0.278,
+   "latency_median_s": 1.51,
+   "latency_p90_s": 2.4,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.299,
+   "words": 276
+  },
+  {
+   "t": 2035.1,
+   "m": "cell",
+   "cell": "fleurs_sk|kinit|agree-1.0",
+   "WER": 0.169,
+   "latency_median_s": 2.98,
+   "latency_p90_s": 4.7,
+   "max_wait_for_engine_s": 1.5,
+   "compute_RTF": 0.633,
+   "words": 273
+  },
+  {
+   "t": 2217.2,
+   "m": "cell",
+   "cell": "fleurs_sk|kinit|agree-0.5",
+   "WER": 0.214,
+   "latency_median_s": 13.95,
+   "latency_p90_s": 20.82,
+   "max_wait_for_engine_s": 21.73,
+   "compute_RTF": 1.129,
+   "words": 278
+  },
+  {
+   "t": 2219.4,
+   "m": "cell",
+   "cell": "fleurs_sk|parakeet|whole",
+   "WER": 0.198,
+   "latency_median_s": 100.26,
+   "latency_p90_s": 149.83,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.014,
+   "words": 232
+  },
+  {
+   "t": 2221.7,
+   "m": "cell",
+   "cell": "fleurs_sk|parakeet|pause",
+   "WER": 0.226,
+   "latency_median_s": 2.74,
+   "latency_p90_s": 7.47,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.014,
+   "words": 221
+  },
+  {
+   "t": 2224.8,
+   "m": "cell",
+   "cell": "fleurs_sk|parakeet|clause",
+   "WER": 0.347,
+   "latency_median_s": 1.59,
+   "latency_p90_s": 3.47,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.019,
+   "words": 227
+  },
+  {
+   "t": 2227.8,
+   "m": "cell",
+   "cell": "fleurs_sk|parakeet|chunk-2.0",
+   "WER": 0.46,
+   "latency_median_s": 0.76,
+   "latency_p90_s": 1.56,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.018,
+   "words": 234
+  },
+  {
+   "t": 2242.3,
+   "m": "cell",
+   "cell": "fleurs_sk|parakeet|agree-1.0",
+   "WER": 0.198,
+   "latency_median_s": 2.72,
+   "latency_p90_s": 5.54,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.09,
+   "words": 256
+  },
+  {
+   "t": 2268.2,
+   "m": "cell",
+   "cell": "fleurs_sk|parakeet|agree-0.5",
+   "WER": 0.286,
+   "latency_median_s": 1.54,
+   "latency_p90_s": 3.95,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.16,
+   "words": 262
+  },
+  {
+   "t": 2272.7,
+   "m": "cell",
+   "cell": "fleurs_de|turbo|whole",
+   "WER": 0.035,
+   "latency_median_s": 127.18,
+   "latency_p90_s": 196.46,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.021,
+   "words": 345
+  },
+  {
+   "t": 2287.3,
+   "m": "cell",
+   "cell": "fleurs_de|turbo|pause",
+   "WER": 0.089,
+   "latency_median_s": 3.01,
+   "latency_p90_s": 6.99,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.067,
+   "words": 360
+  },
+  {
+   "t": 2308.6,
+   "m": "cell",
+   "cell": "fleurs_de|turbo|clause",
+   "WER": 0.121,
+   "latency_median_s": 1.91,
+   "latency_p90_s": 3.77,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.097,
+   "words": 370
+  },
+  {
+   "t": 2344.8,
+   "m": "cell",
+   "cell": "fleurs_de|turbo|chunk-2.0",
+   "WER": 0.334,
+   "latency_median_s": 1.16,
+   "latency_p90_s": 2.04,
+   "max_wait_for_engine_s": 0.26,
+   "compute_RTF": 0.166,
+   "words": 414
+  },
+  {
+   "t": 2418.9,
+   "m": "cell",
+   "cell": "fleurs_de|turbo|agree-1.0",
+   "WER": 0.104,
+   "latency_median_s": 2.36,
+   "latency_p90_s": 3.26,
+   "max_wait_for_engine_s": 0.26,
+   "compute_RTF": 0.34,
+   "words": 359
+  },
+  {
+   "t": 2562.2,
+   "m": "cell",
+   "cell": "fleurs_de|turbo|agree-0.5",
+   "WER": 0.262,
+   "latency_median_s": 1.34,
+   "latency_p90_s": 2.13,
+   "max_wait_for_engine_s": 0.26,
+   "compute_RTF": 0.657,
+   "words": 403
+  },
+  {
+   "t": 2565.5,
+   "m": "cell",
+   "cell": "fleurs_de|parakeet|whole",
+   "WER": 0.037,
+   "latency_median_s": 124.92,
+   "latency_p90_s": 195.02,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.015,
+   "words": 345
+  },
+  {
+   "t": 2569.7,
+   "m": "cell",
+   "cell": "fleurs_de|parakeet|pause",
+   "WER": 0.072,
+   "latency_median_s": 2.83,
+   "latency_p90_s": 6.69,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.019,
+   "words": 349
+  },
+  {
+   "t": 2575.5,
+   "m": "cell",
+   "cell": "fleurs_de|parakeet|clause",
+   "WER": 0.13,
+   "latency_median_s": 1.82,
+   "latency_p90_s": 3.56,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.026,
+   "words": 358
+  },
+  {
+   "t": 2579.5,
+   "m": "cell",
+   "cell": "fleurs_de|parakeet|chunk-2.0",
+   "WER": 0.34,
+   "latency_median_s": 0.92,
+   "latency_p90_s": 1.64,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.018,
+   "words": 337
+  },
+  {
+   "t": 2600.4,
+   "m": "cell",
+   "cell": "fleurs_de|parakeet|agree-1.0",
+   "WER": 0.138,
+   "latency_median_s": 2.26,
+   "latency_p90_s": 3.87,
+   "max_wait_for_engine_s": 0.03,
+   "compute_RTF": 0.095,
+   "words": 372
+  },
+  {
+   "t": 2634.6,
+   "m": "cell",
+   "cell": "fleurs_de|parakeet|agree-0.5",
+   "WER": 0.207,
+   "latency_median_s": 1.41,
+   "latency_p90_s": 2.63,
+   "max_wait_for_engine_s": 0.02,
+   "compute_RTF": 0.157,
+   "words": 386
+  },
+  {
+   "t": 2637.5,
+   "m": "cell",
+   "cell": "fleurs_en|turbo|whole",
+   "WER": 0.085,
+   "latency_median_s": 62.27,
+   "latency_p90_s": 120.88,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.021,
+   "words": 314
+  },
+  {
+   "t": 2642.2,
+   "m": "cell",
+   "cell": "fleurs_en|turbo|pause",
+   "WER": 0.753,
+   "latency_median_s": 2.95,
+   "latency_p90_s": 7.42,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.035,
+   "words": 87
+  },
+  {
+   "t": 2647.8,
+   "m": "cell",
+   "cell": "fleurs_en|turbo|clause",
+   "WER": 0.772,
+   "latency_median_s": 1.91,
+   "latency_p90_s": 3.6,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.042,
+   "words": 85
+  },
+  {
+   "t": 2670.2,
+   "m": "cell",
+   "cell": "fleurs_en|turbo|chunk-2.0",
+   "WER": 0.155,
+   "latency_median_s": 1.15,
+   "latency_p90_s": 1.95,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.166,
+   "words": 326
+  },
+  {
+   "t": 2715.3,
+   "m": "cell",
+   "cell": "fleurs_en|turbo|agree-1.0",
+   "WER": 0.101,
+   "latency_median_s": 2.37,
+   "latency_p90_s": 3.16,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.334,
+   "words": 320
+  },
+  {
+   "t": 2804.1,
+   "m": "cell",
+   "cell": "fleurs_en|turbo|agree-0.5",
+   "WER": 0.136,
+   "latency_median_s": 1.35,
+   "latency_p90_s": 1.92,
+   "max_wait_for_engine_s": 0.64,
+   "compute_RTF": 0.658,
+   "words": 320
+  },
+  {
+   "t": 2805.8,
+   "m": "cell",
+   "cell": "fleurs_en|parakeet|whole",
+   "WER": 0.671,
+   "latency_median_s": 98.11,
+   "latency_p90_s": 130.67,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.012,
+   "words": 109
+  },
+  {
+   "t": 2806.9,
+   "m": "cell",
+   "cell": "fleurs_en|parakeet|pause",
+   "WER": 0.759,
+   "latency_median_s": 2.75,
+   "latency_p90_s": 7.23,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.008,
+   "words": 85
+  },
+  {
+   "t": 2808.2,
+   "m": "cell",
+   "cell": "fleurs_en|parakeet|clause",
+   "WER": 0.772,
+   "latency_median_s": 1.55,
+   "latency_p90_s": 3.44,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.009,
+   "words": 85
+  },
+  {
+   "t": 2810.7,
+   "m": "cell",
+   "cell": "fleurs_en|parakeet|chunk-2.0",
+   "WER": 0.57,
+   "latency_median_s": 0.84,
+   "latency_p90_s": 1.64,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.018,
+   "words": 193
+  },
+  {
+   "t": 2823.3,
+   "m": "cell",
+   "cell": "fleurs_en|parakeet|agree-1.0",
+   "WER": 0.133,
+   "latency_median_s": 3.05,
+   "latency_p90_s": 6.44,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.093,
+   "words": 330
+  },
+  {
+   "t": 2846.2,
+   "m": "cell",
+   "cell": "fleurs_en|parakeet|agree-0.5",
+   "WER": 0.206,
+   "latency_median_s": 2.14,
+   "latency_p90_s": 4.67,
+   "max_wait_for_engine_s": 0.0,
+   "compute_RTF": 0.17,
+   "words": 320
+  },
+  {
+   "t": 2846.2,
+   "m": "done",
+   "wall_s": 2846
+  }
+ ],
+ "env": {
+  "ort": [
+   "TensorrtExecutionProvider",
+   "CUDAExecutionProvider",
+   "CPUExecutionProvider"
+  ],
+  "gpu": "Tesla T4\nTesla T4"
+ },
+ "status": "done"
+}

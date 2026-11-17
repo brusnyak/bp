@@ -1,0 +1,966 @@
+{
+ "strategy": "agree_short",
+ "audio": "processed/testaudio/en_paced.wav",
+ "seconds": 60.0,
+ "src": "en",
+ "tgt": "sk",
+ "tts": "piper",
+ "input_end_s": 44.46,
+ "rates": {
+  "1.0": {
+   "segments": 21,
+   "with_audio": 21,
+   "first_audio_after_source_end_s": [
+    0.19,
+    1.133,
+    0.486,
+    1.033,
+    1.075,
+    0.195,
+    0.463,
+    0.122,
+    0.481,
+    0.493,
+    0.415,
+    0.45,
+    0.491,
+    0.491,
+    1.077,
+    0.14,
+    0.407,
+    0.188,
+    0.5,
+    0.172,
+    0.446
+   ],
+   "lag_s": [
+    0.19,
+    1.323,
+    2.048,
+    1.033,
+    1.075,
+    0.195,
+    1.802,
+    0.307,
+    0.481,
+    0.788,
+    0.688,
+    0.45,
+    0.491,
+    0.85,
+    1.077,
+    0.196,
+    1.973,
+    0.188,
+    0.751,
+    0.172,
+    1.039
+   ],
+   "lag_median_s": 0.751,
+   "lag_p90_s": 1.802,
+   "source_end_s": [
+    2.5,
+    3.5,
+    4.68,
+    6.94,
+    8.26,
+    10.66,
+    11.88,
+    15.14,
+    16.98,
+    20.0,
+    22.04,
+    23.96,
+    26.9,
+    28.8,
+    30.74,
+    33.1,
+    33.26,
+    36.56,
+    38.48,
+    41.76,
+    43.48
+   ],
+   "listen_start_s": [
+    2.69,
+    4.823,
+    6.728,
+    7.973,
+    9.335,
+    10.855,
+    13.682,
+    15.447,
+    17.461,
+    20.788,
+    22.728,
+    24.41,
+    27.391,
+    29.65,
+    31.817,
+    33.296,
+    35.233,
+    36.748,
+    39.231,
+    41.932,
+    44.519
+   ],
+   "lag_max_s": 2.048,
+   "first_word_lag_s": [
+    1.21,
+    1.323,
+    2.048,
+    1.033,
+    1.075,
+    1.235,
+    2.002,
+    1.327,
+    0.981,
+    1.568,
+    0.968,
+    0.61,
+    1.191,
+    0.97,
+    1.077,
+    1.236,
+    1.973,
+    1.188,
+    1.671,
+    1.172,
+    1.439
+   ],
+   "first_word_lag_max_s": 2.048,
+   "segment_s": [
+    1.02,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.04,
+    0.2,
+    1.02,
+    0.5,
+    0.78,
+    0.28,
+    0.16,
+    0.7,
+    0.12,
+    0.0,
+    1.04,
+    0.0,
+    1.0,
+    0.92,
+    1.0,
+    0.4
+   ],
+   "lag_growth_s": -0.018644155844155852,
+   "last_listen_end_vs_input_end_s": 1.3
+  }
+ },
+ "tts_messages": 22,
+ "events": [
+  {
+   "t": 2.552172416006215,
+   "type": "transcription_result",
+   "text": "Good morning and welcome to",
+   "stt_time": 4.169996827840805e-07,
+   "span": [
+    1.48,
+    2.5
+   ]
+  },
+  {
+   "t": 2.628809124988038,
+   "type": "translation_result",
+   "text": "Dobr\u00e9 r\u00e1no a vitajte v",
+   "mt_time": 0.07650954200653359
+  },
+  {
+   "t": 2.69045916601317,
+   "type": "tts_audio",
+   "bytes": 94086,
+   "seconds": 2.132471655328798
+  },
+  {
+   "t": 2.6910009579733014,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 4.169996827840805e-07,
+    "mt_time": 0.07650954200653359,
+    "tts_time": 0.061806000012438744,
+    "input_to_stt_latency": 0.00045641703763976693,
+    "onset_to_first_audio_s": 2.648668333014939,
+    "source_onset_time": 333974.55940624996,
+    "order_wait_s": 0.0,
+    "tts_first_audio_s": 0.061,
+    "first_audio_sent_time": 333977.208074583,
+    "total_latency": 0.13831595901865512
+   }
+  },
+  {
+   "t": 4.527203208010178,
+   "type": "transcription_result",
+   "text": "this live demonstration",
+   "stt_time": 5.00003807246685e-07,
+   "span": [
+    3.5,
+    3.5
+   ]
+  },
+  {
+   "t": 4.572192166000605,
+   "type": "translation_result",
+   "text": "t\u00e1to \u017eiv\u00e1 demon\u0161tr\u00e1cia",
+   "mt_time": 0.04483737499685958
+  },
+  {
+   "t": 4.632926833000965,
+   "type": "tts_audio",
+   "bytes": 84050,
+   "seconds": 1.9048979591836734
+  },
+  {
+   "t": 4.633381749968976,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 5.00003807246685e-07,
+    "mt_time": 0.04483737499685958,
+    "tts_time": 0.060804415959864855,
+    "input_to_stt_latency": 0.0005616249982267618,
+    "onset_to_first_audio_s": 4.59155566606205,
+    "source_onset_time": 333974.55940624996,
+    "order_wait_s": 0.0,
+    "tts_first_audio_s": 0.06,
+    "first_audio_sent_time": 333979.150961916,
+    "total_latency": 0.10564229096053168
+   }
+  },
+  {
+   "t": 5.097723875020165,
+   "type": "transcription_result",
+   "text": "of speech translation.",
+   "stt_time": 2.92027834802866e-07,
+   "span": [
+    4.68,
+    4.68
+   ]
+  },
+  {
+   "t": 5.131199666007888,
+   "type": "translation_result",
+   "text": "prekladu re\u010di.",
+   "mt_time": 0.033063666021917015
+  },
+  {
+   "t": 5.166431249992456,
+   "type": "tts_audio",
+   "bytes": 39980,
+   "seconds": 0.905578231292517
+  },
+  {
+   "t": 5.1669031659839675,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 2.92027834802866e-07,
+    "mt_time": 0.033063666021917015,
+    "tts_time": 0.035398708016145974,
+    "input_to_stt_latency": 0.0010470420238561928,
+    "onset_to_first_audio_s": 5.125156333029736,
+    "source_onset_time": 333974.55940624996,
+    "order_wait_s": 0.0,
+    "tts_first_audio_s": 0.035,
+    "first_audio_sent_time": 333979.684562583,
+    "total_latency": 0.06846266606589779
+   }
+  },
+  {
+   "t": 7.926931458001491,
+   "type": "transcription_result",
+   "text": "I am",
+   "stt_time": 6.660120561718941e-07,
+   "span": [
+    6.94,
+    6.94
+   ]
+  },
+  {
+   "t": 7.955121416016482,
+   "type": "translation_result",
+   "text": "Som.",
+   "mt_time": 0.028062458033673465
+  },
+  {
+   "t": 7.972516749985516,
+   "type": "tts_audio",
+   "bytes": 40746,
+   "seconds": 0.9229478458049887
+  },
+  {
+   "t": 7.972990625014063,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 6.660120561718941e-07,
+    "mt_time": 0.028062458033673465,
+    "tts_time": 0.017428999999538064,
+    "input_to_stt_latency": 0.0003012499655596912,
+    "onset_to_first_audio_s": 2.2912815830204636,
+    "source_onset_time": 333980.19940625,
+    "order_wait_s": 0.0,
+    "tts_first_audio_s": 0.017,
+    "first_audio_sent_time": 333982.490687833,
+    "total_latency": 0.0454921240452677
+   }
+  },
+  {
+   "t": 9.284691333014052,
+   "type": "transcription_result",
+   "text": "speaking",
+   "stt_time": 4.1601015254855156e-07,
+   "span": [
+    8.26,
+    8.26
+   ]
+  },
+  {
+   "t": 9.305137040966656,
+   "type": "translation_result",
+   "text": "hovoren\u00fd",
+   "mt_time": 0.020283291989471763
+  },
+  {
+   "t": 9.335331249982119,
+   "type": "tts_audio",
+   "bytes": 60524,
+   "seconds": 1.3714285714285714
+  },
+  {
+   "t": 9.33577745797811,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 4.1601015254855156e-07,
+    "mt_time": 0.020283291989471763,
+    "tts_time": 0.030111000000033528,
+    "input_to_stt_latency": 0.0001742080203257501,
+    "onset_to_first_audio_s": 3.6540429160231724,
+    "source_onset_time": 333980.19940625,
+    "order_wait_s": 0.0,
+    "tts_first_audio_s": 0.03,
+    "first_audio_sent_time": 333983.853449166,
+    "total_latency": 0.05039470799965784
+   }
+  },
+  {
+   "t": 10.71388300001854,
+   "type": "transcription_result",
+   "text": "English and you will hear German or",
+   "stt_time": 3.7497375160455704e-07,
+   "span": [
+    9.62,
+    10.66
+   ]
+  },
+  {
+   "t": 10.775267874996644,
+   "type": "translation_result",
+   "text": "Angli\u010dtina a budete po\u010du\u0165 nem\u010dinu alebo",
+   "mt_time": 0.06123583298176527
+  },
+  {
+   "t": 10.855389291013125,
+   "type": "tts_audio",
+   "bytes": 124710,
+   "seconds": 2.8268934240362813
+  },
+  {
+   "t": 10.855523957987316,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 3.7497375160455704e-07,
+    "mt_time": 0.06123583298176527,
+    "tts_time": 0.07984341698465869,
+    "input_to_stt_latency": 0.0001836250303313136,
+    "onset_to_first_audio_s": 5.173836041009054,
+    "source_onset_time": 333980.19940625,
+    "order_wait_s": 0.0,
+    "tts_first_audio_s": 0.08,
+    "first_audio_sent_time": 333985.373242291,
+    "total_latency": 0.14107962494017556
+   }
+  },
+  {
+   "t": 12.220438499993179,
+   "type": "transcription_result",
+   "text": "Slovic within a second or two.",
+   "stt_time": 2.500019036233425e-07,
+   "span": [
+    11.68,
+    11.88
+   ]
+  },
+  {
+   "t": 12.279723040992394,
+   "type": "translation_result",
+   "text": "Slovic za sekundu alebo dve.",
+   "mt_time": 0.05902975000208244
+  },
+  {
+   "t": 12.342891708016396,
+   "type": "tts_audio",
+   "bytes": 77868,
+   "seconds": 1.7647165532879818
+  },
+  {
+   "t": 12.343300915963482,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 2.500019036233425e-07,
+    "mt_time": 0.05902975000208244,
+    "tts_time": 0.06317108299117535,
+    "input_to_stt_latency": 0.0006514170090667903,
+    "onset_to_first_audio_s": 6.661507791024633,
+    "source_onset_time": 333980.19940625,
+    "order_wait_s": 0.0,
+    "tts_first_audio_s": 0.063,
+    "first_audio_sent_time": 333986.860914041,
+    "total_latency": 0.12220108299516141
+   }
+  },
+  {
+   "t": 15.188766749983188,
+   "type": "transcription_result",
+   "text": "The system listens through the",
+   "stt_time": 1.66997779160738e-07,
+   "span": [
+    14.12,
+    15.14
+   ]
+  },
+  {
+   "t": 15.216608874965459,
+   "type": "translation_result",
+   "text": "Syst\u00e9m po\u010d\u00fava cez",
+   "mt_time": 0.02767949999542907
+  },
+  {
+   "t": 15.26165541599039,
+   "type": "tts_audio",
+   "bytes": 71440,
+   "seconds": 1.6189569160997732
+  },
+  {
+   "t": 15.261799625004642,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 1.66997779160738e-07,
+    "mt_time": 0.02767949999542907,
+    "tts_time": 0.04481987503822893,
+    "input_to_stt_latency": 0.00011733401333913207,
+    "onset_to_first_audio_s": 2.420136375061702,
+    "source_onset_time": 333987.35940624995,
+    "order_wait_s": 0.0,
+    "tts_first_audio_s": 0.044,
+    "first_audio_sent_time": 333989.779542625,
+    "total_latency": 0.07249954203143716
+   }
+  },
+  {
+   "t": 17.339129458006937,
+   "type": "transcription_result",
+   "text": "microphone and the size when a phrase has ended.",
+   "stt_time": 1.25030055642128e-07,
+   "span": [
+    16.48,
+    16.98
+   ]
+  },
+  {
+   "t": 17.41075062501477,
+   "type": "translation_result",
+   "text": "mikrof\u00f3n a ve\u013ekos\u0165, ke\u010f fr\u00e1za skon\u010dila.",
+   "mt_time": 0.07130845898063853
+  },
+  {
+   "t": 17.460966957965866,
+   "type": "tts_audio",
+   "bytes": 93524,
+   "seconds": 2.1197278911564625
+  },
+  {
+   "t": 17.504773249966092,
+   "type": "tts_audio",
+   "bytes": 53292,
+   "seconds": 1.207437641723356
+  },
+  {
+   "t": 17.505014540976845,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 1.25030055642128e-07,
+    "mt_time": 0.07130845898063853,
+    "tts_time": 0.09382658399408683,
+    "input_to_stt_latency": 0.0007604170241393149,
+    "onset_to_first_audio_s": 4.619489666074514,
+    "source_onset_time": 333987.35940624995,
+    "order_wait_s": 0.0,
+    "tts_first_audio_s": 0.05,
+    "first_audio_sent_time": 333991.978895916,
+    "total_latency": 0.165135168004781
+   }
+  },
+  {
+   "t": 20.366454333008733,
+   "type": "transcription_result",
+   "text": "First the words are recognized.",
+   "stt_time": 3.33995558321476e-07,
+   "span": [
+    19.22,
+    20.0
+   ]
+  },
+  {
+   "t": 20.433148208016064,
+   "type": "translation_result",
+   "text": "Najprv s\u00fa slov\u00e1 rozpoznan\u00e9.",
+   "mt_time": 0.06634024996310472
+  },
+  {
+   "t": 20.492906374973245,
+   "type": "tts_audio",
+   "bytes": 85588,
+   "seconds": 1.9397732426303855
+  },
+  {
+   "t": 20.493165457970463,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 3.33995558321476e-07,
+    "mt_time": 0.06634024996310472,
+    "tts_time": 0.059564625029452145,
+    "input_to_stt_latency": 0.002215124957729131,
+    "onset_to_first_audio_s": 2.511477416031994,
+    "source_onset_time": 333992.49940624996,
+    "order_wait_s": 0.0,
+    "tts_first_audio_s": 0.059,
+    "first_audio_sent_time": 333995.010883666,
+    "total_latency": 0.1259052089881152
+   }
+  },
+  {
+   "t": 22.374992583005223,
+   "type": "transcription_result",
+   "text": "Then they are translated.",
+   "stt_time": 2.500019036233425e-07,
+   "span": [
+    21.76,
+    22.04
+   ]
+  },
+  {
+   "t": 22.410439916013274,
+   "type": "translation_result",
+   "text": "Potom s\u00fa prelo\u017een\u00e9.",
+   "mt_time": 0.03521058399928734
+  },
+  {
+   "t": 22.45493887498742,
+   "type": "tts_audio",
+   "bytes": 69746,
+   "seconds": 1.5805442176870748
+  },
+  {
+   "t": 22.45537341601448,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 2.500019036233425e-07,
+    "mt_time": 0.03521058399928734,
+    "tts_time": 0.044498750008642673,
+    "input_to_stt_latency": 0.0007554590119980276,
+    "onset_to_first_audio_s": 2.1536261660512537,
+    "source_onset_time": 333994.81940624997,
+    "order_wait_s": 0.0,
+    "tts_first_audio_s": 0.044,
+    "first_audio_sent_time": 333996.973032416,
+    "total_latency": 0.07970958400983363
+   }
+  },
+  {
+   "t": 24.302204874984454,
+   "type": "transcription_result",
+   "text": "And they are spoken again.",
+   "stt_time": 2.500019036233425e-07,
+   "span": [
+    23.8,
+    23.96
+   ]
+  },
+  {
+   "t": 24.36235804099124,
+   "type": "translation_result",
+   "text": "A op\u00e4\u0165 sa rozpr\u00e1vaj\u00fa.",
+   "mt_time": 0.06006066600093618
+  },
+  {
+   "t": 24.410447833011858,
+   "type": "tts_audio",
+   "bytes": 83588,
+   "seconds": 1.894421768707483
+  },
+  {
+   "t": 24.410861207987182,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 2.500019036233425e-07,
+    "mt_time": 0.06006066600093618,
+    "tts_time": 0.048027042008470744,
+    "input_to_stt_latency": 0.0009143750066868961,
+    "onset_to_first_audio_s": 2.0690192080801353,
+    "source_onset_time": 333996.85940624995,
+    "order_wait_s": 0.0,
+    "tts_first_audio_s": 0.048,
+    "first_audio_sent_time": 333998.928425458,
+    "total_latency": 0.10808795801131055
+   }
+  },
+  {
+   "t": 27.274951957981102,
+   "type": "transcription_result",
+   "text": "Everything runs on this computer.",
+   "stt_time": 2.0797597244381905e-07,
+   "span": [
+    26.2,
+    26.9
+   ]
+  },
+  {
+   "t": 27.327400583017152,
+   "type": "translation_result",
+   "text": "V\u0161etko be\u017e\u00ed na tomto po\u010d\u00edta\u010di.",
+   "mt_time": 0.052081125031691045
+  },
+  {
+   "t": 27.391279708012007,
+   "type": "tts_audio",
+   "bytes": 99668,
+   "seconds": 2.259047619047619
+  },
+  {
+   "t": 27.391543290985283,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 2.0797597244381905e-07,
+    "mt_time": 0.052081125031691045,
+    "tts_time": 0.06358462502248585,
+    "input_to_stt_latency": 0.0007353330147452652,
+    "onset_to_first_audio_s": 2.529781500052195,
+    "source_onset_time": 333999.37940624997,
+    "order_wait_s": 0.0,
+    "tts_first_audio_s": 0.063,
+    "first_audio_sent_time": 334001.90918775,
+    "total_latency": 0.11566595803014934
+   }
+  },
+  {
+   "t": 29.141784165985882,
+   "type": "transcription_result",
+   "text": "Without a cloud service.",
+   "stt_time": 2.9098009690642357e-07,
+   "span": [
+    28.68,
+    28.8
+   ]
+  },
+  {
+   "t": 29.241356582962908,
+   "type": "translation_result",
+   "text": "Bez obla\u010dnosti.",
+   "mt_time": 0.09922866598935798
+  },
+  {
+   "t": 29.291000708006322,
+   "type": "tts_audio",
+   "bytes": 54730,
+   "seconds": 1.240045351473923
+  },
+  {
+   "t": 29.29132437496446,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 2.9098009690642357e-07,
+    "mt_time": 0.09922866598935798,
+    "tts_time": 0.04889362497488037,
+    "input_to_stt_latency": 0.0005714159924536943,
+    "onset_to_first_audio_s": 2.0687160830711946,
+    "source_onset_time": 334001.73940624995,
+    "order_wait_s": 0.0,
+    "tts_first_audio_s": 0.048,
+    "first_audio_sent_time": 334003.808122333,
+    "total_latency": 0.14812258194433525
+   }
+  },
+  {
+   "t": 31.73553379101213,
+   "type": "transcription_result",
+   "text": "The delay is",
+   "stt_time": 7.500057108700275e-07,
+   "span": [
+    30.74,
+    30.74
+   ]
+  },
+  {
+   "t": 31.783357041014824,
+   "type": "translation_result",
+   "text": "Oneskorenie je",
+   "mt_time": 0.04784208396449685
+  },
+  {
+   "t": 31.81696354097221,
+   "type": "tts_audio",
+   "bytes": 65284,
+   "seconds": 1.4793650793650794
+  },
+  {
+   "t": 31.817520540964324,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 7.500057108700275e-07,
+    "mt_time": 0.04784208396449685,
+    "tts_time": 0.033639750035945326,
+    "input_to_stt_latency": 0.0006972500123083591,
+    "onset_to_first_audio_s": 2.2356653330498375,
+    "source_onset_time": 334004.09940624994,
+    "order_wait_s": 0.0,
+    "tts_first_audio_s": 0.033,
+    "first_audio_sent_time": 334006.335071583,
+    "total_latency": 0.08148258400615305
+   }
+  },
+  {
+   "t": 33.148633041011635,
+   "type": "transcription_result",
+   "text": "the time between my words and the",
+   "stt_time": 2.0803418010473251e-07,
+   "span": [
+    32.06,
+    33.1
+   ]
+  },
+  {
+   "t": 33.18717512500007,
+   "type": "translation_result",
+   "text": "\u010das medzi mojimi slovami",
+   "mt_time": 0.03816054202616215
+  },
+  {
+   "t": 33.239998708013445,
+   "type": "tts_audio",
+   "bytes": 85440,
+   "seconds": 1.9364172335600907
+  },
+  {
+   "t": 33.2404827499995,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 2.0803418010473251e-07,
+    "mt_time": 0.03816054202616215,
+    "tts_time": 0.05288462497992441,
+    "input_to_stt_latency": 0.00017750001279637218,
+    "onset_to_first_audio_s": 3.6585707500344142,
+    "source_onset_time": 334004.09940624994,
+    "order_wait_s": 0.0,
+    "tts_first_audio_s": 0.052,
+    "first_audio_sent_time": 334007.757977,
+    "total_latency": 0.09104537504026666
+   }
+  },
+  {
+   "t": 33.60511020798003,
+   "type": "transcription_result",
+   "text": "voice you hear.",
+   "stt_time": 4.5797787606716156e-07,
+   "span": [
+    33.26,
+    33.26
+   ]
+  },
+  {
+   "t": 33.642391000001226,
+   "type": "translation_result",
+   "text": "Po\u010duje\u0161.",
+   "mt_time": 0.03725695901084691
+  },
+  {
+   "t": 33.66727804101538,
+   "type": "tts_audio",
+   "bytes": 25644,
+   "seconds": 0.5804988662131519
+  },
+  {
+   "t": 33.66775849997066,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 4.5797787606716156e-07,
+    "mt_time": 0.03725695901084691,
+    "tts_time": 0.024990290985442698,
+    "input_to_stt_latency": 0.0014486670261248946,
+    "onset_to_first_audio_s": 4.08601983304834,
+    "source_onset_time": 334004.09940624994,
+    "order_wait_s": 0.0,
+    "tts_first_audio_s": 0.025,
+    "first_audio_sent_time": 334008.185426083,
+    "total_latency": 0.06224770797416568
+   }
+  },
+  {
+   "t": 36.622979249979835,
+   "type": "transcription_result",
+   "text": "Our goal is a delay short",
+   "stt_time": 5.00003807246685e-07,
+   "span": [
+    35.56,
+    36.56
+   ]
+  },
+  {
+   "t": 36.67955870798323,
+   "type": "translation_result",
+   "text": "Na\u0161\u00edm cie\u013eom je kr\u00e1tke me\u0161kanie.",
+   "mt_time": 0.056394083017949015
+  },
+  {
+   "t": 36.74756837496534,
+   "type": "tts_audio",
+   "bytes": 109546,
+   "seconds": 2.4830385487528344
+  },
+  {
+   "t": 36.74768933298765,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 5.00003807246685e-07,
+    "mt_time": 0.056394083017949015,
+    "tts_time": 0.0677945000352338,
+    "input_to_stt_latency": 0.000262040994130075,
+    "onset_to_first_audio_s": 2.606070375069976,
+    "source_onset_time": 334008.65940624994,
+    "order_wait_s": 0.0,
+    "tts_first_audio_s": 0.067,
+    "first_audio_sent_time": 334011.265476625,
+    "total_latency": 0.12418908305699006
+   }
+  },
+  {
+   "t": 38.88229645800311,
+   "type": "transcription_result",
+   "text": "enough for a natural conversation.",
+   "stt_time": 1.6595004126429558e-07,
+   "span": [
+    37.56,
+    38.48
+   ]
+  },
+  {
+   "t": 38.92105725000147,
+   "type": "translation_result",
+   "text": "Dos\u0165 na prirodzen\u00fd rozhovor.",
+   "mt_time": 0.038502249983139336
+  },
+  {
+   "t": 38.97989158297423,
+   "type": "tts_audio",
+   "bytes": 84822,
+   "seconds": 1.9224036281179138
+  },
+  {
+   "t": 38.98016999999527,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 1.6595004126429558e-07,
+    "mt_time": 0.038502249983139336,
+    "tts_time": 0.05883408396039158,
+    "input_to_stt_latency": 0.0007820409955456853,
+    "onset_to_first_audio_s": 4.8385299580404535,
+    "source_onset_time": 334008.65940624994,
+    "order_wait_s": 0.0,
+    "tts_first_audio_s": 0.058,
+    "first_audio_sent_time": 334013.497936208,
+    "total_latency": 0.09733649989357218
+   }
+  },
+  {
+   "t": 41.818059457989875,
+   "type": "transcription_result",
+   "text": "A quiet room matters more",
+   "stt_time": 2.9098009690642357e-07,
+   "span": [
+    40.76,
+    41.76
+   ]
+  },
+  {
+   "t": 41.862600457970984,
+   "type": "translation_result",
+   "text": "Na tichej miestnosti z\u00e1le\u017e\u00ed viac.",
+   "mt_time": 0.044457915995735675
+  },
+  {
+   "t": 41.93225479096873,
+   "type": "tts_audio",
+   "bytes": 114126,
+   "seconds": 2.586893424036281
+  },
+  {
+   "t": 41.93252054101322,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 2.9098009690642357e-07,
+    "mt_time": 0.044457915995735675,
+    "tts_time": 0.06945295899640769,
+    "input_to_stt_latency": 0.0001285409671254456,
+    "onset_to_first_audio_s": 2.5307900000480004,
+    "source_onset_time": 334013.91940624994,
+    "order_wait_s": 0.0,
+    "tts_first_audio_s": 0.069,
+    "first_audio_sent_time": 334016.45019625,
+    "total_latency": 0.11391116597224027
+   }
+  },
+  {
+   "t": 43.84796212497167,
+   "type": "transcription_result",
+   "text": "than an expensive microphone.",
+   "stt_time": 3.7497375160455704e-07,
+   "span": [
+    43.08,
+    43.48
+   ]
+  },
+  {
+   "t": 43.87907958298456,
+   "type": "translation_result",
+   "text": "ako drah\u00fd mikrof\u00f3n.",
+   "mt_time": 0.030705958022736013
+  },
+  {
+   "t": 43.92634249996627,
+   "type": "tts_audio",
+   "bytes": 54828,
+   "seconds": 1.242267573696145
+  },
+  {
+   "t": 43.9264257500181,
+   "type": "final_metrics",
+   "metrics": {
+    "stt_time": 3.7497375160455704e-07,
+    "mt_time": 0.030705958022736013,
+    "tts_time": 0.04709545796504244,
+    "input_to_stt_latency": 0.0006685840198770165,
+    "onset_to_first_audio_s": 4.524613291083369,
+    "source_onset_time": 334013.91940624994,
+    "order_wait_s": 0.0,
+    "tts_first_audio_s": 0.047,
+    "first_audio_sent_time": 334018.444019541,
+    "total_latency": 0.07780179096153006
+   }
+  }
+ ]
+}
