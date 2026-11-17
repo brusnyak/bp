@@ -1,0 +1,308 @@
+{
+ "arms": {
+  "piper": {
+   "summary": {
+    "n": 32,
+    "wall_median_s": 0.164,
+    "wall_max_s": 0.284,
+    "sustained_ratio": 0.078
+   },
+   "rows": [
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.128,
+     "audio_s": 0.99
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.099,
+     "audio_s": 0.92
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.147,
+     "audio_s": 1.4
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.153,
+     "audio_s": 1.29
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.102,
+     "audio_s": 0.93
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.097,
+     "audio_s": 0.87
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.127,
+     "audio_s": 1.16
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.18,
+     "audio_s": 1.65
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.172,
+     "audio_s": 1.64
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.261,
+     "audio_s": 2.5
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.176,
+     "audio_s": 1.7
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.284,
+     "audio_s": 2.66
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.22,
+     "audio_s": 2.23
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.228,
+     "audio_s": 2.11
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.247,
+     "audio_s": 2.48
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.222,
+     "audio_s": 2.08
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.108,
+     "audio_s": 1.66
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.09,
+     "audio_s": 1.42
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.134,
+     "audio_s": 2.17
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.164,
+     "audio_s": 2.5
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.072,
+     "audio_s": 1.07
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.101,
+     "audio_s": 1.67
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.142,
+     "audio_s": 2.43
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.127,
+     "audio_s": 2.23
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.16,
+     "audio_s": 2.71
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.27,
+     "audio_s": 4.41
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.163,
+     "audio_s": 2.61
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.275,
+     "audio_s": 4.78
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.214,
+     "audio_s": 3.54
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.194,
+     "audio_s": 3.31
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.191,
+     "audio_s": 3.2
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.178,
+     "audio_s": 3.16
+    }
+   ]
+  },
+  "piper_plus_openvoice": {
+   "load_s": 4.46,
+   "extract_target_s": 18.77,
+   "extract_source_s": 0.04,
+   "convert_median_s": 0.276,
+   "convert_max_s": 0.456,
+   "sustained_ratio_incl_piper": 0.19,
+   "errors": []
+  }
+ },
+ "log": [
+  {
+   "t": 1.2,
+   "m": "ref",
+   "rc": 0
+  },
+  {
+   "t": 1.5,
+   "m": "pieces",
+   "sk3": 8,
+   "sk6": 8,
+   "cs3": 8,
+   "cs6": 8
+  },
+  {
+   "t": 1.5,
+   "m": "omni_fail",
+   "err": "RuntimeError: arm A skipped in v3: measured in v2 (omni_step12 median 0.658 s, step16 0.9 s)",
+   "tb": "Traceback (most recent call last):\n  File \"/kaggle/src/script.py\", line 52, in <module>\n    raise RuntimeError('arm A skipped in v3: measured in v2 (omni_step12 median 0.658 s, step16 0.9 s)')\nRuntimeError: arm A skipped in v3: measured in v2 (omni_step12 median 0.658 s, step16 0.9 s)\n"
+  },
+  {
+   "t": 9.8,
+   "m": "pip piper",
+   "rc": 0,
+   "tail": ""
+  },
+  {
+   "t": 11.3,
+   "m": "piper voice",
+   "v": "sk_SK-lili-medium",
+   "rc": 0,
+   "tail": ""
+  },
+  {
+   "t": 12.5,
+   "m": "piper voice",
+   "v": "cs_CZ-jirka-medium",
+   "rc": 0,
+   "tail": ""
+  },
+  {
+   "t": 23.0,
+   "m": "piper done",
+   "n": 32,
+   "wall_median_s": 0.164,
+   "wall_max_s": 0.284,
+   "sustained_ratio": 0.078
+  },
+  {
+   "t": 39.1,
+   "m": "pip openvoice",
+   "rc": 0,
+   "tail": "shell-openvoice 0.0.0 requires librosa==0.9.1, but you have librosa 0.11.0 which is incompatible.\nmyshell-openvoice 0.0.0 requires numpy==1.22.0, but you have numpy 2.1.3 which is incompatible.\nmyshell-openvoice 0.0.0 requires pypinyin==0.50.0, but you have pypinyin 0.55.0 which is incompatible.\nmyshell-openvoice 0.0.0 requires unidecode==1.3.7, but you have unidecode 1.4.0 which is incompatible.\n"
+  },
+  {
+   "t": 42.8,
+   "m": "ov ckpt",
+   "path": "/root/.cache/huggingface/hub/models--myshell-ai--OpenVoiceV2/snapshots/f36e7edfe1684461a8343844af60babc2efbb727",
+   "files": [
+    ".DS_Store",
+    ".gitattributes",
+    "README.md",
+    "base_speakers",
+    "converter"
+   ]
+  },
+  {
+   "t": 95.9,
+   "m": "ov arm",
+   "rc": 0,
+   "tail": "lex tensors for all inputs, and return_complex=False will raise an error.\nNote: you can still call torch.view_as_real on the complex output to recover the old return format. (Triggered internally at /pytorch/aten/src/ATen/native/SpectralOps.cpp:874.)\n  return _VF.stft(  # type: ignore[attr-defined]\n"
+  },
+  {
+   "t": 95.9,
+   "m": "openvoice done",
+   "load_s": 4.46,
+   "extract_target_s": 18.77,
+   "extract_source_s": 0.04,
+   "convert_median_s": 0.276,
+   "convert_max_s": 0.456,
+   "sustained_ratio_incl_piper": 0.19,
+   "errors": []
+  },
+  {
+   "t": 95.9,
+   "m": "done",
+   "wall_s": 96
+  }
+ ],
+ "env": {
+  "gpu": "Tesla T4\nTesla T4"
+ },
+ "status": "done"
+}

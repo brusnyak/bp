@@ -1,0 +1,785 @@
+{
+ "arms": {
+  "omni_step12": {
+   "summary": {
+    "n": 32,
+    "wall_median_s": 0.658,
+    "wall_max_s": 0.836,
+    "sustained_ratio": 0.302
+   },
+   "by_size": {
+    "sk3": {
+     "n": 8,
+     "wall_median_s": 0.637,
+     "wall_max_s": 0.649,
+     "sustained_ratio": 0.345
+    },
+    "sk6": {
+     "n": 8,
+     "wall_median_s": 0.771,
+     "wall_max_s": 0.808,
+     "sustained_ratio": 0.27
+    },
+    "cs3": {
+     "n": 8,
+     "wall_median_s": 0.648,
+     "wall_max_s": 0.667,
+     "sustained_ratio": 0.348
+    },
+    "cs6": {
+     "n": 8,
+     "wall_median_s": 0.78,
+     "wall_max_s": 0.836,
+     "sustained_ratio": 0.273
+    }
+   },
+   "rows": [
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.637,
+     "audio_s": 1.68
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.627,
+     "audio_s": 1.86
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.64,
+     "audio_s": 1.9
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.634,
+     "audio_s": 1.84
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.619,
+     "audio_s": 1.57
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.626,
+     "audio_s": 1.8
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.642,
+     "audio_s": 1.95
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.649,
+     "audio_s": 2.12
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.658,
+     "audio_s": 2.28
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.777,
+     "audio_s": 3.0
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.656,
+     "audio_s": 2.16
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.808,
+     "audio_s": 3.51
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.77,
+     "audio_s": 2.81
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.752,
+     "audio_s": 2.52
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.786,
+     "audio_s": 3.05
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.771,
+     "audio_s": 2.8
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.626,
+     "audio_s": 1.68
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.638,
+     "audio_s": 1.76
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.648,
+     "audio_s": 2.0
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.656,
+     "audio_s": 2.04
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.632,
+     "audio_s": 1.38
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.64,
+     "audio_s": 1.84
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.667,
+     "audio_s": 2.16
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.652,
+     "audio_s": 1.97
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.668,
+     "audio_s": 2.16
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.816,
+     "audio_s": 3.32
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.67,
+     "audio_s": 2.2
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.836,
+     "audio_s": 3.72
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.784,
+     "audio_s": 2.84
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.779,
+     "audio_s": 2.8
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.78,
+     "audio_s": 2.72
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.773,
+     "audio_s": 2.57
+    }
+   ]
+  },
+  "omni_step16": {
+   "summary": {
+    "n": 32,
+    "wall_median_s": 0.9,
+    "wall_max_s": 1.147,
+    "sustained_ratio": 0.416
+   },
+   "by_size": {
+    "sk3": {
+     "n": 8,
+     "wall_median_s": 0.86,
+     "wall_max_s": 0.883,
+     "sustained_ratio": 0.484
+    },
+    "sk6": {
+     "n": 8,
+     "wall_median_s": 1.057,
+     "wall_max_s": 1.103,
+     "sustained_ratio": 0.368
+    },
+    "cs3": {
+     "n": 8,
+     "wall_median_s": 0.892,
+     "wall_max_s": 0.919,
+     "sustained_ratio": 0.478
+    },
+    "cs6": {
+     "n": 8,
+     "wall_median_s": 1.074,
+     "wall_max_s": 1.147,
+     "sustained_ratio": 0.378
+    }
+   },
+   "rows": [
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.839,
+     "audio_s": 1.68
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.86,
+     "audio_s": 1.45
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.875,
+     "audio_s": 1.98
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.86,
+     "audio_s": 1.82
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.843,
+     "audio_s": 1.68
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.854,
+     "audio_s": 1.49
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.875,
+     "audio_s": 2.0
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.883,
+     "audio_s": 2.12
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.9,
+     "audio_s": 2.26
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 1.06,
+     "audio_s": 3.0
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.898,
+     "audio_s": 2.16
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 1.103,
+     "audio_s": 3.56
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 1.057,
+     "audio_s": 2.87
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 1.026,
+     "audio_s": 2.56
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 1.077,
+     "audio_s": 3.04
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 1.056,
+     "audio_s": 2.8
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.858,
+     "audio_s": 1.6
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.867,
+     "audio_s": 1.78
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.892,
+     "audio_s": 2.0
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.9,
+     "audio_s": 2.04
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.869,
+     "audio_s": 1.68
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.883,
+     "audio_s": 1.68
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.919,
+     "audio_s": 1.99
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.895,
+     "audio_s": 2.04
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.92,
+     "audio_s": 2.16
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 1.113,
+     "audio_s": 3.32
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.925,
+     "audio_s": 2.2
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 1.147,
+     "audio_s": 3.72
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 1.081,
+     "audio_s": 2.64
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 1.074,
+     "audio_s": 2.8
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 1.07,
+     "audio_s": 2.72
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 1.066,
+     "audio_s": 2.64
+    }
+   ]
+  },
+  "piper": {
+   "summary": {
+    "n": 32,
+    "wall_median_s": 0.15,
+    "wall_max_s": 0.244,
+    "sustained_ratio": 0.07
+   },
+   "rows": [
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.109,
+     "audio_s": 0.95
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.098,
+     "audio_s": 0.95
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.125,
+     "audio_s": 1.38
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.123,
+     "audio_s": 1.22
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.087,
+     "audio_s": 0.93
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.077,
+     "audio_s": 0.77
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.113,
+     "audio_s": 1.2
+    },
+    {
+     "lang": "sk",
+     "words": 3,
+     "wall_s": 0.17,
+     "audio_s": 1.72
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.156,
+     "audio_s": 1.68
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.237,
+     "audio_s": 2.54
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.159,
+     "audio_s": 1.7
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.244,
+     "audio_s": 2.54
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.203,
+     "audio_s": 2.3
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.209,
+     "audio_s": 2.16
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.22,
+     "audio_s": 2.54
+    },
+    {
+     "lang": "sk",
+     "words": 6,
+     "wall_s": 0.206,
+     "audio_s": 2.11
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.094,
+     "audio_s": 1.67
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.083,
+     "audio_s": 1.42
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.113,
+     "audio_s": 2.11
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.15,
+     "audio_s": 2.54
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.062,
+     "audio_s": 1.04
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.091,
+     "audio_s": 1.64
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.127,
+     "audio_s": 2.41
+    },
+    {
+     "lang": "cs",
+     "words": 3,
+     "wall_s": 0.12,
+     "audio_s": 2.3
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.144,
+     "audio_s": 2.68
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.236,
+     "audio_s": 4.37
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.141,
+     "audio_s": 2.61
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.244,
+     "audio_s": 4.7
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.184,
+     "audio_s": 3.51
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.174,
+     "audio_s": 3.29
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.183,
+     "audio_s": 3.24
+    },
+    {
+     "lang": "cs",
+     "words": 6,
+     "wall_s": 0.163,
+     "audio_s": 3.2
+    }
+   ]
+  },
+  "piper_plus_openvoice": {
+   "errors": [
+    "TypeError: OpenVoiceBaseClass.__init__() got an unexpected keyword argument 'enable_watermark'"
+   ],
+   "tb": "Traceback (most recent call last):\n  File \"/kaggle/working/ov_arm.py\", line 8, in <module>\n    t = time.perf_counter(); conv = ToneColorConverter(f'{ckpt}/converter/config.json', device='cuda', enable_watermark=False); conv.load_ckpt(f'{ckpt}/converter/checkpoint.pth')\n                                    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.13/dist-packages/openvoice/api.py\", line 103, in __init__\n    super().__init__(*args, **kwargs)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^\nTypeError: OpenVoiceBaseClass.__init__() got an unexpected keyword argument 'enable_watermark'\n"
+  }
+ },
+ "log": [
+  {
+   "t": 1.2,
+   "m": "ref",
+   "rc": 0
+  },
+  {
+   "t": 1.8,
+   "m": "pieces",
+   "sk3": 8,
+   "sk6": 8,
+   "cs3": 8,
+   "cs6": 8
+  },
+  {
+   "t": 8.2,
+   "m": "pip omnivoice",
+   "rc": 0,
+   "tail": "account all the packages that are installed. This behaviour is the source of the following dependency conflicts.\ndopamine-rl 4.1.2 requires gym<=0.25.2, but you have gym 0.26.2 which is incompatible.\n"
+  },
+  {
+   "t": 62.9,
+   "m": "omni load",
+   "s": 23.2
+  },
+  {
+   "t": 82.0,
+   "m": "omni prompt",
+   "s": 19.12
+  },
+  {
+   "t": 105.2,
+   "m": "omni done",
+   "steps": 12,
+   "n": 32,
+   "wall_median_s": 0.658,
+   "wall_max_s": 0.836,
+   "sustained_ratio": 0.302
+  },
+  {
+   "t": 135.9,
+   "m": "omni done",
+   "steps": 16,
+   "n": 32,
+   "wall_median_s": 0.9,
+   "wall_max_s": 1.147,
+   "sustained_ratio": 0.416
+  },
+  {
+   "t": 141.2,
+   "m": "pip piper",
+   "rc": 0,
+   "tail": ""
+  },
+  {
+   "t": 143.0,
+   "m": "piper voice",
+   "v": "sk_SK-lili-medium",
+   "rc": 0,
+   "tail": ""
+  },
+  {
+   "t": 144.4,
+   "m": "piper voice",
+   "v": "cs_CZ-jirka-medium",
+   "rc": 0,
+   "tail": ""
+  },
+  {
+   "t": 153.8,
+   "m": "piper done",
+   "n": 32,
+   "wall_median_s": 0.15,
+   "wall_max_s": 0.244,
+   "sustained_ratio": 0.07
+  },
+  {
+   "t": 167.2,
+   "m": "pip openvoice",
+   "rc": 0,
+   "tail": "shell-openvoice 0.0.0 requires librosa==0.9.1, but you have librosa 0.11.0 which is incompatible.\nmyshell-openvoice 0.0.0 requires numpy==1.22.0, but you have numpy 2.1.3 which is incompatible.\nmyshell-openvoice 0.0.0 requires pypinyin==0.50.0, but you have pypinyin 0.55.0 which is incompatible.\nmyshell-openvoice 0.0.0 requires unidecode==1.3.7, but you have unidecode 1.4.0 which is incompatible.\n"
+  },
+  {
+   "t": 169.4,
+   "m": "ov ckpt",
+   "path": "/root/.cache/huggingface/hub/models--myshell-ai--OpenVoiceV2/snapshots/f36e7edfe1684461a8343844af60babc2efbb727",
+   "files": [
+    ".DS_Store",
+    ".gitattributes",
+    "README.md",
+    "base_speakers",
+    "converter"
+   ]
+  },
+  {
+   "t": 179.6,
+   "m": "ov arm",
+   "rc": 0,
+   "tail": "dist-packages/jieba/_compat.py:18: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.\n  import pkg_resources\n"
+  },
+  {
+   "t": 179.6,
+   "m": "openvoice done",
+   "errors": [
+    "TypeError: OpenVoiceBaseClass.__init__() got an unexpected keyword argument 'enable_watermark'"
+   ]
+  },
+  {
+   "t": 179.6,
+   "m": "done",
+   "wall_s": 180
+  }
+ ],
+ "env": {
+  "gpu": "Tesla T4\nTesla T4"
+ },
+ "status": "done"
+}
