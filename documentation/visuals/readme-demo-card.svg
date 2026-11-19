@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="480" viewBox="0 0 1200 480" role="img" aria-labelledby="title desc">
+<title id="title">Watch BP's English to Slovak speech translation demo</title>
+<desc id="desc">A static video link card showing English speech converted into Slovak captions and spoken audio.</desc>
+<rect width="1200" height="480" rx="24" fill="#111827"/>
+<rect x="29" y="29" width="1142" height="422" rx="19" fill="#192334" stroke="#475569" stroke-width="2"/>
+<path d="M62 120H1138" stroke="#334155" stroke-width="2"/>
+<circle cx="82" cy="75" r="9" fill="#C41E3A"/>
+<circle cx="111" cy="75" r="9" fill="#64748B"/>
+<circle cx="140" cy="75" r="9" fill="#64748B"/>
+<text x="185" y="84" fill="#E2E8F0" font-size="27" font-weight="600" font-family="Arial, Helvetica, sans-serif">BP / LIVE DEMO</text>
+<text x="82" y="190" fill="#94A3B8" font-size="23" font-family="Arial, Helvetica, sans-serif" letter-spacing="2">ENGLISH SPEECH</text>
+<text x="82" y="251" fill="#F8FAFC" font-size="35" font-weight="600" font-family="Arial, Helvetica, sans-serif">Speak in one language.</text>
+<path d="M82 330h22l11-22 13 44 15-62 14 82 15-51 14 22h16l11-16 12 32 15-39 14 20h12" fill="none" stroke="#FF7A8A" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="596" cy="276" r="64" fill="#C41E3A"/>
+<path d="M580 244L625 276L580 308Z" fill="white"/>
+<text x="732" y="190" fill="#94A3B8" font-size="23" font-family="Arial, Helvetica, sans-serif" letter-spacing="2">SLOVAK OUTPUT</text>
+<text x="732" y="251" fill="#F8FAFC" font-size="35" font-weight="600" font-family="Arial, Helvetica, sans-serif">Hear the translation.</text>
+<text x="732" y="311" fill="#CBD5E1" font-size="25" font-family="Arial, Helvetica, sans-serif">Live captions + voice</text>
+<text x="82" y="413" fill="#CBD5E1" font-size="23" font-family="Arial, Helvetica, sans-serif">▶  Watch the actual recorded demo on YouTube</text>
+</svg>
