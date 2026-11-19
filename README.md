@@ -8,7 +8,7 @@ Local speech translation and live captions for calls and presentations. Micropho
   </a>
   <br/><b>Click the image to watch the demo on YouTube — English → Slovak, live captions, everything local.</b>
 </p>
-**[Try it locally](documentation/site/index.html)** — open the product site in a browser after cloning. **[Watch the demo](https://www.youtube.com/watch?v=MvxVdjCIrx8)** — English → Slovak, live captions, everything local.
+
 
 ## Features
 
