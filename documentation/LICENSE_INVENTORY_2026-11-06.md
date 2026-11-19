@@ -1,7 +1,6 @@
 # BP License Inventory — 2026-11-06
 
-**Purpose:** Commercial-use readiness audit. Fail-closed: non-commercial and unknown-licence
-engines are blocked unless explicitly opted in. Piper is GPL-3.0-or-later (not MIT) — it is
+**Purpose:** Historical commercial-use audit dated 2026-11-06. **Not a current compliance verdict.** As of 2026-11-19, `backend/registry.py` warns for non-commercial and unknown-licence engines but does **not** block them; check the actual selected engine and current model card. Piper is GPL-3.0-or-later (not MIT) — it is
 fine to run locally but shipping it inside a non-GPL bundle is a licence decision for the maintainer.
 
 ## Pipeline components (local-first, no cloud in the pipeline)
@@ -39,14 +38,12 @@ fine to run locally but shipping it inside a non-GPL bundle is a licence decisio
 | NLLB (MT) | facebook/nllb-200 | CC-BY-NC | ❌ No | Non-commercial. Blocked by licence gate unless explicit `allow_noncommercial=True`. |
 | OmniVoice | OmniVoice | HF licence | ⚠️ TBC | HF licence to confirm. GPU-only zero-shot cloning. |
 
-## Licence gate behaviour (backend/registry.py)
+## Current registry behaviour (updated 2026-11-19)
 
-- `commercial-ok`: ships in default profile
-- `gpl-3.0` (piper): fine to run locally; shipping in a non-GPL bundle is a licence decision for the maintainer
-- `non-commercial`: blocked unless `allow_noncommercial=True` (XTTS, NLLB)
-- `unknown`: blocked unless `allow_unknown=True` (confirm model card first)
-
-Both `select` and `instantiate` raise instead of silently passing an unlabelled engine.
+- `commercial-ok` and `gpl-3.0`: registry permits selection; distribution/compliance still requires independent review.
+- `non-commercial` and `unknown`: `select()` emits a warning and may still return the registered engine. The old opt-in blocking policy below is superseded.
+- `instantiate()` checks implementation and local availability, **not** legal permission.
+- Model-card/weight/voice licensing is external and not guaranteed by labels in this file. Separately installed dependencies may still impose obligations; this gateway is not a blanket licence exemption.
 
 ## Not verified
 
@@ -56,4 +53,4 @@ Both `select` and `instantiate` raise instead of silently passing an unlabelled 
 
 ## Last line
 
-🟢 Piper GPL-3.0-or-later (not bundled — user installs via setup.py) | 🟢 Opus-MT CC-BY-4.0 | 🟢 faster-whisper/CT2 MIT/Apache-2.0 | 🟡 OmniVoice HF licence unconfirmed | 🔴 XTTS/NLLB/SeamlessM4T non-commercial — blocked by gate
+🟢 Piper GPL-3.0-or-later (not bundled — user installs via setup.py) | 🟢 Opus-MT CC-BY-4.0 | 🟢 faster-whisper/CT2 MIT/Apache-2.0 | 🟡 OmniVoice HF licence unconfirmed | 🔴 XTTS/NLLB/SeamlessM4T non-commercial — **not blocked solely by licence classification**; verify use/distribution rights
