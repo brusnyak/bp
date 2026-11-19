@@ -1,105 +1,130 @@
-<p align="center">
-  <a href="https://brusnyak.github.io/bp/" target="_blank">
-    <img src="https://img.shields.io/badge/product%20site-brusnyak.github.io%2Fbp-blue?style=for-the-badge&logo=githubpages" alt="Product site" width="auto"/>
-  </a>
-  <a href="https://github.com/brusnyak/bp/actions" target="_blank">
-    <img src="https://img.shields.io/github/actions/workflow/status/brusnyak/bp/.github/workflows/ci.yml?label=CI&style=for-the-badge" alt="CI status" width="auto"/>
-  </a>
-  <a href="LICENSE" target="_blank">
-    <img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge" alt="MIT license" width="auto"/>
-  </a>
-</p>
+<div align="center">
 
-# BP — Live Speech Translation
+# BP · Real-Time Speech Translation
 
-Local speech translation and live captions for calls and presentations. Microphone → VAD → speech recognition → translation → voice → speakers/captions, all running on your own machine after model installation. No cloud speech service.
+**Translate speech into live captions and spoken audio — locally.**
 
-<p align="center">
-  <a href="https://www.youtube.com/watch?v=MvxVdjCIrx8" target="_blank" rel="noopener noreferrer">
-    <img src="https://img.youtube.com/vi/MvxVdjCIrx8/maxresdefault.jpg" alt="Live Speech Translation demo — English → Slovak, live captions, everything local" width="100%" max-width="860" style="border-radius:12px;border:1px solid #ddd;">
-  </a>
-  <br/><b>Watch the demo on YouTube — English → Slovak, live captions, everything local.</b>
-</p>
+For presentations, calls and multilingual audiences. A research prototype built around a configurable streaming pipeline.
 
-<p align="center">
-  <b>Deployed product site (SK/EN):</b> <a href="https://brusnyak.github.io/bp/">brusnyak.github.io/bp</a> · measured speed, voice choices, language routes, room mode.
-</p>
+[**Watch the demo**](https://www.youtube.com/watch?v=MvxVdjCIrx8) · [**Product site**](https://brusnyak.github.io/bp/) · [**Documentation**](documentation/INDEX.md)
 
-## Features
+![CI](https://img.shields.io/github/actions/workflow/status/brusnyak/bp/ci.yml?style=flat-square&label=CI)
+[![MIT code](https://img.shields.io/badge/code-MIT-333?style=flat-square)](LICENSE)
+![Python](https://img.shields.io/badge/Python-3.11%20%7C%203.12-3776AB?style=flat-square&logo=python&logoColor=white)
 
-- **Local-first** — recognition, translation and synthesis run on your machine; no cloud speech service
-- **Live captions** — translated subtitles appear as you speak
-- **Language routes** — English to Slovak, German and Czech (Slovak/Czech input experimental)
-- **Room broadcast** — one speaker, many listeners; each listener picks their language on their phone via link or QR code (no app required, experimental)
+</div>
+
+## At a glance
+
+| **Local pipeline** | **Live output** | **Flexible deployment** |
+| :--- | :--- | :--- |
+| Speech recognition → translation → voice, without a cloud speech API | Captions, synthesized speech and experimental audience broadcast | CPU, Apple Silicon and NVIDIA profiles; browser control |
+
+**[See English → Slovak demo on YouTube](https://www.youtube.com/watch?v=MvxVdjCIrx8)** · No letterboxed video thumbnail in this README.
+
+## System design
+
+```mermaid
+flowchart LR
+    A["Microphone / audio input"] --> B["VAD & speech segmentation"]
+    B --> C["Streaming speech recognition"]
+    C --> D["Machine translation"]
+    D --> E["Text-to-speech"]
+    D --> F["Live translated captions"]
+    E --> G["Speakers / virtual audio device"]
+    E --> H["Audience room (experimental)"]
+    F --> H
+```
+
+- **Backend:** Python, FastAPI and WebSockets; modular STT, MT and TTS engines.
+- **Models:** Whisper / MLX or faster-whisper by profile, Opus-MT translation and generic Piper voices. Experimental alternatives have separate setup and evidence.
+- **Delivery:** Browser interface, audio-device routing into meeting software and experimental room listeners.
+
+[Technical design](documentation/technical_report.md) · [Integration & WebSocket contract](documentation/INTEGRATION.md) · [API / SDK](documentation/sdk.md)
 
 ## Quick start
 
-Requires Git, Python 3.11 or 3.12, and ffmpeg. Setup downloads dependencies and models; allow disk space and internet access for installation.
+**Prerequisites:** Git, Python **3.11 or 3.12**, ffmpeg and disk space for downloaded models. First setup requires internet access; processing runs locally after model installation.
 
-```sh
+**1. Clone**
+
+```bash
 git clone https://github.com/brusnyak/bp.git
 cd bp
-python3.11 scripts/setup.py --profile mac --langs cs,sk,de
-make run PRESET=mac
 ```
 
-| Profile | For |
-|---|---|
-| `mac` | Apple Silicon (Whisper default) |
-| `nvidia` | NVIDIA CUDA |
-| `cpu` | Other machines |
+**2. Choose your hardware and install**
 
-Use `mac` / `nvidia` / `cpu` to match the setup profile and `PRESET`. Add `--dev` for test dependencies. On Windows use a Python 3.11 executable for setup, then `.venv\Scripts\python.exe app.py`; the Makefile's preset loader requires a POSIX shell.
+| Platform / hardware | Setup command |
+| :--- | :--- |
+| macOS · Apple Silicon | `python scripts/setup.py --profile mac --langs cs,sk,de` |
+| Windows / Linux · NVIDIA CUDA | `python scripts/setup.py --profile nvidia --langs cs,sk,de` |
+| Windows / Linux / macOS · CPU | `python scripts/setup.py --profile cpu --langs cs,sk,de` |
 
-Open **http://localhost:8000** in Chrome or Edge. Select the languages, choose **Microphone** and **Output**, use **Test microphone**, wear headphones and press **Start**. Use **Stop** to end capture and queued playback.
+Run the command in your terminal with **Python 3.11/3.12** on PATH. On macOS/Linux, use `python3.11` instead of `python` if needed. The setup script creates `.venv`, installs dependencies and fetches language models; it may take time and substantial storage. `--langs` supports `cs,de,sk,fr,pl`; English is bundled. Platform-specific GPU dependencies and model readiness still need to be verified on your machine.
 
-The standard Mac setup prepares Whisper. The faster Nemotron streaming result measured on the product site uses separately provisioned assets; cloning the repository does not install that configuration automatically. Generic voices are included by setup; personal models and recordings are not shipped. Slovak fine-tune and Nemotron remain manual installs until the model router installs them.
+**3. Start — same command on every OS**
 
-## Choose a route
+```bash
+python scripts/run.py --profile cpu
+```
 
-| Direction | Status |
-|---|---|
-| English → Slovak | Live laptop route measured; Slovak output remains experimental |
-| English → Czech | Available with generic Piper voice; primary pair |
-| English → German | Live route tested on a T4; check your own hardware |
-| German → English | Available; component measurements do not prove sustained live performance |
-| Czech → English | Route measured on a T4; latency depends on profile |
-| Slovak → English | Experimental; low latency needs a faster GPU |
+Replace `cpu` with **`mac`** or **`nvidia`** to match step 2. The launcher loads the matching `presets/<profile>.env` and starts the virtualenv server; no Makefile or POSIX shell required.
 
-See [language evidence](documentation/LANGUAGES.md) and the [product site's route table](https://brusnyak.github.io/bp/#trasy). Installation and model loading alone do not establish translation meaning or speech quality.
+Open **http://localhost:8000** in Chrome or Edge, choose languages and audio devices, test your mic, and press **Start**. Wear headphones to prevent feedback.
 
-## Connect a call or room
+[Supported language routes & hardware](documentation/LANGUAGES.md) · [Meeting/room audio routing](documentation/INTEGRATION.md) · [Troubleshooting & project status](documentation/STATUS.md)
 
-Select a virtual audio device under **Output**, then select its recording end as the meeting application's microphone. For listener phones, open **More → Audience broadcast (room mode) → Start room** and share the link or QR code. Room mode remains experimental — verify it with real devices before the event.
+## Benchmarks & data
 
-The [integration guide](documentation/INTEGRATION.md) covers BlackHole, VB-Cable, PipeWire/PulseAudio, subtitles, HTTPS, the HTTP/WebSocket contract and an AV/IT deployment checklist.
+**Observed route latency — English → Slovak, Mac M1 Pro, paced generated audio (one run per setting).** Lower is better. Measurements cover this test, not guaranteed sustained meeting performance.
 
-## Commands and developer reference
+| Route setting | Median lag | p90 lag | Recognition WER |
+| :--- | ---: | ---: | ---: |
+| Previous baseline | 0.75 s | 1.80 s | 5.2% |
+| Wait 0.5 s | **0.79 s** | **1.39 s** | 5.2% |
 
-| Command | Purpose |
-|---|---|
-| `make test` | Backend regression suites; requires setup with test dependencies |
-| `make check-docs` | Verify marked measurements against saved receipts |
-| `python3 scripts/check_public_tree.py` | Check tracked public text |
-| `.venv/bin/python scripts/build_site.py` | Rebuild the product site from its template, CSS and receipts |
-| `python3 scripts/check_site_links.py` | Check local site links and anchors without a server |
-| `.venv/bin/python scripts/bp.py selftest` | Check assets and configuration |
+[Raw baseline receipt](documentation/evidence/2026-11-15/A_baseline.score.txt) · [Raw tuned receipt](documentation/evidence/2026-11-15/D_wait05.score.txt) · [All Nov 15 runs](documentation/evidence/2026-11-15/)
 
-## Measured results (English → Slovak, Mac M1 Pro, one run, generated audio)
+**Other reproducible evaluations**
 
-| Setting | Median lag | p90 lag | Drift | Recognition WER |
-|---|---|---|---|---|
-| Wait 0.5 s (current) | 0.79 s | 1.39 s | -0.05 s/min | 5.2% |
-| Previous setting | 0.75 s | 1.80 s | — | 5.2% |
+| Evaluation | Example result / scope | Data & methodology |
+| :--- | :--- | :--- |
+| Live server, English → German | **1.56 s** median segment-end lag on a Kaggle T4 with 1.0 s agreement; one tested route configuration | [Benchmark methods](documentation/BENCHMARKS.md) |
+| Recognition + translation quality | FLEURS speech clips (60/language), OPUS-100 translation sentences; WER / chrF reported separately | [Language results](documentation/LANGUAGES.md) |
+| End-to-end & streaming strategies | 25-clip chain timings; paced playback, queue behavior and latency/error tradeoffs | [Benchmarks](documentation/BENCHMARKS.md) |
 
-Measured on `D_wait05` vs `A_baseline` in `documentation/evidence/2026-11-15/`, receipt-checked by `make check-docs`. Full numbers on the product site.
+**Reading the numbers:** recognition WER ≠ translation accuracy; component processing time ≠ observed live delay. See [evidence index](documentation/INDEX.md#understand-the-measurements) for hardware, datasets, raw results and limitations.
 
-[Documentation index](documentation/INDEX.md) · [API and Python SDK](documentation/sdk.md) · [Reading script](documentation/reading_script_multilingual.md) · [Benchmark methods](documentation/BENCHMARKS.md)
+## Project references
 
-## Privacy and licences
+[**Docs index**](documentation/INDEX.md) · [**Architecture**](documentation/technical_report.md) · [**Routes**](documentation/LANGUAGES.md) · [**Benchmarks**](documentation/BENCHMARKS.md) · [**API**](documentation/sdk.md) · [**Licence inventory**](documentation/LICENSE_INVENTORY_2026-11-06.md)
 
-The default speech pipeline runs on the processing host without cloud ASR, translation or TTS. Installation downloads models. Shared use needs access, consent and retention policies; uploaded recordings stay on the host.
+<details>
+<summary><b>Development commands</b></summary>
 
-Code: MIT. Models, voices and runtimes retain their own terms. Piper's runtime is GPL-3.0-or-later; each voice needs its own review. XTTS v2 weights use non-commercial CPML and X-Voice weights use CC-BY-NC. Review [NOTICE.md](NOTICE.md) and the [licence inventory](documentation/LICENSE_INVENTORY_2026-11-06.md) before distributing or operating a shared service. An engine being selectable does not grant commercial rights.
+```bash
+python scripts/setup.py --dev --profile cpu
+make test                 # POSIX shell / Make required
+make check-docs           # validate marked documentation claims
+python scripts/check_site_links.py
+python scripts/check_public_tree.py
+```
 
-Created by Yegor Brusnyak, MIT licence
+On Windows, run test suites via the virtualenv Python instead of relying on Make. See [CI workflow](.github/workflows/ci.yml) for platform-specific commands.
+
+</details>
+
+<details>
+<summary><b>Privacy, experimental features & licence restrictions</b></summary>
+
+- Speech processing uses local models by default; initial setup downloads model assets. Shared deployments need access, consent, and retention controls.
+- Experimental: room broadcast, Slovak speech output/input quality, and some recognition engines / personal voice choices. Installing a model is not proof of live-route quality.
+- The Nemotron configuration shown in some product-site results is separately provisioned; the standard setup does not install it automatically.
+- **Code is MIT; model and voice licences differ.** Piper runtime, XTTS v2 and X-Voice have separate restrictions, including non-commercial terms. Review [NOTICE](NOTICE.md) and [licences](documentation/LICENSE_INVENTORY_2026-11-06.md) before redistribution or commercial use.
+
+</details>
+
+---
+
+<sub>Created by [Yegor Brusnyak](https://github.com/brusnyak) · [MIT code licence](LICENSE)</sub>
