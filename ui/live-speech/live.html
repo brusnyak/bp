@@ -82,6 +82,23 @@
         </div>
         <p id="soundCheckStatus" class="hint" role="status"></p>
         <p id="feedbackWarning" class="hint" role="status" hidden data-i18n>Microphone is open. Use headphones or isolated audio to avoid feedback.</p>
+        <div class="row row-room">
+          <div class="control-group" id="room-broadcast-group">
+            <label class="label" for="roomIdInput" data-i18n>Audience broadcast (room mode)</label>
+            <div class="room-create">
+              <input id="roomIdInput" class="control-select" placeholder="Press Start room" readonly>
+              <button id="startRoomBtn" type="button" class="btn" title="Create a room; listeners join by link">Start room</button>
+            </div>
+            <a id="roomPreviewLink" hidden data-i18n>Open audience link</a>
+            <button id="copyRoomLinkBtn" type="button" class="btn" data-i18n>Copy audience link</button>
+            <div id="roomStatusInfo" class="hint" hidden><span id="roomListenerCount">0 listeners connected</span></div>
+            <div id="roomQrGroup" hidden class="room-qr">
+              <label class="label" for="roomQrImage" data-i18n>QR code for listeners</label>
+              <img id="roomQrImage" src="" alt="Scan to join the room">
+              <p id="roomQrUrl" class="hint"></p>
+            </div>
+          </div>
+        </div>
       </section>
       <p id="routeStatus" class="status-line" role="status" aria-live="polite" aria-atomic="true">Connecting…</p>
       <div class="content">
@@ -158,26 +175,6 @@
                 <option value="chunks">Fixed 2 s windows (old)</option>
               </select>
             </details>
-          </section>
-          <section class="card wide" id="more-room">
-            <h2 data-i18n>Room and meeting</h2>
-            <div class="card-grid">
-              <div class="control-group" id="room-broadcast-group">
-                <label class="label" for="roomIdInput" data-i18n>Audience broadcast (room mode)</label>
-                <div class="room-create">
-                  <input id="roomIdInput" class="control-select" placeholder="Press Start room" readonly>
-                  <button id="startRoomBtn" type="button" class="btn" title="Create a room; listeners join by link">Start room</button>
-                </div>
-                <a id="roomPreviewLink" hidden data-i18n>Open audience link</a>
-                <button id="copyRoomLinkBtn" type="button" class="btn" data-i18n>Copy audience link</button>
-                <div id="roomStatusInfo" class="hint" hidden><span id="roomListenerCount">0 listeners connected</span></div>
-              </div>
-              <div class="control-group">
-                <span class="label" data-i18n>Sending the translation into a meeting?</span>
-                <p class="hint" id="virtualMicHint">Choose a virtual cable as the output, then select it as the microphone in your meeting app.</p>
-                <p class="hint" data-i18n>Use BlackHole on macOS or VB-Cable on Windows. The page cannot tell whether the meeting is listening to the cable.</p>
-              </div>
-            </div>
           </section>
         </div>
       </details>

@@ -138,20 +138,28 @@ class Room:
             caption["translated"] = text
         else:
             t_mt = now()
-            translated = (await translate(text, src_lang, lang)).strip()
-            mt_s = now() - t_mt
-            if not translated:
-                return
-            caption["translated"] = translated
+            mt_s = 0.0
+            translated = text
+            try:
+                translated = (await translate(text, src_lang, lang)).strip()
+            except Exception:
+                log.exception("room %s: translation to '%s' unavailable, sending source caption only", self.room_id, lang)
+            if translated:
+                caption["translated"] = translated
             t_tts = now()
-            audio, sr = await synth(translated, lang)
-            tts_s = now() - t_tts
-            lead = ch.sched.lead_silence(onset, now()) if (prosody.ENABLED and onset is not None) else 0.0
-            if lead > 0:
-                audio = np.concatenate([np.zeros(int(sr * lead), dtype=np.asarray(audio).dtype), np.asarray(audio)])
-            ch.sched.committed(len(audio) / sr - lead)
-            import soundfile as sf
-            buf = io.BytesIO(); sf.write(buf, audio, sr, format="WAV"); wav = buf.getvalue()
+            tts_s = 0.0
+            try:
+                audio, sr = await synth(caption["translated"], lang)
+                tts_s = now() - t_tts
+                lead = ch.sched.lead_silence(onset, now()) if (prosody.ENABLED and onset is not None) else 0.0
+                if lead > 0:
+                    audio = np.concatenate([np.zeros(int(sr * lead), dtype=np.asarray(audio).dtype), np.asarray(audio)])
+                ch.sched.committed(len(audio) / sr - lead)
+                import soundfile as sf
+                buf = io.BytesIO(); sf.write(buf, audio, sr, format="WAV"); wav = buf.getvalue()
+            except Exception:
+                log.exception("room %s: voice synthesis to '%s' unavailable, caption only", self.room_id, lang)
+                wav = None
         t_send = now()
         await asyncio.gather(*(self._send(lst, caption, wav) for lst in targets))   # concurrent: one slow phone must not delay the rest
         if wav is not None:   # where a phrase's time went in this language, so a room run explains its own lag (queue = waited behind earlier phrases of the same language)

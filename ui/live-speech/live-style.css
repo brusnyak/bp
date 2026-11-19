@@ -8,6 +8,10 @@
 .row-lang .spacer { flex: 1; }
 #startStopBtn { min-width: 7rem; }
 .row-audio .field { flex: 1 1 14rem; }
+.row-room { flex: 1 1 100%; }
+.row-room .control-group { flex-direction: row; align-items: center; gap: var(--bp-s3); }
+.row-room .room-create input { max-width: 16rem; }
+.row-room a, .row-room button { white-space: nowrap; }
 .mic-device { display: flex; align-items: center; gap: var(--bp-s3); min-width: 0; }
 .mic-device select { flex: 1; width: 0; }
 .input-level-bar-segments { display: flex; align-items: center; gap: 2px; width: 4rem; height: var(--bp-s6); flex-shrink: 0; }
@@ -76,3 +80,6 @@
   .log-entry { grid-template-columns: 4.5rem 1fr; }
   .log-entry .lv { display: none; }
 }
+.room-qr { margin-top: var(--bp-s3); padding: var(--bp-s3); border: 1px solid var(--bp-hairline); border-radius: var(--bp-r-md); background: var(--bp-surface); }
+.room-qr img { max-width: 10rem; height: auto; display: block; margin: var(--bp-s2) 0; }
+.room-qr .hint { margin: 0; font-size: var(--bp-t-sm); color: var(--bp-muted); overflow-wrap: anywhere; }

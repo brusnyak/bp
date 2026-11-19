@@ -49,6 +49,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const headers = opts.headers || {};
     if (token) headers.Authorization = `Bearer ${token}`;
     const r = await fetch('/api' + path, { ...opts, headers });
+    if (r.status === 401 && token) {   // stale/expired guest token: drop it and retry once
+      localStorage.removeItem('bp_token');
+      return api(path, opts);
+    }
     if (r.status === 401) { throw new Error('unauthorized'); }
     return r.json();
   }

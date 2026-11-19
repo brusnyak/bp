@@ -1,10 +1,15 @@
-# Live Speech Translation
+# BP — Live Speech Translation
 
-Local speech translation and live captions for calls and presentations. Recognition, translation and generic Piper speech run on your own machine. Personal voice cloning and Slovak input remain experimental.
+Local speech translation and live captions for calls and presentations. Microphone → VAD → speech recognition → translation → voice → speakers/captions, all running on your own machine after model installation. No cloud speech service.
 
-**[Start with the product site](documentation/site/index.html)** — setup, language routes, measured speed, voice choices, hardware and room integration. Open the HTML file in a browser after cloning. GitHub's file viewer shows its source.
+**[Try it locally](documentation/site/index.html)** — open the product site in a browser after cloning. **[Watch the demo](https://www.youtube.com/watch?v=MvxVdjCIrx8)** — English → Slovak, live captions, everything local.
 
-Microphone → VAD → speech recognition → translation → voice → speakers / captions. All processing is local after model installation; room listeners receive output over your network.
+## Features
+
+- **Local-first** — recognition, translation and synthesis run on your machine; no cloud speech service
+- **Live captions** — translated subtitles appear as you speak
+- **Language routes** — English to Slovak, German and Czech (Slovak/Czech input experimental)
+- **Room broadcast** — one speaker, many listeners, each picking their language on their phone via QR code (built; real-model test pending)
 
 ## Quick start
 
@@ -21,7 +26,7 @@ Use `mac` for Apple Silicon, `nvidia` for NVIDIA CUDA, or `cpu` for other machin
 
 Open **http://localhost:8000** in Chrome or Edge. Select the languages, choose **Microphone** and **Output**, use **Test microphone**, wear headphones and press **Start** (it prepares the route and begins capture). Use **Stop** to end capture and queued playback.
 
-The standard Mac setup prepares Whisper. The faster Nemotron streaming result on the product site uses separately provisioned assets; cloning the repository does not install that configuration automatically. Generic voices are included by setup; personal models and recordings are not shipped.
+The standard Mac setup prepares Whisper. For the faster streaming route on Apple Silicon use `make run PRESET=mac-nemotron` (Nemotron 3.5 ASR Streaming, 0.6B, ~0.6 GB) — it passed every near-real-time criterion on this machine. `mac` stays the Whisper default for broader compatibility. Generic voices are included by setup; personal models and recordings are not shipped.
 
 ## Choose a route
 
@@ -39,6 +44,12 @@ See [language evidence](documentation/LANGUAGES.md) and the [product site's rout
 ## Connect a call or room
 
 Select a virtual audio device under **Output**, then select its recording end as the meeting application's microphone. For listener phones, open **More → Audience broadcast (room mode) → Start room** and share the link or QR code. Room mode remains experimental.
+
+## Streaming and near real time (verified)
+
+Recognition is the latency floor: Whisper (Mac default) re-decodes a padded 30 s window on every call and starts only after a clause completes — median lag 3.0–3.6 s on this Mac. Nemotron 3.5 ASR Streaming 0.6B (`BP_STT_ENGINE=nemotron`, `make run PRESET=mac-nemotron`) is a streaming recogniser (`open_stream`/`stream_feed`) that consumes audio as it arrives. Verified end-to-end on the real route (English → Slovak, `agree_short`, generated English): median lag **0.82 s**, p90 **1.34 s**, early start **100%**, drift **0.1 s/min**, recognition error **5.2%** — every criterion in `documentation/NEAR_REALTIME_GOAL.md` passes.
+
+The near-real-time goal: median lag ≤ 2.0 s behind speech, p90 ≤ 4.5 s, first-clause voice starting before ≥ half of 8+ word sentences end, ≤ 0.5 s lag growth per minute. Nemotron passes all four on current hardware; Whisper agreement passes quality + early start but misses lag by ~0.6 s on the Mac.
 
 The [integration guide](documentation/INTEGRATION.md) covers BlackHole, VB-Cable, PipeWire/PulseAudio, subtitles, HTTPS, the HTTP/WebSocket contract and an AV/IT deployment checklist.
 
@@ -76,8 +87,12 @@ Saved measurements from the earlier Whisper configurations. These are different 
 
 
 </details>
+## Future plan (next verified work)
 
-Created by Yegor Brusnyak, MIT licence
+
+1. **Streaming STT — done.** Nemotron 3.5 ASR Streaming 0.6B (`BP_STT_ENGINE=nemotron`, `make run PRESET=mac-nemotron`) passes every near-real-time criterion on this Mac (median 0.82 s, p90 1.34 s, early start 100%, error 5.2%). Remaining: real (non-generated) speech measurement, and a Transformers/NVIDIA engine (`open_stream`/`stream_feed`) for GPU boxes at RTF ≤ 0.5.
+2. **Room mode with real models.** Backend and listener page are built and unit-tested (3 and 12 listeners, per-listener send timeout, refused-language notification); the missing step is a real-model run (`bp-room-test-t4` queued on Kaggle).
+3. **Publish.** Regenerate `documentation/site/index.html` via `scripts/build_site.py` after any copy/evidence change, then push to `main` and republish `gh-pages` (`https://brusnyak.github.io/bp/`).
 
 ### Local sessions and voice references
 

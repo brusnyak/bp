@@ -1618,6 +1618,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     const made = await r.json();
                     roomIdInput.value = made.room_id; roomListenUrl = made.listen_url;
                     updateRoomUI(); invalidatePreparation();
+                    const qrUrl = `/api/room/${encodeURIComponent(made.room_id)}/qr`;
+                    try {
+                        const qr = await fetch(qrUrl, { headers: auth });
+                        if (qr.ok) {
+                            const svg = await qr.text();
+                            const qrImage = document.getElementById('roomQrImage');
+                            const qrGroup = document.getElementById('roomQrGroup');
+                            const qrUrlText = document.getElementById('roomQrUrl');
+                            if (qrImage) qrImage.src = 'data:image/svg+xml;utf-8,' + encodeURIComponent(svg);
+                            if (qrGroup) qrGroup.hidden = false;
+                            if (qrUrlText) qrUrlText.textContent = made.listen_url;
+                        }
+                    } catch (e) {
+                        // QR fetch is non-fatal; the link still works
+                    }
                     showNotification('Room started. Listeners join by link.', 'success');
                 } catch (e) {
                     showNotification(`Could not start a room: ${e.message}`, 'error');

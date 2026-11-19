@@ -102,11 +102,10 @@ def listener_model(events, rate):
 
 async def run(a):
     audio = decode(a.audio, a.seconds, a.offset)
-    status, data = post(a.base, "/api/register", {"username": "paced", "email": "paced@bp.local", "password": "paced-pass-1234"})
-    status, data = post(a.base, "/api/login", {"email": "paced@bp.local", "password": "paced-pass-1234"})
+    status, data = post(a.base, "/api/guest", {})
     token = data.get("token") or data.get("access_token")
     if status != 200 or not token:
-        raise SystemExit(f"login failed {status} {data}")
+        raise SystemExit(f"guest token failed {status} {data}")
     url = a.base.replace("https://", "wss://").replace("http://", "ws://") + "/ws?token=" + token
     ctx = ssl._create_unverified_context() if url.startswith("wss") else None
     events, t0 = [], None
