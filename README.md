@@ -2,9 +2,9 @@
 
 # BP · Live Speech Translation
 
-**A local-first speech translation orchestrator for calls, presentations and multilingual rooms.**
+**Local-first speech translation · modular engines · experimental audience routing.**
 
-Connect speech recognition, machine translation and speech synthesis engines; deliver translated captions and audio through a browser.
+Connect speech recognition, translation and speech synthesis; deliver captions and audio through a browser.
 
 [**Watch demo**](https://www.youtube.com/watch?v=MvxVdjCIrx8) · [**Product site**](https://brusnyak.github.io/bp/) · [**Architecture**](#architecture) · [**Results & data**](#results--data)
 
@@ -27,26 +27,46 @@ Connect speech recognition, machine translation and speech synthesis engines; de
 ## Architecture
 
 ```mermaid
-flowchart LR
-    A["Microphone / browser"] --> B["FastAPI + WebSocket session"]
-    B --> C["VAD / audio buffering / segmentation"]
-    C --> D["Selected STT engine"]
-    D --> E["Text transcript"]
-    E --> F["Selected MT engine"]
-    F --> G["Translated text"]
-    G --> H["Captions in browser"]
-    G --> I["Selected TTS engine"]
-    I --> J["Audio playback / virtual device"]
-    E -.-> K["Experimental room fan-out"]
-    K --> L["Per-language MT + TTS"]
-    L --> M["Listener captions + audio"]
+flowchart TB
+    IN["Browser mic / audio source"] --> IO["Session · WebSocket · VAD · buffer"]
+    IO --> ROUTE{"Execution strategy"}
+    REG["Engine registry · profiles · language packs"] -. "select / configure" .-> ROUTE
+
+    subgraph MOD["Modular route · implemented"]
+        direction LR
+        STT["STT"] --> MT["MT"] --> TTS["TTS"]
+    end
+    subgraph UNI["Unified speech-to-speech · planned"]
+        S2S["S2S model adapter"]
+    end
+
+    ROUTE --> STT
+    ROUTE -. "adapter not implemented" .-> S2S
+    MT --> TXT["Translated captions"]
+    TTS --> AUDIO["Translated audio"]
+    S2S -.-> AUDIO
+    S2S -. "only if model supplies text" .-> TXT
+
+    STT -.-> ROOM["Room fan-out · experimental"]
+    ROOM -.-> PER["Per-language MT + TTS"]
+    PER -.-> USERS["Listener captions / audio"]
+
+    classDef source fill:#DCEBFF,stroke:#3B73BD,color:#17345E
+    classDef control fill:#EEE4FF,stroke:#8B5CC3,color:#402268
+    classDef active fill:#DCF4E5,stroke:#399363,color:#154C32
+    classDef future fill:#FFF0CC,stroke:#C79535,color:#704400
+    classDef output fill:#FCE4EB,stroke:#C55479,color:#67233B
+
+    class IN,IO source
+    class ROUTE,REG control
+    class STT,MT,TTS active
+    class S2S future
+    class TXT,AUDIO,ROOM,PER,USERS output
 ```
 
-**Control plane:** [engine registry](backend/registry.py), [language packs](languages/packs/), hardware presets and model selection. **Streaming path:** [session server](app.py), [backend pipeline](backend/streaming/pipeline.py), [room fan-out](backend/room.py).
+**Execution:** [streaming pipeline](backend/streaming/pipeline.py) · [model registry](backend/registry.py) · [room delivery](backend/room.py) · [API](documentation/INTEGRATION.md). BP routes **third-party engines**; it is not itself a foundation model.
 
-**Important boundaries:** This is an orchestration application, not a new foundation speech model. The currently implemented live route chains **STT → MT → TTS**. Alternative recognition and voice engines have different levels of integration and testing. The registry also describes **unified speech-to-speech candidates**, but its Qwen3-Omni and SeamlessM4T v2 adapters are **declared only**, not runnable live routes. Engine registration does not mean installation, compatibility, or benchmark validation.
-
-[Architecture details](documentation/technical_report.md) · [Integrations and wire protocol](documentation/INTEGRATION.md) · [API/SDK](documentation/sdk.md)
+**Status:** modular STT → MT → TTS is implemented. Room fan-out is experimental. Unified S2S is an **integration target**, not a working live adapter; model-dependent captions and voice identity are not guaranteed. [More detail](documentation/technical_report.md).
 
 ## Quick start
 
@@ -73,24 +93,25 @@ Open **http://localhost:8000** in **Chrome or Edge**. Choose your speech route a
 
 ## Results & data
 
-**English → Slovak, recorded replay on Mac M1 Pro.** One run per configuration, generated English audio (not a live participant).
+**Measured routes** · latency is measured *after a speech segment ends*, not word-to-word translation delay.
 
-| Configuration | Median measured lag | p90 lag | Recognition WER |
-| :--- | ---: | ---: | ---: |
-| Baseline | 0.75 s | 1.80 s | 5.2% |
-| Wait 0.5 s | **0.79 s** | **1.39 s** | 5.2% |
+| Route | Test & hardware | Median lag | p90 | Recognition WER |
+| :--- | :--- | ---: | ---: | ---: |
+| EN → SK | Generated 60 s replay · M1 Pro, MLX | **0.79 s** | 1.39 s | 5.2% |
+| EN → SK | Real recorded speech · T4, Whisper agree 1.0 s | 1.89 s | 3.10 s | 23.0% |
+| EN → DE | Real recorded speech · T4, Whisper agree 1.0 s | 1.56 s | 2.55 s | 21.3% |
 
-[Baseline result](documentation/evidence/2026-11-15/A_baseline.score.txt) · [Wait 0.5 result](documentation/evidence/2026-11-15/D_wait05.score.txt) · [Run artifacts](documentation/evidence/2026-11-15/)
+Sources: [Mac replay receipt](documentation/evidence/2026-11-15/D_wait05.score.txt) · [T4 server route data](documentation/evidence/2026-11-07/route_test.json) · [audit / test definitions](AUDIT_EVIDENCE_ROUTES_2026-11-19.md). **These are different tests; do not compare them as one leaderboard.**
 
-| Other evaluated work | Measured scope | Source |
-| :--- | :--- | :--- |
-| Live English → German | <!-- claim:route:en-de|agree10:lag -->1.56<!-- /claim --> s median segment-end lag, 1.0 s agreement, Kaggle T4; one route configuration | [Server-route benchmarks](documentation/BENCHMARKS.md) |
-| Recognition and translation | FLEURS recognition clips (60 per language); OPUS-100 translation examples, WER and chrF | [Language matrix](documentation/LANGUAGES.md) |
-| Streaming / chain behavior | Speech chunking vs agreement, 25-clip whole-chain timings, per-stage and queue measurements | [Methods & data](documentation/BENCHMARKS.md) |
+**Multilingual recognition** · offline FLEURS, Kaggle T4, 60 clips per language. WER ↓ (not full live-route performance).
 
-Measurements of transcription error, translation quality, model speed, speech onset and end-to-end lag are **different metrics**. Saved tests do not establish continuous deployment quality, cloned-voice identity, or room capacity.
+| EN | DE | FR | PL | CS | SK |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 4.5% | 4.8% | 5.0% | 7.7% | 11.6% | 6.5% |
 
-[**All benchmark methods & receipts**](documentation/INDEX.md#understand-the-measurements) · [**Route status**](documentation/STATUS.md) · [**Full documentation**](documentation/INDEX.md)
+Different best-performing recognizers are used by language; SK uses a Slovak fine-tune. [Models & methods](documentation/LANGUAGES.md) · [Raw component evidence](documentation/evidence/2026-11-07/lang_matrix.json).
+
+**Known gaps:** real-speech accuracy differs substantially from clean replay; room-mode T4 experiments reached **4.0–7.31 s** median speaker lag under tested configurations and have no real-device listener validation. See the [evidence audit](AUDIT_EVIDENCE_ROUTES_2026-11-19.md) before claiming production-grade multilingual performance.
 
 ## Licences & deployment
 
@@ -101,16 +122,6 @@ Measurements of transcription error, translation quality, model speed, speech on
 - **Distribution:** first-party code licence and third-party obligations must be reviewed separately before distributing a bundle or using models commercially. Model downloads, local inference and deployment are not interchangeable licensing cases.
 
 [Third-party NOTICE](NOTICE.md) · [Licence inventory (verify current model cards)](documentation/LICENSE_INVENTORY_2026-11-06.md) · [Registry metadata](backend/registry.py)
-
-## Evidence transparency
-
-The 5.2% recognition WER above is from **generated English replay** (`D_wait05` vs `A_baseline`), not real microphone speech. On the real route (Kaggle T4 server, owner English reading) transcript error is **23.0-23.8%** (`route_test.json`, `BENCHMARKS.md` #2b), about 4x the offline simulation. Real-mic Slovak input scores **17.7-45%** depending on engine (`LANGUAGES.md`, `STATUS.md` strategy lab). These are different data and clocks; they are not merged into one headline number.
-
-Room mode is built and unit-tested, with two Kaggle T4 real-model runs (speaker lag 5.64 s for 3 listeners, 7.31 s for 12 listeners; `evidence/2026-11-09/room_test_t4_log.json`, `evidence/2026-11-10/room_test_t4_v3.json`), but it has **not** been verified with real listeners in front of real devices (`STATUS.md` room-mode requirements #1 open).
-
-Nemotron 3.5 ASR 0.6B shows good EN→SK lag on real Mac speech (**1.10 s** median, `route_nemotron_en_sk_real_speech_mac.json`) but SK word error **0.86/0.75 with language drift** on the maintainer mic (`model_landscape_2026-10.md`); its latency is measured, its live-route SK accuracy is not validated.
-
-Full receipts: `documentation/evidence/2026-11-15/`, `documentation/evidence/2026-11-07/`, `documentation/evidence/2026-11-09/`, `documentation/evidence/2026-11-10/`. Consolidated audit: `AUDIT_EVIDENCE_ROUTES_2026-11-19.md`.
 
 <details>
 <summary><b>Developer commands and limitations</b></summary>
