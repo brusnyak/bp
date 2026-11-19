@@ -1,127 +1,119 @@
 <div align="center">
 
-# BP · Real-Time Speech Translation
+# BP · Live Speech Translation
 
-**Translate speech into live captions and spoken audio — locally.**
+**A local-first speech translation orchestrator for calls, presentations and multilingual rooms.**
 
-For presentations, calls and multilingual audiences. A research prototype built around a configurable streaming pipeline.
+Connect speech recognition, machine translation and speech synthesis engines; deliver translated captions and audio through a browser.
 
-[**Watch the demo**](https://www.youtube.com/watch?v=MvxVdjCIrx8) · [**Product site**](https://brusnyak.github.io/bp/) · [**Documentation**](documentation/INDEX.md)
+[**Watch demo**](https://www.youtube.com/watch?v=MvxVdjCIrx8) · [**Product site**](https://brusnyak.github.io/bp/) · [**Architecture**](#architecture) · [**Results & data**](#results--data)
 
 ![CI](https://img.shields.io/github/actions/workflow/status/brusnyak/bp/ci.yml?style=flat-square&label=CI)
-[![MIT code](https://img.shields.io/badge/code-MIT-333?style=flat-square)](LICENSE)
+[![Code licence: MIT](https://img.shields.io/badge/code-MIT-333?style=flat-square)](LICENSE)
 ![Python](https://img.shields.io/badge/Python-3.11%20%7C%203.12-3776AB?style=flat-square&logo=python&logoColor=white)
+
+[![Watch the BP demo: English speech translated to Slovak audio and captions](documentation/visuals/readme-demo-card.svg)](https://www.youtube.com/watch?v=MvxVdjCIrx8)
+
+*Recorded demo: English → Slovak. Click the image to watch on YouTube.*
 
 </div>
 
-## At a glance
+## Capabilities
 
-| **Local pipeline** | **Live output** | **Flexible deployment** |
+| **Orchestrate models** | **Translate live** | **Connect audiences** |
 | :--- | :--- | :--- |
-| Speech recognition → translation → voice, without a cloud speech API | Captions, synthesized speech and experimental audience broadcast | CPU, Apple Silicon and NVIDIA profiles; browser control |
+| Configure STT, MT and TTS engines by route and hardware | Stream captions and generated speech; route audio into meeting software | Share room links/QR codes; multi-listener mode is **experimental** |
 
-**[See English → Slovak demo on YouTube](https://www.youtube.com/watch?v=MvxVdjCIrx8)** · No letterboxed video thumbnail in this README.
-
-## System design
+## Architecture
 
 ```mermaid
 flowchart LR
-    A["Microphone / audio input"] --> B["VAD & speech segmentation"]
-    B --> C["Streaming speech recognition"]
-    C --> D["Machine translation"]
-    D --> E["Text-to-speech"]
-    D --> F["Live translated captions"]
-    E --> G["Speakers / virtual audio device"]
-    E --> H["Audience room (experimental)"]
-    F --> H
+    A["Microphone / browser"] --> B["FastAPI + WebSocket session"]
+    B --> C["VAD / audio buffering / segmentation"]
+    C --> D["Selected STT engine"]
+    D --> E["Text transcript"]
+    E --> F["Selected MT engine"]
+    F --> G["Translated text"]
+    G --> H["Captions in browser"]
+    G --> I["Selected TTS engine"]
+    I --> J["Audio playback / virtual device"]
+    E -.-> K["Experimental room fan-out"]
+    K --> L["Per-language MT + TTS"]
+    L --> M["Listener captions + audio"]
 ```
 
-- **Backend:** Python, FastAPI and WebSockets; modular STT, MT and TTS engines.
-- **Models:** Whisper / MLX or faster-whisper by profile, Opus-MT translation and generic Piper voices. Experimental alternatives have separate setup and evidence.
-- **Delivery:** Browser interface, audio-device routing into meeting software and experimental room listeners.
+**Control plane:** [engine registry](backend/registry.py), [language packs](languages/packs/), hardware presets and model selection. **Streaming path:** [session server](app.py), [backend pipeline](backend/streaming/pipeline.py), [room fan-out](backend/room.py).
 
-[Technical design](documentation/technical_report.md) · [Integration & WebSocket contract](documentation/INTEGRATION.md) · [API / SDK](documentation/sdk.md)
+**Important boundaries:** This is an orchestration application, not a new foundation speech model. The currently implemented live route chains **STT → MT → TTS**. Alternative recognition and voice engines have different levels of integration and testing. The registry also describes **unified speech-to-speech candidates**, but its Qwen3-Omni and SeamlessM4T v2 adapters are **declared only**, not runnable live routes. Engine registration does not mean installation, compatibility, or benchmark validation.
+
+[Architecture details](documentation/technical_report.md) · [Integrations and wire protocol](documentation/INTEGRATION.md) · [API/SDK](documentation/sdk.md)
 
 ## Quick start
 
-**Prerequisites:** Git, Python **3.11 or 3.12**, ffmpeg and disk space for downloaded models. First setup requires internet access; processing runs locally after model installation.
-
-**1. Clone**
+**Requirements:** Git, Python 3.11 or 3.12, ffmpeg, and internet/disk space for first-time dependency and model downloads.
 
 ```bash
 git clone https://github.com/brusnyak/bp.git
 cd bp
 ```
 
-**2. Choose your hardware and install**
+Pick **one** hardware profile:
 
-| Platform / hardware | Setup command |
-| :--- | :--- |
-| macOS · Apple Silicon | `python scripts/setup.py --profile mac --langs cs,sk,de` |
-| Windows / Linux · NVIDIA CUDA | `python scripts/setup.py --profile nvidia --langs cs,sk,de` |
-| Windows / Linux / macOS · CPU | `python scripts/setup.py --profile cpu --langs cs,sk,de` |
+| Hardware | Setup | Start |
+| :--- | :--- | :--- |
+| Apple Silicon (macOS) | `python scripts/setup.py --profile mac` | `python scripts/run.py --profile mac` |
+| NVIDIA CUDA (Windows/Linux) | `python scripts/setup.py --profile nvidia` | `python scripts/run.py --profile nvidia` |
+| CPU (Windows/macOS/Linux) | `python scripts/setup.py --profile cpu` | `python scripts/run.py --profile cpu` |
 
-Run the command in your terminal with **Python 3.11/3.12** on PATH. On macOS/Linux, use `python3.11` instead of `python` if needed. The setup script creates `.venv`, installs dependencies and fetches language models; it may take time and substantial storage. `--langs` supports `cs,de,sk,fr,pl`; English is bundled. Platform-specific GPU dependencies and model readiness still need to be verified on your machine.
+Setup creates `.venv`, downloads model assets and runs a self-test; the separate launcher loads the corresponding `presets/<profile>.env` on all three operating systems. Use `python3.11` instead of `python` where required. Add `--langs cs,sk,de` to setup to choose language packs (default: `de,sk,cs`; other available packs: `fr,pl`).
 
-**3. Start — same command on every OS**
+Open **http://localhost:8000** in **Chrome or Edge**. Choose your speech route and devices, test your microphone, use headphones and start translating. GPU setup, route latency and model availability are hardware-dependent; this table is **not** a claim of tested fresh installs for every combination.
 
-```bash
-python scripts/run.py --profile cpu
-```
+[Language coverage](documentation/LANGUAGES.md) · [Send audio to a call / room](documentation/INTEGRATION.md) · [Known limitations](documentation/ROUTE_LIMITS_2026-11-17.md)
 
-Replace `cpu` with **`mac`** or **`nvidia`** to match step 2. The launcher loads the matching `presets/<profile>.env` and starts the virtualenv server; no Makefile or POSIX shell required.
+## Results & data
 
-Open **http://localhost:8000** in Chrome or Edge, choose languages and audio devices, test your mic, and press **Start**. Wear headphones to prevent feedback.
+**English → Slovak, recorded replay on Mac M1 Pro.** One run per configuration, generated English audio (not a live participant).
 
-[Supported language routes & hardware](documentation/LANGUAGES.md) · [Meeting/room audio routing](documentation/INTEGRATION.md) · [Troubleshooting & project status](documentation/STATUS.md)
-
-## Benchmarks & data
-
-**Observed route latency — English → Slovak, Mac M1 Pro, paced generated audio (one run per setting).** Lower is better. Measurements cover this test, not guaranteed sustained meeting performance.
-
-| Route setting | Median lag | p90 lag | Recognition WER |
+| Configuration | Median measured lag | p90 lag | Recognition WER |
 | :--- | ---: | ---: | ---: |
-| Previous baseline | 0.75 s | 1.80 s | 5.2% |
+| Baseline | 0.75 s | 1.80 s | 5.2% |
 | Wait 0.5 s | **0.79 s** | **1.39 s** | 5.2% |
 
-[Raw baseline receipt](documentation/evidence/2026-11-15/A_baseline.score.txt) · [Raw tuned receipt](documentation/evidence/2026-11-15/D_wait05.score.txt) · [All Nov 15 runs](documentation/evidence/2026-11-15/)
+[Baseline result](documentation/evidence/2026-11-15/A_baseline.score.txt) · [Wait 0.5 result](documentation/evidence/2026-11-15/D_wait05.score.txt) · [Run artifacts](documentation/evidence/2026-11-15/)
 
-**Other reproducible evaluations**
-
-| Evaluation | Example result / scope | Data & methodology |
+| Other evaluated work | Measured scope | Source |
 | :--- | :--- | :--- |
-| Live server, English → German | **1.56 s** median segment-end lag on a Kaggle T4 with 1.0 s agreement; one tested route configuration | [Benchmark methods](documentation/BENCHMARKS.md) |
-| Recognition + translation quality | FLEURS speech clips (60/language), OPUS-100 translation sentences; WER / chrF reported separately | [Language results](documentation/LANGUAGES.md) |
-| End-to-end & streaming strategies | 25-clip chain timings; paced playback, queue behavior and latency/error tradeoffs | [Benchmarks](documentation/BENCHMARKS.md) |
+| Live English → German | <!-- claim:route:en-de|agree10:lag -->1.56<!-- /claim --> s median segment-end lag, 1.0 s agreement, Kaggle T4; one route configuration | [Server-route benchmarks](documentation/BENCHMARKS.md) |
+| Recognition and translation | FLEURS recognition clips (60 per language); OPUS-100 translation examples, WER and chrF | [Language matrix](documentation/LANGUAGES.md) |
+| Streaming / chain behavior | Speech chunking vs agreement, 25-clip whole-chain timings, per-stage and queue measurements | [Methods & data](documentation/BENCHMARKS.md) |
 
-**Reading the numbers:** recognition WER ≠ translation accuracy; component processing time ≠ observed live delay. See [evidence index](documentation/INDEX.md#understand-the-measurements) for hardware, datasets, raw results and limitations.
+Measurements of transcription error, translation quality, model speed, speech onset and end-to-end lag are **different metrics**. Saved tests do not establish continuous deployment quality, cloned-voice identity, or room capacity.
 
-## Project references
+[**All benchmark methods & receipts**](documentation/INDEX.md#understand-the-measurements) · [**Route status**](documentation/STATUS.md) · [**Full documentation**](documentation/INDEX.md)
 
-[**Docs index**](documentation/INDEX.md) · [**Architecture**](documentation/technical_report.md) · [**Routes**](documentation/LANGUAGES.md) · [**Benchmarks**](documentation/BENCHMARKS.md) · [**API**](documentation/sdk.md) · [**Licence inventory**](documentation/LICENSE_INVENTORY_2026-11-06.md)
+## Licences & deployment
+
+**BP repository code is MIT; that does not relicense third-party engines, model weights, voices or data.** BP selects and invokes local dependencies and downloads some through its setup scripts. The application is an orchestrator, but *being a middle layer does not automatically remove distribution, attribution, commercial-use, or copyleft obligations*.
+
+- **Default stack:** Whisper / faster-whisper or MLX, Opus-MT and Piper, depending on profile and language. Piper's runtime is GPL-3.0-or-later; voice weights and translation checkpoints have their **own** terms.
+- **Optional models:** some are non-commercial, unknown-licence, experimental, or declared-only. The current engine registry **warns rather than blocks** selection of non-commercial/unknown licences; it is **not** a legal-compliance gate.
+- **Distribution:** first-party code licence and third-party obligations must be reviewed separately before distributing a bundle or using models commercially. Model downloads, local inference and deployment are not interchangeable licensing cases.
+
+[Third-party NOTICE](NOTICE.md) · [Licence inventory (verify current model cards)](documentation/LICENSE_INVENTORY_2026-11-06.md) · [Registry metadata](backend/registry.py)
 
 <details>
-<summary><b>Development commands</b></summary>
+<summary><b>Developer commands and limitations</b></summary>
 
 ```bash
 python scripts/setup.py --dev --profile cpu
-make test                 # POSIX shell / Make required
-make check-docs           # validate marked documentation claims
-python scripts/check_site_links.py
+python scripts/check_readme_claims.py
 python scripts/check_public_tree.py
+# POSIX shell / Make environment:
+make test
 ```
 
-On Windows, run test suites via the virtualenv Python instead of relying on Make. See [CI workflow](.github/workflows/ci.yml) for platform-specific commands.
-
-</details>
-
-<details>
-<summary><b>Privacy, experimental features & licence restrictions</b></summary>
-
-- Speech processing uses local models by default; initial setup downloads model assets. Shared deployments need access, consent, and retention controls.
-- Experimental: room broadcast, Slovak speech output/input quality, and some recognition engines / personal voice choices. Installing a model is not proof of live-route quality.
-- The Nemotron configuration shown in some product-site results is separately provisioned; the standard setup does not install it automatically.
-- **Code is MIT; model and voice licences differ.** Piper runtime, XTTS v2 and X-Voice have separate restrictions, including non-commercial terms. Review [NOTICE](NOTICE.md) and [licences](documentation/LICENSE_INVENTORY_2026-11-06.md) before redistribution or commercial use.
+Run tests through the virtualenv Python on Windows (see [CI](.github/workflows/ci.yml)). Model choice and language coverage are not guaranteed by registry entries alone. Room mode requires real-model and real-listener validation. For shared use, define access, consent and data-retention policies.
 
 </details>
 
