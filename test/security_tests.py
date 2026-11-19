@@ -30,7 +30,10 @@ def test_missing_jwt_secret_persists_random_secret(monkeypatch, tmp_path):
     secret = auth._jwt_secret()
     assert secret != "dev-only-insecure-secret-change-me" and len(secret) >= 32
     assert path.read_text() == secret == auth._jwt_secret()
-    # POSIX mode bits are not meaningful on Windows/NTFS. Windows relies on\n    # filesystem ACLs; this test does not establish those ACLs are restrictive.\n    if os.name != "nt":\n        assert path.stat().st_mode & 0o777 == 0o600
+    # POSIX mode bits are not meaningful on Windows/NTFS.
+    # Windows ACL protection needs a separate platform-specific test.
+    if os.name != "nt":
+        assert path.stat().st_mode & 0o777 == 0o600
 
 
 def test_voice_path_helpers_block_traversal(tmp_path, monkeypatch):
