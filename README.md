@@ -1,3 +1,15 @@
+<p align="center">
+  <a href="https://brusnyak.github.io/bp/" target="_blank">
+    <img src="https://img.shields.io/badge/product%20site-brusnyak.github.io%2Fbp-blue?style=for-the-badge&logo=githubpages" alt="Product site" width="auto"/>
+  </a>
+  <a href="https://github.com/brusnyak/bp/actions" target="_blank">
+    <img src="https://img.shields.io/github/actions/workflow/status/brusnyak/bp/.github/workflows/ci.yml?label=CI&style=for-the-badge" alt="CI status" width="auto"/>
+  </a>
+  <a href="LICENSE" target="_blank">
+    <img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge" alt="MIT license" width="auto"/>
+  </a>
+</p>
+
 # BP — Live Speech Translation
 
 Local speech translation and live captions for calls and presentations. Microphone → VAD → speech recognition → translation → voice → speakers/captions, all running on your own machine after model installation. No cloud speech service.
@@ -9,7 +21,9 @@ Local speech translation and live captions for calls and presentations. Micropho
   <br/><b>Watch the demo on YouTube — English → Slovak, live captions, everything local.</b>
 </p>
 
-**[Try it locally](documentation/site/index.html)** — open the product site in a browser after cloning. **[Product site (SK/EN)](https://brusnyak.github.io/bp/)** — deployed version with measured speed, voice choices, language routes and room mode.
+<p align="center">
+  <b>Deployed product site (SK/EN):</b> <a href="https://brusnyak.github.io/bp/">brusnyak.github.io/bp</a> · measured speed, voice choices, language routes, room mode.
+</p>
 
 ## Features
 
@@ -26,12 +40,18 @@ Requires Git, Python 3.11 or 3.12, and ffmpeg. Setup downloads dependencies and 
 git clone https://github.com/brusnyak/bp.git
 cd bp
 python3.11 scripts/setup.py --profile mac --langs cs,sk,de
-make run
+make run PRESET=mac
 ```
 
-Use `mac` for Apple Silicon, `nvidia` for NVIDIA CUDA, or `cpu` for other machines; match the setup profile and `PRESET`. Add `--dev` for test dependencies. On Windows use a Python 3.11 executable for setup, then `.venv\Scripts\python.exe app.py`; the Makefile's preset loader requires a POSIX shell.
+| Profile | For |
+|---|---|
+| `mac` | Apple Silicon (Whisper default) |
+| `nvidia` | NVIDIA CUDA |
+| `cpu` | Other machines |
 
-Open **http://localhost:8000** in Chrome or Edge. Select the languages, choose **Microphone** and **Output**, use **Test microphone**, wear headphones and press **Start** (it prepares the route and begins capture). Use **Stop** to end capture and queued playback.
+Use `mac` / `nvidia` / `cpu` to match the setup profile and `PRESET`. Add `--dev` for test dependencies. On Windows use a Python 3.11 executable for setup, then `.venv\Scripts\python.exe app.py`; the Makefile's preset loader requires a POSIX shell.
+
+Open **http://localhost:8000** in Chrome or Edge. Select the languages, choose **Microphone** and **Output**, use **Test microphone**, wear headphones and press **Start**. Use **Stop** to end capture and queued playback.
 
 The standard Mac setup prepares Whisper. The faster Nemotron streaming result measured on the product site uses separately provisioned assets; cloning the repository does not install that configuration automatically. Generic voices are included by setup; personal models and recordings are not shipped. Slovak fine-tune and Nemotron remain manual installs until the model router installs them.
 
@@ -51,12 +71,6 @@ See [language evidence](documentation/LANGUAGES.md) and the [product site's rout
 ## Connect a call or room
 
 Select a virtual audio device under **Output**, then select its recording end as the meeting application's microphone. For listener phones, open **More → Audience broadcast (room mode) → Start room** and share the link or QR code. Room mode remains experimental — verify it with real devices before the event.
-
-## Streaming and near real time (verified)
-
-Recognition is the latency floor: Whisper (Mac default) re-decodes a padded 30 s window on every call and starts only after a clause completes — median lag 3.0–3.6 s on this Mac. Nemotron 3.5 ASR Streaming 0.6B (`BP_STT_ENGINE=nemotron`, `make run PRESET=mac-nemotron`) is a streaming recogniser (`open_stream`/`stream_feed`) that consumes audio as it arrives. Verified end-to-end on the real route (English → Slovak, `agree_short`, generated English): median lag **0.82 s**, p90 **1.34 s**, early start **100%**, drift **0.1 s/min**, recognition error **5.2%** — every criterion in `documentation/NEAR_REALTIME_GOAL.md` passes.
-
-The near-real-time goal: median lag ≤ 2.0 s behind speech, p90 ≤ 4.5 s, first-clause voice starting before ≥ half of 8+ word sentences end, ≤ 0.5 s lag growth per minute. Nemotron passes all four on current hardware; Whisper agreement passes quality + early start but misses lag by ~0.6 s on the Mac.
 
 The [integration guide](documentation/INTEGRATION.md) covers BlackHole, VB-Cable, PipeWire/PulseAudio, subtitles, HTTPS, the HTTP/WebSocket contract and an AV/IT deployment checklist.
 
