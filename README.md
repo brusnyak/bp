@@ -94,6 +94,16 @@ The [integration guide](documentation/INTEGRATION.md) covers BlackHole, VB-Cable
 
 Measured on `D_wait05` vs `A_baseline` in `documentation/evidence/2026-11-15/`, receipt-checked by `make check-docs`. Full numbers on the product site.
 
+## Evidence transparency
+
+The 5.2% recognition WER above is from **generated English replay** (`D_wait05` vs `A_baseline`), not real microphone speech. On the real route (Kaggle T4 server, owner English reading) transcript error is **23.0-23.8%** (`route_test.json`, `BENCHMARKS.md` #2b), about 4x the offline simulation. Real-mic Slovak input scores **17.7-45%** depending on engine (`LANGUAGES.md`, `STATUS.md` strategy lab). These are different data and clocks; they are not merged into one headline number.
+
+Room mode is built and unit-tested, with two Kaggle T4 real-model runs (speaker lag 5.64 s for 3 listeners, 7.31 s for 12 listeners; `evidence/2026-11-09/room_test_t4_log.json`, `evidence/2026-11-10/room_test_t4_v3.json`), but it has **not** been verified with real listeners in front of real devices (`STATUS.md` room-mode requirements #1 open).
+
+Nemotron 3.5 ASR 0.6B shows good EN→SK lag on real Mac speech (**1.10 s** median, `route_nemotron_en_sk_real_speech_mac.json`) but SK word error **0.86/0.75 with language drift** on the maintainer mic (`model_landscape_2026-10.md`); its latency is measured, its live-route SK accuracy is not validated.
+
+Full receipts: `documentation/evidence/2026-11-15/`, `documentation/evidence/2026-11-07/`, `documentation/evidence/2026-11-09/`, `documentation/evidence/2026-11-10/`. Consolidated audit: `AUDIT_EVIDENCE_ROUTES_2026-11-19.md`.
+
 [Documentation index](documentation/INDEX.md) · [API and Python SDK](documentation/sdk.md) · [Reading script](documentation/reading_script_multilingual.md) · [Benchmark methods](documentation/BENCHMARKS.md)
 
 ## Privacy and licences
