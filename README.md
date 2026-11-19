@@ -2,6 +2,12 @@
 
 Local speech translation and live captions for calls and presentations. Microphone → VAD → speech recognition → translation → voice → speakers/captions, all running on your own machine after model installation. No cloud speech service.
 
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=MvxVdjCIrx8" target="_blank" rel="noopener noreferrer">
+    <img src="https://img.youtube.com/vi/MvxVdjCIrx8/maxresdefault.jpg" alt="Live Speech Translation demo" width="100%" max-width="860" style="border-radius:12px;border:1px solid #ddd;">
+  </a>
+  <br/><b>Click the image to watch the demo on YouTube — English → Slovak, live captions, everything local.</b>
+</p>
 **[Try it locally](documentation/site/index.html)** — open the product site in a browser after cloning. **[Watch the demo](https://www.youtube.com/watch?v=MvxVdjCIrx8)** — English → Slovak, live captions, everything local.
 
 ## Features
@@ -19,7 +25,7 @@ Requires Git, Python 3.11 or 3.12, and ffmpeg. Setup downloads dependencies and 
 git clone https://github.com/brusnyak/bp.git
 cd bp
 python3.11 scripts/setup.py --profile mac --langs cs,sk,de
-make run PRESET=mac
+make run
 ```
 
 Use `mac` for Apple Silicon, `nvidia` for NVIDIA CUDA, or `cpu` for other machines; match the setup profile and `PRESET`. Add `--dev` for test dependencies. On Windows use a Python 3.11 executable for setup, then `.venv\Scripts\python.exe app.py`; the Makefile's preset loader requires a POSIX shell.
